@@ -49,7 +49,15 @@ android {
         compose = true
     }
 }
-
+apollo {
+    service("service") {
+        packageName.set("com.asue24.gitlab")
+        introspection {
+            endpointUrl.set("https://gitlab.com/api/graphql")
+            schemaFile.set(file("app/src/main/graphql/com/pranav/schema.graphqls")) //replace with the schema file location
+        }
+    }
+}
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -70,4 +78,6 @@ dependencies {
     implementation (libs.retrofit)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 }
