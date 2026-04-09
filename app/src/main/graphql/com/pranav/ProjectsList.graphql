@@ -1,0 +1,23 @@
+query GetMyProjects {
+    currentUser {
+        username
+        projectMemberships(first: 20) {
+            nodes {
+                id
+                project {
+                    id
+                    name
+                    fullPath
+                    description
+                    visibility
+                    starCount
+                    lastActivityAt
+                }
+            }
+            pageInfo {
+                hasNextPage
+                endCursor
+            }
+        }
+    }
+}
