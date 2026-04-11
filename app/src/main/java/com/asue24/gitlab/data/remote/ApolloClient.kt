@@ -6,7 +6,7 @@ import com.apollographql.apollo.api.http.HttpResponse
 import com.apollographql.apollo.network.http.HttpInterceptor
 import com.apollographql.apollo.network.http.HttpInterceptorChain
 import com.apollographql.apollo.network.okHttpClient
-import com.asue24.gitlab.data.authentication.AccessToken.accessToken
+import com.asue24.gitlab.data.authentication.OAuthConfig.accessToken
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
