@@ -33,8 +33,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -75,9 +74,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.apollo.runtime)
-    implementation (libs.retrofit)
+    implementation(libs.retrofit)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+    implementation(libs.appauth)
 }
