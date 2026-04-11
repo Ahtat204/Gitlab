@@ -20,13 +20,12 @@
             android:label="@string/title_activity_main"
             android:theme="@style/Theme.Gitlab">
             <intent-filter>
-                <data android:scheme="com.asue24.gitlab"/>
-                <data android:host="oauth2redirect"/>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" /><!-- This tells Android, "I want to handle a URL request."-->
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" /><!-- This is critical. It allows the browser (where the user logs into GitLab) to safely "hand off" the result back to your app. Without this, the browser would just display the callback URL as a blank page, and your app would never "hear" the success response.."-->
-                <data android:scheme="com.asue24.gitlab" android:host="oauth2redirect" /><!-- This defines the unique signature of your callback."-->
+                <data android:scheme="com.asue24.gitlab"/>
+                <data android:host="oauth2redirect"/><!-- This defines the unique signature of your callback."-->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
