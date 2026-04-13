@@ -17,7 +17,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
+        manifestPlaceholders .putIfAbsent("appAuthRedirectScheme", "com.asue24.gitlab   ")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
