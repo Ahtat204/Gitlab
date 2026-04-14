@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,12 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.asue24.gitlab.constants.AuthConfig
+import com.asue24.gitlab.constants.AuthStorage
 import com.asue24.gitlab.constants.GitlabRefreshToken
-import com.asue24.gitlab.constants.SafeStore.datastore
 import com.asue24.gitlab.constants.Tokens
+import com.asue24.gitlab.utility.buildResponse
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthState
-import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
@@ -32,23 +31,32 @@ import net.openid.appauth.ResponseTypeValues
 
 class AuthenticationActivity : ComponentActivity() {
     private var authState: AuthState? = null
-    private var authRequest: AuthorizationRequest?=null
-    private var serviceConfig: AuthorizationServiceConfiguration?=null
+    private var serviceConfig: AuthorizationServiceConfiguration?= AuthorizationServiceConfiguration(
+        Uri.parse(AuthConfig.AUTH_URI),
+        Uri.parse(AuthConfig.TOKEN_URI)
+    )
+    private var authRequest: AuthorizationRequest?= AuthorizationRequest.Builder(
+        serviceConfig!!,
+        AuthConfig.CLIENT_ID,
+        ResponseTypeValues.CODE,
+        Uri.parse(AuthConfig.CALLBACK_URL)
+    ).setScope(AuthConfig.SCOPE).build()
     private var authenticationService: AuthorizationService? = null
     private val launcher: ActivityResultLauncher<Intent> = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result -> }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         setContent {
-
             Button({
-                clickHandler()
-            } ,modifier = Modifier.size(200.dp)) { Text(text = "Login") }
+                val authIntent = getService().getAuthorizationRequestIntent(authRequest!!) ?: throw  NullPointerException("Intent is null")
+                launcher.launch(authIntent)
+                authState=AuthState(serviceConfig!!)
+            }
+                ,modifier = Modifier.size(200.dp)) { Text(text = "Login") }
         }
     }
 
-    private  fun exchangeCodeForToken(
+     fun exchangeCodeForToken(
 
         service: AuthorizationService,
         response: AuthorizationResponse,
@@ -66,7 +74,7 @@ class AuthenticationActivity : ComponentActivity() {
 
                 Log.d("result", "AuthActivity :Refresh Token: $refreshToken \t Access Token: $accessToken")
               lifecycleScope.launch {
-                  datastore.updateData {
+                  AuthStorage.getInstance(this@AuthenticationActivity).updateData {
                       GitlabRefreshToken(refreshToken)
                   }
               }
@@ -81,40 +89,21 @@ class AuthenticationActivity : ComponentActivity() {
             }
         }
     }
-
-    private fun clickHandler() {
-             serviceConfig = AuthorizationServiceConfiguration(
-                Uri.parse(AuthConfig.AUTH_URI),
-                Uri.parse(AuthConfig.TOKEN_URI)
-            )
-            authRequest = AuthorizationRequest.Builder(
-                serviceConfig!!,
-                AuthConfig.CLIENT_ID,
-                ResponseTypeValues.CODE,
-                Uri.parse(AuthConfig.CALLBACK_URL)
-            ).setScope(AuthConfig.SCOPE).build()
-
-            val authIntent = getService().getAuthorizationRequestIntent(authRequest!!) ?: throw  NullPointerException("Intent is null")
-        launcher.launch(authIntent)
-        authState=AuthState(serviceConfig!!)
-    }
     override fun onDestroy() {
         authenticationService?.dispose()
         super.onDestroy()
     }
     override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
-        val uri=intent?.data
-        if(uri!=null){
-            val response = AuthorizationResponse.Builder(authRequest!!).fromUri(uri).build()
-               val ex = AuthorizationException.fromIntent(intent)
-        if (ex != null) {
-            Log.e("OAUTH_ERROR", "Code: ${ex.code}, Type: ${ex.type}, Message: ${ex.errorDescription}")
-            Toast.makeText(this, "Error: ${ex.errorDescription}", Toast.LENGTH_SHORT).show()
-        }
-
+    val response=buildResponse(
+        intent, authRequest,
+        this
+    )
+    if (response == null){
+            Log.e("error ","OAUTH_ERROR" )
+            return }
         exchangeCodeForToken(getService(), response,authState!!)
-    }
+
 }
     private fun getService(): AuthorizationService {
         if (authenticationService == null) {
@@ -123,5 +112,5 @@ class AuthenticationActivity : ComponentActivity() {
         return authenticationService!!
     }
 
-}
 
+}
