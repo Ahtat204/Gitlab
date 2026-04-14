@@ -26,7 +26,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" /> <!-- This is critical. It allows the browser (where the user logs into GitLab) to safely "hand off" the result back to your app. Without this, the browser would just display the callback URL as a blank page, and your app would never "hear" the success response.." -->
                 <data android:scheme="com.asue24.gitlab" />
-
                 <data android:host="oauth2redirect" /> <!-- This defines the unique signature of your callback." -->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

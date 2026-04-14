@@ -4,4 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 
 @Composable
-public fun Home(navController: NavHostController){}
+fun LoginScreen(navController: NavHostController) {
+
+}
