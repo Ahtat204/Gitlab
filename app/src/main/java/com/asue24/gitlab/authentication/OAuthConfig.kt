@@ -1,4 +1,4 @@
-package com.asue24.gitlab.data.authentication
+package com.asue24.gitlab.authentication
 
 import java.lang.System.*
 

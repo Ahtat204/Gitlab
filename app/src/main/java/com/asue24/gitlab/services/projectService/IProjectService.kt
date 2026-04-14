@@ -1,4 +1,4 @@
-package com.asue24.gitlab.data.services.projectService
+package com.asue24.gitlab.services.projectService
 
 import com.asue24.gitlab.GetMyProjectsQuery
 
