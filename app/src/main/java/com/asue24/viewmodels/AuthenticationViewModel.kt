@@ -1,12 +1,14 @@
-package com.asue24.gitlab
+package com.asue24.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asue24.gitlab.AuthenticationRepository
+import com.asue24.gitlab.navigation.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class MainViewModel(private val authRepo: AuthenticationRepository) : ViewModel() {
+class AuthenticationViewModel(private val authRepo: AuthenticationRepository) : ViewModel() {
 
     // This is the state your NavHost will observe
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)

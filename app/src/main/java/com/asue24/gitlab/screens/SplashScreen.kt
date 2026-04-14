@@ -1,6 +1,5 @@
-package com.asue24.gitlab
+package com.asue24.gitlab.screens
 
-import android.content.Context
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -13,9 +12,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.asue24.gitlab.constants.AuthStorage
-import com.asue24.gitlab.constants.Tokens
-import com.asue24.gitlab.utility.refreshAccessToken
+import com.asue24.gitlab.R
 import kotlinx.coroutines.delay
 
 @Composable
@@ -26,7 +23,11 @@ fun SplashScreen() {
         animationSpec = tween(durationMillis = 1000)
     )
 
+    LaunchedEffect(true) {
+        startAnimation = true
+        delay(1500)
 
+    }
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -41,7 +42,7 @@ fun SplashScreen() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "My App", color = Color.White,
+                text = "My App", color = Color.Black,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.alpha(alphaAnim.value)
             )
