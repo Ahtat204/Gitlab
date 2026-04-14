@@ -16,7 +16,7 @@ class AuthenticationViewModel(private val authRepo: AuthenticationRepository) : 
 
     init {
         viewModelScope.launch {
-            val hasToken = authRepo.hasValidToken()
+            val hasToken = authRepo.hasValidToken
 
             if (hasToken) {
                 _uiState.value = UiState.Authenticated

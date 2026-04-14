@@ -12,5 +12,5 @@ import androidx.navigation.NavHostController
 @Composable
 public fun Home(navController: NavHostController) {
     Log.d("HomeScreen", "home screen is opened")
-    Button(onClick = {}, modifier = Modifier.size(200.dp)) { Text(text = "Login") }
+    Button(onClick = {}, modifier = Modifier.size(200.dp)) { Text(text = "HomeScreen") }
 }
