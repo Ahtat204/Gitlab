@@ -13,45 +13,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
-import com.apollographql.apollo.ApolloClient
 import com.asue24.gitlab.data.remote.ApolloService
 import com.asue24.gitlab.ui.theme.GitlabTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private val apolloClient=ApolloService.setUpApolloClient()
-    private var Projects:GetMyProjectsQuery.ProjectMemberships?=null
+    private val apolloClient = ApolloService.setUpApolloClient()
+    private var Projects: GetMyProjectsQuery.ProjectMemberships? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        lifecycleScope.launch { Projects=apolloClient.query(GetMyProjectsQuery()).execute().data?.currentUser?.projectMemberships
+        lifecycleScope.launch {
+            Projects = apolloClient.query(GetMyProjectsQuery())
+                .execute().data?.currentUser?.projectMemberships
         }
 
-        Log.e("","$Projects.")
+        Log.e("", "$Projects.")
         setContent {
             GitlabTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android", modifier = Modifier.padding(innerPadding)
-                    )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!", modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    GitlabTheme {
-        Greeting("Android")
     }
 }
