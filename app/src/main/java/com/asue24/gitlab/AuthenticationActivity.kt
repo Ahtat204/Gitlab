@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -14,6 +15,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import com.asue24.gitlab.constants.AuthConfig
+import com.asue24.gitlab.constants.GitlabRefreshToken
+import com.asue24.gitlab.constants.SafeStore.datastore
+import com.asue24.gitlab.constants.Tokens
+import kotlinx.coroutines.launch
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationRequest
@@ -26,13 +33,9 @@ import net.openid.appauth.ResponseTypeValues
 class AuthenticationActivity : ComponentActivity() {
     private var authState: AuthState? = null
     private var authRequest: AuthorizationRequest?=null
-    private val authenticationService by lazy {
-        AuthorizationService(this)
-    }
-    private val launcher: ActivityResultLauncher<Intent> = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-    val data = result.data ?: return@registerForActivityResult
-
-}
+    private var serviceConfig: AuthorizationServiceConfiguration?=null
+    private var authenticationService: AuthorizationService? = null
+    private val launcher: ActivityResultLauncher<Intent> = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result -> }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -45,21 +48,33 @@ class AuthenticationActivity : ComponentActivity() {
         }
     }
 
-    private fun exchangeCodeForToken(
+    private  fun exchangeCodeForToken(
 
         service: AuthorizationService,
         response: AuthorizationResponse,
         authState: AuthState
     ) {
         authState.update(response,null)
-        val additionalParams = mapOf("client_secret" to "")
-        val tokenRequest = response.createTokenExchangeRequest(additionalParams)
+        val tokenRequest = response.createTokenExchangeRequest()
         service.performTokenRequest(tokenRequest) { tokenResponse, ex ->
             if (tokenResponse != null) {
                 authState.update(tokenResponse, ex)
                 val accessToken = tokenResponse.accessToken
+                Tokens.accessToken=accessToken
+                val expiresAt = tokenResponse.accessTokenExpirationTime
                 val refreshToken = tokenResponse.refreshToken
-                Log.d("Access Token: $accessToken", "Refresh Token: $refreshToken")
+
+                Log.d("result", "AuthActivity :Refresh Token: $refreshToken \t Access Token: $accessToken")
+              lifecycleScope.launch {
+                  datastore.updateData {
+                      GitlabRefreshToken(refreshToken)
+                  }
+              }
+                val intent = Intent(this, MainActivity::class.java)
+                // Clear the back stack so the user can't "back" into the login screen
+                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                 startActivity(intent)
+                onDestroy()
             }
             else{
                 Log.d("Error is Null","${ex?.errorDescription} and reason is ${ex?.error} and message is ${ex?.code}")
@@ -68,51 +83,45 @@ class AuthenticationActivity : ComponentActivity() {
     }
 
     private fun clickHandler() {
-             val serviceConfig = AuthorizationServiceConfiguration(
-                Uri.parse("https://gitlab.com/oauth/authorize"),
-                Uri.parse("https://gitlab.com/oauth/token")
+             serviceConfig = AuthorizationServiceConfiguration(
+                Uri.parse(AuthConfig.AUTH_URI),
+                Uri.parse(AuthConfig.TOKEN_URI)
             )
-        Log.d("xhszbhs","first lineeing")
             authRequest = AuthorizationRequest.Builder(
-                serviceConfig,
-                "",
+                serviceConfig!!,
+                AuthConfig.CLIENT_ID,
                 ResponseTypeValues.CODE,
-                Uri.parse("com.asue24.gitlab://oauth2redirect")
-            )
-                .setScope("read_api read_user read_repository")
-                .build()
-        Log.d("xhzzerfdszbhs","first lineeing")
-            val authenticationService = AuthorizationService(this)
-        Log.d("xhzzerfdszbhs","first lineeing")
-            val authIntent = authenticationService.getAuthorizationRequestIntent(authRequest!!)
-        Log.d("xhzzerfdszbhs","first lineeing")
-        Log.d("xhzzerfdszbhs","first lineeing")
+                Uri.parse(AuthConfig.CALLBACK_URL)
+            ).setScope(AuthConfig.SCOPE).build()
+
+            val authIntent = getService().getAuthorizationRequestIntent(authRequest!!) ?: throw  NullPointerException("Intent is null")
         launcher.launch(authIntent)
-        authState=AuthState(serviceConfig)
+        authState=AuthState(serviceConfig!!)
     }
     override fun onDestroy() {
+        authenticationService?.dispose()
         super.onDestroy()
-        authenticationService.dispose()
-
     }
     override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
-    Log.d("DEBUG_INTENT", "Received Intent: ${intent.data}")
         val uri=intent?.data
         if(uri!=null){
             val response = AuthorizationResponse.Builder(authRequest!!).fromUri(uri).build()
                val ex = AuthorizationException.fromIntent(intent)
-                Log.d("xhzzerfdszbhs","first lineeing")
         if (ex != null) {
             Log.e("OAUTH_ERROR", "Code: ${ex.code}, Type: ${ex.type}, Message: ${ex.errorDescription}")
+            Toast.makeText(this, "Error: ${ex.errorDescription}", Toast.LENGTH_SHORT).show()
         }
-        // SUCCESS: Exchange the code for a token
-        exchangeCodeForToken(authenticationService, response,authState!!)
-        Log.d("xhzzerfdszbhs","first lineeing $response")
+
+        exchangeCodeForToken(getService(), response,authState!!)
+    }
+}
+    private fun getService(): AuthorizationService {
+        if (authenticationService == null) {
+            authenticationService  = AuthorizationService(this)
+        }
+        return authenticationService!!
     }
 
-
-
-}
 }
 

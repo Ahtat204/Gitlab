@@ -75,4 +75,6 @@ dependencies {
     implementation(libs.appauth)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
+    implementation (libs.androidx.core.splashscreen)
+    implementation (libs.androidx.navigation.compose)
 }

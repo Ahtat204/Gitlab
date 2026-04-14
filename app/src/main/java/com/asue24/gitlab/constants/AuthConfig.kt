@@ -8,7 +8,7 @@ object AuthConfig {
     const val END_SESSION_URI = "https://gitlab.com/logout"
     const val RESPONSE_TYPE = ResponseTypeValues.CODE
     const val SCOPE = "read_api read_user read_repository"
-    const val CLIENT_ID = ""
+    val CLIENT_ID = ""
     const val CLIENT_SECRET = ""
     const val CALLBACK_URL = "com.asue24.gitlab://oauth2redirect"
     const val LOGOUT_CALLBACK_URL = ""
