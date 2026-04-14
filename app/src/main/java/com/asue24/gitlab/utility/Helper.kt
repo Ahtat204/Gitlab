@@ -19,7 +19,7 @@ import net.openid.appauth.AuthorizationService
 import net.openid.appauth.GrantTypeValues
 import net.openid.appauth.TokenRequest
 
-public fun buildResponse(intent:Intent,authRequest: AuthorizationRequest?,context: Context):AuthorizationResponse?{
+ fun buildResponse(intent:Intent,authRequest: AuthorizationRequest?,context: Context):AuthorizationResponse?{
     var response:AuthorizationResponse?=null
     val uri=intent?.data
     if(uri!=null){
@@ -43,7 +43,7 @@ fun refreshAccessToken(authState: AuthState?,
     service: AuthorizationService,
     refreshToken: String,
                                context: Context// Retrieved from your DataStore // Returns (AccessToken, RefreshToken)
-):Unit {
+){
     // 1. Build the request specifically for a refresh grant
     val request = TokenRequest.Builder(
         authState?.authorizationServiceConfiguration!!,

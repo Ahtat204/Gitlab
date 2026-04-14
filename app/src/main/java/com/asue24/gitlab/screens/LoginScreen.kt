@@ -10,8 +10,8 @@ import androidx.navigation.NavHostController
 import net.openid.appauth.AuthState
 
 @Composable
-fun LoginScreen(navController: NavHostController,Login:()->Unit) {
+fun LoginScreen(Login:()->Unit) {
     Button(onClick = Login
-        ,modifier = Modifier.size(200.dp)) { Text(text = "Login") }
+        ,modifier = Modifier.size(200.dp)) { Text(text = "Signup") }
 
 }

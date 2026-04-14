@@ -1,4 +1,4 @@
-package com.asue24.viewmodels
+package com.asue24.gitlab.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
