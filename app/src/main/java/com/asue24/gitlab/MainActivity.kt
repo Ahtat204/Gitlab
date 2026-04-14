@@ -1,64 +1,123 @@
 package com.asue24.gitlab
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Scaffold
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
+import com.asue24.gitlab.constants.AuthConfig
 import com.asue24.gitlab.constants.AuthStorage
+import com.asue24.gitlab.constants.GitlabRefreshToken
 import com.asue24.gitlab.constants.Tokens
-import com.asue24.gitlab.data.remote.ApolloService
-import com.asue24.gitlab.ui.theme.GitlabTheme
-import com.asue24.gitlab.utility.refreshAccessToken
-import kotlinx.coroutines.delay
+import com.asue24.gitlab.navigation.AppNavGraph
+import com.asue24.gitlab.utility.buildResponse
+import com.asue24.viewmodels.AuthenticationViewModel
 import kotlinx.coroutines.launch
+import net.openid.appauth.AuthState
+import net.openid.appauth.AuthorizationRequest
+import net.openid.appauth.AuthorizationResponse
+import net.openid.appauth.AuthorizationService
+import net.openid.appauth.AuthorizationServiceConfiguration
+import net.openid.appauth.ResponseTypeValues
 
 class MainActivity : ComponentActivity() {
-    private val AuthRepository :AuthenticationRepository by lazy{(application as GitlabApp).authRepo}
+    private var authState: AuthState? = null
+    private var serviceConfig: AuthorizationServiceConfiguration?= AuthorizationServiceConfiguration(
+        Uri.parse(AuthConfig.AUTH_URI),
+        Uri.parse(AuthConfig.TOKEN_URI)
+    )
+    private var authRequest: AuthorizationRequest?= AuthorizationRequest.Builder(
+        serviceConfig!!,
+        AuthConfig.CLIENT_ID,
+        ResponseTypeValues.CODE,
+        Uri.parse(AuthConfig.CALLBACK_URL)
+    ).setScope(AuthConfig.SCOPE).build()
+    private var authenticationService: AuthorizationService? = null
+    private val launcher: ActivityResultLauncher<Intent> = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result -> }
+    private lateinit var authenticationViewModel: AuthenticationViewModel
+    private val AuthRepository: AuthenticationRepository by lazy { (application as GitlabApp).authRepo }
     private var keepSplashOnScreen = true
-    private val apolloClient = Tokens.accessToken?.let { ApolloService.setUpApolloClient(it) }
-    private var Projects: GetMyProjectsQuery.ProjectMemberships? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        splashScreen.setKeepOnScreenCondition { keepSplashOnScreen }
         enableEdgeToEdge()
-        lifecycleScope.launch {
-            if(Tokens.accessToken==null){
-                refreshAccessToken(authState = AuthRepository.authState.value, service = AuthRepository.authService, refreshToken = AuthStorage.getInstance(this@MainActivity).data.toString(),context = this@MainActivity)
-            }
-            delay(2000) // Simulate loading or animation
-            keepSplashOnScreen = false
-            if(AuthStorage.getInstance(this@MainActivity).data.toString().isEmpty()){}
-        }
-        if(AuthStorage.getInstance(this@MainActivity).data.toString().isEmpty()){
-              val intent = Intent(this, AuthenticationActivity::class.java)
-                // Clear the back stack so the user can't "back" into the login screen
-                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                 startActivity(intent)
-        }
-
-        lifecycleScope.launch {
-            Projects = apolloClient?.query(GetMyProjectsQuery())
-                ?.execute()?.data?.currentUser?.projectMemberships
-        }
-
-
-        Log.e("", "$Projects.")
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { keepSplashOnScreen }
+        authenticationViewModel = AuthenticationViewModel(AuthRepository)
         setContent {
             val navController = rememberNavController()
-            AppNavGraph(navController,this,AuthRepository)
-            GitlabTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                }
+            AppNavGraph(navController, authenticationViewModel,::LoginCLick)
+            Button({
+            }
+                ,modifier = Modifier.size(200.dp)) { Text(text = "Login") }
+        }
+    }
+    private fun getService(): AuthorizationService {
+        if (authenticationService == null) {
+            authenticationService  = AuthorizationService(this)
+        }
+        return authenticationService!!
+    }
+
+     fun exchangeCodeForToken(
+         service: AuthorizationService,
+         response: AuthorizationResponse,
+         authState: AuthState
+    ) {
+        authState.update(response,null)
+        val tokenRequest = response.createTokenExchangeRequest()
+        service.performTokenRequest(tokenRequest) { tokenResponse, ex ->
+            if (tokenResponse != null) {
+                authState.update(tokenResponse, ex)
+                val accessToken = tokenResponse.accessToken
+                Tokens.accessToken=accessToken
+                val expiresAt = tokenResponse.accessTokenExpirationTime
+                val refreshToken = tokenResponse.refreshToken
+
+                Log.d("result", "AuthActivity :Refresh Token: $refreshToken \t Access Token: $accessToken")
+              lifecycleScope.launch {
+                  AuthStorage.getInstance(this@MainActivity).updateData {
+                      GitlabRefreshToken(refreshToken)
+                  }
+              }
+            }
+            else{
+                Log.d("Error is Null","${ex?.errorDescription} and reason is ${ex?.error} and message is ${ex?.code}")
             }
         }
+    }
+    override fun onDestroy() {
+        authenticationService?.dispose()
+        super.onDestroy()
+    }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        val response= buildResponse(
+            intent, authRequest,
+            this
+        )
+        if (response == null){
+            Log.e("error ","OAUTH_ERROR" )
+            return }
+        exchangeCodeForToken(getService(), response,authState!!)
+
+    }
+
+
+    private fun LoginCLick( ){
+        val authIntent = getService().getAuthorizationRequestIntent(authRequest!!) ?: throw  NullPointerException("Intent is null")
+        launcher.launch(authIntent)
+        authState=AuthState(serviceConfig!!)
     }
 }
