@@ -16,9 +16,10 @@
         tools:targetApi="31">
         <activity
             android:name=".AuthenticationActivity"
-            android:exported="true"
             android:label="@string/title_activity_authentication"
-            android:theme="@style/Theme.Gitlab">
+            android:theme="@style/Theme.Gitlab"
+            android:exported="true"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" /> <!-- This tells Android, "I want to handle a URL request." -->
