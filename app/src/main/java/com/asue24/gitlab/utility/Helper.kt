@@ -43,7 +43,7 @@ fun refreshAccessToken(authState: AuthState?,
     service: AuthorizationService,
     refreshToken: String,
                                context: Context// Retrieved from your DataStore // Returns (AccessToken, RefreshToken)
-) {
+):Unit {
     // 1. Build the request specifically for a refresh grant
     val request = TokenRequest.Builder(
         authState?.authorizationServiceConfiguration!!,

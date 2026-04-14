@@ -1,5 +1,6 @@
 package com.asue24.gitlab
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -35,8 +36,14 @@ class MainActivity : ComponentActivity() {
             }
             delay(2000) // Simulate loading or animation
             keepSplashOnScreen = false
+            if(AuthStorage.getInstance(this@MainActivity).data.toString().isEmpty()){}
         }
-
+        if(AuthStorage.getInstance(this@MainActivity).data.toString().isEmpty()){
+              val intent = Intent(this, AuthenticationActivity::class.java)
+                // Clear the back stack so the user can't "back" into the login screen
+                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                 startActivity(intent)
+        }
 
         lifecycleScope.launch {
             Projects = apolloClient?.query(GetMyProjectsQuery())
@@ -47,7 +54,7 @@ class MainActivity : ComponentActivity() {
         Log.e("", "$Projects.")
         setContent {
             val navController = rememberNavController()
-            AppNavGraph(navController)
+            AppNavGraph(navController,this,AuthRepository)
             GitlabTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 }
