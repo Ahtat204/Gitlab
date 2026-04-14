@@ -1,4 +1,4 @@
-package com.asue24.gitlab
+package com.asue24.gitlab.navigation
 
 import android.content.Context
 import androidx.compose.material3.Text
@@ -11,15 +11,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.asue24.gitlab.AuthenticationRepository
+import com.asue24.viewmodels.AuthenticationViewModel
 import com.asue24.gitlab.constants.AuthStorage
-import com.asue24.gitlab.navigation.BottomBarScreen
 import com.asue24.gitlab.screens.DashBoard
 import com.asue24.gitlab.screens.Home
 import com.asue24.gitlab.screens.LoginScreen
-import kotlinx.coroutines.delay
 
 @Composable
-fun AppNavGraph(navController: NavHostController, viewModel: MainViewModel) {
+fun AppNavGraph(navController: NavHostController, viewModel: AuthenticationViewModel,Login:()->Unit) {
     val uiState by viewModel.uiState.collectAsState()
 
     NavHost(navController, startDestination = "splash") {
@@ -38,8 +38,8 @@ fun AppNavGraph(navController: NavHostController, viewModel: MainViewModel) {
                 }
             }
         }
-        composable("home") { Home(navController) }
-        composable("login") { LoginScreen(navController) }
+        composable(route = BottomBarScreen.Home.route) { Home(navController) }
+        composable(route = BottomBarScreen.Login.route) { LoginScreen(navController,Login) }
     }
 }
 
@@ -56,7 +56,7 @@ fun BottomNavigationgraph(
             Home(navController)
         }
         composable(route = BottomBarScreen.Login.route) {
-            LoginScreen(navController)
+       //     LoginScreen(navController)
         }
         composable(route = BottomBarScreen.DashBoard.route) {
             DashBoard()
