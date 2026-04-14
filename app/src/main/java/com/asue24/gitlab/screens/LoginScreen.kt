@@ -12,6 +12,6 @@ import net.openid.appauth.AuthState
 @Composable
 fun LoginScreen(Login:()->Unit) {
     Button(onClick = Login
-        ,modifier = Modifier.size(200.dp)) { Text(text = "Signup") }
+        ,modifier = Modifier.size(200.dp)) { Text(text = "LoginScreen") }
 
 }

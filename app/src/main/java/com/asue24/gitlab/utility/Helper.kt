@@ -1,9 +1,14 @@
 package com.asue24.gitlab.utility
 
+
+
 import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import com.asue24.gitlab.MainActivity
+import com.asue24.gitlab.constants.AuthConfig
 import com.asue24.gitlab.constants.AuthStorage
 import com.asue24.gitlab.constants.GitlabRefreshToken
 import com.asue24.gitlab.constants.Tokens
@@ -44,10 +49,12 @@ fun refreshAccessToken(authState: AuthState?,
     refreshToken: String,
                                context: Context// Retrieved from your DataStore // Returns (AccessToken, RefreshToken)
 ){
-    // 1. Build the request specifically for a refresh grant
+if(authState==null) {
+    return
+}
     val request = TokenRequest.Builder(
-        authState?.authorizationServiceConfiguration!!,
-        "YOUR_CLIENT_ID" // Same Client ID as before
+        authState.authorizationServiceConfiguration!!,
+        AuthConfig.CLIENT_ID // Same Client ID as before
     )
     .setGrantType(GrantTypeValues.REFRESH_TOKEN)
     .setRefreshToken(refreshToken)
@@ -71,5 +78,33 @@ fun refreshAccessToken(authState: AuthState?,
         } else {
             // FAILURE: Likely token revoked or expired
             Log.e("OAUTH_REFRESH", "Refresh failed: ${ex?.errorDescription}") }
+    }
+}
+  fun exchangeCodeForToken(
+    service: AuthorizationService,
+    response: AuthorizationResponse,
+    authState: AuthState,
+    activity: MainActivity
+) {
+    authState.update(response,null)
+    val tokenRequest = response.createTokenExchangeRequest()
+    service.performTokenRequest(tokenRequest) { tokenResponse, ex ->
+        if (tokenResponse != null) {
+            authState.update(tokenResponse, ex)
+            val accessToken = tokenResponse.accessToken
+            Tokens.accessToken=accessToken
+            val expiresAt = tokenResponse.accessTokenExpirationTime
+            val refreshToken = tokenResponse.refreshToken
+
+            Log.d("result", "AuthActivity :Refresh Token: $refreshToken \t Access Token: $accessToken")
+            activity.lifecycleScope.launch {
+                AuthStorage.getInstance(activity).updateData {
+                    GitlabRefreshToken(refreshToken)
+                }
+            }
+        }
+        else{
+            Log.d("Error is Null","${ex?.errorDescription} and reason is ${ex?.error} and message is ${ex?.code}")
+        }
     }
 }
