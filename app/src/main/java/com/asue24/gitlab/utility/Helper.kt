@@ -46,24 +46,19 @@ import net.openid.appauth.TokenRequest
 
 fun refreshAccessToken(authState: AuthState?,
     service: AuthorizationService,
-    refreshToken: String,
-                               context: Context// Retrieved from your DataStore // Returns (AccessToken, RefreshToken)
+    refreshToken: String, context: Context
 ){
-if(authState==null) {
-    return
-}
+    if(authState==null) throw NullPointerException("AuthState is null")
+if(authState.authorizationServiceConfiguration==null) throw NullPointerException("authorizationServiceConfiguration is null")
     val request = TokenRequest.Builder(
         authState.authorizationServiceConfiguration!!,
-        AuthConfig.CLIENT_ID // Same Client ID as before
+        AuthConfig.CLIENT_ID
     )
     .setGrantType(GrantTypeValues.REFRESH_TOKEN)
     .setRefreshToken(refreshToken)
     .build()
-
-    // 2. Perform the request
     service.performTokenRequest(request) { tokenResponse, ex ->
         if (tokenResponse != null) {
-            // SUCCESS: You have a new Access Token and potentially a new Refresh Token
            Tokens.accessToken = tokenResponse.accessToken
             val newRefreshToken = tokenResponse.refreshToken
             val scope= CoroutineScope(Dispatchers.IO)
@@ -74,37 +69,7 @@ if(authState==null) {
                     }
                 }
             }
-           // GitLab sometimes rotates refresh tokens
         } else {
-            // FAILURE: Likely token revoked or expired
             Log.e("OAUTH_REFRESH", "Refresh failed: ${ex?.errorDescription}") }
-    }
-}
-  fun exchangeCodeForToken(
-    service: AuthorizationService,
-    response: AuthorizationResponse,
-    authState: AuthState,
-    activity: MainActivity
-) {
-    authState.update(response,null)
-    val tokenRequest = response.createTokenExchangeRequest()
-    service.performTokenRequest(tokenRequest) { tokenResponse, ex ->
-        if (tokenResponse != null) {
-            authState.update(tokenResponse, ex)
-            val accessToken = tokenResponse.accessToken
-            Tokens.accessToken=accessToken
-            val expiresAt = tokenResponse.accessTokenExpirationTime
-            val refreshToken = tokenResponse.refreshToken
-
-            Log.d("result", "AuthActivity :Refresh Token: $refreshToken \t Access Token: $accessToken")
-            activity.lifecycleScope.launch {
-                AuthStorage.getInstance(activity).updateData {
-                    GitlabRefreshToken(refreshToken)
-                }
-            }
-        }
-        else{
-            Log.d("Error is Null","${ex?.errorDescription} and reason is ${ex?.error} and message is ${ex?.code}")
-        }
     }
 }
