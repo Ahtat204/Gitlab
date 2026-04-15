@@ -1,14 +1,10 @@
 package com.asue24.gitlab.navigation
 
 import android.content.Context
-import android.content.ContextWrapper
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,6 +16,7 @@ import com.asue24.gitlab.screens.Home
 import com.asue24.gitlab.screens.LoginScreen
 import com.asue24.gitlab.utility.refreshAccessToken
 import com.asue24.gitlab.viewmodels.AuthenticationViewModel
+import kotlinx.coroutines.flow.first
 import net.openid.appauth.AuthState
 
 
@@ -34,10 +31,10 @@ fun BottomNavigationgraph(
 
     NavHost(navController = navController, startDestination = startDes) {
         composable(route = BottomBarScreen.Home.route) {
-            Home(navController)
+         //   Home(navController)
         }
         composable(route = BottomBarScreen.Login.route) {
-       //     LoginScreen(navController)
+        //LoginScreen(navController)
         }
         composable(route = BottomBarScreen.DashBoard.route) {
             DashBoard()
@@ -45,21 +42,15 @@ fun BottomNavigationgraph(
     }
 }
 @Composable
-fun AppNavGraph(navController: NavHostController, viewModel: AuthenticationViewModel,activity: MainActivity) {
+fun AppNavGraph(navController: NavHostController, viewModel: AuthenticationViewModel,activity: MainActivity,AuthRepository: AuthenticationRepository) {
     val uiState by viewModel.uiState.collectAsState()
 
     NavHost(navController, startDestination = "splash") {
         composable("splash") {
-            // Observe the state and navigate accordingly
             LaunchedEffect(uiState) {
                 when (uiState) {
                     is UiState.Authenticated -> {
-                        refreshAccessToken(
-                            authState = activity.authState,
-                            service = activity.getService(),
-                            refreshToken = AuthStorage.getInstance(activity).data.toString(),
-                            context = activity,
-                        )
+                        refreshAccessToken(AuthStorage.getAuthState(activity).data.first(),AuthRepository.authService,AuthStorage.getInstance(activity).data.first().refreshToken!!,activity)
                         navController.navigate("home") { popUpTo(0) }
                     }
                     is UiState.Unauthenticated -> {
@@ -70,7 +61,15 @@ fun AppNavGraph(navController: NavHostController, viewModel: AuthenticationViewM
                 }
             }
         }
-        composable(route = BottomBarScreen.Home.route) { Home(navController) }
+        composable(route = BottomBarScreen.Home.route) { Home(navController,Login = {
+               // Here you put your existing click logic
+            activity?.let { act ->
+                val authIntent = act.getService().getAuthorizationRequestIntent(act.authRequest!!)
+                    ?: throw NullPointerException("Intent is null")
+                act.launcher.launch(authIntent)
+                act.authState = AuthState(act.serviceConfig!!)
+            }
+        }) }
         composable(BottomBarScreen.Login.route) {
     LoginScreen(
         Login = {

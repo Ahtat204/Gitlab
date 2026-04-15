@@ -26,8 +26,6 @@ sealed class BottomBarScreen(
     /** Home screen, represented by a home icon. */
     object Home : BottomBarScreen("home", "Home", Icons.Default.Home)
 
-    /** Calendar screen, represented by a date-range icon. */
-    object Calendar : BottomBarScreen("calendar", "Calendar", Icons.Default.DateRange)
 
     /** Dashboard screen, represented by a star icon. */
     object DashBoard : BottomBarScreen("dashboard", "Dashboard", Icons.Rounded.Star)
