@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
     id("com.apollographql.apollo") version "4.4.2"
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
@@ -17,7 +18,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
+        manifestPlaceholders .putIfAbsent("appAuthRedirectScheme", "com.asue24.gitlab   ")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -25,8 +26,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -67,9 +67,14 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.apollo.runtime)
-    implementation (libs.retrofit)
+    implementation(libs.retrofit)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+    implementation(libs.appauth)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.serialization.json)
+    implementation (libs.androidx.core.splashscreen)
+    implementation (libs.androidx.navigation.compose)
 }
