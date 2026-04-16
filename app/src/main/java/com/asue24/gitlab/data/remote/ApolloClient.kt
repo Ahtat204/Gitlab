@@ -6,7 +6,7 @@ import com.apollographql.apollo.api.http.HttpResponse
 import com.apollographql.apollo.network.http.HttpInterceptor
 import com.apollographql.apollo.network.http.HttpInterceptorChain
 import com.apollographql.apollo.network.okHttpClient
-import com.asue24.gitlab.constants.Tokens
+import com.asue24.gitlab.domain.utility.constants.Tokens
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
