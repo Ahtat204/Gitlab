@@ -2,6 +2,9 @@ package com.asue24.gitlab.domain.utility.constants
 
 import net.openid.appauth.ResponseTypeValues
 
+/**
+ * Configuration data for the auth flow
+ */
 object AuthConfig {
     const val AUTH_URI = "https://gitlab.com/oauth/authorize"
     const val TOKEN_URI = "https://gitlab.com/oauth/token"
