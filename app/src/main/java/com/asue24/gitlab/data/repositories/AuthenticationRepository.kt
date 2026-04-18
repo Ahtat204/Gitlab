@@ -12,7 +12,7 @@ class AuthenticationRepository(
     dataStore: DataStore<GitlabRefreshToken>?,
 ) {
     private val accessToken = Tokens.accessToken
-    public val authService = AuthorizationService(cntx.applicationContext)
-    public val hasValidToken: Boolean = AuthStorage.getInstance(cntx) != null
+    val authService = AuthorizationService(cntx.applicationContext)
+    val hasValidToken: Boolean = AuthStorage.getInstance(cntx) != null
 
 }
