@@ -6,10 +6,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.asue24.gitlab.data.repositories.AuthenticationRepository
-import com.asue24.gitlab.domain.Authentication.constants.AuthStorage
+import com.asue24.gitlab.domain.utility.constants.AuthStorage
 
 
-/*
+
 @Composable
 fun BottomNavigationgraph(
     navController: NavHostController, context: Context, AuthRepository: AuthenticationRepository
@@ -29,7 +29,7 @@ fun BottomNavigationgraph(
 
         }
     }
-}
+}/*
 @Composable
 fun AppNavGraph(navController: NavHostController, viewModel: AuthenticationViewModel, activity: MainActivity, AuthRepository: AuthenticationRepository) {
     val uiState by viewModel.uiState.collectAsState()

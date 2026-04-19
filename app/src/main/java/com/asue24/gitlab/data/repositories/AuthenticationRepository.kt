@@ -14,5 +14,6 @@ class AuthenticationRepository(
     private val accessToken = Tokens.accessToken
     val authService = AuthorizationService(cntx.applicationContext)
     val hasValidToken: Boolean = AuthStorage.getInstance(cntx) != null
+    private var authenticationService: AuthorizationService? = null
 
 }
