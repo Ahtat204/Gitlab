@@ -1,4 +1,4 @@
-package com.asue24.gitlab.presentation.activities;
+package com.asue24.gitlab.domain.Authentication;
 
 import android.content.Intent
 import android.net.Uri
@@ -24,13 +24,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.asue24.gitlab.GitlabApp
 import com.asue24.gitlab.data.repositories.AuthenticationRepository
-import com.asue24.gitlab.domain.utility.buildResponse
-import com.asue24.gitlab.domain.utility.constants.AuthConfig
-import com.asue24.gitlab.domain.utility.constants.AuthStorage
-import com.asue24.gitlab.domain.utility.constants.Tokens
-import com.asue24.gitlab.domain.utility.constants.authStateStore
-import com.asue24.gitlab.domain.utility.refreshAccessToken
-import com.asue24.gitlab.presentation.viewmodels.AuthenticationViewModel
+import com.asue24.gitlab.domain.Authentication.utility.buildResponse
+import com.asue24.gitlab.domain.Authentication.constants.AuthConfig
+import com.asue24.gitlab.domain.Authentication.constants.AuthStorage
+import com.asue24.gitlab.domain.Authentication.constants.Tokens
+import com.asue24.gitlab.domain.Authentication.constants.authStateStore
+import com.asue24.gitlab.domain.Authentication.utility.refreshAccessToken
+import com.asue24.gitlab.presentation.activities.MainActivity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -158,7 +158,7 @@ scope.launch {
                     "AuthActivity :Refresh Token: $refreshToken \t Access Token: $accessToken"
                 )
                 lifecycleScope.launch {
-                    val AuState=AuthStorage.getAuthState(this@AuthenticationActivity).data.first()
+                    val AuState= AuthStorage.getAuthState(this@AuthenticationActivity).data.first()
                     delay(20000)
                     refreshAccessToken(AuState,getService(),AuState.refreshToken.toString(),this@AuthenticationActivity)
 
