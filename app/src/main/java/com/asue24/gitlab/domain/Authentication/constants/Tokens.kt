@@ -1,4 +1,4 @@
-package com.asue24.gitlab.domain.utility.constants
+package com.asue24.gitlab.domain.Authentication.constants
 object Tokens {
     var accessToken: String? = null
 }

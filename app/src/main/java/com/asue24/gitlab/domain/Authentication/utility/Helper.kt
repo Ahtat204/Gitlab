@@ -1,10 +1,10 @@
-package com.asue24.gitlab.domain.utility
+package com.asue24.gitlab.domain.Authentication.utility
 
 import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import com.asue24.gitlab.domain.utility.constants.AuthStorage
+import com.asue24.gitlab.domain.Authentication.constants.AuthStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
