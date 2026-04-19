@@ -6,7 +6,6 @@ import com.apollographql.apollo.api.http.HttpResponse
 import com.apollographql.apollo.network.http.HttpInterceptor
 import com.apollographql.apollo.network.http.HttpInterceptorChain
 import com.apollographql.apollo.network.okHttpClient
-import com.asue24.gitlab.domain.utility.constants.Tokens
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
@@ -21,8 +20,8 @@ object ApolloService {
                     request: HttpRequest, chain: HttpInterceptorChain
                 ): HttpResponse {
                     return chain.proceed(
-                        request.newBuilder().addHeader("Authorization", "Bearer $accessToken").build()
-
+                        request.newBuilder().addHeader("Authorization", "Bearer $accessToken")
+                            .build()
                     )
                 }
             }).okHttpClient(okHttp.build()).build()

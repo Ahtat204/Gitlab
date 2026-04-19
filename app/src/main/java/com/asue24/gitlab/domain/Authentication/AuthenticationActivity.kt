@@ -1,4 +1,4 @@
-package com.asue24.gitlab
+package com.asue24.gitlab.domain.Authentication;
 
 import android.content.Intent
 import android.net.Uri
@@ -9,28 +9,31 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import com.asue24.gitlab.domain.utility.constants.AuthConfig
-import com.asue24.gitlab.domain.utility.constants.AuthStorage
-import com.asue24.gitlab.domain.utility.constants.GitlabRefreshToken
-import com.asue24.gitlab.domain.utility.constants.Tokens
-import com.asue24.gitlab.domain.utility.constants.authStateStore
-import com.asue24.gitlab.presentation.navigation.AppNavGraph
-import com.asue24.gitlab.presentation.navigation.BottomBarScreen
+import com.asue24.gitlab.GitlabApp
 import com.asue24.gitlab.data.repositories.AuthenticationRepository
-import com.asue24.gitlab.presentation.ui.theme.GitlabTheme
-import com.asue24.gitlab.domain.utility.buildResponse
-import com.asue24.gitlab.presentation.viewmodels.AuthenticationViewModel
+import com.asue24.gitlab.domain.Authentication.utility.buildResponse
+import com.asue24.gitlab.domain.Authentication.constants.AuthConfig
+import com.asue24.gitlab.domain.Authentication.constants.AuthStorage
+import com.asue24.gitlab.domain.Authentication.constants.Tokens
+import com.asue24.gitlab.domain.Authentication.constants.authStateStore
+import com.asue24.gitlab.domain.Authentication.utility.refreshAccessToken
+import com.asue24.gitlab.presentation.activities.MainActivity
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationRequest
@@ -39,7 +42,7 @@ import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
 
-class MainActivity : ComponentActivity() {
+class AuthenticationActivity : ComponentActivity() {
     var serviceConfig: AuthorizationServiceConfiguration? = AuthorizationServiceConfiguration(
         Uri.parse(AuthConfig.AUTH_URI), Uri.parse(AuthConfig.TOKEN_URI)
     )
@@ -55,29 +58,60 @@ class MainActivity : ComponentActivity() {
     private lateinit var authenticationViewModel: AuthenticationViewModel
     private val AuthRepository: AuthenticationRepository by lazy { (application as GitlabApp).authRepo }
     var authState: AuthState? = null
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val scope = lifecycleScope
+scope.launch {
+    // 1. Get the ACTUAL state from the Flow (not the .toString() of the Flow)
+    val authState = AuthStorage.getAuthState(this@AuthenticationActivity).data.first()
+
+    // 2. Check if we actually have a valid session
+    if (authState.isAuthorized) {
+
+        // 3. If the token is missing/expired, WAIT for the refresh
+        if (Tokens.accessToken == null) {
+            try {
+                refreshAccessToken(authState,getService(),authState.refreshToken!!,this@AuthenticationActivity)
+            } catch (e: Exception) {
+                return@launch
+            }
+        }
+
+        // 4. ONLY NOW, after the refresh is DONE, move to MainActivity
+        startActivity(Intent(this@AuthenticationActivity, MainActivity::class.java))
+        finish()
+    } else {
+        // No session found, stay here or show login
+    }
+}
         enableEdgeToEdge()
         installSplashScreen()
+
+
+
+
         authenticationViewModel = AuthenticationViewModel(AuthRepository)
         setContent {
             val navController = rememberNavController()
-            GitlabTheme(darkTheme = true) {
-                Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-                    AppNavGraph(navController, authenticationViewModel, this, AuthRepository)
-                }, floatingActionButton = {
-                    FloatingActionButton(onClick = { navController.navigate(route = BottomBarScreen.CreateTask.route) }) {
-                        Icon(imageVector = Icons.Rounded.Add, contentDescription = null)
-                    }
-                }, floatingActionButtonPosition = FabPosition.End) { x ->
+            Column(
+                Modifier
+                    .offset(100.dp)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Button(modifier = Modifier, onClick = {
+                    val authIntent = getService().getAuthorizationRequestIntent(authRequest!!)
+                        ?: throw NullPointerException("Intent is null")
+                    launcher.launch(authIntent)
+                    authState = AuthState(serviceConfig!!)
+                }) {
+                    Text(text = "Login", fontSize = 30.sp, modifier = Modifier)
                 }
             }
-        }/*     if(Tokens.accessToken!=null){
-          val apolloClient= ApolloService.setUpApolloClient(Tokens.accessToken!!)
-          var Projects:GetMyProjectsQuery.ProjectMemberships?=null
-          lifecycleScope.launch { Projects=apolloClient.query(GetMyProjectsQuery()).execute().data?.currentUser?.projectMemberships
-          }
-      }*/
+        }
 
     }
 
@@ -106,7 +140,7 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    fun exchangeCodeForToken(
+   fun exchangeCodeForToken(
         service: AuthorizationService, response: AuthorizationResponse, authState: AuthState
     ) {
         authState.update(response, null)
@@ -114,7 +148,7 @@ class MainActivity : ComponentActivity() {
         service.performTokenRequest(tokenRequest) { tokenResponse, ex ->
             if (tokenResponse != null) {
                 authState.update(tokenResponse, ex)
-                lifecycleScope.launch { authStateStore.updateData { authState }}
+                lifecycleScope.launch { authStateStore.updateData { authState } }
                 val accessToken = tokenResponse.accessToken
                 Tokens.accessToken = accessToken
                 val refreshToken = tokenResponse.refreshToken
@@ -124,9 +158,11 @@ class MainActivity : ComponentActivity() {
                     "AuthActivity :Refresh Token: $refreshToken \t Access Token: $accessToken"
                 )
                 lifecycleScope.launch {
-                    AuthStorage.getInstance(this@MainActivity).updateData {
-                        GitlabRefreshToken(refreshToken)
-                    }
+                    val AuState= AuthStorage.getAuthState(this@AuthenticationActivity).data.first()
+                    delay(20000)
+                    refreshAccessToken(AuState,getService(),AuState.refreshToken.toString(),this@AuthenticationActivity)
+
+
                 }
             } else {
                 Log.d(
