@@ -18,24 +18,30 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:label="@string/title_activity_authentication"
+            android:launchMode="standard"
+            android:theme="@style/Theme.Gitlab" />
+        <activity
+            android:name=".presentation.activities.AuthenticationActivity"
+            android:exported="true"
             android:label="@string/title_activity_main"
             android:launchMode="singleTask"
             android:theme="@style/Theme.Gitlab">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="com.asue24.gitlab"
-                    android:host="oauth2redirect" />
-            </intent-filter>
 
+                <data
+                    android:host="oauth2redirect"
+                    android:scheme="com.asue24.gitlab" />
+            </intent-filter>
         </activity>
     </application>
 
