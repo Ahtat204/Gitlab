@@ -6,6 +6,6 @@ import com.asue24.gitlab.data.repositories.AuthenticationRepository
 
 class GitlabApp: Application() {
     val authRepo by lazy {
-        AuthenticationRepository(this, AuthStorage.getInstance(this))
+        AuthenticationRepository(this)
     }
 }

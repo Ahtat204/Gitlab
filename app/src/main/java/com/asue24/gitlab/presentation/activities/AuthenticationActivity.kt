@@ -23,12 +23,10 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.asue24.gitlab.GitlabApp
-import com.asue24.gitlab.MainActivity
 import com.asue24.gitlab.data.repositories.AuthenticationRepository
 import com.asue24.gitlab.domain.utility.buildResponse
 import com.asue24.gitlab.domain.utility.constants.AuthConfig
 import com.asue24.gitlab.domain.utility.constants.AuthStorage
-import com.asue24.gitlab.domain.utility.constants.GitlabRefreshToken
 import com.asue24.gitlab.domain.utility.constants.Tokens
 import com.asue24.gitlab.domain.utility.constants.authStateStore
 import com.asue24.gitlab.domain.utility.refreshAccessToken
@@ -75,7 +73,7 @@ scope.launch {
         // 3. If the token is missing/expired, WAIT for the refresh
         if (Tokens.accessToken == null) {
             try {
-                refreshAccessToken(authState,getService(),AuthStorage.getInstance(this@AuthenticationActivity).data.toString(),this@AuthenticationActivity)
+                refreshAccessToken(authState,getService(),authState.refreshToken!!,this@AuthenticationActivity)
             } catch (e: Exception) {
                 return@launch
             }
@@ -160,12 +158,10 @@ scope.launch {
                     "AuthActivity :Refresh Token: $refreshToken \t Access Token: $accessToken"
                 )
                 lifecycleScope.launch {
-                    AuthStorage.getInstance(this@AuthenticationActivity).updateData {
-                        GitlabRefreshToken(refreshToken)
-                    }
-                 val result=   AuthStorage.getInstance(this@AuthenticationActivity).data.first()
                     val AuState=AuthStorage.getAuthState(this@AuthenticationActivity).data.first()
-                    Log.d("result",result.toString())
+                    delay(20000)
+                    refreshAccessToken(AuState,getService(),AuState.refreshToken.toString(),this@AuthenticationActivity)
+
 
                 }
             } else {

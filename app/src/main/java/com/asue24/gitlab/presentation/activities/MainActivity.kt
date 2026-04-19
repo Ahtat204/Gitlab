@@ -1,4 +1,4 @@
-package com.asue24.gitlab
+package com.asue24.gitlab.presentation.activities
 
 import android.os.Bundle
 import android.util.Log
