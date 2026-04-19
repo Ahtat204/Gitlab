@@ -5,11 +5,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import net.openid.appauth.AuthState
 
-private val Context.dataStore by dataStore(
-    fileName = "gitlab-refresh-token",
-    serializer = RefreshTokenSerializer
-)
-
 val Context.authStateStore: DataStore<AuthState> by dataStore(
     fileName = "auth_state.pb",
     serializer = AuthStateSerializer
