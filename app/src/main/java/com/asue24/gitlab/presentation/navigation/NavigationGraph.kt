@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.asue24.gitlab.data.repositories.AuthenticationRepository
-import com.asue24.gitlab.domain.utility.constants.AuthStorage
+import com.asue24.gitlab.domain.Authentication.constants.AuthStorage
 
 
 /*
