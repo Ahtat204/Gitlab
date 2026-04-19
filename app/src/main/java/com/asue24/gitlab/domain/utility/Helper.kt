@@ -1,14 +1,10 @@
 package com.asue24.gitlab.domain.utility
 
-
-import com.asue24.gitlab.domain.utility.constants.authStateStore
 import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
 import com.asue24.gitlab.domain.utility.constants.AuthStorage
-import com.asue24.gitlab.domain.utility.constants.Tokens
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,9 +47,8 @@ fun refreshAccessToken(
         }
         if (authState.authorizationServiceConfiguration == null) return
         authState.performActionWithFreshTokens(service) { accessToken, idToken, ex ->
-            Tokens.accessToken = accessToken
             val scope = CoroutineScope(Dispatchers.IO)
-            scope.launch {AuthStorage.getAuthState(context).updateData { authState } }
+            scope.launch { AuthStorage.getAuthState(context).updateData { authState } }
         }
     } catch (e: Exception) {
         throw e

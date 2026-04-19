@@ -1,29 +1,35 @@
 package com.asue24.gitlab.domain.utility.constants
 
-import androidx.datastore.core.CorruptionException
-import androidx.datastore.core.Serializer
+import com.asue24.gitlab.data.security.CryptoUtility
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.openid.appauth.AuthState
 import java.io.InputStream
 import java.io.OutputStream
 
-object AuthStateSerializer : Serializer<AuthState> {
+object AuthStateSerializer : androidx.datastore.core.Serializer<AuthState> {
     override val defaultValue = AuthState()
-
     override suspend fun readFrom(input: InputStream): AuthState {
-        try {
-            // Read the JSON string and deserialize it
-            return AuthState.jsonDeserialize(input.bufferedReader().use { it.readText() })
-        } catch (e: Exception) {
-            throw CorruptionException("Cannot read proto.", e)
+        return withContext(Dispatchers.IO) {
+            try {
+                val encryptedBytes = input.readBytes()
+                if (encryptedBytes.isEmpty()) return@withContext defaultValue
+                val decryptedBytes = CryptoUtility.decrypt(encryptedBytes)
+                val jsonString = decryptedBytes.decodeToString()
+                AuthState.jsonDeserialize(jsonString)
+            } catch (e: Exception) {
+                defaultValue
+                throw e
+            }
         }
     }
 
     override suspend fun writeTo(t: AuthState, output: OutputStream) {
-        // Serialize the object to a JSON string and write it
         withContext(Dispatchers.IO) {
-            output.write(t.jsonSerializeString().toByteArray())
+            val jsonString = t.jsonSerializeString()
+            val bytes = jsonString.toByteArray()
+            val encryptedBytes = CryptoUtility.encrypt(bytes)
+            output.write(encryptedBytes)
         }
     }
 }
