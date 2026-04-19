@@ -2,6 +2,8 @@ package com.asue24.gitlab.domain.utility.constants
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.openid.appauth.AuthState
 import java.io.InputStream
 import java.io.OutputStream
@@ -20,6 +22,8 @@ object AuthStateSerializer : Serializer<AuthState> {
 
     override suspend fun writeTo(t: AuthState, output: OutputStream) {
         // Serialize the object to a JSON string and write it
-        output.write(t.jsonSerializeString().toByteArray())
+        withContext(Dispatchers.IO) {
+            output.write(t.jsonSerializeString().toByteArray())
+        }
     }
 }

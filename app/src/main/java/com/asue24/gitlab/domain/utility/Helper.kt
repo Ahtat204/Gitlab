@@ -2,6 +2,7 @@ package com.asue24.gitlab.domain.utility
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import com.asue24.gitlab.GetMyProjectsQuery
@@ -12,6 +13,7 @@ import com.asue24.gitlab.domain.utility.constants.Tokens
 import com.asue24.gitlab.data.remote.ApolloService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.openid.appauth.AuthState
@@ -45,39 +47,43 @@ fun buildResponse(
     return null
 }
 
-fun refreshAccessToken(
+ fun refreshAccessToken(
     authState: AuthState?, service: AuthorizationService, refreshToken: String, context: Context
-) {
-    var Projects: GetMyProjectsQuery.ProjectMemberships? = null
-    if (authState == null) throw NullPointerException("AuthState is null")
-    if (authState.authorizationServiceConfiguration == null) throw NullPointerException("authorizationServiceConfiguration is null")
-    val request = TokenRequest.Builder(
-        authState.authorizationServiceConfiguration!!, AuthConfig.CLIENT_ID
-    ).setGrantType(GrantTypeValues.REFRESH_TOKEN).setRefreshToken(refreshToken).build()
-    service.performTokenRequest(request) { tokenResponse, ex ->
-        if (tokenResponse != null) {
-            Tokens.accessToken = tokenResponse.accessToken
-            val newRefreshToken = tokenResponse.refreshToken
+)  {
+     try {
+         Log.d("stored refreshToken value is", refreshToken)
+         var Projects: GetMyProjectsQuery.ProjectMemberships?
+         if (authState == null) {
+             throw NullPointerException("AuthState is null")
+         }
+         if (authState.authorizationServiceConfiguration == null) throw NullPointerException("authorizationServiceConfiguration is null")
+         val request = authState.createTokenRefreshRequest()
+         service.performTokenRequest(request) { tokenResponse, ex ->
+             if (tokenResponse != null) {
+                 Tokens.accessToken = tokenResponse.accessToken
+                 val newRefreshToken = tokenResponse.refreshToken
+                 val apolloClient = ApolloService.setUpApolloClient(accessToken = tokenResponse.accessToken!!)
+                 val scope = CoroutineScope(Dispatchers.IO)
+                 scope.launch {
+                     withContext(Dispatchers.Main) {
+                         AuthStorage.getInstance(context).updateData {
+                             GitlabRefreshToken(newRefreshToken)
+                         }
+                         Projects=apolloClient.query(GetMyProjectsQuery()).execute().data?.currentUser?.projectMemberships
+                         Log.e("projects","$Projects.")
+                     }
+                 }
+             } else {
+                 Log.e("OAUTH_REFRESH", "Refresh failed: ${ex?.errorDescription}")
+                 throw Exception(ex)
+             }
+         }
+     }
+     catch (e:Exception){
+         throw e
+     }
+     finally {
+         Log.d("finally","finally bolcok")
+     }
 
-            val apolloClient = ApolloService.setUpApolloClient(accessToken = tokenResponse.accessToken!!)
-            val scope = CoroutineScope(Dispatchers.IO)
-            scope.launch {
-                withContext(Dispatchers.Main) {
-                    AuthStorage.getInstance(context).updateData {
-                        GitlabRefreshToken(refreshToken)
-                    }
-                    Projects=apolloClient.query(GetMyProjectsQuery()).execute().data?.currentUser?.projectMemberships
-                    Log.e("","$Projects.")
-                }
-            }
-        } else {
-            Log.e("OAUTH_REFRESH", "Refresh failed: ${ex?.errorDescription}")
-            val scope=CoroutineScope(Dispatchers.IO)
-           if (ex?.error == AuthorizationException.TokenRequestErrors.INVALID_GRANT.error) {
-            Log.e("AUTH", "Refresh token dead. Clearing local storage.")
-        } else {
-            // Handle other, potentially transient, network errors
-        }
-        }
-    }
 }
