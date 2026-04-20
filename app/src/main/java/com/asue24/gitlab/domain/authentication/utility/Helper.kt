@@ -46,10 +46,7 @@ fun refreshAccessToken(
             return
         }
         if (authState.authorizationServiceConfiguration == null) return
-        authState.performActionWithFreshTokens(service) { accessToken, idToken, ex ->
-            val scope = CoroutineScope(Dispatchers.IO)
-            scope.launch { AuthStorage.getAuthState(context).updateData { authState } }
-        }
+
     } catch (e: Exception) {
         throw e
     } finally {

@@ -29,11 +29,9 @@ import com.asue24.gitlab.domain.authentication.constants.AuthStorage
 import com.asue24.gitlab.domain.authentication.constants.Tokens
 import com.asue24.gitlab.domain.authentication.constants.authStateStore
 import com.asue24.gitlab.domain.authentication.utility.buildResponse
-import com.asue24.gitlab.domain.authentication.utility.refreshAccessToken
 import com.asue24.gitlab.presentation.activities.MainActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -43,6 +41,7 @@ import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
+import kotlin.concurrent.thread
 
 class AuthenticationActivity : ComponentActivity() {
     private var serviceConfig: AuthorizationServiceConfiguration? =
@@ -59,33 +58,13 @@ class AuthenticationActivity : ComponentActivity() {
     private val launcher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result -> }
     private lateinit var authenticationViewModel: AuthenticationViewModel
-    private val AuthRepository: AuthenticationRepository by lazy { (application as GitlabApp).authRepo }
+    private val authRepository: AuthenticationRepository by lazy { (application as GitlabApp).authRepo }
     private var authState: AuthState? = null
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val scope = CoroutineScope(Dispatchers.IO)
-        scope.launch {
-            val authState = AuthStorage.getAuthState(this@AuthenticationActivity).data.first()
-            if (authState.isAuthorized) {
-                if (Tokens.accessToken == null) {
-                    try {
-                        refreshAccessToken(
-                            authState,
-                            getService(),
-                            authState.refreshToken!!,
-                            this@AuthenticationActivity
-                        )
-                    } catch (e: Exception) {
-                        return@launch
-                    }
-                }
-                startActivity(Intent(this@AuthenticationActivity, MainActivity::class.java))
-                finish()
-            }
-        }
         enableEdgeToEdge()
-        installSplashScreen()
-        authenticationViewModel = AuthenticationViewModel(AuthRepository)
+        authenticationViewModel = AuthenticationViewModel(authRepository)
         setContent {
             val navController = rememberNavController()
             Column(
@@ -131,6 +110,7 @@ class AuthenticationActivity : ComponentActivity() {
         }
         runBlocking { exchangeCodeForToken(getService(), response, authState!!) }
 
+
     }
 
     private fun exchangeCodeForToken(
@@ -141,16 +121,14 @@ class AuthenticationActivity : ComponentActivity() {
         service.performTokenRequest(tokenRequest) { tokenResponse, ex ->
             if (tokenResponse != null) {
                 authState.update(tokenResponse, ex)
-                lifecycleScope.launch { authStateStore.updateData { authState } }
+                lifecycleScope.launch { authStateStore.updateData { authState }
+                    startActivity(Intent(this@AuthenticationActivity, MainActivity::class.java))
+                    finish()}
                 val accessToken = tokenResponse.accessToken
+                val refreshToken = tokenResponse?.refreshToken!!
                 Tokens.accessToken = accessToken
-                val refreshToken = tokenResponse.refreshToken
-                lifecycleScope.launch {
-                    val AuState = AuthStorage.getAuthState(this@AuthenticationActivity).data.first()
-                 /*   delay(20000)
-                    refreshAccessToken(AuState, getService(), AuState.refreshToken.toString(), this@AuthenticationActivity
-                    )*/
-                }
+
+                Log.d("accessToken from AuthAct", refreshToken)
             } else {
                 Log.d(
                     "Error is Null",
