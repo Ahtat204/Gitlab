@@ -21,7 +21,7 @@ import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 class LauncherActivity : ComponentActivity() {
-
+private lateinit var authenticationService:AuthorizationService
     override fun onCreate(savedInstanceState: Bundle?) {
         // 1. Install Splash Screen FIRST
         val splashScreen = installSplashScreen()
@@ -32,14 +32,14 @@ class LauncherActivity : ComponentActivity() {
         // 2. This is the "Magic Gate". It keeps the logo visible
         // as long as isReady is false.
         splashScreen.setKeepOnScreenCondition { !isReady }
-
+authenticationService=AuthorizationService(this@LauncherActivity)
         // 3. Start the non-blocking check
         CoroutineScope(Dispatchers.Main).launch {
             val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
 
             if (storedState.refreshToken != null) {
                 // We have a token! Try to refresh it.
-                storedState.performActionWithFreshTokens(AuthorizationService(this@LauncherActivity)) { token, _, ex ->
+                storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
                     if (token != null && ex == null) {
                         Tokens.accessToken = token
                         Log.d("token is ",Tokens.accessToken!!)
@@ -63,5 +63,10 @@ class LauncherActivity : ComponentActivity() {
     private fun navigateTo(destination: Class<*>) {
         startActivity(Intent(this, destination))
         finish()
+    }
+
+    override fun onDestroy() {
+        authenticationService?.dispose()
+        super.onDestroy()
     }
 }
