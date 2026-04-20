@@ -1,7 +1,6 @@
 package com.asue24.gitlab
 
 import android.app.Application
-import com.asue24.gitlab.domain.Authentication.constants.AuthStorage
 import com.asue24.gitlab.data.repositories.AuthenticationRepository
 
 class GitlabApp: Application() {

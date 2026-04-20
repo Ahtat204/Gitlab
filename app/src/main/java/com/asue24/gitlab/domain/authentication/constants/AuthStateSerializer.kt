@@ -1,4 +1,4 @@
-package com.asue24.gitlab.domain.Authentication.constants
+package com.asue24.gitlab.domain.authentication.constants
 
 import com.asue24.gitlab.data.security.CryptoUtility
 import kotlinx.coroutines.Dispatchers
