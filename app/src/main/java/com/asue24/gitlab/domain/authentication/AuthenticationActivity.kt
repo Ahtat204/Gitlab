@@ -19,20 +19,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.asue24.gitlab.GitlabApp
 import com.asue24.gitlab.data.repositories.AuthenticationRepository
 import com.asue24.gitlab.domain.authentication.constants.AuthConfig
-import com.asue24.gitlab.domain.authentication.constants.AuthStorage
 import com.asue24.gitlab.domain.authentication.constants.Tokens
 import com.asue24.gitlab.domain.authentication.constants.authStateStore
 import com.asue24.gitlab.domain.authentication.utility.buildResponse
 import com.asue24.gitlab.presentation.activities.MainActivity
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthState
@@ -41,7 +37,6 @@ import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
-import kotlin.concurrent.thread
 
 class AuthenticationActivity : ComponentActivity() {
     private var serviceConfig: AuthorizationServiceConfiguration? =
@@ -60,7 +55,6 @@ class AuthenticationActivity : ComponentActivity() {
     private lateinit var authenticationViewModel: AuthenticationViewModel
     private val authRepository: AuthenticationRepository by lazy { (application as GitlabApp).authRepo }
     private var authState: AuthState? = null
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -110,7 +104,6 @@ class AuthenticationActivity : ComponentActivity() {
         }
         runBlocking { exchangeCodeForToken(getService(), response, authState!!) }
 
-
     }
 
     private fun exchangeCodeForToken(
@@ -121,19 +114,12 @@ class AuthenticationActivity : ComponentActivity() {
         service.performTokenRequest(tokenRequest) { tokenResponse, ex ->
             if (tokenResponse != null) {
                 authState.update(tokenResponse, ex)
-                lifecycleScope.launch { authStateStore.updateData { authState }
+                lifecycleScope.launch {
+                    authStateStore.updateData { authState }
                     startActivity(Intent(this@AuthenticationActivity, MainActivity::class.java))
-                    finish()}
-                val accessToken = tokenResponse.accessToken
-                val refreshToken = tokenResponse?.refreshToken!!
-                Tokens.accessToken = accessToken
-
-                Log.d("accessToken from AuthAct", refreshToken)
-            } else {
-                Log.d(
-                    "Error is Null",
-                    "${ex?.errorDescription} and reason is ${ex?.error} and message is ${ex?.code}"
-                )
+                    finish()
+                }
+                Tokens.accessToken = authState.accessToken
             }
         }
     }
