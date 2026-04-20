@@ -1,4 +1,4 @@
-package com.asue24.gitlab.domain.Authentication;
+package com.asue24.gitlab.domain.authentication;
 
 import android.content.Intent
 import android.net.Uri
@@ -24,17 +24,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.asue24.gitlab.GitlabApp
 import com.asue24.gitlab.data.repositories.AuthenticationRepository
-import com.asue24.gitlab.domain.Authentication.utility.buildResponse
-import com.asue24.gitlab.domain.Authentication.constants.AuthConfig
-import com.asue24.gitlab.domain.Authentication.constants.AuthStorage
-import com.asue24.gitlab.domain.Authentication.constants.Tokens
-import com.asue24.gitlab.domain.Authentication.constants.authStateStore
-import com.asue24.gitlab.domain.Authentication.utility.refreshAccessToken
+import com.asue24.gitlab.domain.authentication.constants.AuthConfig
+import com.asue24.gitlab.domain.authentication.constants.AuthStorage
+import com.asue24.gitlab.domain.authentication.constants.Tokens
+import com.asue24.gitlab.domain.authentication.constants.authStateStore
+import com.asue24.gitlab.domain.authentication.utility.buildResponse
+import com.asue24.gitlab.domain.authentication.utility.refreshAccessToken
 import com.asue24.gitlab.presentation.activities.MainActivity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationResponse
@@ -43,55 +45,46 @@ import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
 
 class AuthenticationActivity : ComponentActivity() {
-    var serviceConfig: AuthorizationServiceConfiguration? = AuthorizationServiceConfiguration(
-        Uri.parse(AuthConfig.AUTH_URI), Uri.parse(AuthConfig.TOKEN_URI)
-    )
-    var authRequest: AuthorizationRequest? = AuthorizationRequest.Builder(
+    private var serviceConfig: AuthorizationServiceConfiguration? =
+        AuthorizationServiceConfiguration(
+            Uri.parse(AuthConfig.AUTH_URI), Uri.parse(AuthConfig.TOKEN_URI)
+        )
+    private var authRequest: AuthorizationRequest? = AuthorizationRequest.Builder(
         serviceConfig!!,
         AuthConfig.CLIENT_ID,
         ResponseTypeValues.CODE,
         Uri.parse(AuthConfig.CALLBACK_URL)
     ).setScope(AuthConfig.SCOPE).build()
     private var authenticationService: AuthorizationService? = null
-    val launcher: ActivityResultLauncher<Intent> =
+    private val launcher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result -> }
     private lateinit var authenticationViewModel: AuthenticationViewModel
     private val AuthRepository: AuthenticationRepository by lazy { (application as GitlabApp).authRepo }
-    var authState: AuthState? = null
-
-    @OptIn(ExperimentalCoroutinesApi::class)
+    private var authState: AuthState? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val scope = lifecycleScope
-scope.launch {
-    // 1. Get the ACTUAL state from the Flow (not the .toString() of the Flow)
-    val authState = AuthStorage.getAuthState(this@AuthenticationActivity).data.first()
-
-    // 2. Check if we actually have a valid session
-    if (authState.isAuthorized) {
-
-        // 3. If the token is missing/expired, WAIT for the refresh
-        if (Tokens.accessToken == null) {
-            try {
-                refreshAccessToken(authState,getService(),authState.refreshToken!!,this@AuthenticationActivity)
-            } catch (e: Exception) {
-                return@launch
+        val scope = CoroutineScope(Dispatchers.IO)
+        scope.launch {
+            val authState = AuthStorage.getAuthState(this@AuthenticationActivity).data.first()
+            if (authState.isAuthorized) {
+                if (Tokens.accessToken == null) {
+                    try {
+                        refreshAccessToken(
+                            authState,
+                            getService(),
+                            authState.refreshToken!!,
+                            this@AuthenticationActivity
+                        )
+                    } catch (e: Exception) {
+                        return@launch
+                    }
+                }
+                startActivity(Intent(this@AuthenticationActivity, MainActivity::class.java))
+                finish()
             }
         }
-
-        // 4. ONLY NOW, after the refresh is DONE, move to MainActivity
-        startActivity(Intent(this@AuthenticationActivity, MainActivity::class.java))
-        finish()
-    } else {
-        // No session found, stay here or show login
-    }
-}
         enableEdgeToEdge()
         installSplashScreen()
-
-
-
-
         authenticationViewModel = AuthenticationViewModel(AuthRepository)
         setContent {
             val navController = rememberNavController()
@@ -136,11 +129,11 @@ scope.launch {
             Log.e("error ", "OAUTH_ERROR")
             return
         }
-        exchangeCodeForToken(getService(), response, authState!!)
+        runBlocking { exchangeCodeForToken(getService(), response, authState!!) }
 
     }
 
-   fun exchangeCodeForToken(
+    private fun exchangeCodeForToken(
         service: AuthorizationService, response: AuthorizationResponse, authState: AuthState
     ) {
         authState.update(response, null)
@@ -152,17 +145,11 @@ scope.launch {
                 val accessToken = tokenResponse.accessToken
                 Tokens.accessToken = accessToken
                 val refreshToken = tokenResponse.refreshToken
-
-                Log.d(
-                    "result",
-                    "AuthActivity :Refresh Token: $refreshToken \t Access Token: $accessToken"
-                )
                 lifecycleScope.launch {
-                    val AuState= AuthStorage.getAuthState(this@AuthenticationActivity).data.first()
-                    delay(20000)
-                    refreshAccessToken(AuState,getService(),AuState.refreshToken.toString(),this@AuthenticationActivity)
-
-
+                    val AuState = AuthStorage.getAuthState(this@AuthenticationActivity).data.first()
+                 /*   delay(20000)
+                    refreshAccessToken(AuState, getService(), AuState.refreshToken.toString(), this@AuthenticationActivity
+                    )*/
                 }
             } else {
                 Log.d(

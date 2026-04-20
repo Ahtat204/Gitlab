@@ -1,9 +1,9 @@
-package com.asue24.gitlab.domain.Authentication
+package com.asue24.gitlab.domain.authentication
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asue24.gitlab.data.repositories.AuthenticationRepository
-import com.asue24.gitlab.domain.Authentication.constants.AuthStorage
+import com.asue24.gitlab.domain.authentication.constants.AuthStorage
 import com.asue24.gitlab.presentation.navigation.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -1,15 +1,4 @@
-package com.asue24.gitlab.presentation.navigation
-
-import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import com.asue24.gitlab.data.repositories.AuthenticationRepository
-import com.asue24.gitlab.domain.Authentication.constants.AuthStorage
-
-
-/*
+package com.asue24.gitlab.presentation.navigation/*
 @Composable
 fun BottomNavigationgraph(
     navController: NavHostController, context: Context, AuthRepository: AuthenticationRepository

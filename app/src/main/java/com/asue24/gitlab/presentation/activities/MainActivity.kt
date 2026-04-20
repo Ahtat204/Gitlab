@@ -9,7 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
-import com.asue24.gitlab.domain.Authentication.constants.Tokens
+import com.asue24.gitlab.domain.authentication.constants.Tokens
 import com.asue24.gitlab.presentation.ui.theme.GitlabTheme
 
 class MainActivity : ComponentActivity() {
