@@ -1,19 +1,8 @@
-package com.asue24.gitlab.domain.utility.constants
-
-import androidx.datastore.core.Serializer
-import com.asue24.gitlab.data.security.CryptoUtility
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.io.InputStream
-import java.io.OutputStream
-
+package com.asue24.gitlab.domain.Authentication.constants
 object Tokens {
     var accessToken: String? = null
 }
-
+/*
 @Serializable
 data class GitlabRefreshToken(var refreshToken: String? = null)
 object RefreshTokenSerializer : Serializer<GitlabRefreshToken> {
@@ -35,4 +24,4 @@ object RefreshTokenSerializer : Serializer<GitlabRefreshToken> {
             output.use { it.write(encryptedBytes) }
         }
     }
-}
+}*/

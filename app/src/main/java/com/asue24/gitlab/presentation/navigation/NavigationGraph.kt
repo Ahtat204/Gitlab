@@ -2,25 +2,14 @@ package com.asue24.gitlab.presentation.navigation
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.asue24.gitlab.data.repositories.AuthenticationRepository
-import com.asue24.gitlab.MainActivity
-import com.asue24.gitlab.domain.utility.constants.AuthStorage
-import com.asue24.gitlab.presentation.screens.DashBoard
-import com.asue24.gitlab.presentation.screens.Home
-import com.asue24.gitlab.presentation.screens.LoginScreen
-import com.asue24.gitlab.domain.utility.refreshAccessToken
-import com.asue24.gitlab.presentation.viewmodels.AuthenticationViewModel
-import kotlinx.coroutines.flow.first
-import net.openid.appauth.AuthState
+import com.asue24.gitlab.domain.Authentication.constants.AuthStorage
 
 
-
+/*
 @Composable
 fun BottomNavigationgraph(
     navController: NavHostController, context: Context, AuthRepository: AuthenticationRepository
@@ -37,7 +26,7 @@ fun BottomNavigationgraph(
         //LoginScreen(navController)
         }
         composable(route = BottomBarScreen.DashBoard.route) {
-            DashBoard()
+
         }
     }
 }
@@ -86,4 +75,4 @@ fun AppNavGraph(navController: NavHostController, viewModel: AuthenticationViewM
     )
 }
     }
-}
+}*/
