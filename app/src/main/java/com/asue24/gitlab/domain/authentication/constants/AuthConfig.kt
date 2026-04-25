@@ -1,9 +1,12 @@
 package com.asue24.gitlab.domain.authentication.constants
 
+
+import com.asue24.gitlab.BuildConfig
 import net.openid.appauth.ResponseTypeValues
 
 /**
  * Configuration data for the auth flow
+ * contains Authentication URL (AUTH_URI) and Token URL (TOKEN_URI)</p>
  */
 object AuthConfig {
     const val AUTH_URI = "https://gitlab.com/oauth/authorize"
@@ -11,8 +14,6 @@ object AuthConfig {
     const val END_SESSION_URI = "https://gitlab.com/logout"
     const val RESPONSE_TYPE = ResponseTypeValues.CODE
     const val SCOPE = "read_api read_user read_repository openid "
-    val CLIENT_ID = ""
-    const val CLIENT_SECRET = ""
+    const val CLIENT_ID = BuildConfig.CLIENT_ID
     const val CALLBACK_URL = "com.asue24.gitlab://oauth2redirect"
-    const val LOGOUT_CALLBACK_URL = ""
 }
