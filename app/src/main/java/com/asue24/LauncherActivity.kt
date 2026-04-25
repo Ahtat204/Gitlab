@@ -22,7 +22,7 @@ private lateinit var authenticationService:AuthorizationService
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         var isReady = false
-        splashScreen.setKeepOnScreenCondition { !isReady }
+        splashScreen.setKeepOnScreenCondition { isReady }
 authenticationService=AuthorizationService(this@LauncherActivity)
         CoroutineScope(Dispatchers.Main).launch {
             val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
@@ -34,7 +34,9 @@ authenticationService=AuthorizationService(this@LauncherActivity)
                         Log.d("token is ",Tokens.accessToken!!)
                         lifecycleScope.launch {
                             AuthStorage.getAuthState(this@LauncherActivity).updateData { storedState }
+                            isReady = true
                             navigateTo(MainActivity::class.java)
+
                         }
                     }
                     if(ex!=null) {
@@ -54,7 +56,7 @@ authenticationService=AuthorizationService(this@LauncherActivity)
     }
 
     override fun onDestroy() {
-        authenticationService?.dispose()
+        authenticationService.dispose()
         super.onDestroy()
     }
 }
