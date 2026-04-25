@@ -25,7 +25,7 @@ import com.asue24.gitlab.presentation.navigation.BottomBarScreen
 @Composable
 fun BottomBar(navController: NavHostController) {
     val items = listOf(
-        BottomBarScreen.Home, BottomBarScreen.DashBoard, BottomBarScreen.Activity,BottomBarScreen.Profile
+        BottomBarScreen.Home, BottomBarScreen.Projects, BottomBarScreen.Activity,BottomBarScreen.Profile
     )
 
     // Observe the current back stack entry to highlight the selected item

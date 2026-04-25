@@ -14,7 +14,7 @@ fun BottomNavigationgraph(
         composable(route = BottomBarScreen.Home.route) {
          //   Home(navController)
         }
-        composable(route = BottomBarScreen.DashBoard.route) {
+        composable(route = BottomBarScreen.Projects.route) {
         //LoginScreen(navController)
         }
         composable(route = BottomBarScreen.Profile.route) {

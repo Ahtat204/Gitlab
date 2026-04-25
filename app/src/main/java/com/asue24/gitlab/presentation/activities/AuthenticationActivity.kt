@@ -1,4 +1,4 @@
-package com.asue24.gitlab.domain.authentication;
+package com.asue24.gitlab.presentation.activities;
 
 import android.content.Intent
 import android.net.Uri
@@ -20,15 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.compose.rememberNavController
-import com.asue24.gitlab.GitlabApp
-import com.asue24.gitlab.data.repositories.AuthenticationRepository
 import com.asue24.gitlab.domain.authentication.constants.AuthConfig
 import com.asue24.gitlab.domain.authentication.constants.Tokens
 import com.asue24.gitlab.domain.authentication.constants.authStateStore
 import com.asue24.gitlab.domain.authentication.utility.buildResponse
-import com.asue24.gitlab.presentation.activities.MainActivity
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthState
@@ -52,15 +47,11 @@ class AuthenticationActivity : ComponentActivity() {
     private var authenticationService: AuthorizationService? = null
     private val launcher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result -> }
-    private lateinit var authenticationViewModel: AuthenticationViewModel
-    private val authRepository: AuthenticationRepository by lazy { (application as GitlabApp).authRepo }
     private var authState: AuthState? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        authenticationViewModel = AuthenticationViewModel(authRepository)
         setContent {
-            val navController = rememberNavController()
             Column(
                 Modifier
                     .offset(100.dp)
@@ -81,7 +72,7 @@ class AuthenticationActivity : ComponentActivity() {
 
     }
 
-    fun getService(): AuthorizationService {
+    private fun getService(): AuthorizationService {
         if (authenticationService == null) {
             authenticationService = AuthorizationService(this)
         }
