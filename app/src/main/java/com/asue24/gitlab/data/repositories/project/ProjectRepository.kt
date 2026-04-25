@@ -4,6 +4,6 @@ import com.asue24.gitlab.GetMyProjectsQuery
 import kotlinx.coroutines.flow.Flow
 
 interface ProjectRepository {
-    fun getAllProjects(): Flow<GetMyProjectsQuery.ContributedProjects>
+    fun getAllProjects(): Flow<GetMyProjectsQuery.Data>
     fun getProjectById(id:String):GetMyProjectsQuery.ContributedProjects
 }
