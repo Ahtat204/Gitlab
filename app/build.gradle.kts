@@ -10,6 +10,7 @@ plugins {
     id("com.apollographql.apollo") version "4.4.2"
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -37,6 +38,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
+        debug {
+secrets {
+    propertiesFileName="secrets.properties"
+}
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -46,9 +52,13 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
+    }
+    buildFeatures {
         compose = true
     }
 }
+
 apollo {
     service("service") {
         packageName.set("com.asue24.gitlab")
