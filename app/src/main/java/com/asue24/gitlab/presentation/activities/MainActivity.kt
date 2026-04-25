@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private var Projects: GetMyProjectsQuery.ProjectMemberships? = null
+    //private var Projects: GetMyProjectsQuery.ProjectMemberships? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var isReady = false

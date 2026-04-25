@@ -6,11 +6,12 @@ import com.apollographql.apollo.api.http.HttpResponse
 import com.apollographql.apollo.network.http.HttpInterceptor
 import com.apollographql.apollo.network.http.HttpInterceptorChain
 import com.apollographql.apollo.network.okHttpClient
+import com.asue24.gitlab.domain.authentication.constants.Tokens
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
 object ApolloService {
-    public fun setUpApolloClient(accessToken: String): ApolloClient {
+    public fun setUpApolloClient(): ApolloClient {
         val logging = HttpLoggingInterceptor()
         logging.level = HttpLoggingInterceptor.Level.BODY
         val okHttp = OkHttpClient.Builder().addInterceptor(logging)
@@ -20,7 +21,7 @@ object ApolloService {
                     request: HttpRequest, chain: HttpInterceptorChain
                 ): HttpResponse {
                     return chain.proceed(
-                        request.newBuilder().addHeader("Authorization", "Bearer $accessToken")
+                        request.newBuilder().addHeader("Authorization", "Bearer ${Tokens.accessToken}")
                             .build()
                     )
                 }
