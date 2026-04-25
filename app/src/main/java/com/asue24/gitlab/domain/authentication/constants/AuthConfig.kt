@@ -6,7 +6,7 @@ import net.openid.appauth.ResponseTypeValues
 
 /**
  * Configuration data for the auth flow
- * contains Authentication URL (AUTH_URI) and Token URL (TOKEN_URI)</p>
+ * contains Authentication URL (AUTH_URI) and Token URL (TOKEN_URI)
  */
 object AuthConfig {
     const val AUTH_URI = "https://gitlab.com/oauth/authorize"
