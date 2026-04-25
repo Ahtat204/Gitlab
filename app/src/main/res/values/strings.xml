@@ -2,5 +2,5 @@
     <string name="app_name">Gitlab</string>
     <string name="title_activity_main">Gitlab</string>
     <string name="title_activity_authentication">AuthenticationActivity</string>
-    <string name="title_activity_launcher">LauncherActivity</string>
+    <string name="title_activity_launcher">Gitlab</string>
 </resources>

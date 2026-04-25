@@ -22,7 +22,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-        manifestPlaceholders .putIfAbsent("appAuthRedirectScheme", "com.asue24.gitlab   ")
+        manifestPlaceholders.putIfAbsent("appAuthRedirectScheme", "com.asue24.gitlab   ")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault())
         val formattedDate = dateFormat.format(Date())
@@ -54,7 +54,7 @@ apollo {
         packageName.set("com.asue24.gitlab")
         introspection {
             endpointUrl.set("https://gitlab.com/api/graphql")
-            schemaFile.set(file("app/src/main/graphql/com/pranav/schema.graphqls")) //replace with the schema file location
+            schemaFile.set(file("app/src/main/graphql/com/pranav/schema.graphqls"))
         }
     }
 }
@@ -66,7 +66,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation(libs.androidx.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -80,9 +80,14 @@ dependencies {
     kapt(libs.hilt.android.compiler)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+    implementation(libs.androidx.material3.android)
     implementation(libs.appauth)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
-    implementation (libs.androidx.core.splashscreen)
-    implementation (libs.androidx.navigation.compose)
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.material)
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation("androidx.compose.material:material-icons-core:1.7.8")
+
 }
