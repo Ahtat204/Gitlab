@@ -33,7 +33,7 @@
             android:launchMode="standard"
             android:theme="@style/Theme.Gitlab" />
         <activity
-            android:name=".domain.authentication.AuthenticationActivity"
+            android:name=".presentation.activities.AuthenticationActivity"
             android:exported="true"
             android:label="@string/title_activity_main"
             android:launchMode="singleTask"

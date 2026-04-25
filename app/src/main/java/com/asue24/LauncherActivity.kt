@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.asue24.gitlab.domain.authentication.AuthenticationActivity
+import com.asue24.gitlab.presentation.activities.AuthenticationActivity
 import com.asue24.gitlab.domain.authentication.constants.AuthStorage
 import com.asue24.gitlab.domain.authentication.constants.Tokens
 import com.asue24.gitlab.presentation.activities.MainActivity
