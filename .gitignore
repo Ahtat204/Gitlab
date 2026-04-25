@@ -11,3 +11,4 @@ local.properties
 *.svg
 .env
 **.secrets
+secrets.properties
