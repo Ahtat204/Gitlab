@@ -1,0 +1,18 @@
+query GetRepoTree($projectPath: ID!, $path: String!) {
+    project(fullPath: $projectPath) {
+        repository {
+            tree(path: $path) {
+                lastCommit {
+                    id
+                    title
+                }
+                blobs{ nodes {
+                    name
+                    type     # Returns "tree" for folders, "blob" for files
+                    path
+                    flatPath
+                }}
+            }
+        }
+    }
+}
