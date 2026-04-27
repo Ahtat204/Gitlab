@@ -4,6 +4,7 @@ query GetMyProjects {
         contributedProjects{
             count
             nodes {
+                id
                 name
                 webUrl
             }

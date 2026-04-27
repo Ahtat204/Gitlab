@@ -36,21 +36,3 @@ fun buildResponse(
     }
     return null
 }
-
-fun refreshAccessToken(
-    authState: AuthState?, service: AuthorizationService, refreshToken: String, context: Context
-) {
-    try {
-        Log.d("stored refreshToken value is", refreshToken)
-        if (authState == null) {
-            return
-        }
-        if (authState.authorizationServiceConfiguration == null) return
-
-    } catch (e: Exception) {
-        throw e
-    } finally {
-        Log.d("finally", "finally bolcok")
-    }
-
-}
