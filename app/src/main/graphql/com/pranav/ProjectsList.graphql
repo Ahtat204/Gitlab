@@ -1,34 +1,12 @@
 query GetMyProjects {
     currentUser {
-        id
-        avatarUrl
-        projectMemberships(first: 20) {
-            __typename
+        username
+        contributedProjects{
+            count
             nodes {
-
-                __typename
                 id
-                project {
-                    lastActivityAt
-                    avatarUrl
-                    __typename
-                    languages {
-                        color
-                        name
-                    }
-                    id
-                    name
-                    fullPath
-                    description
-                    visibility
-                    starCount
-                    lastActivityAt
-                }
-            }
-            pageInfo {
-                __typename
-                hasNextPage
-                endCursor
+                name
+                webUrl
             }
         }
     }
