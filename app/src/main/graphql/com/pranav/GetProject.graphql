@@ -1,5 +1,7 @@
 query GetRepoTree($projectPath: ID!, $path: String!) {
     project(fullPath: $projectPath) {
+        id
+        name
         repository {
             tree(path: $path) {
                 lastCommit {

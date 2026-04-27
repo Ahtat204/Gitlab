@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
@@ -15,12 +16,14 @@ import com.asue24.gitlab.domain.authentication.constants.Tokens
 import com.asue24.gitlab.presentation.components.BottomBar
 import com.asue24.gitlab.presentation.navigation.BottomNavigationgraph
 import com.asue24.gitlab.presentation.ui.theme.GitlabTheme
+import com.asue24.gitlab.presentation.viewmodels.ProjectViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private val projectViewModel: ProjectViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var isReady = false
