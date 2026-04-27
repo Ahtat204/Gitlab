@@ -1,49 +1,17 @@
-query GetRepoTree($projectPath: ID!) {
-
+query GetRepoTree($projectPath: ID!, $path: String!) {
     project(fullPath: $projectPath) {
-        __typename
-        id
-        name
-        topics
-        description
-        lastActivityAt
         repository {
-            __typename
-            lastCommit{
-                id
-                name
-            }
-            tree(path: "") {
-                __typename
+            tree(path: $path) {
                 lastCommit {
-                    __typename
                     id
                     title
                 }
-                trees{
-                    __typename
-                    nodes {
-                        __typename
-                        name
-                    }
-                    edges {
-                        __typename
-                        node {
-                            __typename
-                            name
-                        }
-                    }
-                }
-                blobs{
-                    __typename
-                    nodes {
-                        __typename
-                        name
-                        type     # Returns "tree" for folders, "blob" for files
-                        path
-                        flatPath
-
-                    }}
+                blobs{ nodes {
+                    name
+                    type     # Returns "tree" for folders, "blob" for files
+                    path
+                    flatPath
+                }}
             }
         }
     }
