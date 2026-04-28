@@ -11,9 +11,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
+import com.asue24.gitlab.GetMyProjectsQuery
+import com.asue24.gitlab.GetRepoTreeQuery
+import com.asue24.gitlab.data.remote.ApolloService
 import com.asue24.gitlab.domain.authentication.constants.AuthStorage
 import com.asue24.gitlab.domain.authentication.constants.Tokens
 import com.asue24.gitlab.presentation.components.BottomBar
+import com.asue24.gitlab.presentation.components.ProjectDetailScreen
 import com.asue24.gitlab.presentation.navigation.BottomNavigationgraph
 import com.asue24.gitlab.presentation.ui.theme.GitlabTheme
 import com.asue24.gitlab.presentation.viewmodels.ProjectViewModel
@@ -23,6 +27,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private var Projects: GetRepoTreeQuery.Project? = null
     private val projectViewModel: ProjectViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +37,9 @@ class MainActivity : ComponentActivity() {
             Log.d("AccessToken", Tokens.accessToken.toString())
             val authState = AuthStorage.getAuthState(this@MainActivity).data.first()
             isReady = true
+            Projects = ApolloService.setUpApolloClient().query(GetRepoTreeQuery("gid://gitlab/ProjectMember/153573617","Ahtat204/e-store-orderservice"))
+                .execute().data?.project
+            Log.d("OrderService", Projects.toString())
         }
         val splashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition { !isReady }
@@ -44,6 +52,11 @@ class MainActivity : ComponentActivity() {
                     BottomBar(navController)
                 }, floatingActionButtonPosition = FabPosition.End) { x ->
                     BottomNavigationgraph(navController)
+                    ProjectDetailScreen(
+                        "gid://gitlab/ProjectMember/153573617",
+                        "Ahtat204/e-store-orderservice",
+                        projectViewModel
+                    )
                 }
             }
         }
@@ -53,7 +66,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ApiScreen() {
-    var Projects by remember { mutableStateOf< GetMyProjectsQuery. ProjectMemberships?>(null) }
+    var Projects by remember { mutableStateOf< GetMyProjectsQuery. ContributedProjects?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
@@ -63,9 +76,9 @@ fun ApiScreen() {
             isLoading = true
             val result = withContext(Dispatchers.IO) {
                 Log.d("AccessToken", Tokens.accessToken.toString())
-                val apolloClient = ApolloService.setUpApolloClient(Tokens.accessToken!!)
+                val apolloClient = ApolloService.setUpApolloClient()
              return@withContext    apolloClient.query(GetMyProjectsQuery())
-                    .execute().data?.currentUser?.projectMemberships
+                    .execute().data?.currentUser?.contributedProjects
             }
             Projects = result
         } catch (e: Exception) {
@@ -93,4 +106,5 @@ fun ApiScreen() {
             }
         }
     }
-}*/
+}
+*/
