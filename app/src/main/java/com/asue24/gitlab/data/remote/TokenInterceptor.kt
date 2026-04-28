@@ -1,5 +1,6 @@
 package com.asue24.gitlab.data.remote
 
+import android.app.Application
 import android.content.Context
 import android.util.Log
 import com.asue24.gitlab.GitlabApp
@@ -25,6 +26,7 @@ class TokenInterceptor() : Interceptor {
     val authenticationService = Tokens.authService
     @OptIn(InternalCoroutinesApi::class)
     override fun intercept(chain: Interceptor.Chain): Response {
+        Log.d("TokenInterceptor","first log")
         var request = chain.request()
         val builder = request.newBuilder()
         val token = Tokens.accessToken
@@ -33,11 +35,12 @@ class TokenInterceptor() : Interceptor {
         }
         request = builder.build()
         var response = chain.proceed(request)
+
         if (response.code == 401) {
             synchronized(Locker) {
                 val state = Tokens.CurrentAuthState
                 val accessToken = Tokens.accessToken
-                if (accessToken != null && accessToken.equals(token) && state != null && Tokens.authService != null) {
+                if (accessToken != null && accessToken.equals(token) && state != null && Tokens.authService != null && Tokens.context!=null) {
                     val deferred = CompletableDeferred<String?>()
                     runBlocking {
                         state.performActionWithFreshTokens(Tokens.authService!!) { token, _, ex ->
@@ -47,7 +50,7 @@ class TokenInterceptor() : Interceptor {
                                 Tokens.authService = authenticationService
                                 deferred.complete(token)
                                 CoroutineScope(Dispatchers.IO).launch {
-                                   AuthStorage.getAuthState(context).updateData { state }
+                                   AuthStorage.getAuthState(Tokens.context!!).updateData { state }
                                 }
                             }
                             if (ex != null) {
@@ -55,6 +58,7 @@ class TokenInterceptor() : Interceptor {
                             }
                         }
                         deferred.await()
+                        response.close()
                     }
                     builder.header("Authorization", "Bearer ${Tokens.accessToken}")
                     request = builder.build()
@@ -66,6 +70,7 @@ class TokenInterceptor() : Interceptor {
             }
             response.close()
         }
+        Log.d("Last Log",response.toString())
         return response
     }
 }

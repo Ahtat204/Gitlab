@@ -16,11 +16,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
 class LauncherActivity : ComponentActivity() {
-public val authenticationService=AuthorizationService(this@LauncherActivity)
+private lateinit var  authenticationService:AuthorizationService
     override fun onCreate(savedInstanceState: Bundle?) {
         // 1. Install Splash Screen FIRST
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        authenticationService= AuthorizationService(this)
+        Tokens.authService=authenticationService
+        Tokens.context=application
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
         CoroutineScope(Dispatchers.Main).launch {

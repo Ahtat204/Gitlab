@@ -1,5 +1,6 @@
 package com.asue24.gitlab.presentation.activities
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -11,7 +12,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
-import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.GetRepoTreeQuery
 import com.asue24.gitlab.data.remote.ApolloService
 import com.asue24.gitlab.domain.authentication.constants.AuthStorage
@@ -21,6 +21,7 @@ import com.asue24.gitlab.presentation.components.ProjectDetailScreen
 import com.asue24.gitlab.presentation.navigation.BottomNavigationgraph
 import com.asue24.gitlab.presentation.ui.theme.GitlabTheme
 import com.asue24.gitlab.presentation.viewmodels.ProjectViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -37,14 +38,15 @@ class MainActivity : ComponentActivity() {
             Log.d("AccessToken", Tokens.accessToken.toString())
             val authState = AuthStorage.getAuthState(this@MainActivity).data.first()
             isReady = true
-            Projects = ApolloService.setUpApolloClient().query(GetRepoTreeQuery("Ahtat204/e-store-orderservice",""))
+            Projects = ApolloService.setUpApolloClient()
+                .query(GetRepoTreeQuery("Ahtat204/e-store-orderservice", ""))
                 .execute().data?.project
             Log.d("OrderService", Projects.toString())
         }
         val splashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition { !isReady }
         installSplashScreen()
-
+        Tokens.context = application
         setContent {
             val navController = rememberNavController()
             GitlabTheme(darkTheme = true) {
@@ -53,8 +55,7 @@ class MainActivity : ComponentActivity() {
                 }, floatingActionButtonPosition = FabPosition.End) { x ->
                     BottomNavigationgraph(navController)
                     ProjectDetailScreen(
-                        "Ahtat204/e-store-orderservice",
-                        ""
+                        "Ahtat204/e-store-orderservice", ""
                     )
                 }
             }
