@@ -8,11 +8,22 @@ query GetRepoTree($projectPath: ID!, $path: String!) {
                     id
                     title
                 }
+                trees{
+                    nodes {
+                        name
+                    }
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
                 blobs{ nodes {
                     name
                     type     # Returns "tree" for folders, "blob" for files
                     path
                     flatPath
+
                 }}
             }
         }
