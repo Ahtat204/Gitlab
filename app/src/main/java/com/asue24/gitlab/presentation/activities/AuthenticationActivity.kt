@@ -111,6 +111,8 @@ class AuthenticationActivity : ComponentActivity() {
                     finish()
                 }
                 Tokens.accessToken = authState.accessToken
+                Tokens.authService=authenticationService
+                Tokens.CurrentAuthState=authState
             }
         }
     }

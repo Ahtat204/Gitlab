@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
             Log.d("AccessToken", Tokens.accessToken.toString())
             val authState = AuthStorage.getAuthState(this@MainActivity).data.first()
             isReady = true
-            Projects = ApolloService.setUpApolloClient().query(GetRepoTreeQuery("gid://gitlab/ProjectMember/153573617","Ahtat204/e-store-orderservice"))
+            Projects = ApolloService.setUpApolloClient().query(GetRepoTreeQuery("Ahtat204/e-store-orderservice",""))
                 .execute().data?.project
             Log.d("OrderService", Projects.toString())
         }
@@ -54,8 +54,7 @@ class MainActivity : ComponentActivity() {
                     BottomNavigationgraph(navController)
                     ProjectDetailScreen(
                         "Ahtat204/e-store-orderservice",
-                        "",
-                        projectViewModel
+                        ""
                     )
                 }
             }

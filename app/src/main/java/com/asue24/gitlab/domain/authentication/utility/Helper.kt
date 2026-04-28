@@ -38,7 +38,7 @@ fun buildResponse(
 }
 
 fun refreshAccessToken(
-    authState: AuthState?, service: AuthorizationService, refreshToken: String, context: Context
+    authState: AuthState?, refreshToken: String
 ) {
     try {
         Log.d("stored refreshToken value is", refreshToken)
