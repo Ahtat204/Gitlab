@@ -12,4 +12,5 @@ local.properties
 .env
 **.secrets
 secrets.properties
+**.txt
 app/test.json
