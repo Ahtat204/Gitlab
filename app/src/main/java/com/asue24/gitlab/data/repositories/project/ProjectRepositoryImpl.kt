@@ -34,10 +34,12 @@ class ProjectRepositoryImpl() : ProjectRepository {
 
         return response.flowOn(Dispatchers.IO)
     }
-    override suspend fun getProjectById(id: String, path: String): GetRepoTreeQuery.Project {
+    override suspend fun getProjectById(id: String, path: String): GetRepoTreeQuery.Project? {
         return cache[id] ?: gitlab.query(GetRepoTreeQuery(id, path))
             .execute()
-            .dataAssertNoErrors.project!!
-            .also { cache[id] = it }
+            .dataAssertNoErrors.project
+            .also { it?.let {
+                cache[id]=it
+            } }
     }
 }

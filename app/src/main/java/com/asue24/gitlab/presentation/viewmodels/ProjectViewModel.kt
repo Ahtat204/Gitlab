@@ -23,7 +23,7 @@ class ProjectViewModel() : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             projectRepository.getAllProjects().collect { data ->
                 val newNodes =
-                    data.currentUser?.contributedProjects?.nodes?.filterNotNull() ?: emptyList()
+                    data.currentUser?.projectMemberships?.nodes?.filterNotNull() ?: emptyList()
                 _projects.value = newNodes
             }
         }

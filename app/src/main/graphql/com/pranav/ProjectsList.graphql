@@ -1,20 +1,22 @@
 query GetMyProjects {
     currentUser {
-        contributedProjects{
-            count
+        username
+        projectMemberships(first: 20) {
             nodes {
                 id
-                name
-                webUrl
-                visibility
-                description
-                topics
-                updatedAt
-                starCount
-                openMergeRequestsCount
-                pipeline{
-                    status
+                project {
+                    id
+                    name
+                    fullPath
+                    description
+                    visibility
+                    starCount
+                    lastActivityAt
                 }
+            }
+            pageInfo {
+                hasNextPage
+                endCursor
             }
         }
     }
