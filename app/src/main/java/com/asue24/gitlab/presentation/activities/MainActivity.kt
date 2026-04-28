@@ -53,8 +53,8 @@ class MainActivity : ComponentActivity() {
                 }, floatingActionButtonPosition = FabPosition.End) { x ->
                     BottomNavigationgraph(navController)
                     ProjectDetailScreen(
-                        "153573617",
                         "Ahtat204/e-store-orderservice",
+                        "",
                         projectViewModel
                     )
                 }
