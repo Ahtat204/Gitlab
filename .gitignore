@@ -16,3 +16,4 @@ keystore
 app/release
 keystore_base64.txt
 explanation.txt
+app/test.json

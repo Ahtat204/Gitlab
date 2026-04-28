@@ -9,11 +9,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asue24.gitlab.presentation.viewmodels.ProjectViewModel
 
 @Composable
-fun ProjectDetailScreen(id: String, viewModel: ProjectViewModel) {
+fun ProjectDetailScreen(id: String,path:String, viewModel: ProjectViewModel) {
     // 1. Observe the State
     val project by viewModel.currentProject.collectAsStateWithLifecycle()
     LaunchedEffect (id) {
-        viewModel.loadProject(id, "root")
+        viewModel.loadProject(id, path)
     }
     project?.let {
         Text("Project: ${it.name}")
