@@ -89,7 +89,9 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.material)
-    implementation("androidx.compose.material:material-icons-extended:1.7.8")
-    implementation("androidx.compose.material:material-icons-core:1.7.8")
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.apollo.normalized.cache)
+    implementation(libs.apollo.normalized.cache.sqlite)
 
 }
