@@ -68,7 +68,7 @@ class TokenInterceptor() : Interceptor {
                     }
                 }
             }
-            response.close()
+
         }
         Log.d("Last Log",response.toString())
         return response
