@@ -33,6 +33,6 @@ object ApolloService {
                             .addHeader("Authorization", "Bearer ${Tokens.accessToken}").build()
                     )
                 }
-            }).okHttpClient(okHttp.build()).build()
+            }).okHttpClient(okHttp.addInterceptor(TokenInterceptor()).build()).build()
     }
 }
