@@ -54,9 +54,6 @@ class MainActivity : ComponentActivity() {
                     BottomBar(navController)
                 }, floatingActionButtonPosition = FabPosition.End) { x ->
                     BottomNavigationgraph(navController)
-                    ProjectDetailScreen(
-                        "Ahtat204/e-store-orderservice", ""
-                    )
                 }
             }
         }
