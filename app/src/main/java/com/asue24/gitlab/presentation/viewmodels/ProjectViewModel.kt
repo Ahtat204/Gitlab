@@ -9,6 +9,8 @@ import com.asue24.gitlab.data.repositories.project.ProjectRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class ProjectViewModel : ViewModel() {
@@ -18,9 +20,9 @@ class ProjectViewModel : ViewModel() {
     private val projectRepository: ProjectRepository = ProjectRepositoryImpl()
     private val _projects = MutableStateFlow<List<Node>>(emptyList())
     val projects: StateFlow<List<Node>> = _projects.asStateFlow()
-    fun loadProject(id: String, path: String) {
+    fun loadProject(id: String) {
         viewModelScope.launch {
-            val project = projectRepository.getProjectById(id, path)
+            val project = projectRepository.getProjectById(id)
             currentProject.value = project
         }
     }

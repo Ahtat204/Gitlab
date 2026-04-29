@@ -93,6 +93,6 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.apollo.normalized.cache)
-    implementation(libs.apollo.normalized.cache.sqlite)
+    implementation(libs.apollo.http.cache)
 
 }

@@ -6,18 +6,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asue24.gitlab.presentation.viewmodels.ProjectViewModel
 
 @Composable
-fun ProjectDetailScreen(id: String,path:String) {
+fun ProjectDetailScreen(id: String) {
     val viewModel= viewModel<ProjectViewModel>()
-    // 1. Observe the State
     val project by viewModel.currentProject.collectAsStateWithLifecycle()
     LaunchedEffect (id) {
-        viewModel.loadProject(id, path)
+        viewModel.loadProject(id)
     }
     project?.let {
         Text("Project: ${it.name.toString()}",color = Color.White)

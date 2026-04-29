@@ -1,5 +1,6 @@
 [versions]
 agp = "8.8.2"
+apolloHttpCache = "4.4.2"
 apolloNormalizedCache = "4.4.2"
 appauth = "0.11.1"
 coreSplashscreen = "1.0.1"
@@ -30,8 +31,8 @@ androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", versi
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsExtended" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+apollo-http-cache = { module = "com.apollographql.apollo:apollo-http-cache", version.ref = "apolloHttpCache" }
 apollo-normalized-cache = { module = "com.apollographql.apollo:apollo-normalized-cache", version.ref = "apolloNormalizedCache" }
-apollo-normalized-cache-sqlite = { module = "com.apollographql.apollo:apollo-normalized-cache-sqlite", version.ref = "apolloNormalizedCache" }
 appauth = { module = "net.openid:appauth", version.ref = "appauth" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

@@ -13,8 +13,8 @@ object ApolloService {
     private val cacheFactory = MemoryCacheFactory(10 * 1024 * 1024, expireAfterMillis = 600000)
     val client: ApolloClient by lazy {
         val okHttpClient = OkHttpClient.Builder().addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            }).addInterceptor(AuthenticationInterceptor()).build()
+            level = HttpLoggingInterceptor.Level.BASIC
+        }).addInterceptor(AuthenticationInterceptor()).build()
 
         ApolloClient.Builder().serverUrl("https://gitlab.com/api/graphql")
             .normalizedCache(cacheFactory, writeToCacheAsynchronously = false)

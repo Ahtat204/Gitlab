@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
+import java.io.File
 
 class LauncherActivity : ComponentActivity() {
 private lateinit var  authenticationService:AuthorizationService
@@ -24,6 +25,10 @@ private lateinit var  authenticationService:AuthorizationService
         // 1. Install Splash Screen FIRST
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        val existed=File("gitlab/httpCache")
+        if(!existed.exists()){
+            existed.mkdir()
+        }
         authenticationService= AuthorizationService(this)
         Tokens.authService=authenticationService
         Tokens.context=application
