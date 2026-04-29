@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asue24.gitlab.presentation.viewmodels.ProjectViewModel
@@ -19,6 +20,7 @@ fun ProjectDetailScreen(id: String,path:String) {
         viewModel.loadProject(id, path)
     }
     project?.let {
-        Text("Project: ${it.name}",color = Color.White)
+        Text("Project: ${it.description.toString()}",color = Color.White)
+        Text("Project: ${it.topics?.get(1).toString()}",color = Color.White)
     } ?: CircularProgressIndicator()
 }
