@@ -22,22 +22,6 @@ import java.io.File
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var isReady = true/*    val scope = CoroutineScope(Dispatchers.IO)
-        scope.launch {
-            Log.d("AccessToken", Tokens.accessToken.toString())
-            val authState = AuthStorage.getAuthState(this@MainActivity).data.first()
-            isReady = true
-            Projects = ApolloService.setUpApolloClient()
-                .query(GetRepoTreeQuery("Ahtat204/e-store-orderservice", ""))
-                .execute().data?.project
-            Log.d("OrderService", Projects.toString())
-            val expiry=Tokens.CurrentAuthState?.accessTokenExpirationTime!!
-            Log.d("AccessExpiryDate",expiry.toString())
-
-        }*/
-
-        val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { !isReady }
         installSplashScreen()
         Tokens.context = application
         val mFolder = File(Environment. getExternalStorageDirectory().path+"gitlab/httpCache")
@@ -56,49 +40,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-}/*
-
-@Composable
-fun ApiScreen() {
-    var Projects by remember { mutableStateOf< GetMyProjectsQuery. ContributedProjects?>(null) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
-
-    // LaunchedEffect runs once when key is Unit (first composition)
-    LaunchedEffect(Unit) {
-        try {
-            isLoading = true
-            val result = withContext(Dispatchers.IO) {
-                Log.d("AccessToken", Tokens.accessToken.toString())
-                val apolloClient = ApolloService.setUpApolloClient()
-             return@withContext    apolloClient.query(GetMyProjectsQuery())
-                    .execute().data?.currentUser?.contributedProjects
-            }
-            Projects = result
-        } catch (e: Exception) {
-            errorMessage = e.localizedMessage ?: "Unknown error"
-        } finally {
-            isLoading = false
-        }
-    }
-
-    // UI
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        when {
-            isLoading -> CircularProgressIndicator()
-            errorMessage != null -> Text("Error: $errorMessage")
-
-            Projects != null -> Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text("Title: ${Projects?.nodes?.get(1)?.project?.name}", style = MaterialTheme.typography.titleMedium)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(Projects?.nodes?.get(1)?.project?.description!!, color = Color.White)
-            }
-        }
-    }
 }
-*/
