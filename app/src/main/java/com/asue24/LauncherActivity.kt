@@ -34,7 +34,7 @@ private lateinit var  authenticationService:AuthorizationService
         Tokens.context=application
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
 
             if (storedState.refreshToken != null) {
