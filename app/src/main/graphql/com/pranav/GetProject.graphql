@@ -6,8 +6,13 @@ query GetRepoTree($projectPath: ID!) {
         name
         topics
         description
+        lastActivityAt
         repository {
             __typename
+            lastCommit{
+                id
+                name
+            }
             tree(path: "") {
                 __typename
                 lastCommit {
