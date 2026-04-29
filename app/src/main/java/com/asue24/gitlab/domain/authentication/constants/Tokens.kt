@@ -6,8 +6,8 @@ import net.openid.appauth.AuthorizationService
 
 object Tokens {
     var accessToken: String? = null
-    var CurrentAuthState:AuthState?=null
-    var authService:AuthorizationService?=null
-    var context: Context?=null
+    var CurrentAuthState: AuthState? = null
+    var authService: AuthorizationService? = null
+    var context: Context? = null
 }
 
