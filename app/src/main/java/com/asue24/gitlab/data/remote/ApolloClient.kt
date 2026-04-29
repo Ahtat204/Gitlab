@@ -14,7 +14,7 @@ import java.io.File
 object ApolloService {
     private val sqlNormalizedCacheFactory = SqlNormalizedCacheFactory("apollo.db")
     private val cacheFactory =
-        MemoryCacheFactory(10 * 1024 * 1024, expireAfterMillis = 60000) //10MB of cache , TTL=1 min
+        MemoryCacheFactory(10 * 1024 * 1024, expireAfterMillis = 100000) //10MB of cache , TTL=1 min
 
     fun setUpApolloClient(): ApolloClient {
         val logging = HttpLoggingInterceptor()
@@ -23,7 +23,7 @@ object ApolloService {
         return ApolloClient.Builder().serverUrl("https://gitlab.com/api/graphql")
             .logCacheMisses({ res -> Log.w("CacheMiss", "object wasn't found in Cache${res}") })
             .normalizedCache(
-                cacheFactory
+                cacheFactory, cacheKeyGenerator,writeToCacheAsynchronously=false
             ).okHttpClient(okHttp.addInterceptor(TokenInterceptor()).build()).build()
     }
 
