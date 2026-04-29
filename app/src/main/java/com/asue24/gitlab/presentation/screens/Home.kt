@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
 @Composable
-public fun Home(navController: NavHostController,Login:()->Unit) {
+fun Home(navController: NavHostController, Login: () -> Unit) {
     Log.d("HomeScreen", "home screen is opened")
     Button(onClick = Login, modifier = Modifier.size(200.dp)) { Text(text = "HomeScreen") }
 }
