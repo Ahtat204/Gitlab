@@ -1,6 +1,7 @@
 package com.asue24.gitlab.presentation.activities
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +10,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
+import com.apollographql.apollo.cache.normalized.apolloStore
+import com.asue24.gitlab.data.remote.ApolloService
 import com.asue24.gitlab.domain.authentication.constants.Tokens
 import com.asue24.gitlab.presentation.components.BottomBar
 import com.asue24.gitlab.presentation.navigation.BottomNavigationgraph
@@ -28,9 +31,10 @@ class MainActivity : ComponentActivity() {
             Log.d("OrderService", Projects.toString())
             val expiry=Tokens.CurrentAuthState?.accessTokenExpirationTime!!
             Log.d("AccessExpiryDate",expiry.toString())
-            val cacheDump=ApolloService.setUpApolloClient().apolloStore.dump()
-            Log.d("ApolloCache", "Cache Contents: ${cacheDump.keys}+values${cacheDump.values}")
+
         }*/
+        val cacheDump = ApolloService.setUpApolloClient().apolloStore.dump()
+        Log.d("ApolloCache", "Cache Contents: ${cacheDump.isEmpty()}")
         val splashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition { !isReady }
         installSplashScreen()
