@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ProjectViewModel() : ViewModel() {
+class ProjectViewModel : ViewModel() {
     val currentProject = MutableStateFlow<GetRepoTreeQuery.Project?>(null)
 
     //TODO:this will be refactored to Dependency Injection,we're just testing now
@@ -30,7 +30,7 @@ class ProjectViewModel() : ViewModel() {
     }
 
     fun loadProject(id: String, path: String) {
-        currentProject.value=null
+        currentProject.value = null
         viewModelScope.launch {
             val project = projectRepository.getProjectById(id, path)
             currentProject.value = project

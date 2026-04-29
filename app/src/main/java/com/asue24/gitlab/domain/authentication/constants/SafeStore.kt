@@ -5,9 +5,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import net.openid.appauth.AuthState
 
-public val Context.authStateStore: DataStore<AuthState> by dataStore(
-    fileName = "auth_state.txt",
-    serializer = AuthStateSerializer
+val Context.authStateStore: DataStore<AuthState> by dataStore(
+    fileName = "auth_state.txt", serializer = AuthStateSerializer
 )
 
 object AuthStorage {

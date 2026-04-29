@@ -1,22 +1,25 @@
 package com.asue24
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.asue24.gitlab.presentation.activities.AuthenticationActivity
 import com.asue24.gitlab.domain.authentication.constants.AuthStorage
 import com.asue24.gitlab.domain.authentication.constants.Tokens
+import com.asue24.gitlab.presentation.activities.AuthenticationActivity
 import com.asue24.gitlab.presentation.activities.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
+
 class LauncherActivity : ComponentActivity() {
 private lateinit var  authenticationService:AuthorizationService
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         // 1. Install Splash Screen FIRST
         val splashScreen = installSplashScreen()
