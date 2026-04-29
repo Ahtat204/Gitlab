@@ -1,12 +1,8 @@
 package com.asue24.gitlab.data.remote
 
-import android.app.Application
-import android.content.Context
 import android.util.Log
-import com.asue24.gitlab.GitlabApp
 import com.asue24.gitlab.domain.authentication.constants.AuthStorage
 import com.asue24.gitlab.domain.authentication.constants.Tokens
-import com.asue24.gitlab.domain.authentication.constants.authStateStore
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,11 +18,12 @@ object Locker {
     private val locker = Any()
 }
 
-class TokenInterceptor() : Interceptor {
+class TokenInterceptor : Interceptor {
     val authenticationService = Tokens.authService
+
     @OptIn(InternalCoroutinesApi::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-        Log.d("TokenInterceptor","first log")
+        Log.d("TokenInterceptor", "first log")
         var request = chain.request()
         val builder = request.newBuilder()
         val token = Tokens.accessToken
@@ -40,7 +37,7 @@ class TokenInterceptor() : Interceptor {
             synchronized(Locker) {
                 val state = Tokens.CurrentAuthState
                 val accessToken = Tokens.accessToken
-                if (accessToken != null && accessToken.equals(token) && state != null && Tokens.authService != null && Tokens.context!=null) {
+                if (accessToken != null && accessToken.equals(token) && state != null && Tokens.authService != null && Tokens.context != null) {
                     val deferred = CompletableDeferred<String?>()
                     runBlocking {
                         state.performActionWithFreshTokens(Tokens.authService!!) { token, _, ex ->
@@ -50,7 +47,7 @@ class TokenInterceptor() : Interceptor {
                                 Tokens.authService = authenticationService
                                 deferred.complete(token)
                                 CoroutineScope(Dispatchers.IO).launch {
-                                   AuthStorage.getAuthState(Tokens.context!!).updateData { state }
+                                    AuthStorage.getAuthState(Tokens.context!!).updateData { state }
                                 }
                             }
                             if (ex != null) {
@@ -70,7 +67,7 @@ class TokenInterceptor() : Interceptor {
             }
 
         }
-        Log.d("Last Log",response.toString())
+        Log.d("Last Log", response.toString())
         return response
     }
 }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 /**
  * this is a singleton object , which guarantees the ConcurrentHashMap will live throughout the Application lifecycle
  */
-class ProjectRepositoryImpl() : ProjectRepository {
+class ProjectRepositoryImpl : ProjectRepository {
     private val gitlab = ApolloService.setUpApolloClient()
 
     /**
