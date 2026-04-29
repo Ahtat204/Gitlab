@@ -33,8 +33,7 @@ class MainActivity : ComponentActivity() {
             Log.d("AccessExpiryDate",expiry.toString())
 
         }*/
-        val cacheDump = ApolloService.setUpApolloClient().apolloStore.dump()
-        Log.d("ApolloCache", "Cache Contents: ${cacheDump.isEmpty()}")
+
         val splashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition { !isReady }
         installSplashScreen()
