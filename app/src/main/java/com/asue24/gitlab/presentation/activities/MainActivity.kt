@@ -1,37 +1,23 @@
 package com.asue24.gitlab.presentation.activities
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
-import com.apollographql.apollo.cache.normalized.apolloStore
-import com.asue24.gitlab.GetRepoTreeQuery
-import com.asue24.gitlab.data.remote.ApolloService
-import com.asue24.gitlab.domain.authentication.constants.AuthStorage
 import com.asue24.gitlab.domain.authentication.constants.Tokens
 import com.asue24.gitlab.presentation.components.BottomBar
 import com.asue24.gitlab.presentation.navigation.BottomNavigationgraph
 import com.asue24.gitlab.presentation.ui.theme.GitlabTheme
-import com.asue24.gitlab.presentation.viewmodels.ProjectViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private var Projects: GetRepoTreeQuery.Project? = null
-    private val projectViewModel: ProjectViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var isReady = false
-        val scope = CoroutineScope(Dispatchers.IO)
+        var isReady = true/*    val scope = CoroutineScope(Dispatchers.IO)
         scope.launch {
             Log.d("AccessToken", Tokens.accessToken.toString())
             val authState = AuthStorage.getAuthState(this@MainActivity).data.first()
@@ -44,7 +30,7 @@ class MainActivity : ComponentActivity() {
             Log.d("AccessExpiryDate",expiry.toString())
             val cacheDump=ApolloService.setUpApolloClient().apolloStore.dump()
             Log.d("ApolloCache", "Cache Contents: ${cacheDump.keys}+values${cacheDump.values}")
-        }
+        }*/
         val splashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition { !isReady }
         installSplashScreen()

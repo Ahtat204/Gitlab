@@ -22,7 +22,7 @@ object ApolloService {
         return ApolloClient.Builder().serverUrl("https://gitlab.com/api/graphql")
             .logCacheMisses({ res -> Log.w("CacheMiss", "object wasn't found in Cache${res}") })
             .normalizedCache(
-                cacheFactory
+                cacheFactory, ProjectCacheKeyResolver
             ).okHttpClient(okHttp.addInterceptor(TokenInterceptor()).build()).build()
     }
 }
