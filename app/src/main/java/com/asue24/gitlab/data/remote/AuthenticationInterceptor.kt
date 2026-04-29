@@ -18,7 +18,7 @@ object Locker {
     private val locker = Any()
 }
 
-class TokenInterceptor : Interceptor {
+class AuthenticationInterceptor : Interceptor {
     val authenticationService = Tokens.authService
 
     @OptIn(InternalCoroutinesApi::class)
