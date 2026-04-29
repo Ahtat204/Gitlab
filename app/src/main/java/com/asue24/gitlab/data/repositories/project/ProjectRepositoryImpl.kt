@@ -34,6 +34,6 @@ class ProjectRepositoryImpl : ProjectRepository {
     }
 
     override suspend fun getProjectById(id: String, path: String): GetRepoTreeQuery.Project? =
-        gitlab.query(GetRepoTreeQuery(id, path)).execute().dataAssertNoErrors.project
+        gitlab.query(GetRepoTreeQuery(id, path)).fetchPolicy(FetchPolicy.CacheAndNetwork).execute().dataAssertNoErrors.project
 
 }
