@@ -20,7 +20,6 @@ fun ProjectDetailScreen(id: String,path:String) {
         viewModel.loadProject(id, path)
     }
     project?.let {
-        Text("Project: ${it.description.toString()}",color = Color.White)
-        Text("Project: ${it.topics?.get(1).toString()}",color = Color.White)
+        Text("Project: ${it.name.toString()}",color = Color.White)
     } ?: CircularProgressIndicator()
 }
