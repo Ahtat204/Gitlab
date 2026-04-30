@@ -47,6 +47,7 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
+            isDebuggable=false
         }
         debug {
 
@@ -61,8 +62,6 @@ android {
     }
     buildFeatures {
         buildConfig = true
-    }
-    buildFeatures {
         compose = true
     }
 }
