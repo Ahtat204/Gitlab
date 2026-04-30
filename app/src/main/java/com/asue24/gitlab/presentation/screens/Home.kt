@@ -8,8 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.asue24.gitlab.presentation.components.MyWorkItems
 
 @Composable
 fun Home(navController: NavHostController) {
- 
+    MyWorkItems(navController)
 }

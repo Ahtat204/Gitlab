@@ -13,12 +13,9 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 
-object Locker {
-    @OptIn(InternalCoroutinesApi::class)
-    private val locker = Any()
-}
 
 class AuthenticationInterceptor : Interceptor {
+    private val Locker=Any()
     val authenticationService = Tokens.authService
 
     @OptIn(InternalCoroutinesApi::class)

@@ -1,9 +1,6 @@
 package com.asue24.gitlab.data.repositories.project
 
-import android.util.Log
 import com.apollographql.apollo.cache.normalized.FetchPolicy
-import com.apollographql.apollo.cache.normalized.api.NormalizedCache
-import com.apollographql.apollo.cache.normalized.apolloStore
 import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.GetRepoTreeQuery
