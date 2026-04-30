@@ -39,15 +39,11 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
-            isDebuggable = false
+            isDebuggable=false
         }
         debug {
 
         }
-        debug {}
-    }
-    secrets {
-        propertiesFileName = "secrets.properties"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -73,7 +69,6 @@ apollo {
     }
 }
 dependencies {
-    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -106,5 +101,5 @@ dependencies {
     implementation(libs.androidx.material.icons.core)
     implementation(libs.apollo.normalized.cache)
     implementation(libs.apollo.http.cache)
-    implementation(libs.coil.compose)
+
 }
