@@ -1,5 +1,7 @@
 package com.asue24.gitlab.data.repositories.project
 
+import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.GetRepoTreeQuery
 import com.asue24.gitlab.data.remote.ApolloService
@@ -7,24 +9,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * this is a singleton object , which guarantees the ConcurrentHashMap will live throughout the Application lifecycle
  */
-class ProjectRepositoryImpl() : ProjectRepository {
-    /**
-     * Extremely fast project lookup to avoid frequent API requests .
-     */
-    private val cache: ConcurrentHashMap<String, GetRepoTreeQuery.Project> = ConcurrentHashMap()
-    private val gitlab = ApolloService.setUpApolloClient()
+class ProjectRepositoryImpl : ProjectRepository {
+    private val gitlab = ApolloService.client
 
     /**
      * @brief Streams contributed projects from GitLab.
      * Uses context preservation and structured concurrency.
      */
     override fun getAllProjects(): Flow<GetMyProjectsQuery.Data> {
-        val result = gitlab.query(GetMyProjectsQuery()).toFlow()
+        val result =
+            gitlab.query(GetMyProjectsQuery()).fetchPolicy(FetchPolicy.CacheAndNetwork).toFlow()
         val response = result.map { resp ->
             if (resp.hasErrors()) {
                 throw RuntimeException("GraphQL Errors: ${resp.errors}")
@@ -34,12 +32,10 @@ class ProjectRepositoryImpl() : ProjectRepository {
 
         return response.flowOn(Dispatchers.IO)
     }
-    override suspend fun getProjectById(id: String, path: String): GetRepoTreeQuery.Project? {
-        return cache[id] ?: gitlab.query(GetRepoTreeQuery(id, path))
-            .execute()
-            .dataAssertNoErrors.project
-            .also { it?.let {
-                cache[id]=it
-            } }
+
+    override suspend fun getProjectById(id: String): GetRepoTreeQuery.Project? {
+        return gitlab.query(GetRepoTreeQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
+            .execute().dataAssertNoErrors.project
     }
+
 }
