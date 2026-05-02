@@ -62,3 +62,11 @@ val customFontFamily = FontFamily(
     Font(R.font.regular, FontWeight.Normal),
     Font(R.font.regular, FontWeight.Bold)
 )
+val topBarFont = FontFamily(
+    Font(R.font.topbarfont, FontWeight.Normal),
+    Font(R.font.topbarfont, FontWeight.Bold)
+)
+val titleFont = FontFamily(
+    Font(R.font.sansserif, FontWeight.Normal),
+    Font(R.font.sansserif, FontWeight.Bold)
+)
