@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.asue24.gitlab.presentation.ui.theme.Orange
+import com.asue24.gitlab.presentation.ui.theme.topBarFont
 
 /**
  * the name represent the name of the screen ,as this Bar will contain useful buttons (like search and refresh )
@@ -22,8 +22,7 @@ import com.asue24.gitlab.presentation.ui.theme.Orange
 @Composable
 fun TopBar(name: String) {
     Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = name,
@@ -31,7 +30,7 @@ fun TopBar(name: String) {
                 .weight(0.6f)
                 .padding(20.dp, 0.dp),
             color = Color.White,
-            fontSize = 27.sp
+            fontSize = 27.sp, fontFamily = topBarFont
         )
         IconButton(onClick = {}, modifier = Modifier.weight(0.2f)) {
             Icon(
@@ -41,6 +40,5 @@ fun TopBar(name: String) {
                 modifier = Modifier
             )
         }
-
     }
 }
