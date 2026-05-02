@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.asue24.gitlab.presentation.ui.theme.Orange
 
 /**
  * the name represent the name of the screen ,as this Bar will contain useful buttons (like search and refresh )
@@ -32,21 +33,14 @@ fun TopBar(name: String) {
             color = Color.White,
             fontSize = 27.sp
         )
-        IconButton(onClick = {}, modifier = Modifier.weight(0.5f)) {
+        IconButton(onClick = {}, modifier = Modifier.weight(0.2f)) {
             Icon(
                 Icons.Filled.Search,
                 contentDescription = null,
-                tint = Color.Blue,
+                tint = Color.White,
                 modifier = Modifier
             )
         }
-        IconButton(onClick = {}, modifier = Modifier.weight(0.5f)) {
-            Icon(
-                Icons.Filled.Search,
-                contentDescription = null,
-                tint = Color.Blue,
-                modifier = Modifier
-            )
-        }
+
     }
 }

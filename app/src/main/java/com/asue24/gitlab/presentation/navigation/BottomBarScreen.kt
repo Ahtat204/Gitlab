@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.twotone.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -25,9 +26,9 @@ sealed class BottomBarScreen(
 
     /** Dashboard screen, represented by a star icon. */
     data object Projects : BottomBarScreen(
-        "projects", "projects", Icons.Filled.Folder
+        "projects", "Projects", Icons.Filled.Folder
     )
 
     data object Profile : BottomBarScreen("profile", "Profile", Icons.TwoTone.Person)
-    data object Activity : BottomBarScreen("activity", "Activity", Icons.Filled.Timeline)
+    data object Activity : BottomBarScreen("activity", "Activity", Icons.Filled.Timer)
 }

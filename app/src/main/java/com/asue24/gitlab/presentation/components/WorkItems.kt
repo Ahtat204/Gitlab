@@ -2,27 +2,40 @@ package com.asue24.gitlab.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.asue24.gitlab.R
 
 /**
  * this Component shows a List of Work Items on your Gitlab , examples: MRs , Issues ,To-do items,Starred Projects...
  */
 @Composable
- fun MyWorkItems(navController: NavController) {
-    val myWorkItems = listOf("issues", "merge requests", "To-do items")
+fun MyWorkItems(navController: NavController) {
+    val myWorkItems = listOf(
+        Item("Issues", R.drawable.mergerequest, 1),
+        Item("Merge Requests ", R.drawable.mergerequest, 1),
+        Item("Workspaces", R.drawable.mergerequest, 1),
+        Item("Milestones", R.drawable.mergerequest, 1),
+        Item("Starred", R.drawable.mergerequest, 1),
+        Item("Groups", R.drawable.mergerequest, 1)
+    )
 
-    Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier.padding(0.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Your Work", fontSize = 20.sp)
         myWorkItems.forEach { item ->
-        WorkItem(item) {
-            navController.navigate(item)
-        }
-
+            WorkItem(item) {
+                navController.navigate(item)
+            }
         }
     }
 }
