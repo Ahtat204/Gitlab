@@ -29,6 +29,7 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
+            isDebuggable=false
         }
         debug {
 secrets {
@@ -45,8 +46,6 @@ secrets {
     }
     buildFeatures {
         buildConfig = true
-    }
-    buildFeatures {
         compose = true
     }
 }
@@ -57,10 +56,12 @@ apollo {
         introspection {
             endpointUrl.set("https://gitlab.com/api/graphql")
             schemaFile.set(file("app/src/main/graphql/com/pranav/schema.graphqls"))
+            addTypename.set("always")
         }
     }
 }
 dependencies {
+    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -89,7 +90,11 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.material)
-    implementation("androidx.compose.material:material-icons-extended:1.7.8")
-    implementation("androidx.compose.material:material-icons-core:1.7.8")
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.apollo.normalized.cache)
+    implementation(libs.apollo.http.cache)
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("io.coil-kt:coil-svg:2.7.0")
 
 }

@@ -1,4 +1,4 @@
-package com.asue24.gitlab.presentation.activities;
+package com.asue24.gitlab.presentation.activities
 
 import android.content.Intent
 import android.net.Uri
@@ -111,6 +111,8 @@ class AuthenticationActivity : ComponentActivity() {
                     finish()
                 }
                 Tokens.accessToken = authState.accessToken
+                Tokens.authService = authenticationService
+                Tokens.CurrentAuthState = authState
             }
         }
     }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.asue24.gitlab.presentation.screens.Home
 
 @Composable
 fun BottomNavigationgraph(
@@ -12,7 +13,7 @@ fun BottomNavigationgraph(
 
     NavHost(navController = navController, startDestination = BottomBarScreen.Home.route) {
         composable(route = BottomBarScreen.Home.route) {
-         //   Home(navController)
+        Home(navController)
         }
         composable(route = BottomBarScreen.Projects.route) {
         //LoginScreen(navController)
