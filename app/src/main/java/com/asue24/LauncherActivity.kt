@@ -1,5 +1,6 @@
 package com.asue24
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -63,6 +64,8 @@ private lateinit var  authenticationService:AuthorizationService
 
     private fun navigateTo(destination: Class<*>) {
         startActivity(Intent(this, destination))
+        this.overridePendingTransition( android.R.anim.overshoot_interpolator,
+            android.R.anim.fade_out)
         finish()
     }
 
