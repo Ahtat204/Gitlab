@@ -1,4 +1,5 @@
 package com.asue24.gitlab.data.security
+
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import java.security.KeyStore
@@ -14,41 +15,34 @@ object CryptoUtility {
     private const val PADDING = KeyProperties.ENCRYPTION_PADDING_PKCS7
     private const val TRANSFORMATION = "$ALGORITHM/$BLOCK_MODE/$PADDING"
     private val cipher = Cipher.getInstance(TRANSFORMATION)
-    private val keyStore = KeyStore
-        .getInstance("AndroidKeyStore")
-        .apply {
+    private val keyStore = KeyStore.getInstance("AndroidKeyStore").apply {
             load(null)
         }
+
     private fun getKey(): SecretKey {
-        val existingKey = keyStore
-            .getEntry(KEY_ALIAS, null) as? KeyStore.SecretKeyEntry
+        val existingKey = keyStore.getEntry(KEY_ALIAS, null) as? KeyStore.SecretKeyEntry
         return existingKey?.secretKey ?: createKey()
     }
+
     private fun createKey(): SecretKey {
-        return KeyGenerator
-            .getInstance(ALGORITHM)
-            .apply {
+        return KeyGenerator.getInstance(ALGORITHM).apply {
                 init(
                     KeyGenParameterSpec.Builder(
-                        KEY_ALIAS,
-                        KeyProperties.PURPOSE_ENCRYPT or
-                                KeyProperties.PURPOSE_DECRYPT
-                    )
-                        .setBlockModes(BLOCK_MODE)
-                        .setEncryptionPaddings(PADDING)
-                        .setRandomizedEncryptionRequired(true)
-                        .setUserAuthenticationRequired(false)
+                        KEY_ALIAS, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+                    ).setBlockModes(BLOCK_MODE).setEncryptionPaddings(PADDING)
+                        .setRandomizedEncryptionRequired(true).setUserAuthenticationRequired(false)
                         .build()
                 )
-            }
-            .generateKey()
+            }.generateKey()
     }
+
     fun encrypt(bytes: ByteArray): ByteArray {
         cipher.init(Cipher.ENCRYPT_MODE, getKey())
         val iv = cipher.iv
         val encrypted = cipher.doFinal(bytes)
         return iv + encrypted
     }
+
     fun decrypt(bytes: ByteArray): ByteArray {
         val iv = bytes.copyOfRange(0, cipher.blockSize)
         val data = bytes.copyOfRange(cipher.blockSize, bytes.size)
