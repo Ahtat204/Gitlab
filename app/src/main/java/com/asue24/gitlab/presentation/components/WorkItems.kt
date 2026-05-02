@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.asue24.gitlab.R
+import com.asue24.gitlab.presentation.ui.theme.titleFont
 
 /**
  * this Component shows a List of Work Items on your Gitlab , examples: MRs , Issues ,To-do items,Starred Projects...
@@ -18,12 +19,12 @@ import com.asue24.gitlab.R
 @Composable
 fun MyWorkItems(navController: NavController) {
     val myWorkItems = listOf(
-        Item("Issues", R.drawable.mergerequest, 1),
+        Item("Issues", R.drawable.issues, 1),
         Item("Merge Requests ", R.drawable.mergerequest, 1),
-        Item("Workspaces", R.drawable.mergerequest, 1),
-        Item("Milestones", R.drawable.mergerequest, 1),
-        Item("Starred", R.drawable.mergerequest, 1),
-        Item("Groups", R.drawable.mergerequest, 1)
+        Item("Workspaces", R.drawable.workspaces, 1),
+        Item("Milestones", R.drawable.milestone, 1),
+        Item("Starred", R.drawable.star, 1),
+        Item("Groups", R.drawable.group, 1)
     )
 
     Column(
@@ -31,7 +32,7 @@ fun MyWorkItems(navController: NavController) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Your Work", fontSize = 20.sp)
+        Text(text = "Your Work", fontFamily = titleFont, fontSize = 20.sp)
         myWorkItems.forEach { item ->
             WorkItem(item) {
                 navController.navigate(item)

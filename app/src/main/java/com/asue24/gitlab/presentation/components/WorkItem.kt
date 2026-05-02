@@ -46,7 +46,7 @@ fun WorkItem(item: Item, openScreen: () -> Unit) {
             Icon(
                 painter = painterResource(item.Id),
                 contentDescription = item.name,
-                Modifier.size(30.dp)
+                Modifier.size(30.dp).padding(3.dp), tint = Orange
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(text = item.name, fontFamily = customFontFamily, modifier = Modifier.weight(0.9f))
