@@ -3,6 +3,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,6 +13,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.asue24.gitlab.presentation.navigation.BottomBarScreen
+import com.asue24.gitlab.presentation.ui.theme.Orange
 
 
 /**
@@ -69,6 +71,15 @@ fun RowScope.AddItem(
                 imageVector = screen.icon,
                 contentDescription = "${screen.title} icon"
             )
-        }
+        }, colors = NavigationBarItemColors(
+            selectedIconColor =Color.White,
+            selectedTextColor =Orange,
+            selectedIndicatorColor =Orange,
+            unselectedIconColor =Color.White,
+            unselectedTextColor =Color.White,
+            disabledIconColor =Orange,
+            disabledTextColor =Orange
+        ),
+        alwaysShowLabel = true
     )
 }

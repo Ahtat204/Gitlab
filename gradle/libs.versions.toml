@@ -25,6 +25,7 @@ datastorePreferences = "1.1.1"
 kotlinxSerializationJson = "1.7.3"
 material3Android = "1.4.0"
 secretsGradlePlugin = "2.0.1"
+material3 = "1.4.0"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
@@ -59,6 +60,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-material3-android = {group = "androidx.compose.material3",name = "material3-android",version.ref = "material3Android" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 
 [plugins]
