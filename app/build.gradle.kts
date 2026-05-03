@@ -30,7 +30,17 @@ android {
         val fileName = "${rootProject.name}_v${versionName}_${versionCode}_${formattedDate}"
         setProperty("archivesBaseName", rootProject.name)
     }
-
+    signingConfigs {
+        create("release") {
+            storeFile = file("../keystore")
+            storePassword = System.getenv("SIGNING_KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("SIGNING_ALIAS")
+            keyPassword = System.getenv("SIGNING_ALIAS_PASSWORD")
+        }
+    }
+    secrets {
+        propertiesFileName="secrets.properties"
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -39,9 +49,7 @@ android {
             )
         }
         debug {
-secrets {
-    propertiesFileName="secrets.properties"
-}
+
         }
     }
     compileOptions {
