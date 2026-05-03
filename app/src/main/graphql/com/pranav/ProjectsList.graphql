@@ -1,6 +1,5 @@
 query GetMyProjects {
     currentUser {
-        username
         projectMemberships(first: 20) {
             nodes {
                 id

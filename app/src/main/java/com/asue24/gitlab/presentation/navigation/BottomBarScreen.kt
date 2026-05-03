@@ -1,15 +1,11 @@
 package com.asue24.gitlab.presentation.navigation
+
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Assignment
+import androidx.compose.material.icons.filled.AvTimer
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.material.icons.outlined.Assessment
-import androidx.compose.material.icons.outlined.Assignment
-import androidx.compose.material.icons.rounded.Dashboard
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.Timeline
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.twotone.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -24,16 +20,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
  * @property icon The icon displayed in the bottom bar.
  */
 sealed class BottomBarScreen(
-    val route: String,
-    val title: String,
-    val icon: ImageVector
+    val route: String, val title: String, val icon: ImageVector
 ) {
     /** Home screen, represented by a home icon. */
-    data object Home : BottomBarScreen("home", "Home",Icons.Default.Home)
+    data object Home : BottomBarScreen("home", "Home", Icons.Default.Home)
     /** Dashboard screen, represented by a star icon. */
-    data object Projects : BottomBarScreen("projects", "projects",
-        Icons.Filled.Folder
+    data object Projects : BottomBarScreen(
+        "projects", "Projects", Icons.Filled.Folder
     )
     data object Profile : BottomBarScreen("profile", "Profile", Icons.TwoTone.Person)
-    data object Activity : BottomBarScreen("activity", "Activity", Icons.Filled.Timeline)
+    data object Activity : BottomBarScreen("activity", "Activity", Icons.Filled.AvTimer)
 }

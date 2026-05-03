@@ -1,6 +1,5 @@
 package com.asue24.gitlab.domain.authentication.constants
 
-
 import com.asue24.gitlab.BuildConfig
 import net.openid.appauth.ResponseTypeValues
 
