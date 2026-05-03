@@ -41,6 +41,9 @@ android {
             )
             isDebuggable = false
         }
+        debug {
+
+        }
         debug {}
     }
     secrets {
