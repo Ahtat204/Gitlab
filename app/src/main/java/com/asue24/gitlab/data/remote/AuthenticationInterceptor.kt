@@ -20,7 +20,6 @@ class AuthenticationInterceptor : Interceptor {
 
     @OptIn(InternalCoroutinesApi::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-        Log.d("TokenInterceptor", "first log")
         var request = chain.request()
         val builder = request.newBuilder()
         val token = Tokens.accessToken
@@ -64,7 +63,7 @@ class AuthenticationInterceptor : Interceptor {
             }
 
         }
-        Log.d("Last Log", response.toString())
+
         return response
     }
 }

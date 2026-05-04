@@ -1,7 +1,9 @@
 package com.asue24.gitlab.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.GetMyProjectsQuery.Node
 import com.asue24.gitlab.GetRepoTreeQuery
 import com.asue24.gitlab.data.repositories.project.ProjectRepository
@@ -12,28 +14,25 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ProjectViewModel() : ViewModel() {
+class ProjectViewModel : ViewModel() {
     val currentProject = MutableStateFlow<GetRepoTreeQuery.Project?>(null)
 
     //TODO:this will be refactored to Dependency Injection,we're just testing now
     private val projectRepository: ProjectRepository = ProjectRepositoryImpl()
-    private val _projects = MutableStateFlow<List<Node>>(emptyList())
-    val projects: StateFlow<List<Node>> = _projects.asStateFlow()
+    private val _projects = MutableStateFlow< GetMyProjectsQuery.CurrentUser?>(null)
+    val projects: StateFlow< GetMyProjectsQuery.CurrentUser?> = _projects.asStateFlow()
     fun loadAllProjects() {
         viewModelScope.launch(Dispatchers.IO) {
-            projectRepository.getAllProjects().collect { data ->
-                val newNodes =
-                    data.currentUser?.projectMemberships?.nodes?.filterNotNull() ?: emptyList()
-                _projects.value = newNodes
-            }
+            val projects = projectRepository.getAllProjects().currentUser
+            _projects.value = projects
         }
     }
 
-    fun loadProject(id: String, path: String) {
-        currentProject.value=null
+    fun loadProject(id: String) {
         viewModelScope.launch {
-            val project = projectRepository.getProjectById(id, path)
-            currentProject.value = project
+            projectRepository.getProjectById(id).collect {
+                currentProject.value = it?.project
+            }
         }
     }
 }
