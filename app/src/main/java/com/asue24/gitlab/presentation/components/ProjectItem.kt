@@ -49,7 +49,6 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
            data?.let{
                it.avatarUrl?.let {url->
                    val avatar= "https://gitlab.com/$url"
-                   Log.d("UserAvatar",avatar)
                    AsyncImage(imageLoader = customImageLoader,
                        model = ImageRequest.Builder(LocalContext.current).data(avatar) // Image URL
                            .crossfade(true) // Smooth fade-in
@@ -71,7 +70,6 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
                     .background(Background)
             ) {
                 project.let { project ->
-                    Log.d("lastactivity",project.lastActivityAt.toString())
                     Text(
                         text = project.name,
                         fontSize = 17.sp,
@@ -100,7 +98,6 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
                             modifier = Modifier.padding(14.dp, 0.dp)
                         ) {
                             Language(language.color.toString().toColorInt())
-                            Log.d("Language color", language.color.toString())
                             Text(
                                 text = language.name,
                                 fontSize = 11.sp,
