@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationResponse
@@ -30,22 +29,4 @@ fun buildResponse(
         return response
     }
     return null
-}
-
-fun refreshAccessToken(
-    authState: AuthState?, refreshToken: String
-) {
-    try {
-        Log.d("stored refreshToken value is", refreshToken)
-        if (authState == null) {
-            return
-        }
-        if (authState.authorizationServiceConfiguration == null) return
-
-    } catch (e: Exception) {
-        throw e
-    } finally {
-        Log.d("finally", "finally bolcok")
-    }
-
 }
