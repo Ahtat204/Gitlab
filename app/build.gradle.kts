@@ -30,28 +30,19 @@ android {
         val fileName = "${rootProject.name}_v${versionName}_${versionCode}_${formattedDate}"
         setProperty("archivesBaseName", rootProject.name)
     }
-    signingConfigs {
-        create("release") {
-            storeFile = file("../keystore")
-            storePassword = System.getenv("SIGNING_KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("SIGNING_ALIAS")
-            keyPassword = System.getenv("SIGNING_ALIAS_PASSWORD")
-        }
-    }
-    secrets {
-        propertiesFileName="secrets.properties"
-    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
-            isDebuggable=false
+            isDebuggable = false
         }
-        debug {
-
-        }
+        debug {}
+    }
+    secrets {
+        propertiesFileName = "secrets.properties"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -77,6 +68,7 @@ apollo {
     }
 }
 dependencies {
+    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -109,5 +101,6 @@ dependencies {
     implementation(libs.androidx.material.icons.core)
     implementation(libs.apollo.normalized.cache)
     implementation(libs.apollo.http.cache)
-
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("io.coil-kt:coil-svg:2.7.0")
 }
