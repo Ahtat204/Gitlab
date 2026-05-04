@@ -29,13 +29,12 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
-            isDebuggable=false
+            isDebuggable = false
         }
-        debug {
-secrets {
-    propertiesFileName="secrets.properties"
-}
-        }
+        debug {}
+    }
+    secrets {
+        propertiesFileName = "secrets.properties"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -96,5 +95,4 @@ dependencies {
     implementation(libs.apollo.http.cache)
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("io.coil-kt:coil-svg:2.7.0")
-
 }
