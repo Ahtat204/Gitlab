@@ -1,8 +1,6 @@
 query GetMyProjects {
-
     currentUser {
         id
-        __typename
         projectMemberships(first: 20) {
             __typename
             nodes {
