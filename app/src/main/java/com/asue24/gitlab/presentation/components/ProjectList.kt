@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,28 +36,22 @@ fun ProjectList(x: PaddingValues) {
     val projectList by projectViewModel.projects.collectAsState()
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = x,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier.fillMaxSize(), contentPadding = x, verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(projectList) { item ->
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { },
-                elevation = CardDefaults.cardElevation(4.dp)
+                modifier = Modifier.fillMaxWidth().clickable { }, elevation = CardDefaults.cardElevation(4.dp)
             ) {
                 Row(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
                 ) {
-                    item.project?.name?.let {
-                        Text(
-                            text = it, fontSize = 18.sp, modifier = Modifier.weight(1f)
-                        )
-                    }
+                    item.project.let {name->
+                        name?.name?.let {
+                            Text(
+                                text = it, fontSize = 18.sp, modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }?:CircularProgressIndicator()
                     Text(
                         text = "→", fontSize = 18.sp
                     )
