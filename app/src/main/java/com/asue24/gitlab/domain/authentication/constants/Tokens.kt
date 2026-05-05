@@ -9,5 +9,6 @@ object Tokens {
     var CurrentAuthState: AuthState? = null
     var authService: AuthorizationService? = null
     var context: Context? = null
+    var counter:Int=0
 }
 
