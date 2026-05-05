@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.asue24.gitlab.presentation.screens.Home
+import com.asue24.gitlab.presentation.screens.ProjectsScreen
 
 @Composable
 fun BottomNavigationgraph(
@@ -17,7 +18,7 @@ fun BottomNavigationgraph(
         Home(navController,x)
         }
         composable(route = BottomBarScreen.Projects.route) {
-        //LoginScreen(navController)
+            ProjectsScreen(navController,x)
         }
         composable(route = BottomBarScreen.Profile.route) {
 
