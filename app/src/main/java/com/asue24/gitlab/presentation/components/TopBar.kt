@@ -22,7 +22,7 @@ import com.asue24.gitlab.presentation.ui.theme.topBarFont
 @Composable
 fun TopBar(name: String) {
     Row(
-        horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Top
     ) {
         Text(
             text = name,
