@@ -19,11 +19,8 @@ object ApolloService {
             level = HttpLoggingInterceptor.Level.BASIC
         }).addInterceptor(AuthenticationInterceptor()).build()
 
-        ApolloClient.Builder().httpCache(
-      directory =File(Environment. getExternalStorageDirectory().path+"gitlab/httpCache"),
-      maxSize = 100 * 1024 * 1024
-    ).serverUrl("https://gitlab.com/api/graphql")
-            .normalizedCache(cacheFactory, writeToCacheAsynchronously = false)
-            .okHttpClient(okHttpClient).fetchPolicy(FetchPolicy.CacheFirst).build()
+        ApolloClient.Builder().serverUrl("https://gitlab.com/api/graphql")
+            .normalizedCache(cacheFactory, writeToCacheAsynchronously = true)
+            .okHttpClient(okHttpClient).fetchPolicy(FetchPolicy.CacheAndNetwork).build()
     }
 }

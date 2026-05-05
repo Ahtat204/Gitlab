@@ -22,7 +22,7 @@ class ProjectRepositoryImpl : ProjectRepository {
      */
     override fun getAllProjects(): Flow<GetMyProjectsQuery.Data> {
         val result =
-            gitlab.query(GetMyProjectsQuery()).fetchPolicy(FetchPolicy.CacheAndNetwork).toFlow()
+            gitlab.query(GetMyProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).toFlow()
         val response = result.map { resp ->
             if (resp.hasErrors()) {
                 throw RuntimeException("GraphQL Errors: ${resp.errors}")
