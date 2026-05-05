@@ -1,13 +1,13 @@
 package com.asue24.gitlab.data.repositories.project
 
 import android.util.Log
+import com.apollographql.apollo.api.ApolloResponse
 import com.apollographql.apollo.cache.normalized.FetchPolicy
-import com.apollographql.apollo.cache.normalized.api.NormalizedCache
-import com.apollographql.apollo.cache.normalized.apolloStore
 import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.GetRepoTreeQuery
 import com.asue24.gitlab.data.remote.ApolloService
+import com.asue24.gitlab.domain.authentication.constants.Tokens
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -24,17 +24,28 @@ class ProjectRepositoryImpl : ProjectRepository {
      * Uses context preservation and structured concurrency.
      */
     override fun getAllProjects(): Flow<GetMyProjectsQuery.Data> {
-        val result =
-            gitlab.query(GetMyProjectsQuery()).fetchPolicy(FetchPolicy.CacheAndNetwork).toFlow()
-        val response = result.map { resp ->
+        var result: Flow<ApolloResponse<GetMyProjectsQuery.Data>>
+        var response: Flow<GetMyProjectsQuery.Data>
+
+        if (Tokens.counter == 1) {
+            result = gitlab.query(GetMyProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).toFlow()
+            response = result.map { resp ->
+                if (resp.hasErrors()) {
+                    throw RuntimeException("GraphQL Errors: ${resp.errors}")
+                }
+                resp.dataAssertNoErrors
+            }
+            return response.flowOn(Dispatchers.IO)
+        }
+        result = gitlab.query(GetMyProjectsQuery()).fetchPolicy(FetchPolicy.NetworkFirst).toFlow()
+        Tokens.counter=1
+        response = result.map { resp ->
             if (resp.hasErrors()) {
                 throw RuntimeException("GraphQL Errors: ${resp.errors}")
             }
             resp.dataAssertNoErrors
         }
-      /*  val cache = gitlab.apolloStore.dump()
-        val rawCache= NormalizedCache.prettifyDump(dump = cache)*/
-        Log.d("ApolloCache", rawCache)
+
         return response.flowOn(Dispatchers.IO)
     }
 
