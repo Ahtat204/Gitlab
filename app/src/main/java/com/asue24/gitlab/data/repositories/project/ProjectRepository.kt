@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProjectRepository {
     fun getAllProjects(): Flow<GetMyProjectsQuery.Data>
-    suspend fun getProjectById(id: String): GetRepoTreeQuery.Project?
+    suspend fun getProjectById(id: String):Flow< GetRepoTreeQuery.Data?>
 }
