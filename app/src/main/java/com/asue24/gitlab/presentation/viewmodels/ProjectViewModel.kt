@@ -1,7 +1,9 @@
 package com.asue24.gitlab.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.GetMyProjectsQuery.Node
 import com.asue24.gitlab.GetRepoTreeQuery
 import com.asue24.gitlab.data.repositories.project.ProjectRepository
@@ -25,17 +27,25 @@ class ProjectViewModel : ViewModel() {
 
     fun loadAllProjects() {
         viewModelScope.launch(Dispatchers.IO) {
+            try{}
+            catch (ex:Exception){
+                Log.e("exception",ex.toString())
+        }
             projectRepository.getAllProjects().collect { data ->
-                val newNodes =
-                    data.currentUser?.projectMemberships?.nodes?.filterNotNull() ?: emptyList()
-                _projects.value = newNodes
+                if(data is  GetMyProjectsQuery.Data){
+                    val newNodes =
+                        data.currentUser?.projectMemberships?.nodes?.filterNotNull() ?: emptyList()
+                    _projects.value = newNodes
+                }
             }
         }
     }
     fun loadProject(id: String) {
         viewModelScope.launch {
-            val project = projectRepository.getProjectById(id)
-            currentProject.value = project
+            projectRepository.getProjectById(id).collect {
+                currentProject.value = it?.project
+            }
+
         }
     }
 }
