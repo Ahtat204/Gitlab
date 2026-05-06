@@ -24,7 +24,7 @@ class ProjectViewModel : ViewModel() {
             val projects =
                 projectRepository.getAllProjects().currentUser?.projectMemberships?.nodes?.filterNotNull()
                     ?: emptyList()
-            _projects.value = projects
+            _projects.value = projects.filter { it.project?.visibility== "public"}
         }
     }
 
