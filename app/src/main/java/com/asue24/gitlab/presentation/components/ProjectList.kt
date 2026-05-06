@@ -2,10 +2,13 @@ package com.asue24.gitlab.presentation.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,34 +33,50 @@ import com.asue24.gitlab.presentation.viewmodels.ProjectViewModel
 @Composable
 fun ProjectList(x: PaddingValues) {
     val projectViewModel: ProjectViewModel = viewModel()
-    LaunchedEffect (1) {
+    LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
     }
     val projectList by projectViewModel.projects.collectAsState()
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(), contentPadding = x, verticalArrangement = Arrangement.spacedBy(8.dp)
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.End
     ) {
-        items(projectList) { item ->
-            Card(
-                modifier = Modifier.fillMaxWidth().clickable { }, elevation = CardDefaults.cardElevation(4.dp)
+        if (projectList.isEmpty()) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(x).offset(160.dp, y = (190).dp)) { CircularProgressIndicator(modifier = Modifier.padding(x)) }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(x),
+                contentPadding = x,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
-                ) {
-                    item.project.let {name->
-                        name?.name?.let {
-                            Text(
-                                text = it, fontSize = 18.sp, modifier = Modifier.weight(1f)
-                            )
+                items(projectList) { item ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { },
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            item.project?.let { project ->
+                                Text(
+                                    text = project.name,
+                                    fontSize = 18.sp,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
                         }
-                    }?:CircularProgressIndicator()
-                    Text(
-                        text = "→", fontSize = 18.sp
-                    )
+                    }
                 }
             }
         }
+
     }
 
 }

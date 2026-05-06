@@ -1,9 +1,7 @@
 package com.asue24.gitlab.presentation.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.GetMyProjectsQuery.Node
 import com.asue24.gitlab.GetRepoTreeQuery
 import com.asue24.gitlab.data.repositories.project.ProjectRepository
@@ -12,8 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class ProjectViewModel : ViewModel() {
@@ -23,29 +19,20 @@ class ProjectViewModel : ViewModel() {
     private val projectRepository: ProjectRepository = ProjectRepositoryImpl()
     private val _projects = MutableStateFlow<List<Node>>(emptyList())
     val projects: StateFlow<List<Node>> = _projects.asStateFlow()
-
-
     fun loadAllProjects() {
         viewModelScope.launch(Dispatchers.IO) {
-            try{}
-            catch (ex:Exception){
-                Log.e("exception",ex.toString())
-        }
-            projectRepository.getAllProjects().collect { data ->
-                if(data is  GetMyProjectsQuery.Data){
-                    val newNodes =
-                        data.currentUser?.projectMemberships?.nodes?.filterNotNull() ?: emptyList()
-                    _projects.value = newNodes
-                }
-            }
+            val projects =
+                projectRepository.getAllProjects().currentUser?.projectMemberships?.nodes?.filterNotNull()
+                    ?: emptyList()
+            _projects.value = projects
         }
     }
+
     fun loadProject(id: String) {
         viewModelScope.launch {
             projectRepository.getProjectById(id).collect {
                 currentProject.value = it?.project
             }
-
         }
     }
 }
