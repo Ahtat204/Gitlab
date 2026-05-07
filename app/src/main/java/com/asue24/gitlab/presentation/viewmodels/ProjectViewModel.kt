@@ -1,5 +1,6 @@
 package com.asue24.gitlab.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asue24.gitlab.GetMyProjectsQuery.Node
@@ -21,6 +22,10 @@ class ProjectViewModel : ViewModel() {
     val projects: StateFlow<List<Node>> = _projects.asStateFlow()
     fun loadAllProjects() {
         viewModelScope.launch(Dispatchers.IO) {
+            val avatar=projectRepository.getAllProjects().currentUser?.avatarUrl
+            if(avatar!=null){
+                Log.d("avatar",avatar)
+            }
             val projects =
                 projectRepository.getAllProjects().currentUser?.projectMemberships?.nodes?.filterNotNull()
                     ?: emptyList()

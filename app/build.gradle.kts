@@ -103,5 +103,5 @@ dependencies {
     implementation(libs.androidx.material.icons.core)
     implementation(libs.apollo.normalized.cache)
     implementation(libs.apollo.http.cache)
-
+    implementation(libs.coil.compose)
 }
