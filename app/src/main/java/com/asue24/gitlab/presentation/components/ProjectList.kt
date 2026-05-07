@@ -43,6 +43,7 @@ fun ProjectList(x: PaddingValues) {
     ) {
         if (projectList.isEmpty()) {
             CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
+
         } else {
             Text(
                 text = "Your Projects",
