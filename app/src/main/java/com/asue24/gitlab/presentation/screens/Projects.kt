@@ -6,6 +6,6 @@ import androidx.navigation.NavHostController
 import com.asue24.gitlab.presentation.components.ProjectList
 
 @Composable
-fun ProjectsScreen(navController: NavHostController,x: PaddingValues){
+fun PersonalProjectsScreen(navController: NavHostController, x: PaddingValues){
     ProjectList(x)
 }
