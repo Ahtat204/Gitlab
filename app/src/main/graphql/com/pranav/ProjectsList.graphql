@@ -8,6 +8,10 @@ query GetMyProjects {
                 id
                 project {
                     __typename
+                    languages {
+                        color
+                        name
+                    }
                     id
                     name
                     fullPath

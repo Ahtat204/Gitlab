@@ -1,5 +1,6 @@
 package com.asue24.gitlab.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,13 +17,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asue24.gitlab.presentation.ui.theme.titleFont
 import com.asue24.gitlab.presentation.viewmodels.ProjectViewModel
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.take
 
 /**
  * the x:Paddingvalues parameter will be injected from the Scaffold
@@ -37,7 +37,9 @@ fun ProjectList(x: PaddingValues) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(x)
+        modifier = Modifier
+            .padding(x)
+            .background(Color.Black)
     ) {
         if (projectList.isEmpty()) {
             CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
@@ -51,7 +53,8 @@ fun ProjectList(x: PaddingValues) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = x,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(0.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 items(projectList) { item ->
                     ProjectItem(item)
