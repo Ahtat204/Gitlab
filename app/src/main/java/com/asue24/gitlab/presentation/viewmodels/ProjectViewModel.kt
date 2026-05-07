@@ -23,9 +23,9 @@ class ProjectViewModel : ViewModel() {
     val projects: StateFlow< GetMyProjectsQuery.CurrentUser?> = _projects.asStateFlow()
     fun loadAllProjects() {
         viewModelScope.launch(Dispatchers.IO) {
-            val avatar=projectRepository.getAllProjects().currentUser?.avatarUrl
-            if(avatar!=null){
-                Log.d("avatar",avatar)
+            val lastActi=projectRepository.getAllProjects().currentUser?.avatarUrl
+            if(lastActi!=null){
+                Log.d("avatar",lastActi)
             }
             val projects = projectRepository.getAllProjects().currentUser
             _projects.value = projects
