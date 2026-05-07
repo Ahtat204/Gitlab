@@ -3,16 +3,13 @@ package com.asue24.gitlab.presentation.components
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,12 +22,14 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.presentation.ui.theme.Background
 import com.asue24.gitlab.presentation.ui.theme.customFontFamily
 
 @Composable
 fun ProjectItem(data: GetMyProjectsQuery.Node) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -45,7 +44,9 @@ fun ProjectItem(data: GetMyProjectsQuery.Node) {
 
 
         ) {
+
             data.project?.let { project ->
+
                 Text(
                     text = project.name,
                     fontSize = 17.sp,
@@ -70,7 +71,8 @@ fun ProjectItem(data: GetMyProjectsQuery.Node) {
                 if(languages?.isNotEmpty() == true){
                     val language=languages[0]
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(14.dp,0.dp)){
-                        Language(Color(hexColorToLong(language.color.toString())),"")
+                        Language(language.color.toString().toColorInt())
+                        Log.d("Language color",language.color.toString())
                         Text(
                             text = language.name,
                             fontSize = 11.sp,
@@ -89,7 +91,7 @@ fun ProjectItem(data: GetMyProjectsQuery.Node) {
 
 
 @Composable
-fun Language(color: Color,language:String) {
+fun Language(color: Int) {
 
     Canvas(
         modifier = Modifier
@@ -101,7 +103,7 @@ fun Language(color: Color,language:String) {
         drawPoints(
             points = listOf(center),
             pointMode = PointMode.Points,
-            color = color,
+            color = Color(color),
             strokeWidth = 26f, // Controls point size
             cap = StrokeCap.Round // Makes the point circular
         )
