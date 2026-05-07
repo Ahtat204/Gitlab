@@ -1,5 +1,7 @@
 package com.asue24.gitlab.presentation.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,18 +25,24 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asue24.gitlab.presentation.ui.theme.titleFont
 import com.asue24.gitlab.presentation.viewmodels.ProjectViewModel
+import java.time.Instant
+import java.time.ZoneId
 
 /**
  * the x:Paddingvalues parameter will be injected from the Scaffold
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProjectList(x: PaddingValues) {
     val projectViewModel: ProjectViewModel = viewModel()
     LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
     }
-    val Currentuser by projectViewModel.projects.collectAsState()
-    Currentuser?.projectMemberships?.nodes?.let {
+    val CurrUser by projectViewModel.projects.collectAsState()
+    CurrUser?.projectMemberships?.nodes?.sortedBy {
+        Instant.parse(it?.project?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
+            .toLocalDate()
+    }?.let {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -42,7 +50,7 @@ fun ProjectList(x: PaddingValues) {
                 .padding(x)
                 .background(Color.Black)
         ) {
-            if (Currentuser?.projectMemberships?.nodes?.isEmpty() == true || Currentuser?.avatarUrl==null) {
+            if (CurrUser?.projectMemberships?.nodes?.isEmpty() == true || CurrUser?.avatarUrl == null) {
                 CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
 
             } else {
@@ -59,7 +67,7 @@ fun ProjectList(x: PaddingValues) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(it) { item ->
-                        item?.project?.let {ProjectItem(Currentuser,it)  }
+                        item?.project?.let { ProjectItem(CurrUser, it) }
                     }
                 }
             }

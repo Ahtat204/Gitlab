@@ -71,6 +71,7 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
                     .background(Background)
             ) {
                 project.let { project ->
+                    Log.d("lastactivity",project.lastActivityAt.toString())
                     Text(
                         text = project.name,
                         fontSize = 17.sp,
