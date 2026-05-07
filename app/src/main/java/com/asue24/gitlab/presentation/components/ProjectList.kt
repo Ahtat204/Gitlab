@@ -33,32 +33,34 @@ fun ProjectList(x: PaddingValues) {
     LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
     }
-    val projectList by projectViewModel.projects.collectAsState()
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(x)
-            .background(Color.Black)
-    ) {
-        if (projectList.isEmpty()) {
-            CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
+    val Currentuser by projectViewModel.projects.collectAsState()
+    Currentuser?.projectMemberships?.nodes?.let {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(x)
+                .background(Color.Black)
+        ) {
+            if (Currentuser?.projectMemberships?.nodes?.isEmpty() == true || Currentuser?.avatarUrl==null) {
+                CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
 
-        } else {
-            Text(
-                text = "Your Projects",
-                fontFamily = titleFont,
-                fontSize = 20.sp,
-                modifier = Modifier
-            )
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = x,
-                verticalArrangement = Arrangement.spacedBy(0.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                items(projectList) { item ->
-                    ProjectItem(item)
+            } else {
+                Text(
+                    text = "Your Projects",
+                    fontFamily = titleFont,
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                )
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = x,
+                    verticalArrangement = Arrangement.spacedBy(0.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    items(it) { item ->
+                        item?.project?.let {ProjectItem(Currentuser,it)  }
+                    }
                 }
             }
         }
