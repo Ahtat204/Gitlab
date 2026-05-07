@@ -30,11 +30,12 @@ import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.asue24.gitlab.GetMyProjectsQuery
+import com.asue24.gitlab.presentation.components.CoilCache.customImageLoader
 import com.asue24.gitlab.presentation.ui.theme.Background
 import com.asue24.gitlab.presentation.ui.theme.customFontFamily
 
 @Composable
-fun ProjectItem(data: GetMyProjectsQuery.Node) {
+fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQuery.Project) {
 
     Card(
         modifier = Modifier
@@ -42,16 +43,14 @@ fun ProjectItem(data: GetMyProjectsQuery.Node) {
             .fillMaxHeight()
             .height(100.dp)
     ) {
-        val projectI=data.project
-
        Row(modifier = Modifier
            .background(Color.Black), verticalAlignment = Alignment.Top) {
 
-           projectI?.let{
+           data?.let{
                it.avatarUrl?.let {url->
                    val avatar= "https://gitlab.com/$url"
                    Log.d("UserAvatar",avatar)
-                   AsyncImage(
+                   AsyncImage(imageLoader = customImageLoader,
                        model = ImageRequest.Builder(LocalContext.current).data(avatar) // Image URL
                            .crossfade(true) // Smooth fade-in
                            .build(),
@@ -64,13 +63,14 @@ fun ProjectItem(data: GetMyProjectsQuery.Node) {
                }
 
            }
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .background(Background)
             ) {
-                projectI?.let { project ->
+                project.let { project ->
                     Text(
                         text = project.name,
                         fontSize = 17.sp,
