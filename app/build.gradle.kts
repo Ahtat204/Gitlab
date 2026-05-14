@@ -12,7 +12,9 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
-
+hilt {
+    enableAggregatingTask = false
+}
 android {
     namespace = "com.asue24.gitlab"
     compileSdk = 35
@@ -101,6 +103,6 @@ dependencies {
     implementation(libs.androidx.material.icons.core)
     implementation(libs.apollo.normalized.cache)
     implementation(libs.apollo.http.cache)
-    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation(libs.coil.compose)
     implementation("io.coil-kt:coil-svg:2.7.0")
 }
