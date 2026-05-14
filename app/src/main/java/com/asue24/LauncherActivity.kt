@@ -12,6 +12,7 @@ import com.asue24.gitlab.domain.authentication.constants.AuthStorage
 import com.asue24.gitlab.domain.authentication.constants.Tokens
 import com.asue24.gitlab.presentation.activities.AuthenticationActivity
 import com.asue24.gitlab.presentation.activities.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
 import java.io.File
 
+@AndroidEntryPoint
 class LauncherActivity : ComponentActivity() {
 private lateinit var  authenticationService:AuthorizationService
     @RequiresApi(Build.VERSION_CODES.O)
