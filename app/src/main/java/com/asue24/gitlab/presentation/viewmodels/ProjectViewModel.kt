@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.internal.wait
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,18 +24,17 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     val projects: StateFlow< GetMyProjectsQuery.CurrentUser?> = _projects.asStateFlow()
     fun loadAllProjects() {
         viewModelScope.launch(Dispatchers.IO) {
-            val projects = projectRepository.getAllProjects().collect {user->
+            val projects = projectRepository.getAllProjects().collect { user ->
                 _projects.value = user.currentUser
             }
+        }}
 
-        }
-    }
 
-    fun loadProject(id: String) {
-        viewModelScope.launch {
-            projectRepository.getProjectById(id).collect {
-                currentProject.value = it?.project
+        fun loadProject(id: String) {
+            viewModelScope.launch {
+                projectRepository.getProjectById(id).collect {
+                    currentProject.value = it?.project
+                }
             }
         }
     }
-}
