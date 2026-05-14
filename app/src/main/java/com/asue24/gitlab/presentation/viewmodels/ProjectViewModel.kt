@@ -23,16 +23,17 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     val projects: StateFlow< GetMyProjectsQuery.CurrentUser?> = _projects.asStateFlow()
     fun loadAllProjects() {
         viewModelScope.launch(Dispatchers.IO) {
-            val projects = projectRepository.getAllProjects().currentUser
-            _projects.value = projects
-        }
-    }
+            val projects = projectRepository.getAllProjects().collect { user ->
+                _projects.value = user.currentUser
+            }
+        }}
 
-    fun loadProject(id: String) {
-        viewModelScope.launch {
-            projectRepository.getProjectById(id).collect {
-                currentProject.value = it?.project
+
+        fun loadProject(id: String) {
+            viewModelScope.launch {
+                projectRepository.getProjectById(id).collect {
+                    currentProject.value = it?.project
+                }
             }
         }
     }
-}
