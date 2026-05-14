@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.asue24.gitlab.presentation.ui.theme.titleFont
 import com.asue24.gitlab.presentation.viewmodels.ProjectViewModel
 import java.time.Instant
@@ -33,8 +33,7 @@ import java.time.ZoneId
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ProjectList(x: PaddingValues) {
-    val projectViewModel: ProjectViewModel = viewModel()
+fun ProjectList(x: PaddingValues, projectViewModel: ProjectViewModel = hiltViewModel()) {
     LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
     }
