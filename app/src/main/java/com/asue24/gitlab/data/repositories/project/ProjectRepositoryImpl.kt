@@ -9,16 +9,16 @@ import com.asue24.gitlab.GetRepoTreeQuery
 import com.asue24.gitlab.data.remote.ApolloService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * this is a singleton object , which guarantees the ConcurrentHashMap will live throughout the Application lifecycle
  */
-class ProjectRepositoryImpl @Inject constructor(): ProjectRepository {
-    private val gitlab = ApolloService.client
-
+class ProjectRepositoryImpl @Inject constructor(private val apolloClient: ApolloClient) :
+    ProjectRepository {
     /**
      * @brief Streams contributed projects from GitLab.
      * Uses context preservation and structured concurrency.
