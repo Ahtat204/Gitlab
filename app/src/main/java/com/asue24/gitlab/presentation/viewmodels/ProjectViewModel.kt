@@ -24,9 +24,16 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     @OptIn(ExperimentalCoroutinesApi::class)
     fun loadAllProjects() {
         viewModelScope.launch {
-            projectRepository.getAllProjects(FetchPolicy.CacheFirst).collect { data ->
-                    _projects.value = data.currentUser
-                }
+          try {
+              projectRepository.getAllProjects(FetchPolicy.CacheFirst).collect { data ->
+                  _projects.value = data.currentUser
+              }
+          }
+          catch (ex:Exception){
+              projectRepository.getAllProjects(FetchPolicy.NetworkFirst).collect { data ->
+                  _projects.value = data.currentUser
+              }
+          }
         }
     }
 
