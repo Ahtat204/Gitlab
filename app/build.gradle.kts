@@ -7,12 +7,14 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrains.kotlin.serialization)
-    alias(libs.plugins.apollo)
-    alias(libs.plugins.kapt)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.secrets.gradle)
+    id("com.apollographql.apollo") version "4.4.2"
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
-
+hilt {
+    enableAggregatingTask = false
+}
 android {
     namespace = "com.asue24.gitlab"
     compileSdk = 35
@@ -102,8 +104,5 @@ dependencies {
     implementation(libs.apollo.normalized.cache)
     implementation(libs.apollo.http.cache)
     implementation(libs.coil.compose)
-    implementation(libs.coil.svg)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.hilt.navigation.compose)
+    implementation("io.coil-kt:coil-svg:2.7.0")
 }
