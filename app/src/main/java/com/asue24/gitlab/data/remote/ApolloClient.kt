@@ -18,7 +18,7 @@ object ApolloService {
         }).addInterceptor(AuthenticationInterceptor()).build()
 
         ApolloClient.Builder().serverUrl("https://gitlab.com/api/graphql")
-            .okHttpClient(okHttpClient).addInterceptor(CacheInterceptor)
+            .okHttpClient(okHttpClient)
             .logCacheMisses({ res -> Log.w("CacheMiss", "object wasn't found in Cache${res}") })
             .normalizedCache(cacheFactory, writeToCacheAsynchronously = false).build()
     }
