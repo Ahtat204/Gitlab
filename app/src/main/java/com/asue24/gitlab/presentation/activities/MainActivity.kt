@@ -25,7 +25,7 @@ import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    public val counter:Int=0
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
