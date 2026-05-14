@@ -19,10 +19,11 @@ import com.asue24.gitlab.domain.authentication.constants.Tokens
 import com.asue24.gitlab.presentation.components.BottomBar
 import com.asue24.gitlab.presentation.navigation.BottomNavigationgraph
 import com.asue24.gitlab.presentation.ui.theme.GitlabTheme
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     public val counter:Int=0
     @OptIn(ExperimentalMaterial3Api::class)
