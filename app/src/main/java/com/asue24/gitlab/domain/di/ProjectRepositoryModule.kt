@@ -10,7 +10,7 @@ import dagger.hilt.android.components.ViewModelComponent
 
 @Module
 @InstallIn(ViewModelComponent::class)
-object  ProjectRepositoryModule {
-    @Provides
-     fun provideProjectRepository(impl: ProjectRepositoryImpl): ProjectRepository=ProjectRepositoryImpl()
+abstract class ProjectRepositoryModule {
+    @Binds
+    abstract fun provideProjectRepository(impl: ProjectRepositoryImpl): ProjectRepository
 }
