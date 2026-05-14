@@ -11,11 +11,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 /**
  * this is a singleton object , which guarantees the ConcurrentHashMap will live throughout the Application lifecycle
  */
-class ProjectRepositoryImpl : ProjectRepository {
+class ProjectRepositoryImpl @Inject constructor(): ProjectRepository {
     private val gitlab = ApolloService.client
 
     /**
