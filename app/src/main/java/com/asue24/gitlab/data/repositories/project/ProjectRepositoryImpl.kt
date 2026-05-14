@@ -12,7 +12,6 @@ import com.asue24.gitlab.GetRepoTreeQuery
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
