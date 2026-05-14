@@ -1,5 +1,6 @@
 package com.asue24.gitlab.data.repositories.project
 
+import android.util.Log
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.cache.normalized.FetchPolicy
@@ -10,9 +11,8 @@ import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.GetRepoTreeQuery
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -27,28 +27,16 @@ class ProjectRepositoryImpl @Inject constructor(private val apolloClient: Apollo
      */
     @OptIn(ApolloExperimental::class)
   override suspend fun getAllProjects(policy: FetchPolicy): Flow<GetMyProjectsQuery.Data> {
-
-      return flow {
-          try{
-              emitAll(
-                  apolloClient.query(GetMyProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst)
-                      .watch().map { it.dataAssertNoErrors })
-
-
-          }
-          catch (ex: Exception){
-              if(ex is CacheMissException){
-                  emitAll(
-                      apolloClient.query(GetMyProjectsQuery()).fetchPolicy(FetchPolicy.NetworkFirst)
-                          .watch().map { it.dataAssertNoErrors })
-              }
-          }
+      val result= apolloClient.query(GetMyProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull { it.data }.catch { ex->
+          Log.e("errorhap",ex.cause.toString()+"\n"+ex.stackTrace)
+      }.mapNotNull { it }
+        return result
 
 }
 
 
 
-}
+
 
     override suspend fun getProjectById(id: String): Flow<GetRepoTreeQuery.Data?> {
             return flow {
