@@ -33,7 +33,7 @@ import java.time.ZoneId
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ProjectList(x: PaddingValues, projectViewModel: ProjectViewModel = hiltViewModel()) {
+fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hiltViewModel()) {
     LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
     }
