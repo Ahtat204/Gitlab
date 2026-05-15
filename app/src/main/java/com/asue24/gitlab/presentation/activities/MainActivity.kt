@@ -14,7 +14,7 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.asue24.gitlab.domain.usecase.authentication.constants.Tokens
 import com.asue24.gitlab.presentation.components.BottomBar
-import com.asue24.gitlab.presentation.navigation.BottomNavigationgraph
+import com.asue24.gitlab.presentation.navigation.BottomNavigationGraph
 import com.asue24.gitlab.presentation.ui.theme.GitlabTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize(),bottomBar = {
                     BottomBar(navController)
                 }, floatingActionButtonPosition = FabPosition.End) { x ->
-                    BottomNavigationgraph(navController,x)
+                    BottomNavigationGraph(navController,x)
                 }
             }
         }
