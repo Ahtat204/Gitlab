@@ -3,7 +3,7 @@ package com.asue24.gitlab.presentation.components
 import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
-import com.asue24.gitlab.domain.authentication.constants.Tokens.context
+import com.asue24.gitlab.domain.usecase.authentication.constants.Tokens.context
 
 object CoilCache {
 
