@@ -25,9 +25,8 @@ sealed class BottomBarScreen(
     /** Home screen, represented by a home icon. */
     data object Home : BottomBarScreen("home", "Home", Icons.Default.Home)
     /** Dashboard screen, represented by a star icon. */
-    data object Projects : BottomBarScreen(
-        "projects", "Projects", Icons.Filled.Folder
-    )
+    data object Projects : BottomBarScreen("projects", "Projects", Icons.Filled.Folder)
+
     data object Profile : BottomBarScreen("profile", "Profile", Icons.TwoTone.Person)
     data object Activity : BottomBarScreen("activity", "Activity", Icons.Filled.AvTimer)
 }
