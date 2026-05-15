@@ -1,4 +1,4 @@
-package com.asue24.gitlab.presentation.components
+package com.asue24.gitlab.presentation.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.asue24.gitlab.presentation.components.ProjectItem
 import com.asue24.gitlab.presentation.ui.theme.titleFont
 import com.asue24.gitlab.presentation.viewmodels.ProjectViewModel
 import java.time.Instant
