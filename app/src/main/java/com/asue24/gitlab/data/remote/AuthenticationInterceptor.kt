@@ -1,8 +1,8 @@
 package com.asue24.gitlab.data.remote
 
 import android.util.Log
-import com.asue24.gitlab.domain.authentication.constants.AuthStorage
-import com.asue24.gitlab.domain.authentication.constants.Tokens
+import com.asue24.gitlab.domain.usecase.authentication.AuthStorage
+import com.asue24.gitlab.domain.usecase.authentication.constants.Tokens
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

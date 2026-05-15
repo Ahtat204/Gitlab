@@ -1,4 +1,4 @@
-package com.asue24.gitlab.domain.authentication.constants
+package com.asue24.gitlab.domain.usecase.authentication
 
 import android.content.Context
 import androidx.datastore.core.DataStore

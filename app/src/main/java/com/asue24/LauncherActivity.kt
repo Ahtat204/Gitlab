@@ -1,6 +1,5 @@
 package com.asue24
 
-import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -8,8 +7,8 @@ import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.asue24.gitlab.domain.authentication.constants.AuthStorage
-import com.asue24.gitlab.domain.authentication.constants.Tokens
+import com.asue24.gitlab.domain.usecase.authentication.AuthStorage
+import com.asue24.gitlab.domain.usecase.authentication.constants.Tokens
 import com.asue24.gitlab.presentation.activities.AuthenticationActivity
 import com.asue24.gitlab.presentation.activities.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,23 +19,64 @@ import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
 import java.io.File
 
+/**
+ * LauncherActivity is the entry point of the application.
+ *
+ * ## Responsibilities
+ * - Displays the splash screen while authentication state is being checked.
+ * - Initializes [AuthorizationService] and sets up token context in [Tokens].
+ * - Ensures cache directory (`gitlab/httpCache`) exists for Apollo/HTTP caching.
+ * - Determines whether to navigate to [MainActivity] (authenticated) or
+ *   [AuthenticationActivity] (login required).
+ *
+ * ## Lifecycle
+ * - **onCreate**:
+ *   - Installs splash screen.
+ *   - Initializes authentication service and token context.
+ *   - Launches coroutine to check stored authentication state.
+ *   - If a valid refresh token exists, attempts to refresh access token.
+ *   - Navigates to the appropriate activity based on authentication outcome.
+ * - **onDestroy**:
+ *   - Disposes of [AuthorizationService] to release resources.
+ *
+ * ## Error Handling
+ * - If token refresh fails, navigates to [AuthenticationActivity].
+ * - Exceptions during token refresh are rethrown after navigation.
+ *
+ * ## Navigation
+ * - [navigateTo]: Helper method to start a new activity with transition animation
+ *   and finish the launcher.
+ *
+ * ## Usage
+ * This activity is automatically launched at app startup. It should not be
+ * started manually from other parts of the app.
+ */
 @AndroidEntryPoint
 class LauncherActivity : ComponentActivity() {
-private lateinit var  authenticationService:AuthorizationService
+
+    private lateinit var authenticationService: AuthorizationService
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 1. Install Splash Screen FIRST
+        // Install splash screen before super.onCreate
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        val existed=File("gitlab/httpCache")
-        if(!existed.exists()){
+
+        // Ensure cache directory exists
+        val existed = File("gitlab/httpCache")
+        if (!existed.exists()) {
             existed.mkdir()
         }
-        authenticationService= AuthorizationService(this)
-        Tokens.authService=authenticationService
-        Tokens.context=application
+
+        // Initialize authentication service and token context
+        authenticationService = AuthorizationService(this)
+        Tokens.authService = authenticationService
+        Tokens.context = application
+
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
+
+        // Check stored authentication state
         CoroutineScope(Dispatchers.IO).launch {
             val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
 
@@ -44,18 +84,17 @@ private lateinit var  authenticationService:AuthorizationService
                 storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
                     if (token != null && ex == null) {
                         Tokens.accessToken = token
-                        Tokens.CurrentAuthState=storedState
-                        Tokens.authService=authenticationService
+                        Tokens.CurrentAuthState = storedState
+                        Tokens.authService = authenticationService
                         lifecycleScope.launch {
                             AuthStorage.getAuthState(this@LauncherActivity).updateData { storedState }
                             isReady = true
                             navigateTo(MainActivity::class.java)
-
                         }
                     }
-                    if(ex!=null) {
-                    navigateTo(AuthenticationActivity::class.java)
-                    throw ex
+                    if (ex != null) {
+                        navigateTo(AuthenticationActivity::class.java)
+                        throw ex
                     }
                 }
             } else {
@@ -64,10 +103,13 @@ private lateinit var  authenticationService:AuthorizationService
         }
     }
 
+    /** Navigates to the given destination activity with transition animation. */
     private fun navigateTo(destination: Class<*>) {
         startActivity(Intent(this, destination))
-        this.overridePendingTransition( android.R.anim.overshoot_interpolator,
-            android.R.anim.fade_out)
+        overridePendingTransition(
+            android.R.anim.overshoot_interpolator,
+            android.R.anim.fade_out
+        )
         finish()
     }
 
