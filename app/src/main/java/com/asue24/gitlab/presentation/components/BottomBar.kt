@@ -27,7 +27,7 @@ import com.asue24.gitlab.presentation.ui.theme.Orange
 @Composable
 fun BottomBar(navController: NavHostController) {
     val items = listOf(
-        BottomBarScreen.Home, BottomBarScreen.Projects, BottomBarScreen.Activity,BottomBarScreen.Profile
+        BottomBarScreen.Home, BottomBarScreen.Activity,BottomBarScreen.Explore,BottomBarScreen.Profile
     )
 
     // Observe the current back stack entry to highlight the selected item
