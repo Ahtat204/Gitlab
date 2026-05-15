@@ -19,12 +19,14 @@ import com.asue24.gitlab.presentation.ui.theme.titleFont
 @Composable
 fun MyWorkItems(navController: NavController) {
     val myWorkItems = listOf(
-        Item("Issues", R.drawable.issues, 1),
-        Item("Merge Requests ", R.drawable.mergerequest, 1),
-        Item("Workspaces", R.drawable.workspaces, 1),
-        Item("Milestones", R.drawable.milestone, 1),
-        Item("Starred", R.drawable.star, 1),
-        Item("Groups", R.drawable.group, 1)
+        Item("Issues", "issues",R.drawable.issues, 1),
+        Item("Merge Requests ","mergerequests", R.drawable.mergerequest, 1),
+        Item("Workspaces","workspaces", R.drawable.workspaces, 1),
+        Item("Milestones","workspaces", R.drawable.milestone, 1),
+        Item("Starred","starrted", R.drawable.star, 1),
+        Item("Groups","groups", R.drawable.group, 1),
+        Item("Personal projects", "personal",R.drawable.project, 1),
+        Item("Contributed Projects", "contributed",R.drawable.project, 1),
     )
 
     Column(
@@ -35,7 +37,7 @@ fun MyWorkItems(navController: NavController) {
         Text(text = "Your Work", fontFamily = titleFont, fontSize = 20.sp)
         myWorkItems.forEach { item ->
             WorkItem(item) {
-                navController.navigate(item)
+                navController.navigate(item.route)
             }
         }
     }
