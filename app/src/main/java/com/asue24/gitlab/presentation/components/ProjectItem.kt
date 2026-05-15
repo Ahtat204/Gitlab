@@ -30,7 +30,6 @@ import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.asue24.gitlab.GetMyProjectsQuery
-import com.asue24.gitlab.domain.usecase.authentication.utility.getFirstNthSafely
 import com.asue24.gitlab.presentation.components.CoilCache.customImageLoader
 import com.asue24.gitlab.presentation.ui.theme.Background
 import com.asue24.gitlab.presentation.ui.theme.Orange
@@ -100,7 +99,9 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
                                         text = topic,
                                         fontSize = 11.sp,
                                         color = Orange,
-                                        modifier = Modifier.offset(0.dp, 0.dp).padding(10.dp,0.dp),
+                                        modifier = Modifier
+                                            .offset(0.dp, 0.dp)
+                                            .padding(10.dp, 0.dp),
                                         fontFamily = customFontFamily
 
                                     )
