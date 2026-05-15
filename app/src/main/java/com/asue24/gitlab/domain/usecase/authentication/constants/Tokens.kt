@@ -1,4 +1,4 @@
-package com.asue24.gitlab.domain.authentication.constants
+package com.asue24.gitlab.domain.usecase.authentication.constants
 
 import android.content.Context
 import net.openid.appauth.AuthState
@@ -9,6 +9,5 @@ object Tokens {
     var CurrentAuthState: AuthState? = null
     var authService: AuthorizationService? = null
     var context: Context? = null
-    var counter:Int=0
 }
 
