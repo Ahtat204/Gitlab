@@ -1,4 +1,4 @@
-package com.asue24.gitlab.domain.authentication.utility
+package com.asue24.gitlab.domain.usecase.authentication.utility
 
 import android.content.Context
 import android.content.Intent
