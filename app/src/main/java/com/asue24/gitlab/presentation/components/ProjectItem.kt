@@ -1,8 +1,8 @@
 package com.asue24.gitlab.presentation.components
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -30,8 +30,10 @@ import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.asue24.gitlab.GetMyProjectsQuery
+import com.asue24.gitlab.domain.usecase.authentication.utility.getFirstNthSafely
 import com.asue24.gitlab.presentation.components.CoilCache.customImageLoader
 import com.asue24.gitlab.presentation.ui.theme.Background
+import com.asue24.gitlab.presentation.ui.theme.Orange
 import com.asue24.gitlab.presentation.ui.theme.customFontFamily
 
 @Composable
@@ -41,7 +43,7 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .height(100.dp)
+            .height(120.dp)
     ) {
        Row(modifier = Modifier
            .background(Color.Black), verticalAlignment = Alignment.Top) {
@@ -90,6 +92,22 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
                             fontFamily = customFontFamily,
                         )
                     }
+                    project.topics?.let { topics->
+                        Row(horizontalArrangement = Arrangement.Start) {
+                            topics.onEachIndexed { index, topic ->
+                                if(index<3){
+                                    Text(
+                                        text = topic,
+                                        fontSize = 11.sp,
+                                        color = Orange,
+                                        modifier = Modifier.offset(0.dp, 0.dp).padding(10.dp,0.dp),
+                                        fontFamily = customFontFamily
+
+                                    )
+                                }
+                            }
+                        }
+                    }
                     val languages = project.languages
                     if (languages?.isNotEmpty() == true) {
                         val language = languages[0]
@@ -107,6 +125,7 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
                             )
                         }
                     }
+
                 }
             }
         }
@@ -133,7 +152,7 @@ fun Language(color: Int) {
             cap = StrokeCap.Round // Makes the point circular
         )
     }}
-
+/*
 
 
 fun hexColorToLong(hex: String): Long {
@@ -144,4 +163,4 @@ fun hexColorToLong(hex: String): Long {
 
     // Parse as unsigned long from hex
     return cleanHex.toLong(16)
-}
+}*/

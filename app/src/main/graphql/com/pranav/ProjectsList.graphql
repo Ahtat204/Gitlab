@@ -9,6 +9,7 @@ query GetMyProjects {
                 __typename
                 id
                 project {
+                    topics
                     lastActivityAt
                     avatarUrl
                     __typename
