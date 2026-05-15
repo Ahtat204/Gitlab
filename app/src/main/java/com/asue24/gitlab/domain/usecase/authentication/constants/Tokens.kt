@@ -1,4 +1,4 @@
-package com.asue24.gitlab.domain.authentication.constants
+package com.asue24.gitlab.domain.usecase.authentication.constants
 
 import android.content.Context
 import net.openid.appauth.AuthState

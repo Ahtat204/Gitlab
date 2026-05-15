@@ -21,8 +21,10 @@ import androidx.compose.ui.unit.dp
 import com.asue24.gitlab.R
 import com.asue24.gitlab.presentation.ui.theme.Orange
 import com.asue24.gitlab.presentation.ui.theme.customFontFamily
+import kotlinx.serialization.Serializable
 
-public data class Item(public val name: String, public val Id: Int, public val count: Int)
+@Serializable
+data class Item(val name: String,val route:String,  val Id: Int,  val count: Int)
 
 /**
  *
@@ -50,7 +52,7 @@ fun WorkItem(item: Item, openScreen: () -> Unit) {
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(text = item.name, fontFamily = customFontFamily, modifier = Modifier.weight(0.9f))
-            Text(text = item.count.toString(), color = Color.White, modifier = Modifier.weight(0.1f))
+
         }
     }
 }

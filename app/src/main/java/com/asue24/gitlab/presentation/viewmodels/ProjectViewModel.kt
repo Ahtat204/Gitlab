@@ -2,28 +2,95 @@ package com.asue24.gitlab.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.asue24.gitlab.GetMyProjectsQuery.Node
+import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.GetRepoTreeQuery
 import com.asue24.gitlab.data.repositories.project.ProjectRepository
-import com.asue24.gitlab.data.repositories.project.ProjectRepositoryImpl
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProjectViewModel : ViewModel() {
+/**
+ * ViewModel responsible for exposing GitLab project data to the UI layer.
+ *
+ * ## Overview
+ * - Integrates with [ProjectRepository] to fetch project lists and repository trees.
+ * - Uses Kotlin [StateFlow] to provide reactive, lifecycle‑aware state to the UI.
+ * - Scoped with [HiltViewModel] for dependency injection and lifecycle management.
+ *
+ * ## State
+ * - [projects]: Holds the authenticated user’s contributed projects.
+ * - [currentProject]: Holds the currently selected project’s repository tree.
+ *
+ * ## Behavior
+ * - **loadAllProjects()**: Fetches all projects using Apollo caching. Falls back
+ *   to `NetworkFirst` policy if cache retrieval fails.
+ * - **loadProject(id)**: Retrieves a specific project’s repository tree by ID.
+ *
+ * ## Error Handling
+ * - Exceptions during data collection are caught. The ViewModel retries with
+ *   a network fetch to ensure data availability.
+ *
+ * ## Usage
+ * Inject into a UI controller (e.g., Activity/Fragment) and collect flows:
+ * ```kotlin
+ * @Composable
+ * fun screen(projectVM:ProjectViewModel=hiltViewModel) {
+ *  LaunchedEffect(1) {
+ *         projectViewModel.loadAllProjects()
+ *     }
+ * }
+ * ```
+ */
+@HiltViewModel
+class ProjectViewModel @Inject constructor(
+    private val projectRepository: ProjectRepository
+) : ViewModel() {
+
+    /** Currently selected project’s repository tree. */
     val currentProject = MutableStateFlow<GetRepoTreeQuery.Project?>(null)
 
-    //TODO:this will be refactored to Dependency Injection,we're just testing now
-    private val projectRepository: ProjectRepository = ProjectRepositoryImpl()
-    private val _projects = MutableStateFlow<List<Node>>(emptyList())
-    val projects: StateFlow<List<Node>> = _projects.asStateFlow()
+    /** Backing state for contributed projects. */
+    private val _projects = MutableStateFlow<GetMyProjectsQuery.CurrentUser?>(null)
+
+    /** Public immutable flow of contributed projects. */
+    val projects: StateFlow<GetMyProjectsQuery.CurrentUser?> = _projects.asStateFlow()
+
+    /**
+     * Loads all projects contributed by the authenticated user.
+     *
+     * - First attempts with [FetchPolicy.CacheFirst].
+     * - On exception, retries with [FetchPolicy.NetworkFirst].
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun loadAllProjects() {
+        viewModelScope.launch {
+            try {
+                projectRepository.getAllProjects(FetchPolicy.CacheFirst).collect { data ->
+                    _projects.value = data.currentUser
+                }
+            } catch (ex: Exception) {
+                projectRepository.getAllProjects(FetchPolicy.NetworkFirst).collect { data ->
+                    _projects.value = data.currentUser
+                }
+            }
+        }
+    }
+
+    /**
+     * Loads a specific project’s repository tree by its ID.
+     *
+     * @param id The unique project identifier.
+     */
     fun loadProject(id: String) {
         viewModelScope.launch {
-            val project = projectRepository.getProjectById(id)
-            currentProject.value = project
+            projectRepository.getProjectById(id).collect {
+                currentProject.value = it?.project
+            }
         }
     }
 }

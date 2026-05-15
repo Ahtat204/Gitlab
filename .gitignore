@@ -8,9 +8,14 @@
 .externalNativeBuild
 .cxx
 local.properties
+**.graphqls
 *.svg
 .env
 **.secrets
 secrets.properties
+keystore
+app/release
+keystore_base64.txt
+explanation.txt
 **.txt
 app/test.json

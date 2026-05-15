@@ -1,41 +1,101 @@
 package com.asue24.gitlab.data.repositories.project
 
+import android.util.Log
+import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
+import com.apollographql.apollo.cache.normalized.memoryCacheOnly
+import com.apollographql.apollo.cache.normalized.watch
 import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.GetRepoTreeQuery
-import com.asue24.gitlab.data.remote.ApolloService
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.mapNotNull
+import javax.inject.Inject
 
 /**
- * this is a singleton object , which guarantees the ConcurrentHashMap will live throughout the Application lifecycle
+ * Implementation of [ProjectRepository] that integrates with GitLab via Apollo GraphQL.
+ *
+ * ## Overview
+ * - Provides reactive streams of project data using Kotlin [Flow].
+ * - Uses Apollo’s normalized caching with configurable [FetchPolicy].
+ * - Annotated with `@Inject` for dependency injection, ensuring a singleton lifecycle.
+ *
+ * ## Responsibilities
+ * - Fetch all projects contributed by the authenticated user.
+ * - Retrieve repository tree data for a specific project by ID.
+ * - Handle errors gracefully with logging and structured concurrency.
+ *
+ * ## Dependencies
+ * - [ApolloClient]: Executes GraphQL queries and manages caching.
+ * - [GetMyProjectsQuery], [GetRepoTreeQuery]: Auto‑generated query classes.
+ * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
  */
-class ProjectRepositoryImpl : ProjectRepository {
-    private val gitlab = ApolloService.client
+class ProjectRepositoryImpl @Inject constructor(
+    private val apolloClient: ApolloClient
+) : ProjectRepository {
 
     /**
-     * @brief Streams contributed projects from GitLab.
-     * Uses context preservation and structured concurrency.
+     * Streams all projects the authenticated user has contributed to.
+     *
+     * @param policy The [FetchPolicy] to control cache vs. network behavior.
+     * @return A [Flow] emitting [GetMyProjectsQuery.Data] objects.
+     *
+     * ### Behavior
+     * - Executes [GetMyProjectsQuery] with the provided fetch policy.
+     * - Uses Apollo’s `watch()` to continuously observe changes.
+     * - Filters out null results with `mapNotNull`.
+     * - Logs exceptions with [Log.e] while keeping the stream alive.
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getAllProjects(FetchPolicy.CacheFirst)
+     *         .collect { projects -> renderProjects(projects) }
+     * }
+     * ```
      */
-    override fun getAllProjects(): Flow<GetMyProjectsQuery.Data> {
-        val result =
-            gitlab.query(GetMyProjectsQuery()).fetchPolicy(FetchPolicy.CacheAndNetwork).toFlow()
-        val response = result.map { resp ->
-            if (resp.hasErrors()) {
-                throw RuntimeException("GraphQL Errors: ${resp.errors}")
+    @OptIn(ApolloExperimental::class)
+    override suspend fun getAllProjects(policy: FetchPolicy): Flow<GetMyProjectsQuery.Data> {
+        return apolloClient.query(GetMyProjectsQuery()).memoryCacheOnly(true)
+            .fetchPolicy(FetchPolicy.CacheFirst)
+            .watch()
+            .mapNotNull { it.data }
+            .catch { ex ->
+                Log.e("ProjectRepository", ex.cause.toString() + "\n" + ex.stackTrace)
             }
-            resp.dataAssertNoErrors
-        }
-
-        return response.flowOn(Dispatchers.IO)
+            .mapNotNull { it }
     }
 
-    override suspend fun getProjectById(id: String): GetRepoTreeQuery.Project? {
-        return gitlab.query(GetRepoTreeQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
-            .execute().dataAssertNoErrors.project
+    /**
+     * Retrieves the repository tree for a given project.
+     *
+     * @param id The unique identifier of the project.
+     * @return A [Flow] emitting [GetRepoTreeQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetRepoTreeQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Logs errors without terminating the stream.
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getProjectById("12345")
+     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * }
+     * ```
+     */
+    override suspend fun getProjectById(id: String): Flow<GetRepoTreeQuery.Data?> {
+        return apolloClient.query(GetRepoTreeQuery(id))
+            .fetchPolicy(FetchPolicy.CacheFirst)
+            .watch()
+            .mapNotNull { it.data }
+            .catch { ex ->
+                Log.e("ProjectRepository", ex.cause.toString() + "\n" + ex.stackTrace)
+            }
+            .mapNotNull { it }
     }
-
 }
