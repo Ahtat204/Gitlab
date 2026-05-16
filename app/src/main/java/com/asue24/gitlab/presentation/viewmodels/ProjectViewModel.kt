@@ -1,8 +1,5 @@
 package com.asue24.gitlab.presentation.viewmodels
 
-import android.net.http.NetworkException
-import android.os.Build
-import androidx.annotation.RequiresExtension
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.apollographql.apollo.cache.normalized.FetchPolicy
@@ -11,6 +8,7 @@ import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.GetProjectDetailsQuery
 import com.asue24.gitlab.data.repositories.project.ProjectRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -51,9 +49,8 @@ import javax.inject.Inject
  * ```
  */
 @HiltViewModel
-class ProjectViewModel @Inject constructor(
-    private val projectRepository: ProjectRepository
-) : ViewModel() {
+class ProjectViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
+    ViewModel() {
     /** Currently selected project’s repository tree. */
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
 
@@ -69,7 +66,6 @@ class ProjectViewModel @Inject constructor(
      * - First attempts with [FetchPolicy.CacheFirst].
      * - On exception, retries with [FetchPolicy.NetworkFirst].
      */
-    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @OptIn(ExperimentalCoroutinesApi::class)
     fun loadAllProjects() {
         viewModelScope.launch {
@@ -83,19 +79,31 @@ class ProjectViewModel @Inject constructor(
                         _projects.value = data.currentUser
                     }
                 }
+                if (ex is CancellationException) throw ex
             }
         }
     }
 
     /**
-     * Loads a specific project’s repository tree by its ID.
+     * Loads a specific project’s details and statistics,such as commit counts and last commit , open MRs and issues count...
      *
      * @param id The unique project identifier.
      */
     fun loadProject(id: String) {
         viewModelScope.launch {
-            projectRepository.getProjectById(id).collect {
-                currentProject.value = it?.project
+            try {
+                projectRepository.getProjectById(id, FetchPolicy.CacheFirst).collect {
+                    currentProject.value = it?.project
+                }
+            } catch (ex: Exception) {
+                if (ex is CacheMissException) {
+                    projectRepository.getProjectById(id, FetchPolicy.NetworkFirst).collect {
+                        currentProject.value = it?.project
+                    }
+                }
+                if (ex is CancellationException) {
+                    throw ex
+                }
             }
         }
     }
