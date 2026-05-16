@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.exception.CacheMissException
-import com.asue24.gitlab.GetMyProjectsQuery
-import com.asue24.gitlab.GetProjectDetailsQuery
+import com.asue24.gitlab.data.queries.GetMyProjectsQuery
+import com.asue24.gitlab.data.queries.GetProjectDetailsQuery
 import com.asue24.gitlab.data.repositories.project.ProjectRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
