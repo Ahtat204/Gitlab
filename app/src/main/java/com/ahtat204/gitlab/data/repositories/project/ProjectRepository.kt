@@ -1,8 +1,8 @@
 package com.ahtat204.gitlab.data.repositories.project
 
 import com.apollographql.apollo.cache.normalized.FetchPolicy
-import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
-import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.asue24.gitlab.data.queries.GetMyProjectsQuery
+import com.asue24.gitlab.data.queries.GetProjectDetailsQuery
 import kotlinx.coroutines.flow.Flow
 
 interface ProjectRepository {
