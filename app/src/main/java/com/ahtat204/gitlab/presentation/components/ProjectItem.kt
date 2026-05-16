@@ -134,25 +134,6 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
 
     }
 
-
-@Composable
-fun Language(color: Int) {
-
-    Canvas(
-        modifier = Modifier
-    ) {
-        // Coordinates for the point (center of the canvas)
-        val center = Offset(1.0f, size.height / 2)
-
-        // Draw a single point
-        drawPoints(
-            points = listOf(center),
-            pointMode = PointMode.Points,
-            color = Color(color),
-            strokeWidth = 26f, // Controls point size
-            cap = StrokeCap.Round // Makes the point circular
-        )
-    }}
 /*
 
 
