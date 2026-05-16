@@ -50,11 +50,11 @@ android {
 }
 
 apollo {
-    service("service") {
-        packageName.set("com.asue24.gitlab")
+    service("gitlab") {
+        packageName.set("com.asue24.gitlab.data.queries")
         introspection {
             endpointUrl.set("https://gitlab.com/api/graphql")
-            schemaFile.set(file("app/src/main/graphql/com/pranav/schema.graphqls"))
+            schemaFile.set(file("app/src/main/graphql/com/asue24/schema.graphqls"))
             addTypename.set("always")
         }
     }

@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.asue24.gitlab.GetMyProjectsQuery
+import com.asue24.gitlab.data.queries.GetMyProjectsQuery
 import com.asue24.gitlab.presentation.components.CoilCache.customImageLoader
 import com.asue24.gitlab.presentation.ui.theme.Background
 import com.asue24.gitlab.presentation.ui.theme.Orange
