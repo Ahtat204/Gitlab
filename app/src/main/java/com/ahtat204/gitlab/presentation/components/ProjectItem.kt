@@ -29,11 +29,11 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
 import com.ahtat204.gitlab.presentation.components.CoilCache.customImageLoader
 import com.ahtat204.gitlab.presentation.ui.theme.Background
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
+import com.asue24.gitlab.data.queries.GetMyProjectsQuery
 
 @Composable
 fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQuery.Project) {
