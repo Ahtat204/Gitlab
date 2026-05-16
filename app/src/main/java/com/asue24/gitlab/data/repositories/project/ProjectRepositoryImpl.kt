@@ -8,6 +8,7 @@ import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.apollographql.apollo.cache.normalized.watch
 import com.asue24.gitlab.GetMyProjectsQuery
 import com.asue24.gitlab.GetProjectDetailsQuery
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapNotNull
@@ -59,6 +60,7 @@ class ProjectRepositoryImpl @Inject constructor(
         return apolloClient.query(GetMyProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapNotNull { it.data }.catch { ex ->
                 Log.e("ProjectRepository", ex.cause.toString() + "\n" + ex.stackTrace)
+                if (ex is CancellationException) throw ex
             }.mapNotNull { it }
     }
 
@@ -82,10 +84,11 @@ class ProjectRepositoryImpl @Inject constructor(
      * }
      * ```
      */
-    override suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?> {
-        return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
+    override suspend fun getProjectById(id: String,policy: FetchPolicy): Flow<GetProjectDetailsQuery.Data?> {
+        return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(policy)
             .watch().mapNotNull { it.data }.catch { ex ->
                 Log.e("ProjectRepository", ex.cause.toString() + "\n" + ex.stackTrace)
+                if (ex is CancellationException) throw ex
             }.mapNotNull { it }
     }
 }
