@@ -1,4 +1,4 @@
-package com.asue24.gitlab
+package com.ahtat204.gitlab
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
