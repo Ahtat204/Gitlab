@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ahtat204.gitlab.presentation.components.BottomBar
 import com.ahtat204.gitlab.presentation.navigation.BottomNavigationGraph
 import com.ahtat204.gitlab.presentation.ui.theme.GitlabTheme
+import com.asue24.gitlab.presentation.navigation.BottomNavigationGraph
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 

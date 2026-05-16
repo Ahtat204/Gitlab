@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.presentation.screens
 
+
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -28,7 +29,6 @@ import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.ahtat204.gitlab.presentation.components.ProjectItem
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
 import kotlinx.coroutines.Dispatchers
@@ -81,7 +81,7 @@ fun PersonalProjects(
     projectViewModel: ProjectViewModel = hiltViewModel()
 ) {
     val loader: ImageLoader =
-        ImageLoader.Builder(context!!).crossfade(true).dispatcher(Dispatchers.IO)
+        ImageLoader.Builder(context).crossfade(true).dispatcher(Dispatchers.IO)
             .respectCacheHeaders(false).build()
     LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
@@ -107,7 +107,7 @@ fun PersonalProjects(
                     text = "Your Projects",
                     fontFamily = titleFont,
                     fontSize = 20.sp,
-                    modifier = Modifier, color = Orange
+                    modifier = Modifier
                 )
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
