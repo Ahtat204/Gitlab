@@ -2,3 +2,4 @@
 ../keystore_base64.txt
 ../keystore
 release
+app/src/main/graphql/com/pranav/schema.graphqls
