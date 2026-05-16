@@ -94,7 +94,7 @@ class AuthenticationActivity : ComponentActivity() {
         // Compose UI with login button
         setContent {
             Column(
-                Modifier.offset(100.dp).fillMaxSize(),
+                Modifier.offset(10.dp).fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -104,7 +104,7 @@ class AuthenticationActivity : ComponentActivity() {
                     launcher.launch(authIntent)
                     authState = AuthState(serviceConfig!!)
                 }) {
-                    Text(text = "Login", fontSize = 30.sp)
+                    Text(text = "Login With Gitlab", fontSize = 30.sp)
                 }
             }
         }

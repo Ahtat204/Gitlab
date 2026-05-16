@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProjectRepository {
     suspend fun getAllProjects(policy: FetchPolicy): Flow<GetMyProjectsQuery.Data>
-    suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?>
+    suspend fun getProjectById(id: String,policy: FetchPolicy): Flow<GetProjectDetailsQuery.Data?>
 }
