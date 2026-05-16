@@ -10,6 +10,7 @@ query GetProjectDetails($projectPath: ID!) {
             name
             fullPath
         }
+
         statistics {
             commitCount
         }
@@ -44,45 +45,12 @@ query GetProjectDetails($projectPath: ID!) {
         }
         repository {
 
-            branchNames(searchPattern: "*", offset: 0, limit: 100)
             __typename
+            branchNames(searchPattern: "*", offset: 0, limit: 100)
             rootRef
             lastCommit{
                 id
                 name
-            }
-            tree(path: "") {
-                __typename
-
-                lastCommit {
-                    __typename
-                    id
-                    title
-                }
-                trees{
-                    __typename
-                    nodes {
-                        __typename
-                        name
-                    }
-                    edges {
-                        __typename
-                        node {
-                            __typename
-                            name
-                        }
-                    }
-                }
-                blobs{
-                    __typename
-                    nodes {
-                        __typename
-                        name
-                        type     # Returns "tree" for folders, "blob" for files
-                        path
-                        flatPath
-
-                    }}
             }
         }
     }
