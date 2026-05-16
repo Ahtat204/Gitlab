@@ -17,12 +17,14 @@ query GetProjectDetails($projectPath: ID!) {
 
         projectMembers{
             nodes {
+
                 user {
                     name
                 }
             }
         }
-
+        forksCount
+        starCount
         id
         name
         topics

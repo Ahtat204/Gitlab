@@ -13,9 +13,45 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 
-
+/**
+ * An OkHttp [Interceptor] that attaches and refreshes OAuth access tokens
+ * for authenticated requests against the GitLab API.
+ *
+ * This interceptor ensures that every outgoing request includes a valid
+ * `Authorization` header. If a request fails with HTTP 401 (Unauthorized),
+ * it attempts to refresh the access token using the current [AuthState].
+ *
+ * ## Behavior
+ * - Adds the `Authorization: Bearer <token>` header if a token is available.
+ * - If the response is `401 Unauthorized`:
+ *   - Synchronizes on a lock to prevent concurrent refresh attempts.
+ *   - Uses [net.openid.appauth.AuthState.performActionWithFreshTokens] to refresh the token.
+ *   - Updates [Tokens.accessToken] and persists the new state via [AuthStorage].
+ *   - Retries the request with the refreshed token.
+ *   - Logs an error if the retry still fails with `401`.
+ *
+ * ## Concurrency
+ * - A `Locker` object is used to synchronize token refresh operations,
+ *   preventing race conditions when multiple requests fail simultaneously.
+ *
+ * ## Persistence
+ * - After a successful refresh, the updated [AuthState] is saved into
+ *   [AuthStorage] using DataStore, ensuring the new token is available
+ *   for future requests.
+ *
+ * ## Usage
+ * Register this interceptor with OkHttp:
+ * ```kotlin
+ * val client = OkHttpClient.Builder()
+ *     .addInterceptor(AuthenticationInterceptor())
+ *     .build()
+ * ```
+ *
+ * @constructor Creates an interceptor that manages authentication headers
+ * and token refresh logic for GitLab API requests.
+ */
 class AuthenticationInterceptor : Interceptor {
-    private val Locker=Any()
+    private val Locker = Any()
     val authenticationService = Tokens.authService
 
     @OptIn(InternalCoroutinesApi::class)
@@ -33,7 +69,9 @@ class AuthenticationInterceptor : Interceptor {
             synchronized(Locker) {
                 val state = Tokens.CurrentAuthState
                 val accessToken = Tokens.accessToken
-                if (accessToken != null && accessToken.equals(token) && state != null && Tokens.authService != null && Tokens.context != null) {
+                if (accessToken != null && accessToken == token &&
+                    state != null && Tokens.authService != null && Tokens.context != null
+                ) {
                     val deferred = CompletableDeferred<String?>()
                     runBlocking {
                         state.performActionWithFreshTokens(Tokens.authService!!) { token, _, ex ->
@@ -61,9 +99,7 @@ class AuthenticationInterceptor : Interceptor {
                     }
                 }
             }
-
         }
-
         return response
     }
 }
