@@ -1,10 +1,14 @@
 package com.asue24.gitlab.presentation.viewmodels
 
+import android.net.http.NetworkException
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.apollo.exception.CacheMissException
 import com.asue24.gitlab.GetMyProjectsQuery
-import com.asue24.gitlab.GetRepoTreeQuery
+import com.asue24.gitlab.GetProjectDetailsQuery
 import com.asue24.gitlab.data.repositories.project.ProjectRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -50,9 +54,8 @@ import javax.inject.Inject
 class ProjectViewModel @Inject constructor(
     private val projectRepository: ProjectRepository
 ) : ViewModel() {
-
     /** Currently selected project’s repository tree. */
-    val currentProject = MutableStateFlow<GetRepoTreeQuery.Project?>(null)
+    val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
 
     /** Backing state for contributed projects. */
     private val _projects = MutableStateFlow<GetMyProjectsQuery.CurrentUser?>(null)
@@ -66,6 +69,7 @@ class ProjectViewModel @Inject constructor(
      * - First attempts with [FetchPolicy.CacheFirst].
      * - On exception, retries with [FetchPolicy.NetworkFirst].
      */
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @OptIn(ExperimentalCoroutinesApi::class)
     fun loadAllProjects() {
         viewModelScope.launch {
@@ -74,8 +78,10 @@ class ProjectViewModel @Inject constructor(
                     _projects.value = data.currentUser
                 }
             } catch (ex: Exception) {
-                projectRepository.getAllProjects(FetchPolicy.NetworkFirst).collect { data ->
-                    _projects.value = data.currentUser
+                if (ex is CacheMissException) {
+                    projectRepository.getAllProjects(FetchPolicy.NetworkFirst).collect { data ->
+                        _projects.value = data.currentUser
+                    }
                 }
             }
         }
