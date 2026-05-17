@@ -16,7 +16,7 @@
         android:theme="@style/Theme.Gitlab"
         tools:targetApi="31">
         <activity
-            android:name="com.ahtat204.LauncherActivity"
+            android:name=".presentation.activities.LauncherActivity"
             android:exported="true"
             android:label="@string/title_activity_launcher"
             android:theme="@style/Theme.Gitlab">
