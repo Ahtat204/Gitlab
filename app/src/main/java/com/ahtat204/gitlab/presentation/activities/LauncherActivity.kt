@@ -1,5 +1,6 @@
-package com.ahtat204
+package com.ahtat204.gitlab.presentation.activities
 
+import android.R
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -9,8 +10,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
-import com.ahtat204.gitlab.presentation.activities.AuthenticationActivity
-import com.ahtat204.gitlab.presentation.activities.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +23,7 @@ import java.io.File
  *
  * ## Responsibilities
  * - Displays the splash screen while authentication state is being checked.
- * - Initializes [AuthorizationService] and sets up token context in [Tokens].
+ * - Initializes [net.openid.appauth.AuthorizationService] and sets up token context in [com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens].
  * - Ensures cache directory (`gitlab/httpCache`) exists for Apollo/HTTP caching.
  * - Determines whether to navigate to [MainActivity] (authenticated) or
  *   [AuthenticationActivity] (login required).
@@ -37,7 +36,7 @@ import java.io.File
  *   - If a valid refresh token exists, attempts to refresh access token.
  *   - Navigates to the appropriate activity based on authentication outcome.
  * - **onDestroy**:
- *   - Disposes of [AuthorizationService] to release resources.
+ *   - Disposes of [net.openid.appauth.AuthorizationService] to release resources.
  *
  * ## Error Handling
  * - If token refresh fails, navigates to [AuthenticationActivity].
@@ -107,8 +106,8 @@ class LauncherActivity : ComponentActivity() {
     private fun navigateTo(destination: Class<*>) {
         startActivity(Intent(this, destination))
         overridePendingTransition(
-            android.R.anim.overshoot_interpolator,
-            android.R.anim.fade_out
+            R.anim.overshoot_interpolator,
+            R.anim.fade_out
         )
         finish()
     }
