@@ -32,6 +32,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
 import kotlinx.coroutines.Dispatchers
 import java.time.Instant
 import java.time.ZoneId
+
 /**
  * Composable that displays the authenticated user's personal GitLab projects.
  *
@@ -108,7 +109,7 @@ fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hilt
                     verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(nodes) { item ->
+                    items(nodes, key = { item -> item?.id ?: Any() }) { item ->
                         item?.project?.let { ProjectItem(CurrUser, it, loader) }
                     }
                 }
