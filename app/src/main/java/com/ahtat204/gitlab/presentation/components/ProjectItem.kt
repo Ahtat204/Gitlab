@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.presentation.components
 
+//import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,12 +36,51 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.ahtat204.gitlab.presentation.ui.theme.Background
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.asue24.gitlab.data.queries.GetMyProjectsQuery
 
+/**
+ * Composable that renders a single GitLab project item card.
+ *
+ * ## Overview
+ * Displays project details including:
+ * - User avatar (if available)
+ * - Project name and visibility (public/private icon)
+ * - Project description (truncated to one line)
+ * - Project topics (up to 3 shown)
+ * - Primary language with color indicator
+ *
+ * ## Parameters
+ * @param data The [GetMyProjectsQuery.CurrentUser] object containing user metadata
+ *             (used to load avatar image if available).
+ * @param project The [GetMyProjectsQuery.Project] object representing the project
+ *                whose details will be displayed.
+ * @param imageLoader The [ImageLoader] instance used by Coil to load images asynchronously.
+ *
+ * ## UI Behavior
+ * - Wraps content in a [Card] with fixed height.
+ * - Displays avatar image using [AsyncImage] with caching and crossfade enabled.
+ * - Shows project name alongside a visibility icon (`Public` or `Lock`).
+ * - Shows project description if present, truncated with ellipsis.
+ * - Displays up to three topics styled in orange.
+ * - Displays the first language with a colored circle and name.
+ *
+ * ## Example
+ * ```kotlin
+ * ProjectItem(
+ *     data = userData,
+ *     project = project,
+ *     imageLoader = imageLoader
+ * )
+ * ```
+ *
+ * ## Notes
+ * - Uses Coil’s [AsyncImage] for image loading with memory and disk caching.
+ * - Applies custom font family and colors for consistent styling.
+ * - Topics and languages are optional and only shown if available.
+ */
 @Composable
 fun ProjectItem(
     data: GetMyProjectsQuery.CurrentUser?,
@@ -60,10 +99,6 @@ fun ProjectItem(
             data?.let {
                 it.avatarUrl?.let { url ->
                     val avatar = "https://gitlab.com/$url"
-                    LaunchedEffect(Unit) {
-                        val request = ImageRequest.Builder(context!!).data(url).build()
-                        imageLoader.enqueue(request)
-                    }
                     AsyncImage(
                         imageLoader = imageLoader,
                         model = ImageRequest.Builder(LocalContext.current).data(avatar) // Image URL

@@ -70,8 +70,6 @@ class LauncherActivity : ComponentActivity() {
         // Initialize authentication service and token context
         authenticationService = AuthorizationService(this)
         Tokens.authService = authenticationService
-        Tokens.context = application
-
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
 
