@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.presentation.components
 
+//import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,7 +36,6 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.ahtat204.gitlab.presentation.ui.theme.Background
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
@@ -100,10 +99,6 @@ fun ProjectItem(
             data?.let {
                 it.avatarUrl?.let { url ->
                     val avatar = "https://gitlab.com/$url"
-                    LaunchedEffect(Unit) {
-                        val request = ImageRequest.Builder(context!!).data(url).build()
-                        imageLoader.enqueue(request)
-                    }
                     AsyncImage(
                         imageLoader = imageLoader,
                         model = ImageRequest.Builder(LocalContext.current).data(avatar) // Image URL
