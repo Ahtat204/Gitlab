@@ -27,6 +27,7 @@ kotlinxSerializationJson = "1.7.3"
 material3Android = "1.4.0"
 secretsGradlePlugin = "2.0.1"
 material3 = "1.4.0"
+junitJupiter = "5.14.0"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
@@ -67,6 +68,7 @@ androidx-material3-android = {group = "androidx.compose.material3",name = "mater
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 
 
 [plugins]
