@@ -1,6 +1,5 @@
 package com.ahtat204.gitlab.presentation.components
 
-import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,7 +20,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,7 +40,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.asue24.gitlab.data.queries.GetMyProjectsQuery
 
 @Composable
-fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQuery.Project,counter: MutableState<Int>) {
+fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQuery.Project) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,8 +65,8 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
                             .clip(RoundedCornerShape(20.dp))
                   , onState = {state->
                       when(state){
-                          is AsyncImagePainter.State.Loading->{counter.value=0}
-                          is AsyncImagePainter.State.Success->{counter.value=1}
+                          is AsyncImagePainter.State.Loading->{}
+                          is AsyncImagePainter.State.Success->{}
                           else ->{}
                       }
                         }  )
@@ -81,9 +79,11 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
                     .fillMaxHeight()
                     .background(Background)
             ) {
-
                 project.let { project ->
-                    Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = project.name,
                             fontSize = 17.sp,
@@ -97,7 +97,11 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
                             else -> Icons.Default.Lock
                         }
                         project.visibility?.let {
-                            Icon(visibilityIcon, contentDescription = null, modifier = Modifier.size(15.dp))
+                            Icon(
+                                visibilityIcon,
+                                contentDescription = null,
+                                modifier = Modifier.size(15.dp)
+                            )
                         }
                     }
 
