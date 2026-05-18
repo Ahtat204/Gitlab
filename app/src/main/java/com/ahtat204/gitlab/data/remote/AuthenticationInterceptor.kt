@@ -70,7 +70,7 @@ class AuthenticationInterceptor : Interceptor {
                 val state = Tokens.CurrentAuthState
                 val accessToken = Tokens.accessToken
                 if (accessToken != null && accessToken == token &&
-                    state != null && Tokens.authService != null && Tokens.context != null
+                    state != null && Tokens.authService != null
                 ) {
                     val deferred = CompletableDeferred<String?>()
                     runBlocking {
@@ -81,7 +81,7 @@ class AuthenticationInterceptor : Interceptor {
                                 Tokens.authService = authenticationService
                                 deferred.complete(token)
                                 CoroutineScope(Dispatchers.IO).launch {
-                                    AuthStorage.getAuthState(Tokens.context!!).updateData { state }
+                                    AuthStorage.getAuthState(Tokens.context).updateData { state }
                                 }
                             }
                             if (ex != null) {
