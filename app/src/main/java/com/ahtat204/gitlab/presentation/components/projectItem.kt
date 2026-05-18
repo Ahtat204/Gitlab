@@ -20,6 +20,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,17 +31,23 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
+import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.ahtat204.gitlab.presentation.components.CoilCache.customImageLoader
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.ahtat204.gitlab.presentation.ui.theme.Background
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.asue24.gitlab.data.queries.GetMyProjectsQuery
 
 @Composable
-fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQuery.Project) {
+fun ProjectItem(
+    data: GetMyProjectsQuery.CurrentUser?,
+    project: GetMyProjectsQuery.Project,
+    imageLoader: ImageLoader
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -53,23 +60,28 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
             data?.let {
                 it.avatarUrl?.let { url ->
                     val avatar = "https://gitlab.com/$url"
+                    LaunchedEffect(Unit) {
+                        val request = ImageRequest.Builder(context!!).data(url).build()
+                        imageLoader.enqueue(request)
+                    }
                     AsyncImage(
-                        imageLoader = customImageLoader,
+                        imageLoader = imageLoader,
                         model = ImageRequest.Builder(LocalContext.current).data(avatar) // Image URL
-                            .crossfade(true) // Smooth fade-in
+                            .crossfade(true).memoryCachePolicy(CachePolicy.ENABLED)
+                            .diskCachePolicy(CachePolicy.ENABLED) // Smooth fade-in
                             .build(),
                         contentDescription = "Sample Image",
                         modifier = Modifier
                             .padding(10.dp)
                             .size(40.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                  , onState = {state->
-                      when(state){
-                          is AsyncImagePainter.State.Loading->{}
-                          is AsyncImagePainter.State.Success->{}
-                          else ->{}
-                      }
-                        }  )
+                            .clip(RoundedCornerShape(20.dp)),
+                        onState = { state ->
+                            when (state) {
+                                is AsyncImagePainter.State.Loading -> {}
+                                is AsyncImagePainter.State.Success -> {}
+                                else -> {}
+                            }
+                        })
                 }
             }
 

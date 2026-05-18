@@ -24,9 +24,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import coil.Coil.imageLoader
+import coil.ImageLoader
+import coil.request.ImageRequest
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.ahtat204.gitlab.presentation.components.ProjectItem
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
+import kotlinx.coroutines.Dispatchers
 import java.time.Instant
 import java.time.ZoneId
 
@@ -36,9 +41,14 @@ import java.time.ZoneId
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hiltViewModel()) {
+    val loader: ImageLoader= ImageLoader.Builder(context!!)
+        .crossfade(true).dispatcher(Dispatchers.IO)
+        .respectCacheHeaders(false)
+        .build()
     LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
     }
+
     val CurrUser by projectViewModel.projects.collectAsState()
     CurrUser?.projectMemberships?.nodes?.sortedBy {
         Instant.parse(it?.project?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
@@ -69,7 +79,7 @@ fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hilt
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(nodes) { item ->
-                        item?.project?.let { ProjectItem(CurrUser, it) }
+                        item?.project?.let { ProjectItem(CurrUser, it,loader) }
                     }
                 }
             }
