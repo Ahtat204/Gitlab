@@ -4,4 +4,4 @@ A GitLab Android client built with Jetpack Compose,GraphQL with Apollo and Gitla
 screenshots:
 <div>
 <img src="homescreen.jpg" height=440>
-<img src="projectsScreen.jpg" height=440></div>
+<img src="projectlist.jpg" height=440></div>
