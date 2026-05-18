@@ -15,8 +15,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,11 +41,12 @@ fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hilt
     LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
     }
+    val state= remember { mutableStateOf(0) }
     val CurrUser by projectViewModel.projects.collectAsState()
     CurrUser?.projectMemberships?.nodes?.sortedBy {
         Instant.parse(it?.project?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
             .toLocalDate()
-    }?.let {
+    }?.let { nodes ->
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -50,7 +54,7 @@ fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hilt
                 .padding(x)
                 .background(Color.Black)
         ) {
-            if (CurrUser?.projectMemberships?.nodes?.isEmpty() == true || CurrUser?.avatarUrl == null) {
+            if (CurrUser?.projectMemberships?.nodes?.isEmpty() == true || CurrUser?.avatarUrl == null||state.value!=nodes.size) {
                 CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
 
             } else {
@@ -66,8 +70,8 @@ fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hilt
                     verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(it) { item ->
-                        item?.project?.let { ProjectItem(CurrUser, it) }
+                    items(nodes) { item ->
+                        item?.project?.let { ProjectItem(CurrUser, it, state) }
                     }
                 }
             }
