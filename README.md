@@ -202,8 +202,3 @@ Contributions are welcome! Here's the standard flow:
 5. **Push**: `git push origin feature/your-feature`
 6. **Open** a pull request
 
-Please follow the existing code style and include tests for new behavior where applicable.
-
----
-*This README was generated with ❤️ by [ReadmeBuddy](https://readmebuddy.com)*
-
