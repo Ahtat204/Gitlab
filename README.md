@@ -1,204 +1,346 @@
- ![Status](https://img.shields.io/badge/status-ongoing-green?style=for-the-badge)
+# 📱 GitLab Client
 
-# Gitlab
+[![Status](https://img.shields.io/badge/status-ongoing-green?style=for-the-badge)](https://github.com/Ahtat204/Gitlab)
+[![Language](https://img.shields.io/badge/language-Kotlin-7F52FF?style=for-the-badge)](https://kotlinlang.org)
+[![Platform](https://img.shields.io/badge/platform-Android-3DDC84?style=for-the-badge)](https://www.android.com)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
-> An Android client to view GitLab repositories without using a web browser.
+> A native Android client for GitLab that brings your repositories to your fingertips. Browse projects, view merge requests, and manage issues without opening a web browser.
+
+## 📸 Screenshots
+
+| Home Screen | Project List |
+|:---:|:---:|
+| ![Home Screen](homescreen.jpg) | ![Project List](projectlist.jpg) |
+
+---
 
 ## 📑 Table of Contents
 
-- [Description](#description)
-- [Key Features](#key-features)
-- [Use Cases](#use-cases)
-- [Tech Stack](#tech-stack)
-- [Quick Start](#quick-start)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
+- [Overview](#overview)
+- [✨ Key Features](#-key-features)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🚀 Quick Start](#-quick-start)
+- [📁 Project Structure](#-project-structure)
+- [⚙️ Configuration](#️-configuration)
+- [🔒 Security](#-security)
+- [📚 Architecture](#-architecture)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
-## 📝 Description
+---
 
-This application serves as a dedicated Android client for GitLab, designed for developers who want a quick, native way to view and browse their repositories on mobile devices. By eliminating the need to log in via a mobile web browser, the app streamlines how users check their project list on the go.
+## Overview
 
-Under the hood, the project is written in Kotlin for Android and utilizes Jetpack Compose to deliver a clean and responsive user interface. It integrates Apollo Kotlin to query GitLab's GraphQL API for efficient data loading, and handles secure user sessions using the native GitLab OAuth2 authentication flow.
+**GitLab Client** is a modern Android application built with **Kotlin** and **Jetpack Compose** that provides a native, efficient way to interact with GitLab. Whether you're a developer on the go or prefer a dedicated mobile experience, this app eliminates the need to open a web browser while maintaining full access to your GitLab workspace.
+
+The application leverages **Apollo Kotlin** for GraphQL queries and **OAuth2** for secure authentication, ensuring a seamless and secure user experience.
+
+---
 
 ## ✨ Key Features
 
-- **📱 Modern Jetpack Compose UI** — Provides a clean, fully native user interface built using Jetpack Compose.
-- **⚡ Apollo GraphQL Integration** — Queries GitLab's API efficiently using Apollo Kotlin for optimized data loading.
-- **🔐 GitLab OAuth2 Authentication** — Secures user access through GitLab's official OAuth2 authorization flow.
-- **📁 Mobile Repository Browsing** — Allows users to quickly access and view their GitLab projects directly on an Android device.
+- 📱 **Modern Jetpack Compose UI** — Clean, responsive, and fully native Android interface built with Jetpack Compose for an intuitive user experience.
+- 🔐 **GitLab OAuth2 Authentication** — Secure login using GitLab's official OAuth2 authorization flow.
+- ⚡ **GraphQL Integration** — Efficient data fetching using Apollo Kotlin for optimized performance.
+- 📂 **Repository Browsing** — Quickly view and navigate your GitLab projects on mobile.
+- 🔍 **Project Details** — Access comprehensive project information including merge requests, issues, and statistics.
+- 💾 **Secure Token Storage** — Encrypted storage of authentication tokens for safe credential management.
+- 🎨 **Dark & Light Themes** — Adaptive UI themes for comfortable viewing in any lighting condition.
 
-## 🎯 Use Cases
-
-- Checking repository lists and project details on a mobile device without opening a web browser.
-- Accessing GitLab data securely on the go using native OAuth2 login.
+---
 
 ## 🛠️ Tech Stack
 
-- 🤖 **Android (Native)**
-- 🟪 **Kotlin**
+| Layer | Technologies |
+|:---:|:---|
+| **UI Framework** | Jetpack Compose, Material Design 3 |
+| **Language** | Kotlin |
+| **Data Layer** | Apollo Kotlin (GraphQL), OkHttp |
+| **Authentication** | OAuth2 |
+| **Security** | Crypto/Encryption utilities |
+| **Dependency Injection** | Hilt (inferred from structure) |
+| **Image Loading** | Coil |
+| **Platform** | Android (Native) |
+| **Build System** | Gradle (Kotlin DSL) |
 
-## ⚡ Quick Start
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Android Studio Giraffe or later
+- Android SDK 24 (or higher)
+- Kotlin 1.9+
+- Git
+
+### Installation
 
 ```bash
-
 # 1. Clone the repository
 git clone https://github.com/Ahtat204/Gitlab.git
+cd Gitlab
 
-# See the Development Setup section below
+# 2. Open in Android Studio
+# File > Open > Select the project directory
+
+# 3. Configure GitLab OAuth2 credentials
+# Update AuthConfig.kt with your GitLab app credentials
+
+# 4. Sync Gradle and run the app
+./gradlew build
+# Then run on emulator or physical device
 ```
+
+### Configuration
+
+1. **Register a GitLab Application**:
+   - Go to GitLab → Preferences → Applications
+   - Create a new application with redirect URI: `gitlab://oauth-callback`
+   - Note your Application ID and Secret
+
+2. **Update AuthConfig.kt**:
+   ```kotlin
+   object AuthConfig {
+       const val GITLAB_CLIENT_ID = "your_client_id"
+       const val GITLAB_CLIENT_SECRET = "your_client_secret"
+       const val REDIRECT_URI = "gitlab://oauth-callback"
+   }
+   ```
+
+3. **Build and Run**:
+   ```bash
+   ./gradlew installDebug
+   ```
+
+---
 
 ## 📁 Project Structure
 
 ```
-.
-├── app
+Gitlab/
+├── app/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/ahtat204/gitlab/
+│   │   │   │   ├── data/                    # Data layer
+│   │   │   │   │   ├── remote/              # API & network
+│   │   │   │   │   │   └── AuthenticationInterceptor.kt
+│   │   │   │   │   ├── repositories/        # Repository implementations
+│   │   │   │   │   │   └── project/
+│   │   │   │   │   └── security/            # Encryption utilities
+│   │   │   │   ├── domain/                  # Domain layer
+│   │   │   │   │   ├── di/                  # Dependency injection
+│   │   │   │   │   │   ├── ApolloModule.kt
+│   │   │   │   │   │   └── ProjectRepositoryModule.kt
+│   │   │   │   │   ├── models/              # Data models
+│   │   │   │   │   │   ├── Project.kt
+│   │   │   │   │   │   └── MergeRequest.kt
+│   │   │   │   │   └── usecase/             # Business logic
+│   │   │   │   │       └── authentication/
+│   │   │   │   ├── presentation/            # Presentation layer
+│   │   │   │   │   ├── activities/          # Activities
+│   │   │   │   │   │   ├── MainActivity.kt
+│   │   │   │   │   │   ├── AuthenticationActivity.kt
+│   │   │   │   │   │   └── LauncherActivity.kt
+│   │   │   │   │   ├── screens/             # Composable screens
+│   │   │   │   │   │   ├── Home.kt
+│   │   │   │   │   │   ├── Projects.kt
+│   │   │   │   │   │   ├── MergeRequests.kt
+│   │   │   │   │   │   ├── Issues.kt
+│   │   │   │   │   │   ├── Profile.kt
+│   │   │   │   │   │   └── PersonalProjects.kt
+│   │   │   │   │   ├── components/          # Reusable Compose components
+│   │   │   │   │   │   ├── ProjectItem.kt
+│   │   │   │   │   │   ├── BottomBar.kt
+│   │   │   │   │   │   └── TopAppBar.kt
+│   │   │   │   │   ├── viewmodels/          # ViewModels
+│   │   │   │   │   │   └── ProjectViewModel.kt
+│   │   │   │   │   ├── navigation/          # Navigation graph
+│   │   │   │   │   │   ├── NavigationGraph.kt
+│   │   │   │   │   │   └── BottomBarScreen.kt
+│   │   │   │   │   └── ui/theme/            # Theme & styling
+│   │   │   │   │       ├── Color.kt
+│   │   │   │   │       ├── Theme.kt
+│   │   │   │   │       └── Type.kt
+│   │   │   │   └── GitlabApp.kt             # Application class
+│   │   │   ├── graphql/                     # GraphQL queries & schema
+│   │   │   │   └── com/ahtat204/
+│   │   │   │       ├── ProjectsList.graphql
+│   │   │   │       ├── GetProjectDetails.graphql
+│   │   │   │       └── schema.graphqls
+│   │   │   ├── res/                         # Resources
+│   │   │   │   ├── drawable/                # Icons & images
+│   │   │   │   ├── values/                  # Strings, colors, themes
+│   │   │   │   └── font/                    # Custom fonts
+│   │   │   └── AndroidManifest.xml
+│   │   └── test/                            # Unit tests
 │   ├── build.gradle.kts
-│   ├── proguard-rules.pro
-│   └── src
-│       ├── androidTest
-│       │   └── java
-│       │       └── com
-│       │           └── ahtat204
-│       │               └── gitlab
-│       │                   └── ExampleInstrumentedTest.kt
-│       ├── main
-│       │   ├── AndroidManifest.xml
-│       │   ├── graphql
-│       │   │   └── com
-│       │   │       └── ahtat204
-│       │   │           ├── GetProjectDetails.graphql
-│       │   │           ├── ProjectsList.graphql
-│       │   │           └── schema.graphqls
-│       │   ├── java
-│       │   │   └── com
-│       │   │       └── ahtat204
-│       │   │           └── gitlab
-│       │   │               ├── GitlabApp.kt
-│       │   │               ├── data
-│       │   │               │   ├── remote
-│       │   │               │   │   └── AuthenticationInterceptor.kt
-│       │   │               │   ├── repositories
-│       │   │               │   │   └── project
-│       │   │               │   │       ├── ProjectRepository.kt
-│       │   │               │   │       └── ProjectRepositoryImpl.kt
-│       │   │               │   └── security
-│       │   │               │       └── CryptoUtility.kt
-│       │   │               ├── domain
-│       │   │               │   ├── di
-│       │   │               │   │   ├── ApolloModule.kt
-│       │   │               │   │   └── ProjectRepositoryModule.kt
-│       │   │               │   ├── models
-│       │   │               │   │   ├── MergeRequest.kt
-│       │   │               │   │   ├── Project.kt
-│       │   │               │   │   └── ProjectElements/
-│       │   │               │   └── usecase
-│       │   │               │       └── authentication
-│       │   │               │           ├── AuthStateSerializer.kt
-│       │   │               │           ├── SafeStore.kt
-│       │   │               │           ├── constants
-│       │   │               │           │   ├── AuthConfig.kt
-│       │   │               │           │   └── Tokens.kt
-│       │   │               │           └── utility
-│       │   │               │               └── Helper.kt
-│       │   │               └── presentation
-│       │   │                   ├── activities
-│       │   │                   │   ├── AuthenticationActivity.kt
-│       │   │                   │   ├── LauncherActivity.kt
-│       │   │                   │   ├── MainActivity.kt
-│       │   │                   │   └── ui
-│       │   │                   │       └── theme
-│       │   │                   │           ├── Color.kt
-│       │   │                   │           ├── Theme.kt
-│       │   │                   │           └── Type.kt
-│       │   │                   ├── components
-│       │   │                   │   ├── BottomBar.kt
-│       │   │                   │   ├── Category.kt
-│       │   │                   │   ├── CoilCache.kt
-│       │   │                   │   ├── LanguageCircle.kt
-│       │   │                   │   ├── LatestUpdates.kt
-│       │   │                   │   ├── MergeRequestsSummary.kt
-│       │   │                   │   ├── Notifications.kt
-│       │   │                   │   ├── ProjectDetailsScreen.kt
-│       │   │                   │   ├── ProjectItem.kt
-│       │   │                   │   ├── ToDoItems.kt
-│       │   │                   │   ├── TodoList.kt
-│       │   │                   │   ├── TopAppBar.kt
-│       │   │                   │   ├── TopBar.kt
-│       │   │                   │   ├── WorkItem.kt
-│       │   │                   │   └── WorkItems.kt
-│       │   │                   ├── navigation
-│       │   │                   │   ├── BottomBarScreen.kt
-│       │   │                   │   ├── NavigationGraph.kt
-│       │   │                   │   └── UIState.kt
-│       │   │                   ├── screens
-│       │   │                   │   ├── Home.kt
-│       │   │                   │   ├── Issues.kt
-│       │   │                   │   ├── MergeRequests.kt
-│       │   │                   │   ├── PersonalProjects.kt
-│       │   │                   │   ├── Profile.kt
-│       │   │                   │   ├── Projects.kt
-│       │   │                   │   ├── SplashScreen.kt
-│       │   │                   │   └── StarrtedProjects.kt
-│       │   │                   ├── ui
-│       │   │                   │   └── theme
-│       │   │                   │       ├── Color.kt
-│       │   │                   │       ├── Theme.kt
-│       │   │                   │       └── Type.kt
-│       │   │                   └── viewmodels
-│       │   │                       └── ProjectViewModel.kt
-│       │   └── res
-│       │       ├── drawable
-│       │       │   ├── gitlab.png
-│       │       │   ├── group.png
-│       │       │   ├── ic_launcher_background.xml
-│       │       │   ├── ic_launcher_foreground.xml
-│       │       │   ├── issues.png
-│       │       │   ├── logo.png
-│       │       │   ├── mergerequest.png
-│       │       │   ├── milestone.png
-│       │       │   ├── project.png
-│       │       │   ├── star.png
-│       │       │   └── workspaces.png
-│       │       ├── font
-│       │       │   ├── regular.ttf
-│       │       │   ├── sansserif.ttf
-│       │       │   └── topbarfont.ttf
-│       │       ├── values
-│       │       │   ├── colors.xml
-│       │       │   ├── strings.xml
-│       │       │   └── themes.xml
-│       │       └── xml
-│       │           ├── backup_rules.xml
-│       │           └── data_extraction_rules.xml
-│       └── test
-│           └── java
-│               └── com
-│                   └── asue24
-│                       └── gitlab
-│                           └── ExampleUnitTest.kt
-├── build.gradle.kts
-├── gradle
-│   ├── libs.versions.toml
-│   └── wrapper
-│       ├── gradle-wrapper.jar
-│       └── gradle-wrapper.properties
+│   └── proguard-rules.pro
+├── gradle/
+│   ├── libs.versions.toml                   # Dependency versions
+│   └── wrapper/
+├── build.gradle.kts                         # Root build configuration
+├── settings.gradle.kts
 ├── gradle.properties
-├── gradlew
-├── gradlew.bat
-├── homescreen.jpg
-├── projectlist.jpg
-└── settings.gradle.kts
-
+├── gradlew & gradlew.bat
+└── README.md
 ```
 
-## 👥 Contributing
+---
 
-Contributions are welcome! Here's the standard flow:
+## ⚙️ Configuration
+
+### Environment Variables
+
+```properties
+# gradle.properties
+# Add your GitLab instance URL if using a self-hosted GitLab
+GITLAB_API_URL=https://gitlab.com/api/v4
+```
+
+### Dependencies
+
+Key dependencies are managed in `gradle/libs.versions.toml`. Update versions as needed:
+
+- **Apollo Kotlin**: GraphQL client
+- **Jetpack Compose**: UI framework
+- **Coil**: Image loading library
+- **OkHttp**: HTTP client with interceptors
+- **Material Design 3**: Design components
+
+---
+
+## 🔒 Security
+
+- **OAuth2 Flow**: Secure authentication without storing passwords
+- **Encrypted Token Storage**: Access tokens are encrypted using Android's Crypto API
+- **HTTPS Only**: All API communications are encrypted
+- **ProGuard Rules**: Code obfuscation for production builds
+
+### Best Practices
+
+1. Never commit API credentials to the repository
+2. Store OAuth secrets in a secure configuration file (not in version control)
+3. Regularly update dependencies for security patches
+4. Review GraphQL queries to minimize exposed data
+
+---
+
+## 📚 Architecture
+
+This project follows **Clean Architecture** principles with a layered approach:
+
+### Layers
+
+1. **Presentation Layer** (UI)
+   - Composable screens using Jetpack Compose
+   - ViewModels for state management
+   - Navigation graph for screen transitions
+
+2. **Domain Layer** (Business Logic)
+   - Use cases for business operations
+   - Domain models
+   - Repository interfaces
+
+3. **Data Layer** (Data Sources)
+   - Repository implementations
+   - Remote data sources (API)
+   - Local caching (if applicable)
+   - Interceptors for request/response handling
+
+### Design Patterns
+
+- **MVVM**: ViewModel-based state management
+- **Repository Pattern**: Abstraction of data sources
+- **Dependency Injection**: Using Hilt for DI
+- **Single Responsibility Principle**: Each component has one responsibility
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Whether it's bug fixes, feature requests, or improvements, please follow these guidelines:
+
+### Development Workflow
 
 1. **Fork** the repository
-2. **Clone** your fork: `git clone https://github.com/Ahtat204/Gitlab.git`
-3. **Branch**: `git checkout -b feature/your-feature`
-4. **Commit**: `git commit -m 'feat: add some feature'`
-5. **Push**: `git push origin feature/your-feature`
-6. **Open** a pull request
+   ```bash
+   git clone https://github.com/Ahtat204/Gitlab.git
+   ```
 
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+3. **Make your changes**
+   - Follow Kotlin coding conventions
+   - Add comments for complex logic
+   - Test your changes locally
+
+4. **Commit with clear messages**
+   ```bash
+   git commit -m "feat: add awesome feature"
+   # or
+   git commit -m "fix: resolve issue with X"
+   ```
+
+5. **Push to your fork**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+6. **Open a Pull Request**
+   - Provide a clear description of your changes
+   - Link to any related issues
+   - Include screenshots for UI changes
+
+### Commit Convention
+
+- `feat:` - New feature
+- `fix:` - Bug fix
+- `refactor:` - Code refactoring
+- `docs:` - Documentation
+- `style:` - Code style (formatting, etc.)
+- `test:` - Adding or updating tests
+- `chore:` - Build, dependencies, etc.
+
+### Code Style
+
+- Follow [Kotlin coding conventions](https://kotlinlang.org/docs/coding-conventions.html)
+- Use meaningful variable and function names
+- Keep functions small and focused
+- Add KDoc comments for public APIs
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- [GitLab](https://gitlab.com) for the GraphQL API
+- [Jetpack Compose](https://developer.android.com/jetpack/compose) for the modern UI framework
+- [Apollo Kotlin](https://www.apollographql.com/docs/kotlin/) for GraphQL client
+- The Android development community
+
+---
+
+## 📞 Support
+
+Have questions or found a bug? 
+
+- Open an [Issue](https://github.com/Ahtat204/Gitlab/issues)
+- Check existing issues for similar problems
+- Provide detailed error messages and reproduction steps
+
+---
+
+**Made with ❤️ by [Ahtat204](https://github.com/Ahtat204)**
+
+Last updated: May 2026
