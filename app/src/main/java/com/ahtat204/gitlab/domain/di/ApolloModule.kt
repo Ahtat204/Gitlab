@@ -59,14 +59,7 @@ object ApolloModule {
         return ApolloClient.Builder()
             .serverUrl("https://gitlab.com/api/graphql")
             .addHttpHeader("Authorization", "Bearer ${Tokens.accessToken}")
-            .okHttpClient(
-                OkHttpClient.Builder()
-                    .addInterceptor(HttpLoggingInterceptor().apply {
-                        level = HttpLoggingInterceptor.Level.HEADERS
-                    })
-                    .addInterceptor(AuthenticationInterceptor())
-                    .build()
-            )
+            .okHttpClient(OkHttpClient())
             .normalizedCache(
                 cacheFactory,
                 writeToCacheAsynchronously = false
