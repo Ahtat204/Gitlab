@@ -1,7 +1,7 @@
-package com.asue24.gitlab.data.repositories.profile
+package com.ahtat204.gitlab.data.repositories.profile
 
 import com.apollographql.apollo.ApolloClient
-import com.asue24.gitlab.GetMyProfileQuery
+import com.asue24.gitlab.data.queries.GetMyProfileQuery
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn

@@ -1,6 +1,6 @@
-package com.asue24.gitlab.data.repositories.profile
+package com.ahtat204.gitlab.data.repositories.profile
 
-import com.asue24.gitlab.GetMyProfileQuery
+import com.asue24.gitlab.data.queries.GetMyProfileQuery
 import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {

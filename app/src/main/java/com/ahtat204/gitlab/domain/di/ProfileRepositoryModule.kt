@@ -1,7 +1,7 @@
-package com.asue24.gitlab.domain.di
+package com.ahtat204.gitlab.domain.di
 
-import com.asue24.gitlab.data.repositories.profile.ProfileRepository
-import com.asue24.gitlab.data.repositories.profile.ProfileRepositoryImpl
+import com.ahtat204.gitlab.data.repositories.profile.ProfileRepository
+import com.ahtat204.gitlab.data.repositories.profile.ProfileRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
