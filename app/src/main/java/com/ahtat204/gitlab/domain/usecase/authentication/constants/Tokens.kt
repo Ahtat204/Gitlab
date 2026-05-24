@@ -7,7 +7,6 @@ import net.openid.appauth.AuthorizationService
 object Tokens {
     var accessToken: String? = null
     var CurrentAuthState: AuthState? = null
-    var authService: AuthorizationService? = null
     private var appContext: Context? = null
     val context: Context
         get() = appContext ?: throw IllegalStateException("Tokens object must be initialized with Application Context first.")

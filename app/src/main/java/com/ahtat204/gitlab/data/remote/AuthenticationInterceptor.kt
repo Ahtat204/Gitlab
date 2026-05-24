@@ -10,6 +10,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.openid.appauth.AuthorizationService
 import okhttp3.Interceptor
 import okhttp3.Response
 
@@ -52,7 +53,6 @@ import okhttp3.Response
  */
 class AuthenticationInterceptor : Interceptor {
     private val Locker = Any()
-    val authenticationService = Tokens.authService
 
     @OptIn(InternalCoroutinesApi::class)
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -70,15 +70,14 @@ class AuthenticationInterceptor : Interceptor {
                 val state = Tokens.CurrentAuthState
                 val accessToken = Tokens.accessToken
                 if (accessToken != null && accessToken == token &&
-                    state != null && Tokens.authService != null
+                    state != null
                 ) {
                     val deferred = CompletableDeferred<String?>()
                     runBlocking {
-                        state.performActionWithFreshTokens(Tokens.authService!!) { token, _, ex ->
+                        state.performActionWithFreshTokens(AuthorizationService(Tokens.context)) { token, _, ex ->
                             if (token != null && ex == null) {
                                 Tokens.accessToken = token
                                 Tokens.CurrentAuthState = state
-                                Tokens.authService = authenticationService
                                 deferred.complete(token)
                                 CoroutineScope(Dispatchers.IO).launch {
                                     AuthStorage.getAuthState(Tokens.context).updateData { state }
