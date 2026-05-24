@@ -66,10 +66,8 @@ class LauncherActivity : ComponentActivity() {
         if (!existed.exists()) {
             existed.mkdir()
         }
-
-        // Initialize authentication service and token context
         authenticationService = AuthorizationService(this)
-        Tokens.authService = authenticationService
+
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
 
@@ -82,7 +80,6 @@ class LauncherActivity : ComponentActivity() {
                     if (token != null && ex == null) {
                         Tokens.accessToken = token
                         Tokens.CurrentAuthState = storedState
-                        Tokens.authService = authenticationService
                         lifecycleScope.launch {
                             AuthStorage.getAuthState(this@LauncherActivity).updateData { storedState }
                             isReady = true
