@@ -1,0 +1,59 @@
+query GetProjectDetails($projectPath: ID!) {
+    project(fullPath: $projectPath) {
+
+        __typename
+        statistics {
+            commitCount
+
+        }
+        namespace {
+            name
+            fullPath
+        }
+
+        statistics {
+            commitCount
+        }
+
+        projectMembers{
+            nodes {
+
+                user {
+                    name
+                }
+            }
+        }
+        forksCount
+        starCount
+        id
+        name
+        topics
+        description
+        lastActivityAt
+        issues{
+            count
+        }
+        mergeRequests{
+            count
+        }
+        pipelines{
+            count
+        }
+        topics
+        languages {
+            color
+            name
+            share
+        }
+        repository {
+
+            __typename
+            branchNames(searchPattern: "*", offset: 0, limit: 100)
+            rootRef
+            lastCommit{
+                id
+                name
+            }
+        }
+    }
+}
