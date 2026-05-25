@@ -10,19 +10,28 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
+import com.ahtat204.gitlab.R
+import com.ahtat204.gitlab.domain.usecase.authentication.authStateStore
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
-import com.ahtat204.gitlab.domain.usecase.authentication.authStateStore
 import com.ahtat204.gitlab.domain.usecase.authentication.utility.buildResponse
+import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthState
@@ -31,7 +40,6 @@ import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
-import androidx.core.net.toUri
 
 /**
  * Activity responsible for handling OAuth2 authentication flow with GitLab.
@@ -94,10 +102,20 @@ class AuthenticationActivity : ComponentActivity() {
         // Compose UI with login button
         setContent {
             Column(
-                Modifier.offset(10.dp).fillMaxSize(),
+                Modifier
+                    .offset(10.dp)
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                Icon(
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = "logo",
+                    Modifier
+                        .size(150.dp)
+                        .padding(0.dp), tint = Orange
+                )
+                Spacer(modifier = Modifier.height(120.dp))
                 Button(onClick = {
                     val authIntent = getService().getAuthorizationRequestIntent(authRequest!!)
                         ?: throw NullPointerException("Intent is null")
@@ -159,7 +177,6 @@ class AuthenticationActivity : ComponentActivity() {
                     finish()
                 }
                 Tokens.accessToken = authState.accessToken
-                Tokens.authService = authenticationService
                 Tokens.CurrentAuthState = authState
             }
         }

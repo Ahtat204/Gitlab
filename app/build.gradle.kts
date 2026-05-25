@@ -51,7 +51,7 @@ android {
 
 apollo {
     service("gitlab") {
-        packageName.set("com.ahtat204.gitlab.data.queries")
+        packageName.set("com.asue24.gitlab.data.queries")
         introspection {
             endpointUrl.set("https://gitlab.com/api/graphql")
             schemaFile.set(file("app/src/main/graphql/com/ahtat204/schema.graphqls"))

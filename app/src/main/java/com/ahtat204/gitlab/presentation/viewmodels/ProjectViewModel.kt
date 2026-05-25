@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.repositories.project.ProjectRepository
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.exception.CacheMissException
-import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
-import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.asue24.gitlab.data.queries.GetMyProjectsQuery
+import com.asue24.gitlab.data.queries.GetProjectDetailsQuery
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
