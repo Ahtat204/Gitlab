@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.presentation.components
 
-import androidx.compose.foundation.Canvasimport androidx.compose.runtime.Composable
+import androidx.compose.foundation.Canvas
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
