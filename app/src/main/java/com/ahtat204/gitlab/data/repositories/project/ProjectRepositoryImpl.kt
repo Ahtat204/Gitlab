@@ -8,11 +8,14 @@ import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.apollographql.apollo.cache.normalized.watch
 import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
+import javax.inject.Singleton
+
 
 /**
  * Implementation of [ProjectRepository] that integrates with GitLab via Apollo GraphQL.
@@ -21,6 +24,7 @@ import javax.inject.Inject
  * - Provides reactive streams of project data using Kotlin [Flow].
  * - Uses Apollo’s normalized caching with configurable [FetchPolicy].
  * - Annotated with `@Inject` for dependency injection, ensuring a singleton lifecycle.
+ * - Annotated with [Singleton] to avoid creating a new Repository everytime the ViewModel is created since this Dependency is just for fetching data , doesn't have a state to hold
  *
  * ## Responsibilities
  * - Fetch all projects contributed by the authenticated user.
@@ -32,6 +36,7 @@ import javax.inject.Inject
  * - [GetMyProjectsQuery], [GetProjectDetailsQuery]: Auto‑generated query classes.
  * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
  */
+@Singleton
 class ProjectRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient
 ) : ProjectRepository {
@@ -93,4 +98,5 @@ class ProjectRepositoryImpl @Inject constructor(
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
     }
+
 }

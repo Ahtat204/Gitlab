@@ -2,6 +2,8 @@ package com.ahtat204.gitlab.domain.di
 
 import com.ahtat204.gitlab.data.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.data.repositories.project.ProjectRepositoryImpl
+import com.ahtat204.gitlab.data.repositories.user.UserRepository
+import com.ahtat204.gitlab.data.repositories.user.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -10,22 +12,22 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Singleton
 
 /**
- * Dagger Hilt module that binds [ProjectRepositoryImpl] to the [ProjectRepository] interface.
+ * Dagger Hilt module that binds [UserRepositoryImpl] to the [UserRepository] interface.
  *
  * ## Overview
- * - Ensures that whenever a [ProjectRepository] is requested in the DI graph,
- *   Hilt provides an instance of [ProjectRepositoryImpl].
+ * - Ensures that whenever a [UserRepository] is requested in the DI graph,
+ *   Hilt provides an instance of [UserRepositoryImpl].
  * - Installed in the [ViewModelComponent], meaning the bound instance
  *   will live as long as the ViewModel lifecycle.
  *
  * ## Benefits
- * - Promotes clean architecture by depending on the abstraction ([ProjectRepository])
+ * - Promotes clean architecture by depending on the abstraction ([UserRepository])
  *   rather than the concrete implementation.
- * - Simplifies testing: alternative implementations of [ProjectRepository] can be
+ * - Simplifies testing: alternative implementations of [UserRepository] can be
  *   swapped in without changing consumer code.
  *
  * ## Usage
- * Inject [ProjectRepository] into a ViewModel:
+ * Inject [UserRepository] into a ViewModel:
  * ```kotlin
  * @HiltViewModel
  * class ProjectViewModel @Inject constructor(
@@ -35,16 +37,17 @@ import javax.inject.Singleton
  * }
  * ```
  */
+
 @Module
 @InstallIn(ViewModelComponent::class)
-abstract class ProjectRepositoryModule {
-
+abstract class UserRepositoryModule {
     /**
-     * Binds [ProjectRepositoryImpl] as the concrete implementation of [ProjectRepository].<br>
+     * Binds [UserRepositoryImpl] as the concrete implementation of [UserRepository].<br>
+     * Used [Singleton] to avoid creating a new Repository everytime the ViewModel is created since this Dependency is just for fetching data , doesn't have a state to hold
      * @param impl The injected implementation.
      * @return The bound [ProjectRepository] interface.
      *
      */
     @Binds
-    abstract fun provideProjectRepository(impl: ProjectRepositoryImpl): ProjectRepository
+    abstract fun registerUserRepository(impl: UserRepositoryImpl): UserRepository
 }
