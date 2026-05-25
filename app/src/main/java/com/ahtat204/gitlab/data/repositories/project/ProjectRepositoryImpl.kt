@@ -1,13 +1,13 @@
 package com.ahtat204.gitlab.data.repositories.project
 
 import android.util.Log
+import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.apollographql.apollo.cache.normalized.watch
-import com.asue24.gitlab.data.queries.GetMyProjectsQuery
-import com.asue24.gitlab.data.queries.GetProjectDetailsQuery
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
