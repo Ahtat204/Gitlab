@@ -14,11 +14,11 @@ plugins {
 }
 
 android {
-    namespace = "com.asue24.gitlab"
+    namespace = "com.ahtat204.gitlab"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.asue24.gitlab"
+        applicationId = "com.ahtat204.gitlab"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -58,11 +58,11 @@ android {
 }
 
 apollo {
-    service("service") {
-        packageName.set("com.asue24.gitlab")
+    service("gitlab") {
+        packageName.set("com.ahtat204.gitlab.data.queries")
         introspection {
             endpointUrl.set("https://gitlab.com/api/graphql")
-            schemaFile.set(file("app/src/main/graphql/com/pranav/schema.graphqls"))
+            schemaFile.set(file("app/src/main/graphql/com/ahtat204/schema.graphqls"))
             addTypename.set("always")
         }
     }
