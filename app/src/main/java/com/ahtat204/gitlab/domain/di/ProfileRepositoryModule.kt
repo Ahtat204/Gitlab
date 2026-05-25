@@ -7,9 +7,9 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 
-@InstallIn(ViewModelComponent::class)
 @Module
+@InstallIn(ViewModelComponent::class)
 abstract class ProfileRepositoryModule {
     @Binds
-    abstract fun provideProfileRepository(impl: ProfileRepositoryImpl): ProfileRepository
+    abstract fun provideProfileRepository(profile: ProfileRepositoryImpl): ProfileRepository
 }
