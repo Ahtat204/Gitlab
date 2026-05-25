@@ -1,23 +1,31 @@
 package com.ahtat204.gitlab.domain.usecase.authentication.security
 
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Before
+import org.junit.Test
+import org.junit.jupiter.api.assertNotNull
+import org.mockito.Mockito.mock
 
 class CryptoUtilityTest {
-    @BeforeEach
-    fun setUp() {
-        TODO("Not yet implemented")
-    }
+    private lateinit var crypto: CryptoUtility
 
-    @AfterEach
-    fun tearDown() {
-        TODO("Not yet implemented")
+    @Before
+    public fun setup() {
+        crypto = mock(CryptoUtility)
     }
 
     @Test
-    fun encrypt() {
+    fun testEncryptionDecryption() {
+        val testEncryption: ByteArray = "testing203".toByteArray()
+        val encryptedByteArray = crypto.encrypt(testEncryption)
+        assertNotNull(encryptedByteArray)
+        assertNotEquals(testEncryption, encryptedByteArray)
+        val decryptedByteArray = crypto.decrypt(encryptedByteArray)
+        assertNotNull(decryptedByteArray)
+        assertNotEquals(decryptedByteArray, encryptedByteArray)
+        assertEquals(decryptedByteArray, testEncryption)
+
     }
 
     @Test
