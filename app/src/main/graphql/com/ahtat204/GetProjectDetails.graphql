@@ -13,14 +13,8 @@ query GetProjectDetails($projectPath: ID!) {
             name
             fullPath
         }
-
-        statistics {
-            commitCount
-        }
-
         projectMembers{
             nodes {
-
                 user {
                     name
                 }

@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.ahtat204.gitlab.presentation.components.ProjectItem
@@ -73,7 +74,7 @@ import java.time.ZoneId
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hiltViewModel()) {
+fun PersonalProjects(navController: NavHostController,x: PaddingValues, projectViewModel: ProjectViewModel = hiltViewModel()) {
     val loader: ImageLoader =
         ImageLoader.Builder(context!!).crossfade(true).dispatcher(Dispatchers.IO)
             .respectCacheHeaders(false).build()

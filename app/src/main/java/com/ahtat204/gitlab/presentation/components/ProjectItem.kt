@@ -2,6 +2,7 @@ package com.ahtat204.gitlab.presentation.components
 
 //import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -85,7 +86,7 @@ import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
 fun ProjectItem(
     data: GetMyProjectsQuery.CurrentUser?,
     project: GetMyProjectsQuery.Project,
-    imageLoader: ImageLoader
+    imageLoader: ImageLoader,
 ) {
     Card(
         modifier = Modifier
