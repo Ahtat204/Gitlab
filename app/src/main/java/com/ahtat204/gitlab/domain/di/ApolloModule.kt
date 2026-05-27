@@ -44,7 +44,7 @@ object ApolloModule {
 
     private val cacheFactory = MemoryCacheFactory(
         maxSizeBytes = 30 * 1024 * 1024,
-        expireAfterMillis = 120000
+        expireAfterMillis = 600000 // 10 minutes , don't worry , memory isn't gonna explode because there's a fixed size,30MB
     )
 
     /**

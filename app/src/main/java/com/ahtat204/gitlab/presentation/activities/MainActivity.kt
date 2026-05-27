@@ -20,28 +20,61 @@ import com.ahtat204.gitlab.presentation.ui.theme.GitlabTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
+/**
+ * The main entry point of the GitLab Android application(only after Authentication)
+ *
+ * This activity sets up:
+ * - A splash screen on launch.
+ * - System window compatibility for edge-to-edge UI.
+ * - A local cache directory for HTTP requests.
+ * - The Compose UI hierarchy with a themed [Scaffold].
+ *
+ * The UI includes:
+ * - A [BottomBar] for navigation between screens.
+ * - A [BottomNavigationGraph] to handle navigation destinations.
+ *
+ * Dependency injection is enabled via [AndroidEntryPoint] for Hilt.
+ *
+ * @constructor Creates the main activity for the GitLab app.
+ */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    /**
+     * Called when the activity is starting.
+     *
+     * - Installs the splash screen.
+     * - Configures system window behavior.
+     * - Ensures the HTTP cache folder exists in external storage.
+     * - Sets up the Compose UI with navigation and theming.
+     *
+     * @param savedInstanceState If the activity is being re-initialized
+     * after previously being shut down, this contains the data it most
+     * recently supplied in [onSaveInstanceState].
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         WindowCompat.setDecorFitsSystemWindows(window, true)
+
         val mFolder = File(Environment.getExternalStorageDirectory().path + "gitlab/httpCache")
         if (!mFolder.exists()) {
             mFolder.mkdir()
         }
+
         setContent {
             val navController = rememberNavController()
             GitlabTheme(darkTheme = true) {
-                Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-                    BottomBar(navController)
-                }, floatingActionButtonPosition = FabPosition.End) { x ->
-                    BottomNavigationGraph(navController, x)
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = { BottomBar(navController) },
+                    floatingActionButtonPosition = FabPosition.End
+                ) { paddingValues ->
+                    BottomNavigationGraph(navController, paddingValues)
                 }
             }
         }
     }
-
 }
