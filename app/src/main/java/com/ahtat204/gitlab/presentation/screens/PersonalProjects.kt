@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,7 +74,11 @@ import java.time.ZoneId
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PersonalProjects(navController: NavHostController,x: PaddingValues, projectViewModel: ProjectViewModel = hiltViewModel()) {
+fun PersonalProjects(
+    navController: NavHostController,
+    x: PaddingValues,
+    projectViewModel: ProjectViewModel = hiltViewModel()
+) {
     val loader: ImageLoader =
         ImageLoader.Builder(context!!).crossfade(true).dispatcher(Dispatchers.IO)
             .respectCacheHeaders(false).build()
@@ -112,12 +115,10 @@ fun PersonalProjects(navController: NavHostController,x: PaddingValues, projectV
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(nodes, key = { item -> item?.id ?: Any() }) { item ->
-                        item?.project?.let { ProjectItem(CurrUser, it, loader,navController) }
+                        item?.project?.let { ProjectItem(CurrUser, it, loader, navController) }
                     }
                 }
             }
         }
-    }?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-        CircularProgressIndicator()
     }
 }
