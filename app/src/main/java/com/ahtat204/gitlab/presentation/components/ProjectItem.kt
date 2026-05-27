@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import androidx.navigation.NavHostController
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
@@ -41,6 +42,8 @@ import com.ahtat204.gitlab.presentation.ui.theme.Background
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 /**
  * Composable that renders a single GitLab project item card.
@@ -86,11 +89,12 @@ import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
 fun ProjectItem(
     data: GetMyProjectsQuery.CurrentUser?,
     project: GetMyProjectsQuery.Project,
-    imageLoader: ImageLoader,
+    imageLoader: ImageLoader,navController: NavHostController
 ) {
+    val encodedId = URLEncoder.encode(project.fullPath, StandardCharsets.UTF_8.toString())
     Card(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth().clickable(onClick = { navController.navigate("project?projectId=$encodedId") })
             .fillMaxHeight()
             .height(120.dp)
     ) {

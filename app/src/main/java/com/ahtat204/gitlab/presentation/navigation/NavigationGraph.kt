@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.ProjectDetailScreen
@@ -18,7 +19,7 @@ import com.ahtat204.gitlab.presentation.screens.ProjectDetailScreen
 fun BottomNavigationGraph(
     navController: NavHostController, x: PaddingValues
 ) {
-    val path= remember{ mutableStateOf("") }
+
     NavHost(navController = navController, startDestination = BottomBarScreen.Home.route) {
         composable(route = BottomBarScreen.Home.route) {
             Home(navController, x)
@@ -27,11 +28,11 @@ fun BottomNavigationGraph(
         composable(route = BottomBarScreen.Profile.route) {}
         composable(route = "personal") {
             PersonalProjects(navController,x)
-            navController.navigate(ProjectDetailScreen(x,path.value))
         }
         composable(route = BottomBarScreen.Activity.route) {}
-        composable(route ="project"){
-            ProjectDetailScreen(x,path.value)
+        composable(route ="project?projectId={projectId}", arguments = listOf(navArgument("projectId"){defaultValue=""})){ backStackEntry->
+            val projectId=backStackEntry.arguments?.getString("projectId")
+            projectId?.let {  ProjectDetailScreen(x,it)}
         }
     }
 }
