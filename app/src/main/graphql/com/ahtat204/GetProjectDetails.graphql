@@ -1,24 +1,12 @@
 query GetProjectDetails($projectPath: ID!) {
     project(fullPath: $projectPath) {
         __typename
-        namespace {
-            name
-            fullName
-        }
         statistics {
             commitCount
 
         }
         namespace {
-            name
-            fullPath
-        }
-        projectMembers{
-            nodes {
-                user {
-                    name
-                }
-            }
+            path
         }
         forksCount
         starCount

@@ -41,10 +41,10 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object ApolloModule {
 
-    // In‑memory cache: 10 MB, entries expire after 60 seconds
+
     private val cacheFactory = MemoryCacheFactory(
-        maxSizeBytes = 10 * 1024 * 1024,
-        expireAfterMillis = 60000
+        maxSizeBytes = 30 * 1024 * 1024,
+        expireAfterMillis = 120000
     )
 
     /**
@@ -55,7 +55,7 @@ object ApolloModule {
      */
     @Singleton
     @Provides
-    fun GetApolloService(): ApolloClient {
+    fun getApolloService(): ApolloClient {
         return ApolloClient.Builder()
             .serverUrl("https://gitlab.com/api/graphql")
             .addHttpHeader("Authorization", "Bearer ${Tokens.accessToken}")

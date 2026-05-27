@@ -19,5 +19,6 @@ keystore_base64.txt
 explanation.txt
 **.txt
 app/test.json
+test.json
 reflog.sh
 Runtree.py
