@@ -97,6 +97,8 @@ fun GeneralDetails(forkCount: Int, startCount: Int, name: String, description: S
                 tint = Orange
             )
             Text(text = forkCount.toString(), color = Color.White, fontSize = 15.sp)
+            Spacer(modifier = Modifier.width(15.dp))
+
         }
     }
 }
