@@ -50,7 +50,9 @@ import com.ahtat204.gitlab.presentation.ui.theme.titleFont
  * ```
  */
 @Composable
-fun GeneralDetails(forkCount: Int, startCount: Int, name: String, description: String) {
+fun GeneralDetails(
+    forkCount: Int, startCount: Int, name: String, description: String
+) {
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Center,
@@ -67,6 +69,7 @@ fun GeneralDetails(forkCount: Int, startCount: Int, name: String, description: S
             color = Color.White,
             textAlign = TextAlign.Center
         )
+
         Text(
             description,
             fontFamily = titleFont,
@@ -98,7 +101,6 @@ fun GeneralDetails(forkCount: Int, startCount: Int, name: String, description: S
             )
             Text(text = forkCount.toString(), color = Color.White, fontSize = 15.sp)
             Spacer(modifier = Modifier.width(15.dp))
-
         }
     }
 }

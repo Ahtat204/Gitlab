@@ -1,10 +1,11 @@
 package com.ahtat204.gitlab.presentation.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
@@ -14,14 +15,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import com.ahtat204.gitlab.presentation.components.GeneralDetails
 import com.ahtat204.gitlab.presentation.components.ProjectItem
+import com.ahtat204.gitlab.presentation.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
 import java.time.Instant
@@ -86,6 +89,22 @@ fun ProjectDetailScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             GeneralDetails(pro.forksCount, pro.starCount, pro.name, pro.description ?: "")
+        /*    pro.languages?.let { language ->
+                Row(horizontalArrangement = Arrangement.Start) {
+                    language.onEachIndexed { index, topic -> Text(
+                            text = topic.name,
+                            fontSize = 17.sp,
+                            color = Orange,
+                            modifier = Modifier
+                                .offset(0.dp, 0.dp)
+                                .padding(10.dp, 0.dp),
+                            fontFamily = customFontFamily
+                        )
+                    }
+                }
+            }*/
+
+
         }
     }
 }

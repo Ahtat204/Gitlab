@@ -4,7 +4,9 @@ query GetProjectDetails($projectPath: ID!) {
         statistics {
             commitCount
 
+
         }
+
         namespace {
             path
         }
@@ -12,9 +14,7 @@ query GetProjectDetails($projectPath: ID!) {
         starCount
         id
         name
-        topics
         description
-        lastActivityAt
         issues{
             count
         }
@@ -26,7 +26,6 @@ query GetProjectDetails($projectPath: ID!) {
         }
         topics
         languages {
-            color
             name
             share
         }
