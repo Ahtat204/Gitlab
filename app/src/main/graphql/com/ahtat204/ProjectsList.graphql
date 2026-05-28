@@ -29,7 +29,7 @@ query GetMyProjectsPaginated { ## this in case the user has large number of proj
         }
     }
 }
-query GetMyProjects($cursor: String){
+query GetMoreProjects($cursor: String){
     currentUser {
         avatarUrl
         projectMemberships(after: $cursor) {
