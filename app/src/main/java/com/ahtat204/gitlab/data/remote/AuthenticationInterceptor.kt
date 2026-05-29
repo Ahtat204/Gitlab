@@ -1,7 +1,7 @@
 package com.ahtat204.gitlab.data.remote
 
 import android.util.Log
-import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
+import com.ahtat204.gitlab.domain.usecase.authentication.security.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope

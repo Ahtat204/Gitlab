@@ -2,9 +2,6 @@ package com.ahtat204.gitlab.data.repositories.profile
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
-import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
-import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
-import com.ahtat204.gitlab.data.repositories.project.ProjectRepository
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
@@ -13,7 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
+
 /**
  * Implementation of [ProfileRepository] that integrates with GitLab via Apollo GraphQL.
  *
@@ -31,6 +30,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * - [GetMyProfileQuery]: Auto‑generated query classes.
  * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
  */
+@Singleton
 class ProfileRepositoryImpl @Inject constructor(private val apolloClient: ApolloClient) :
     ProfileRepository {
     /**
