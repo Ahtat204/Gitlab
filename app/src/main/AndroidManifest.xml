@@ -46,7 +46,7 @@
 
                 <data
                     android:host="oauth2redirect"
-                    android:scheme="com.asue24.gitlab" /> <!-- if you change this to com.ahtat204.gitlab do not forget to change it in Gitlab OAuth2 settings -->
+                    android:scheme="com.asue24.gitlab" />
             </intent-filter>
         </activity>
     </application>
