@@ -1,13 +1,14 @@
-package com.ahtat204.gitlab.domain.usecase.authentication
+package com.ahtat204.gitlab.domain.usecase.authentication.security
 
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
+import com.ahtat204.gitlab.domain.usecase.authentication.AuthStateSerializer
 import net.openid.appauth.AuthState
 
 /**
  * Provides a secure [DataStore] instance for persisting and retrieving
- * [AuthState] objects using the [AuthStateSerializer].
+ * [AuthState] objects using the [com.ahtat204.gitlab.domain.usecase.authentication.AuthStateSerializer].
  *
  * This setup ensures that OAuth authentication state (tokens, refresh state,
  * etc.) is stored in an encrypted format and can be accessed consistently
@@ -15,7 +16,7 @@ import net.openid.appauth.AuthState
  *
  * ## Components
  * - `authStateStore`: An extension property on [Context] that creates a
- *   DataStore backed by the file `auth_state.txt` and uses [AuthStateSerializer]
+ *   DataStore backed by the file `auth_state.txt` and uses [com.ahtat204.gitlab.domain.usecase.authentication.AuthStateSerializer]
  *   for secure serialization.
  * - `AuthStorage`: A singleton-style object that manages a global reference
  *   to the [DataStore]. It ensures that only one instance of the DataStore

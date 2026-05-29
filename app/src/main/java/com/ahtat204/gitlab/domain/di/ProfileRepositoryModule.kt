@@ -12,6 +12,5 @@ import javax.inject.Singleton
 @InstallIn(ViewModelComponent::class)
 abstract class ProfileRepositoryModule {
     @Binds
-    @Singleton
     abstract fun provideProfileRepository(profile: ProfileRepositoryImpl): ProfileRepository
 }

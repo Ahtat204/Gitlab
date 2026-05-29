@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.data.security
+package com.ahtat204.gitlab.domain.usecase.authentication.security
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties

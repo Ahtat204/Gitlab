@@ -3,7 +3,7 @@ package com.ahtat204.gitlab.domain.usecase.authentication
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.datastore.core.Serializer
-import com.ahtat204.gitlab.data.security.CryptoUtility
+import com.ahtat204.gitlab.domain.usecase.authentication.security.CryptoUtility
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.openid.appauth.AuthState

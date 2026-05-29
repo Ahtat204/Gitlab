@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.ahtat204.gitlab.R
-import com.ahtat204.gitlab.domain.usecase.authentication.authStateStore
+import com.ahtat204.gitlab.domain.usecase.authentication.security.authStateStore
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.ahtat204.gitlab.domain.usecase.authentication.utility.buildResponse
