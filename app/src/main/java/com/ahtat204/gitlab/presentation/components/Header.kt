@@ -25,7 +25,35 @@ import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-
+/**
+ * A specialized header component for the GitLab user profile or account dashboard.
+ *
+ * This composable renders a user's primary profile information, including their avatar,
+ * full name, username, and current status. It is designed to be used at the top of
+ * profile-centric screens to provide immediate identity context.
+ *
+ * @param name The full display name of the user.
+ * @param username The unique GitLab handle of the user (prefixed with '@' automatically).
+ * @param status The current status string or presence indicator of the user.
+ * @param imageLoader The [ImageLoader] instance used for handling image requests,
+ * injected to ensure optimal memory management and singleton reuse.
+ * @param avatar The URL suffix for the user's avatar image; if null, the avatar
+ * section will not be rendered.
+ *
+ * @note This component utilizes [Coil] for asynchronous image loading with active
+ * memory and disk caching policies to maintain high-performance rendering.
+ *
+ * @example
+ * ```kotlin
+ * Header(
+ * name = "John Doe",
+ * username = "jdoe",
+ * status = "Available",
+ * imageLoader = myImageLoader,
+ * avatar = "uploads/user/avatar.png"
+ * )
+ * ```
+ */
 @Composable
 fun Header(
     name: String, username: String, status: String, imageLoader: ImageLoader, avatar: String?

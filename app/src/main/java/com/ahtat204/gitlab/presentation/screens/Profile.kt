@@ -22,6 +22,27 @@ import com.ahtat204.gitlab.presentation.components.Header
 import com.ahtat204.gitlab.presentation.viewmodels.ProfileViewModel
 import kotlinx.coroutines.Dispatchers
 
+
+/**
+ * A profile screen composable responsible for orchestrating the user's account information display.
+ *
+ * This screen follows the MVVM architecture, utilizing [ProfileViewModel] to fetch and manage
+ * user profile state asynchronously. Upon initialization, it triggers a profile load operation
+ * and reacts to state changes via [collectAsState].
+ *
+ * @param navController The [NavHostController] used for handling inter-screen navigation.
+ * @param x The [PaddingValues] injected by the parent scaffold/layout, ensuring proper
+ * alignment relative to system UI elements (e.g., bottom bars or status bars).
+ * @param profileViewModel The Hilt-injected ViewModel responsible for business logic and
+ * data persistence for the profile state.
+ *
+ * @note This component instantiates a local [ImageLoader] with specific IO dispatchers and
+ * cache configurations, optimized for profile imagery.
+ * *
+ *
+ * @see ProfileViewModel
+ * @see Header
+ */
 @Composable
 fun Profile(
     navController: NavHostController,
