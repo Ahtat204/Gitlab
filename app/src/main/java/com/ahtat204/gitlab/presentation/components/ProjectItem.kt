@@ -1,6 +1,6 @@
 package com.ahtat204.gitlab.presentation.components
 
-import android.widget.Space
+//import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,16 +31,62 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.ahtat204.gitlab.presentation.components.CoilCache.customImageLoader
 import com.ahtat204.gitlab.presentation.ui.theme.Background
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
-import com.asue24.gitlab.data.queries.GetMyProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
 
+/**
+ * Composable that renders a single GitLab project item card.
+ *
+ * ## Overview
+ * Displays project details including:
+ * - User avatar (if available)
+ * - Project name and visibility (public/private icon)
+ * - Project description (truncated to one line)
+ * - Project topics (up to 3 shown)
+ * - Primary language with color indicator
+ *
+ * ## Parameters
+ * @param data The [GetMyProjectsQuery.CurrentUser] object containing user metadata
+ *             (used to load avatar image if available).
+ * @param project The [GetMyProjectsQuery.Project] object representing the project
+ *                whose details will be displayed.
+ * @param imageLoader The [ImageLoader] instance used by Coil to load images asynchronously.
+ *
+ * ## UI Behavior
+ * - Wraps content in a [Card] with fixed height.
+ * - Displays avatar image using [AsyncImage] with caching and crossfade enabled.
+ * - Shows project name alongside a visibility icon (`Public` or `Lock`).
+ * - Shows project description if present, truncated with ellipsis.
+ * - Displays up to three topics styled in orange.
+ * - Displays the first language with a colored circle and name.
+ *
+ * ## Example
+ * ```kotlin
+ * ProjectItem(
+ *     data = userData,
+ *     project = project,
+ *     imageLoader = imageLoader
+ * )
+ * ```
+ *
+ * ## Notes
+ * - Uses Coil’s [AsyncImage] for image loading with memory and disk caching.
+ * - Applies custom font family and colors for consistent styling.
+ * - Topics and languages are optional and only shown if available.
+ */
 @Composable
-fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQuery.Project) {
+fun ProjectItem(
+    data: GetMyProjectsQuery.CurrentUser?,
+    project: GetMyProjectsQuery.Project,
+    imageLoader: ImageLoader
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,16 +100,23 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
                 it.avatarUrl?.let { url ->
                     val avatar = "https://gitlab.com/$url"
                     AsyncImage(
-                        imageLoader = customImageLoader,
+                        imageLoader = imageLoader,
                         model = ImageRequest.Builder(LocalContext.current).data(avatar) // Image URL
-                            .crossfade(true) // Smooth fade-in
+                            .crossfade(true).memoryCachePolicy(CachePolicy.ENABLED)
+                            .diskCachePolicy(CachePolicy.ENABLED) // Smooth fade-in
                             .build(),
                         contentDescription = "Sample Image",
                         modifier = Modifier
                             .padding(10.dp)
                             .size(40.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                    )
+                            .clip(RoundedCornerShape(20.dp)),
+                        onState = { state ->
+                            when (state) {
+                                is AsyncImagePainter.State.Loading -> {}
+                                is AsyncImagePainter.State.Success -> {}
+                                else -> {}
+                            }
+                        })
                 }
             }
 
@@ -73,9 +126,11 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
                     .fillMaxHeight()
                     .background(Background)
             ) {
-
                 project.let { project ->
-                    Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = project.name,
                             fontSize = 17.sp,
@@ -89,7 +144,11 @@ fun ProjectItem(data: GetMyProjectsQuery.CurrentUser?, project: GetMyProjectsQue
                             else -> Icons.Default.Lock
                         }
                         project.visibility?.let {
-                            Icon(visibilityIcon, contentDescription = null, modifier = Modifier.size(15.dp))
+                            Icon(
+                                visibilityIcon,
+                                contentDescription = null,
+                                modifier = Modifier.size(15.dp)
+                            )
                         }
                     }
 
