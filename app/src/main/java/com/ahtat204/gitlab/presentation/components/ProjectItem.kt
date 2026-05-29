@@ -38,10 +38,10 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.presentation.ui.theme.Background
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
-import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -57,9 +57,9 @@ import java.nio.charset.StandardCharsets
  * - Primary language with color indicator
  *
  * ## Parameters
- * @param data The [GetMyProjectsQuery.CurrentUser] object containing user metadata
+ * @param data The [GetMyProjectsPaginatedQuery.CurrentUser] object containing user metadata
  *             (used to load avatar image if available).
- * @param project The [GetMyProjectsQuery.Project] object representing the project
+ * @param project The [GetMyProjectsPaginatedQuery.Project] object representing the project
  *                whose details will be displayed.
  * @param imageLoader The [ImageLoader] instance used by Coil to load images asynchronously.
  *
@@ -87,14 +87,15 @@ import java.nio.charset.StandardCharsets
  */
 @Composable
 fun ProjectItem(
-    data: GetMyProjectsQuery.CurrentUser?,
-    project: GetMyProjectsQuery.Project,
+    data: GetMyProjectsPaginatedQuery.CurrentUser?,
+    project: GetMyProjectsPaginatedQuery.Project,
     imageLoader: ImageLoader,navController: NavHostController
 ) {
     val encodedId = URLEncoder.encode(project.fullPath, StandardCharsets.UTF_8.toString())
     Card(
         modifier = Modifier
-            .fillMaxWidth().clickable(onClick = { navController.navigate("project?projectId=$encodedId") })
+            .fillMaxWidth()
+            .clickable(onClick = { navController.navigate("project?projectId=$encodedId") })
             .fillMaxHeight()
             .height(120.dp)
     ) {

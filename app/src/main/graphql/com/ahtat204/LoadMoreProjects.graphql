@@ -1,7 +1,7 @@
-query GetMyProjectsPaginated { ## this in case the user has large number of projects ,in my case , I currently don't
+query GetMoreProjects($cursor: String){
     currentUser {
         avatarUrl
-        projectMemberships(first: 10) {
+        projectMemberships(after: $cursor) {
             __typename
             nodes {
 
