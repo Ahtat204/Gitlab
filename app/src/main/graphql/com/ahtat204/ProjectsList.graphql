@@ -1,17 +1,14 @@
 query GetMyProjects {
     currentUser {
-        id
         avatarUrl
         projectMemberships(first: 20) {
             __typename
             nodes {
-
                 __typename
                 id
                 project {
                     topics
                     lastActivityAt
-                    avatarUrl
                     __typename
                     languages {
                         color
@@ -22,8 +19,6 @@ query GetMyProjects {
                     fullPath
                     description
                     visibility
-                    starCount
-                    lastActivityAt
                 }
             }
             pageInfo {

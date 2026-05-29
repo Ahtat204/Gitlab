@@ -6,18 +6,17 @@ query GetMyProfile{
         publicEmail
         avatarUrl
         webUrl
+        status {
+            availability
+            emoji
+            message
+
+        }
         bio
         location
-        organization
-        state
-        createdAt
         github
         jobTitle
         projectCount
-        pronouns
         linkedin
-        status {
-            message
-        }
     }
 }
