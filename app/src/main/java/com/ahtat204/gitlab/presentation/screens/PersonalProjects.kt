@@ -75,7 +75,7 @@ import java.time.ZoneId
 @Composable
 fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hiltViewModel()) {
     val loader: ImageLoader =
-        ImageLoader.Builder(context).crossfade(true).dispatcher(Dispatchers.IO)
+        ImageLoader.Builder(context!!).crossfade(true).dispatcher(Dispatchers.IO)
             .respectCacheHeaders(false).build()
     LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
