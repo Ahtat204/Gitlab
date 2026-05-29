@@ -58,7 +58,7 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     private val _projects = MutableStateFlow<GetMyProjectsQuery.CurrentUser?>(null)
 
     /** Public immutable flow of contributed projects. */
-    val projects: StateFlow<GetMyProjectsQuery.CurrentUser?> = _projects.asStateFlow()
+    val projects: StateFlow<GetMyProjectsQuery.CurrentUser?> get() =  _projects.asStateFlow()
 
     /**
      * Loads all projects contributed by the authenticated user.

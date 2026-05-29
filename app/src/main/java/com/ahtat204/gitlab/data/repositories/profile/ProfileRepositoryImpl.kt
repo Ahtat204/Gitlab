@@ -49,7 +49,7 @@ class ProfileRepositoryImpl @Inject constructor(private val apolloClient: Apollo
      * ```kotlin
      * viewModelScope.launch {
      *     profileRepository.getMyProfile(FetchPolicy.CacheFirst)
-     *         .collect { profile -> myProfile=it }
+     *         .collect { myProfile=it.CurrentUser }
      * }
      * ```
      */

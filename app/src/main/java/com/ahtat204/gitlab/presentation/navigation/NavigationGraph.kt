@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
+import com.ahtat204.gitlab.presentation.screens.Profile
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -20,7 +21,9 @@ fun BottomNavigationGraph(
             Home(navController, x)
         }
 //        composable(route = BottomBarScreen.Projects.route) {}
-        composable(route = BottomBarScreen.Profile.route) {}
+        composable(route = BottomBarScreen.Profile.route) {
+            Profile(navController,x)
+        }
         composable(route = "personal") {
             PersonalProjects(x)
         }
