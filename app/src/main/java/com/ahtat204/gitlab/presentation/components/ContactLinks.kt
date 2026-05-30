@@ -21,6 +21,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import com.ahtat204.gitlab.data.queries.type.Color
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 
@@ -41,7 +42,7 @@ fun ContactLinks(vararg links: String) {
                 )
                 withStyle(
                     style = SpanStyle(
-                        color = Orange, fontSize = 16.sp, textDecoration = TextDecoration.Underline
+                        color = androidx.compose.ui.graphics.Color.White, fontSize = 16.sp, textDecoration = TextDecoration.Underline
                     )
                 ) {
                     append(link)
@@ -49,15 +50,9 @@ fun ContactLinks(vararg links: String) {
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.End
             ) {
-                Icon(
-                    Icons.Default.Link,
-                    contentDescription = "link",
-                    Modifier
-                        .size(13.dp),
-                    tint = Orange
-                )
+
                 ClickableText(
                     text = annotatedText, onClick = { offset ->
                         annotatedText.getStringAnnotations("URL", offset, offset).firstOrNull()
