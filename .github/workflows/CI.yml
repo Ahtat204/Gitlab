@@ -20,29 +20,25 @@ jobs:
       - name: Create secrets file
         run: |
           printf "CIENTID=20302211ABH62HY6" > $GITHUB_WORKSPACE/secrets.properties
-      - name: Debug file location
-        run: |
-          touch secrets.properties
-          echo "Current directory is:"
-          pwd
-          echo "Files in current directory:"
-          ls -F
-          echo "Check if file exists in app/ folder:"
-          ls -F app/ || echo "app/ folder not found or empty"
+      - name: Download Schema
+        if: steps.cache-schema.outputs.cache-hit != 'true'
+        run: ./gradlew downloadApolloSchema --endpoint='https://gitlab.com/api/graphql' --schema='app/src/main/graphql/com/ahtat204/schema.graphqls'
+      - name: Cache GraphQL Schema
+        id: cache-schema
+        uses: actions/cache@v4
+        with:
+          path: app/src/main/graphql/com/ahtat204/gitlab/schema.graphqls
+          # The key uses the file itself to generate a hash,
+          # so the cache only invalidates if the schema changes.
+          key: ${{ runner.os }}-graphql-schema-${{ hashFiles('app/src/main/graphql/com/ahtat204/gitlab/schema.graphqls') }}
+          restore-keys: |
+            ${{ runner.os }}-graphql-schema-
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew clean build
       - run: echo "Build status report=${{ job.status }}"
-      - name: Verify file exists
-        run: |
-          if [ -f "$GITHUB_WORKSPACE/secrets.properties" ]; then
-            echo "File found successfully!"
-          else
-            echo "File not found! Searching directory..."
-            ls -R $GITHUB_WORKSPACE
-          fi
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run Unit Tests
