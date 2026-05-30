@@ -27,6 +27,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.ImageLoader
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.ahtat204.gitlab.presentation.components.ProjectItem
+import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
 import kotlinx.coroutines.Dispatchers
@@ -101,7 +102,7 @@ fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hilt
                     text = "Your Projects",
                     fontFamily = titleFont,
                     fontSize = 20.sp,
-                    modifier = Modifier
+                    modifier = Modifier, color = Orange
                 )
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),

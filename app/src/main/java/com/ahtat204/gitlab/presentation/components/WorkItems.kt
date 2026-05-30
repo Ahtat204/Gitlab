@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.R
+import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 
 /**
@@ -72,7 +73,7 @@ fun MyWorkItems(navController: NavController) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Your Work", fontFamily = titleFont, fontSize = 20.sp)
+        Text(text = "Your Work", fontFamily = titleFont, fontSize = 20.sp, color = Orange)
         myWorkItems.forEach { item ->
             WorkItem(item) {
                 navController.navigate(item.route)

@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
@@ -68,6 +67,7 @@ fun Header(
         modifier = Modifier
             .fillMaxWidth()
             .padding(30.dp, 18.dp)
+            .clip(RoundedCornerShape(40.dp))
     ) {
         avatar?.let {
             AsyncImage(
@@ -81,13 +81,14 @@ fun Header(
                     .padding(4.dp)
                     .size(80.dp)
                     .clip(RoundedCornerShape(40.dp)),
-                onState = { state ->
-                    when (state) {
-                        is AsyncImagePainter.State.Loading -> {}
-                        is AsyncImagePainter.State.Success -> {}
-                        else -> {}
-                    }
-                })
+                /*   onState = { state ->
+                       when (state) {
+                           is AsyncImagePainter.State.Loading -> {}
+                           is AsyncImagePainter.State.Success -> {}
+                           else -> {}
+                       }
+                   }*/
+            )
         }
         Column(
             verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start
@@ -132,7 +133,6 @@ fun Header(
                 )
             )
         }
-
     }
 
 }
