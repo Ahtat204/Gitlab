@@ -66,7 +66,7 @@ fun MyWorkItems(navController: NavController) {
     )
 
     Column(
-        modifier = Modifier.padding(0.dp),
+        modifier = Modifier.padding(0.dp).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
