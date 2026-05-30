@@ -7,18 +7,27 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.ahtat204.gitlab.presentation.components.Header
+import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.ProfileViewModel
 import kotlinx.coroutines.Dispatchers
 
@@ -62,11 +71,22 @@ fun Profile(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .padding(x)
-                .background(Color.Black).fillMaxSize()
+                .background(Color.Black).fillMaxSize().verticalScroll(rememberScrollState())
         ) {
+            Text(text = "Your Profile", fontFamily = titleFont, fontSize = 20.sp)
             profile.avatarUrl?.let { Log.d("url", it) }
             Header(
                 profile.name, profile.username, profile.status?.message?:"", loader, profile.avatarUrl
+            )
+            Text(
+                profile.jobTitle?:"",
+                fontFamily = titleFont,
+                fontSize = 20.sp,
+                letterSpacing = 1.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(2.dp, 5.dp),
+                color = Color.White,
+                textAlign = TextAlign.Center
             )
         }
     }
