@@ -1,14 +1,15 @@
-name: Build
+name: Bundle
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - "main"
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build Debug APK
-    needs: test
+  bundle:
+    name: Build signed Debug APK
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
