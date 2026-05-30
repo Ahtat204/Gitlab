@@ -20,6 +20,8 @@ jobs:
       - name: Create secrets file
         run: |
           printf "CIENTID=20302211ABH62HY6" > $GITHUB_WORKSPACE/secrets.properties
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
       - name: Download Schema
         if: steps.cache-schema.outputs.cache-hit != 'true'
         run: ./gradlew downloadApolloSchema --endpoint='https://gitlab.com/api/graphql' --schema='app/src/main/graphql/com/ahtat204/schema.graphqls'
