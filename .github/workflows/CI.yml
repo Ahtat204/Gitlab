@@ -19,7 +19,7 @@ jobs:
           cache: gradle
       - name: Create secrets file
         run: |
-          echo "CIENT_ID=20302211ABH62HY6" > $GITHUB_WORKSPACE/secrets.properties
+          echo "CLIENT_ID=20302211ABH62HY6" > $GITHUB_WORKSPACE/secrets.properties
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Download Schema
