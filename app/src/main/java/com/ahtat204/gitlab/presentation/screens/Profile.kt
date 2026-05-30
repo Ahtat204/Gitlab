@@ -88,6 +88,8 @@ fun Profile(
                 loader,
                 profile.avatarUrl
             )
+            val github="https://github.com/${profile.github?:""}"
+            ContactLinks(github,profile.linkedin?:"")
             Text(
                 profile.jobTitle ?: "",
                 fontFamily = titleFont,
@@ -108,8 +110,8 @@ fun Profile(
                 modifier = Modifier.fillMaxWidth(0.9f),
                 fontFamily = customFontFamily,
             )
-            val github="https://github.com/${profile.github?:""}"
-            ContactLinks(github,profile.linkedin?:"")
+
+
         }
     }
 
