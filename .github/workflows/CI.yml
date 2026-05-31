@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+jobs:
+  build-test:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+      - name: Create secrets file
+        run: |
+          echo "CLIENT_ID=20302211ABH62HY6" > $GITHUB_WORKSPACE/secrets.properties
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Cache GraphQL Schema
+        id: cache-schema
+        uses: actions/cache@v4
+        with:
+          path: app/src/main/graphql/com/ahtat204/gitlab/schema.graphqls
+          key: ${{ runner.os }}-graphql-v1-${{ hashFiles('app/src/main/graphql/com/ahtat204/gitlab/schema.graphqls') }}
+          restore-keys: |
+            ${{ runner.os }}-graphql-schema-
+
+      - name: Download Schema
+        if: steps.cache-schema.outputs.cache-hit != 'true'
+        run: ./gradlew downloadApolloSchema --endpoint='https://gitlab.com/api/graphql' --schema='app/src/main/graphql/com/ahtat204/gitlab/schema.graphqls'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew clean build
+      - run: echo "Build status report=${{ job.status }}"
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Run Unit Tests
+        run: ./gradlew test --stacktrace
