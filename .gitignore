@@ -18,8 +18,8 @@ app/release
 keystore_base64.txt
 explanation.txt
 **.txt
-app/test.json
-test.json
 reflog.sh
+test.json
 Runtree.py
-.kotlin
+.kotlin/
+app/test.json
