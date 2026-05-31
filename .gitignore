@@ -23,3 +23,6 @@ test.json
 Runtree.py
 .kotlin/
 app/test.json
+jobs.json
+projects.json
+clean.sh
