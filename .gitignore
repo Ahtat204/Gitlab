@@ -23,3 +23,6 @@ app/test.json
 Runtree.py
 reflog.sh
 test.json
+clean.sh
+jobs.json
+projects.json

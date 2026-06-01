@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.ImageLoader
+import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.ahtat204.gitlab.presentation.components.ContactLinks
 import com.ahtat204.gitlab.presentation.components.Header
@@ -88,8 +89,8 @@ fun Profile(
                 loader,
                 profile.avatarUrl
             )
-            val github="https://github.com/${profile.github?:""}"
-            ContactLinks(github,profile.linkedin?:"")
+            //="https://github.com/${profile.github?:""}"
+            val github=if(profile.github !=null)Pair("https://github.com/${profile.github?:""}",R.drawable.github) else Pair(null,null)
             Text(
                 profile.jobTitle ?: "",
                 fontFamily = titleFont,
@@ -111,6 +112,8 @@ fun Profile(
                 fontFamily = customFontFamily,
             )
 
+            val linked:Pair<String?,Int?> =if(profile.linkedin==null) Pair(null,null) else Pair(profile.linkedin,R.drawable.linkedin)
+            ContactLinks(linked,github)
 
         }
     }
