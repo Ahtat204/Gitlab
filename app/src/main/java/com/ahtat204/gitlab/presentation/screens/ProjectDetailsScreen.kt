@@ -1,13 +1,14 @@
 package com.ahtat204.gitlab.presentation.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,15 +17,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import coil.ImageLoader
+import com.ahtat204.gitlab.data.queries.type.Color
+import com.ahtat204.gitlab.presentation.components.CollaborationDetails
 import com.ahtat204.gitlab.presentation.components.GeneralDetails
 import com.ahtat204.gitlab.presentation.components.ProjectItem
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
 import java.time.Instant
@@ -68,7 +69,7 @@ import java.time.ZoneId
  * - Displays up to all available projects; topics and languages are shown if present.
  */
 @Composable
-fun ProjectDetailScreen(
+fun ProjectDetailScreen(navController: NavController,
     x: PaddingValues, path: String, projectViewModel: ProjectViewModel = hiltViewModel()
 ) {
     val project by projectViewModel.currentProject.collectAsStateWithLifecycle()
@@ -76,7 +77,7 @@ fun ProjectDetailScreen(
         projectViewModel.loadProject(path)
     }
     Column(
-        modifier = Modifier.padding(x),
+        modifier = Modifier.background(androidx.compose.ui.graphics.Color.Black).padding(x).verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -88,8 +89,7 @@ fun ProjectDetailScreen(
                 fontSize = 20.sp,
                 modifier = Modifier.fillMaxWidth()
             )
-            GeneralDetails(pro.forksCount, pro.starCount, pro.name, pro.description ?: "")
-        /*    pro.languages?.let { language ->
+            GeneralDetails(pro.forksCount, pro.starCount, pro.name, pro.description ?: "")/*    pro.languages?.let { language ->
                 Row(horizontalArrangement = Arrangement.Start) {
                     language.onEachIndexed { index, topic -> Text(
                             text = topic.name,
@@ -103,8 +103,7 @@ fun ProjectDetailScreen(
                     }
                 }
             }*/
-
-
+            CollaborationDetails(pro.issues?.count?:0,pro.mergeRequests?.count?:0,2,2,2,navController)
         }
     }
 }

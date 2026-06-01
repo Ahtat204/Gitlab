@@ -57,14 +57,14 @@ import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 @Composable
 fun MyWorkItems(navController: NavController) {
     val myWorkItems = listOf(
-        Item("Issues", "issues",R.drawable.issues, 1),
-        Item("Merge Requests ","mergerequests", R.drawable.mergerequest, 1),
-        Item("Workspaces","workspaces", R.drawable.workspaces, 1),
-        Item("Milestones","workspaces", R.drawable.milestone, 1),
-        Item("Starred","starrted", R.drawable.star, 1),
-        Item("Groups","groups", R.drawable.group, 1),
-        Item("Personal projects", "personal",R.drawable.project, 1),
-        Item("Contributed Projects", "contributed",R.drawable.project, 1),
+        Item("Issues", "issues",R.drawable.issues),
+        Item("Merge Requests ","mergerequests", R.drawable.mergerequest),
+        Item("Workspaces","workspaces", R.drawable.workspaces),
+        Item("Milestones","workspaces", R.drawable.milestone),
+        Item("Starred","starrted", R.drawable.star),
+        Item("Groups","groups", R.drawable.group),
+        Item("Personal projects", "personal",R.drawable.project),
+        Item("Contributed Projects", "contributed",R.drawable.project),
     )
 
     Column(

@@ -59,7 +59,7 @@ fun BottomNavigationGraph(
             arguments = listOf(navArgument("projectId") { defaultValue = "" })
         ) { backStackEntry ->
             val projectId = backStackEntry.arguments?.getString("projectId")
-            projectId?.let { ProjectDetailScreen(x, it) }
+            projectId?.let { ProjectDetailScreen(navController,x, it) }
         }
     }
 }
