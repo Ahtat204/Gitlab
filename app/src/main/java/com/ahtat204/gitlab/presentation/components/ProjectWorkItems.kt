@@ -28,7 +28,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
 
 /**
- * Displays a clickable card representing a [Item].
+ * Displays a clickable card representing an [Item].
  *
  * The card includes:
  * - An icon loaded from the item's resource ID.
@@ -44,10 +44,10 @@ import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
  * ```
  * ProjectWorkItems(
  *     item = Item(
- *         name = "Repositories",
- *         route = "repositories_screen",
- *         Id = R.drawable.repo_icon,
- *         count = 10
+ *         name = "Merge Requests",
+ *         route = "project/{id}/merge_requests",
+ *         Id = R.drawable.mergerequest,
+ *         count = project.openMergeRequestsCount
  *     ),
  *     openScreen = { navController.navigate(item.route) }
  * )
@@ -59,12 +59,12 @@ fun ProjectWorkItems(item: Item, openScreen: () -> Unit) {
         openScreen, modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp, 1.dp)
-            .background(Gray)
+            .background(Color.Black)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Gray)
+                .background(Color.Black)
                 .height(60.dp).fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp)),
             horizontalArrangement = Arrangement.Start,
@@ -74,7 +74,7 @@ fun ProjectWorkItems(item: Item, openScreen: () -> Unit) {
                 painter = painterResource(item.Id),
                 contentDescription = item.name,
                 Modifier
-                    .size(30.dp)
+                    .size(27.dp)
                     .padding(0.dp,3.dp),
                 tint = Orange
             )
@@ -87,8 +87,9 @@ fun ProjectWorkItems(item: Item, openScreen: () -> Unit) {
                 letterSpacing = 4.sp
             )
             Text(
-                text = item.count.toString(),
+                text = "${item.count}",
                 fontSize = 20.sp,
+                color = Orange,
                 textAlign = TextAlign.End,
                 fontFamily = topBarFont,
                 modifier = Modifier.weight(0.9f).padding(10.dp)
