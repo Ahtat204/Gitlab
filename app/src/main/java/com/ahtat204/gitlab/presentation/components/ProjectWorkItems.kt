@@ -25,6 +25,33 @@ import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
 
+/**
+ * Displays a clickable card representing a [Item].
+ *
+ * The card includes:
+ * - An icon loaded from the item's resource ID.
+ * - The item's name styled with a custom font.
+ *
+ * When clicked, the card triggers the [openScreen] callback, typically used
+ * to navigate to the item's associated screen.
+ *
+ * @param item The [Item] to be displayed inside the card.
+ * @param openScreen A callback function invoked when the card is clicked.
+ *
+ * Example usage:
+ * ```
+ * ProjectWorkItems(
+ *     item = Item(
+ *         name = "Repositories",
+ *         route = "repositories_screen",
+ *         Id = R.drawable.repo_icon,
+ *         count = 10
+ *     ),
+ *     openScreen = { navController.navigate(item.route) }
+ * )
+ * ```
+ */
+
 @Composable
 fun ProjectWorkItems(item: Item, openScreen: () -> Unit) {
     Card(
@@ -53,7 +80,8 @@ fun ProjectWorkItems(item: Item, openScreen: () -> Unit) {
                 text = item.name,
                 fontSize = 20.sp,
                 fontFamily = topBarFont,
-                modifier = Modifier.weight(0.9f)
+                modifier = Modifier.weight(0.9f),
+                letterSpacing = 4.sp
             )
             Text(
                 text = item.count.toString(),

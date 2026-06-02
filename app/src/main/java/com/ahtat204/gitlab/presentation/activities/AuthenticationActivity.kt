@@ -118,14 +118,15 @@ class AuthenticationActivity : ComponentActivity() {
                         .padding(0.dp), tint = Orange
                 )
                 Spacer(modifier = Modifier.height(120.dp))
-                Button(onClick = {
+                if(response==null)       Button(onClick = {
                     val authIntent = getService().getAuthorizationRequestIntent(authRequest!!)
                         ?: throw NullPointerException("Intent is null")
                     launcher.launch(authIntent)
                     authState = AuthState(serviceConfig!!)
                 }) {
-                  if(response==null)  Text(text = "Login With Gitlab", fontSize = 30.sp) else CircularProgressIndicator()
+                   Text(text = "Login With Gitlab", fontSize = 30.sp)
                 }
+                else CircularProgressIndicator()
             }
         }
     }

@@ -22,7 +22,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.ImageLoader
-import com.ahtat204.gitlab.data.queries.type.Color
 import com.ahtat204.gitlab.presentation.components.CollaborationDetails
 import com.ahtat204.gitlab.presentation.components.GeneralDetails
 import com.ahtat204.gitlab.presentation.components.ProjectItem
@@ -69,15 +68,21 @@ import java.time.ZoneId
  * - Displays up to all available projects; topics and languages are shown if present.
  */
 @Composable
-fun ProjectDetailScreen(navController: NavController,
-    x: PaddingValues, path: String, projectViewModel: ProjectViewModel = hiltViewModel()
+fun ProjectDetailScreen(
+    navController: NavController,
+    x: PaddingValues,
+    path: String,
+    projectViewModel: ProjectViewModel = hiltViewModel()
 ) {
     val project by projectViewModel.currentProject.collectAsStateWithLifecycle()
     LaunchedEffect(true) {
         projectViewModel.loadProject(path)
     }
     Column(
-        modifier = Modifier.background(androidx.compose.ui.graphics.Color.Black).padding(x).verticalScroll(rememberScrollState()),
+        modifier = Modifier
+            .background(androidx.compose.ui.graphics.Color.Black)
+            .padding(x)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -89,21 +94,17 @@ fun ProjectDetailScreen(navController: NavController,
                 fontSize = 20.sp,
                 modifier = Modifier.fillMaxWidth()
             )
-            GeneralDetails(pro.forksCount, pro.starCount, pro.name, pro.description ?: "")/*    pro.languages?.let { language ->
-                Row(horizontalArrangement = Arrangement.Start) {
-                    language.onEachIndexed { index, topic -> Text(
-                            text = topic.name,
-                            fontSize = 17.sp,
-                            color = Orange,
-                            modifier = Modifier
-                                .offset(0.dp, 0.dp)
-                                .padding(10.dp, 0.dp),
-                            fontFamily = customFontFamily
-                        )
-                    }
-                }
-            }*/
-            CollaborationDetails(pro.issues?.count?:0,pro.mergeRequests?.count?:0,2,2,2,navController)
+            GeneralDetails(pro.forksCount,
+                pro.starCount, pro.name,
+                pro.description ?: "")
+            CollaborationDetails(
+                pro.openIssuesCount?: 0,
+                pro.openMergeRequestsCount ?: 0,
+                2,
+                2,
+                2,
+                navController
+            )
         }
     }
 }
