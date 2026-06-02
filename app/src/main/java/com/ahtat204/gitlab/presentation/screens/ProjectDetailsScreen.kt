@@ -25,6 +25,7 @@ import coil.ImageLoader
 import com.ahtat204.gitlab.presentation.components.CollaborationDetails
 import com.ahtat204.gitlab.presentation.components.GeneralDetails
 import com.ahtat204.gitlab.presentation.components.ProjectItem
+import com.ahtat204.gitlab.presentation.ui.theme.Gray
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
 import java.time.Instant
@@ -80,7 +81,7 @@ fun ProjectDetailScreen(
     }
     Column(
         modifier = Modifier
-            .background(androidx.compose.ui.graphics.Color.Black)
+            .background(Gray)
             .padding(x)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -94,16 +95,11 @@ fun ProjectDetailScreen(
                 fontSize = 20.sp,
                 modifier = Modifier.fillMaxWidth()
             )
-            GeneralDetails(pro.forksCount,
-                pro.starCount, pro.name,
-                pro.description ?: "")
+            GeneralDetails(
+                pro.forksCount, pro.starCount, pro.name, pro.description ?: ""
+            )
             CollaborationDetails(
-                pro.openIssuesCount?: 0,
-                pro.openMergeRequestsCount ?: 0,
-                2,
-                2,
-                2,
-                navController
+                pro.openIssuesCount ?: 0, pro.openMergeRequestsCount ?: 0, 2, 2, 2, navController
             )
         }
     }

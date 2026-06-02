@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.R
+import com.ahtat204.gitlab.presentation.ui.theme.Gray
 
 @Composable
 fun CollaborationDetails(
@@ -24,17 +24,14 @@ fun CollaborationDetails(
     Column(
         modifier = Modifier
             .padding(0.dp)
-            .background(Color.Transparent),
+            .background(Gray),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ProjectWorkItems(Item("issues", "issues", R.drawable.issues, issuesCount)) {}
         ProjectWorkItems(
             Item(
-                "Merge Requests",
-                "merge_requests",
-                R.drawable.mergerequest,
-                mergeRequestCount
+                "Merge Requests", "merge_requests", R.drawable.mergerequest, mergeRequestCount
             )
         ) {}
         ProjectWorkItems(Item("Pipelines", "pipelines", R.drawable.pipeline, membersCount)) {}
