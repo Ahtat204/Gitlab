@@ -19,3 +19,12 @@ keystore_base64.txt
 explanation.txt
 **.txt
 app/test.json
+.kotlin/
+AndroidStudio.vbs
+Runtree.py
+clean.sh
+events.json
+jobs.json
+projects.json
+reflog.sh
+test.json

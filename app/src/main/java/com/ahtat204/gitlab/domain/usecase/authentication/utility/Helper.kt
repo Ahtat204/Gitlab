@@ -4,9 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import com.ahtat204.gitlab.domain.usecase.authentication.authStateStore
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.GlobalSingleton
+import com.ahtat204.gitlab.presentation.activities.MainActivity
+import kotlinx.coroutines.launch
+import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationResponse
+import net.openid.appauth.AuthorizationService
 
 /**
  * Builds an [AuthorizationResponse] from the given [Intent] after a completed
@@ -41,9 +47,7 @@ import net.openid.appauth.AuthorizationResponse
  * successfully, or `null` if no URI is found.
  */
 fun buildResponse(
-    intent: Intent,
-    authRequest: AuthorizationRequest?,
-    context: Context
+    intent: Intent, authRequest: AuthorizationRequest?, context: Context
 ): AuthorizationResponse? {
     var response: AuthorizationResponse? = null
     val uri = intent.data
@@ -62,3 +66,5 @@ fun buildResponse(
     }
     return null
 }
+
+
