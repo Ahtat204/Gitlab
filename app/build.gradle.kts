@@ -51,7 +51,7 @@ android {
 
 apollo {
     service("gitlab") {
-        packageName.set("com.asue24.gitlab.data.queries")
+        packageName.set("com.ahtat204.gitlab.data.queries")
         introspection {
             endpointUrl.set("https://gitlab.com/api/graphql")
             schemaFile.set(file("app/src/main/graphql/com/ahtat204/schema.graphqls"))
@@ -70,10 +70,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material)
     testImplementation(libs.junit)
-    testImplementation(libs.junit.jupiter)
-    testImplementation(libs.junit.jupiter)
-    testImplementation (libs.mockito.kotlin)
-    testImplementation(libs.mockito.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
