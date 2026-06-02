@@ -1,5 +1,6 @@
-package com.asue24
+package com.ahtat204.gitlab.presentation.activities
 
+import android.R
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -7,10 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.asue24.gitlab.domain.usecase.authentication.AuthStorage
-import com.asue24.gitlab.domain.usecase.authentication.constants.Tokens
-import com.asue24.gitlab.presentation.activities.AuthenticationActivity
-import com.asue24.gitlab.presentation.activities.MainActivity
+import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +23,7 @@ import java.io.File
  *
  * ## Responsibilities
  * - Displays the splash screen while authentication state is being checked.
- * - Initializes [AuthorizationService] and sets up token context in [Tokens].
+ * - Initializes [net.openid.appauth.AuthorizationService] and sets up token context in [com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens].
  * - Ensures cache directory (`gitlab/httpCache`) exists for Apollo/HTTP caching.
  * - Determines whether to navigate to [MainActivity] (authenticated) or
  *   [AuthenticationActivity] (login required).
@@ -37,7 +36,7 @@ import java.io.File
  *   - If a valid refresh token exists, attempts to refresh access token.
  *   - Navigates to the appropriate activity based on authentication outcome.
  * - **onDestroy**:
- *   - Disposes of [AuthorizationService] to release resources.
+ *   - Disposes of [net.openid.appauth.AuthorizationService] to release resources.
  *
  * ## Error Handling
  * - If token refresh fails, navigates to [AuthenticationActivity].
@@ -53,39 +52,23 @@ import java.io.File
  */
 @AndroidEntryPoint
 class LauncherActivity : ComponentActivity() {
-
     private lateinit var authenticationService: AuthorizationService
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Install splash screen before super.onCreate
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-
-        // Ensure cache directory exists
         val existed = File("gitlab/httpCache")
-        if (!existed.exists()) {
-            existed.mkdir()
-        }
-
-        // Initialize authentication service and token context
+        if (!existed.exists()) existed.mkdir()
         authenticationService = AuthorizationService(this)
-        Tokens.authService = authenticationService
-        Tokens.context = application
-
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
-
-        // Check stored authentication state
         CoroutineScope(Dispatchers.IO).launch {
             val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
-
             if (storedState.refreshToken != null) {
                 storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
                     if (token != null && ex == null) {
                         Tokens.accessToken = token
                         Tokens.CurrentAuthState = storedState
-                        Tokens.authService = authenticationService
                         lifecycleScope.launch {
                             AuthStorage.getAuthState(this@LauncherActivity).updateData { storedState }
                             isReady = true
@@ -107,8 +90,8 @@ class LauncherActivity : ComponentActivity() {
     private fun navigateTo(destination: Class<*>) {
         startActivity(Intent(this, destination))
         overridePendingTransition(
-            android.R.anim.overshoot_interpolator,
-            android.R.anim.fade_out
+            R.anim.overshoot_interpolator,
+            R.anim.fade_out
         )
         finish()
     }
