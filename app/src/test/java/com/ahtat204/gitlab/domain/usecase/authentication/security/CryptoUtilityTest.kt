@@ -2,9 +2,9 @@ package com.ahtat204.gitlab.domain.usecase.authentication.security
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
-import org.junit.jupiter.api.assertNotNull
 import org.mockito.Mockito.mock
 
 class CryptoUtilityTest {
