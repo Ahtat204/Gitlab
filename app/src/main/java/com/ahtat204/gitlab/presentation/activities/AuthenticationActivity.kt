@@ -29,7 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.domain.usecase.authentication.authStateStore
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.GlobalSingleton
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.ahtat204.gitlab.domain.usecase.authentication.utility.buildResponse
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import kotlinx.coroutines.launch
@@ -89,7 +89,7 @@ class AuthenticationActivity : ComponentActivity() {
         ResponseTypeValues.CODE, AuthConfig.CALLBACK_URL.toUri()
     ).setScope(AuthConfig.SCOPE).build()
 
-    private lateinit var authenticationService: AuthorizationService
+    private var authenticationService: AuthorizationService? = null
     private val launcher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
 
@@ -98,7 +98,7 @@ class AuthenticationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        authenticationService= AuthorizationService(GlobalSingleton.context)
+
         // Compose UI with login button
         setContent {
             Column(
@@ -117,7 +117,7 @@ class AuthenticationActivity : ComponentActivity() {
                 )
                 Spacer(modifier = Modifier.height(120.dp))
                 Button(onClick = {
-                    val authIntent = authenticationService.getAuthorizationRequestIntent(authRequest!!)
+                    val authIntent = getService().getAuthorizationRequestIntent(authRequest!!)
                         ?: throw NullPointerException("Intent is null")
                     launcher.launch(authIntent)
                     authState = AuthState(serviceConfig!!)
@@ -128,10 +128,16 @@ class AuthenticationActivity : ComponentActivity() {
         }
     }
 
-
+    /** Lazily initializes [AuthorizationService]. */
+    private fun getService(): AuthorizationService {
+        if (authenticationService == null) {
+            authenticationService = AuthorizationService(this)
+        }
+        return authenticationService!!
+    }
 
     override fun onDestroy() {
-        authenticationService.dispose()
+        authenticationService?.dispose()
         super.onDestroy()
     }
 
@@ -145,11 +151,7 @@ class AuthenticationActivity : ComponentActivity() {
             Log.e("AuthenticationActivity", "OAUTH_ERROR")
             return
         }
-        runBlocking {
-            exchangeCodeForToken(authenticationService, response, authState!!)
-            startActivity(Intent(this@AuthenticationActivity, MainActivity::class.java))
-            finish()
-        }
+        runBlocking { exchangeCodeForToken(getService(), response, authState!!) }
     }
 
     /**
@@ -171,9 +173,11 @@ class AuthenticationActivity : ComponentActivity() {
                 authState.update(tokenResponse, ex)
                 lifecycleScope.launch {
                     authStateStore.updateData { authState }
+                    startActivity(Intent(this@AuthenticationActivity, MainActivity::class.java))
+                    finish()
                 }
-                GlobalSingleton.accessToken = authState.accessToken
-                GlobalSingleton.CurrentAuthState = authState
+                Tokens.accessToken = authState.accessToken
+                Tokens.CurrentAuthState = authState
             }
         }
     }

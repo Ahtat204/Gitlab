@@ -4,7 +4,7 @@ import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
 import com.apollographql.apollo.cache.normalized.normalizedCache
 import com.apollographql.apollo.network.okHttpClient
 import com.ahtat204.gitlab.data.remote.AuthenticationInterceptor
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.GlobalSingleton
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +23,7 @@ import javax.inject.Singleton
  * - Configures normalized in‑memory caching for query results.
  *
  * ## Key Features
- * - **Authorization header**: Injects a bearer token from [GlobalSingleton.accessToken].
+ * - **Authorization header**: Injects a bearer token from [Tokens.accessToken].
  * - **Logging**: Uses [HttpLoggingInterceptor] to log HTTP headers for debugging.
  * - **AuthenticationInterceptor**: Custom interceptor for handling GitLab auth.
  * - **Normalized cache**: Backed by [MemoryCacheFactory] with a 10 MB limit and
@@ -58,7 +58,7 @@ object ApolloModule {
     fun GetApolloService(): ApolloClient {
         return ApolloClient.Builder()
             .serverUrl("https://gitlab.com/api/graphql")
-            .addHttpHeader("Authorization", "Bearer ${GlobalSingleton.accessToken}")
+            .addHttpHeader("Authorization", "Bearer ${Tokens.accessToken}")
             .okHttpClient(
                 OkHttpClient.Builder()
                     .addInterceptor(HttpLoggingInterceptor().apply {

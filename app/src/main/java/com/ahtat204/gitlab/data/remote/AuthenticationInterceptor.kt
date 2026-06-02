@@ -2,7 +2,7 @@ package com.ahtat204.gitlab.data.remote
 
 import android.util.Log
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.GlobalSingleton
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +27,7 @@ import okhttp3.Response
  * - If the response is `401 Unauthorized`:
  *   - Synchronizes on a lock to prevent concurrent refresh attempts.
  *   - Uses [net.openid.appauth.AuthState.performActionWithFreshTokens] to refresh the token.
- *   - Updates [GlobalSingleton.accessToken] and persists the new state via [AuthStorage].
+ *   - Updates [Tokens.accessToken] and persists the new state via [AuthStorage].
  *   - Retries the request with the refreshed token.
  *   - Logs an error if the retry still fails with `401`.
  *
@@ -58,7 +58,7 @@ class AuthenticationInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
         val builder = request.newBuilder()
-        val token = GlobalSingleton.accessToken
+        val token = Tokens.accessToken
         if (token != null) {
             builder.header("Authorization", "Bearer $token")
         }
@@ -67,20 +67,20 @@ class AuthenticationInterceptor : Interceptor {
 
         if (response.code == 401) {
             synchronized(Locker) {
-                val state = GlobalSingleton.CurrentAuthState
-                val accessToken = GlobalSingleton.accessToken
+                val state = Tokens.CurrentAuthState
+                val accessToken = Tokens.accessToken
                 if (accessToken != null && accessToken == token &&
                     state != null
                 ) {
                     val deferred = CompletableDeferred<String?>()
                     runBlocking {
-                        state.performActionWithFreshTokens(AuthorizationService(GlobalSingleton.context)) { token, _, ex ->
+                        state.performActionWithFreshTokens(AuthorizationService(Tokens.context)) { token, _, ex ->
                             if (token != null && ex == null) {
-                                GlobalSingleton.accessToken = token
-                                GlobalSingleton.CurrentAuthState = state
+                                Tokens.accessToken = token
+                                Tokens.CurrentAuthState = state
                                 deferred.complete(token)
                                 CoroutineScope(Dispatchers.IO).launch {
-                                    AuthStorage.getAuthState(GlobalSingleton.context).updateData { state }
+                                    AuthStorage.getAuthState(Tokens.context).updateData { state }
                                 }
                             }
                             if (ex != null) {
@@ -90,7 +90,7 @@ class AuthenticationInterceptor : Interceptor {
                         deferred.await()
                         response.close()
                     }
-                    builder.header("Authorization", "Bearer ${GlobalSingleton.accessToken}")
+                    builder.header("Authorization", "Bearer ${Tokens.accessToken}")
                     request = builder.build()
                     response = chain.proceed(request)
                     if (response.code == 401) {
