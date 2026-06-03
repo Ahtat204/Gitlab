@@ -73,6 +73,7 @@ dependencies {
     testImplementation (libs.mockito.kotlin)
     testImplementation(libs.mockito.core)
     testImplementation(libs.hilt.android.testing)
+    testImplementation("com.apollographql.mockserver:apollo-mockserver:0.0.1")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
