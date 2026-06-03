@@ -6,5 +6,5 @@ import retrofit2.http.GET
 
 interface RetrofitClient {
     @GET("/events")
-    fun getProjectsCount(): Response<Events>
+    fun getEvents(): Response<Events>
 }
