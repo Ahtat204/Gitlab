@@ -51,7 +51,7 @@ android {
 
 apollo {
     service("gitlab") {
-        packageName.set("com.asue24.gitlab.data.queries")
+        packageName.set("com.ahtat204.gitlab.data.queries")
         introspection {
             endpointUrl.set("https://gitlab.com/api/graphql")
             schemaFile.set(file("app/src/main/graphql/com/ahtat204/schema.graphqls"))
@@ -98,6 +98,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation (libs.retrofit)
     implementation(libs.converter.gson)
 }

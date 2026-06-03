@@ -28,3 +28,5 @@ projects.json
 reflog.sh
 test.json
 .kotlin
+.kotlin/
+app/test.json
