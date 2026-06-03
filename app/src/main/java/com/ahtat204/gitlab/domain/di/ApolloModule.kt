@@ -1,10 +1,10 @@
 package com.ahtat204.gitlab.domain.di
+
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
 import com.apollographql.apollo.cache.normalized.normalizedCache
 import com.apollographql.apollo.network.okHttpClient
-import com.ahtat204.gitlab.data.remote.AuthenticationInterceptor
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,11 +40,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ApolloModule {
-
     // In‑memory cache: 10 MB, entries expire after 60 seconds
     private val cacheFactory = MemoryCacheFactory(
-        maxSizeBytes = 10 * 1024 * 1024,
-        expireAfterMillis = 60000
+        maxSizeBytes = 10 * 1024 * 1024, expireAfterMillis = 60000
     )
 
     /**
@@ -55,15 +53,11 @@ object ApolloModule {
      */
     @Singleton
     @Provides
-    fun GetApolloService(): ApolloClient {
-        return ApolloClient.Builder()
-            .serverUrl("https://gitlab.com/api/graphql")
+    fun getApolloService(): ApolloClient {
+        return ApolloClient.Builder().serverUrl("https://gitlab.com/api/graphql")
             .addHttpHeader("Authorization", "Bearer ${Tokens.accessToken}")
-            .okHttpClient(OkHttpClient())
-            .normalizedCache(
-                cacheFactory,
-                writeToCacheAsynchronously = false
-            )
-            .build()
+            .okHttpClient(OkHttpClient()).normalizedCache(
+                cacheFactory, writeToCacheAsynchronously = false
+            ).build()
     }
 }
