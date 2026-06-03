@@ -98,7 +98,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.converter.moshi)
-    implementation(libs.moshi)
-    implementation(libs.moshi.kotlin)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
 }
