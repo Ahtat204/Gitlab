@@ -8,6 +8,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+**.graphqls
 *.svg
 .env
 **.secrets
@@ -28,5 +29,5 @@ output22.txt
 projects.json
 reflog.sh
 test.json
-
 **.txt
+

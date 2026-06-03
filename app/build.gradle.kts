@@ -3,18 +3,18 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrains.kotlin.serialization)
-    id("com.apollographql.apollo") version "4.4.2"
-    id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
-    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    alias(libs.plugins.apollo)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.secrets.gradle)
 }
 
 android {
-    namespace = "com.asue24.gitlab"
+    namespace = "com.ahtat204.gitlab"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.asue24.gitlab"
+        applicationId = "com.ahtat204.gitlab"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -22,27 +22,19 @@ android {
         manifestPlaceholders.putIfAbsent("appAuthRedirectScheme", "com.asue24.gitlab   ")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    signingConfigs {
-        create("release") {
-            storeFile = file("../keystore")
-            storePassword = System.getenv("SIGNING_KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("SIGNING_ALIAS")
-            keyPassword = System.getenv("SIGNING_ALIAS_PASSWORD")
-        }
-    }
-    secrets {
-        propertiesFileName="secrets.properties"
-    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
+            isDebuggable = false
         }
-        debug {
-
-        }
+        debug {}
+    }
+    secrets {
+        propertiesFileName = "secrets.properties"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -53,22 +45,22 @@ android {
     }
     buildFeatures {
         buildConfig = true
-    }
-    buildFeatures {
         compose = true
     }
 }
 
 apollo {
-    service("service") {
-        packageName.set("com.asue24.gitlab")
+    service("gitlab") {
+        packageName.set("com.ahtat204.gitlab.data.queries")
         introspection {
             endpointUrl.set("https://gitlab.com/api/graphql")
-            schemaFile.set(file("app/src/main/graphql/com/pranav/schema.graphqls"))
+            schemaFile.set(file("app/src/main/graphql/com/ahtat204/schema.graphqls"))
+            addTypename.set("always")
         }
     }
 }
 dependencies {
+    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -97,7 +89,13 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.material)
-    implementation("androidx.compose.material:material-icons-extended:1.7.8")
-    implementation("androidx.compose.material:material-icons-core:1.7.8")
-
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.apollo.normalized.cache)
+    implementation(libs.apollo.http.cache)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.hilt.navigation.compose)
 }
