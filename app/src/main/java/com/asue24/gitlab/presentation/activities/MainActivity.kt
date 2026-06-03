@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
                     BottomBar(navController)
                 }, floatingActionButtonPosition = FabPosition.End) { x ->
-                    BottomNavigationgraph(navController)
+                    BottomNavigationgraph(navController,x)
                 }
             }
         }
