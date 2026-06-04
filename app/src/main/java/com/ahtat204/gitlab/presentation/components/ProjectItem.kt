@@ -3,12 +3,10 @@ package com.ahtat204.gitlab.presentation.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -29,7 +27,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,9 +37,7 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
-import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.presentation.ui.theme.Background
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
@@ -93,7 +88,8 @@ import java.nio.charset.StandardCharsets
 fun ProjectItem(
     data: GetMyProjectsPaginatedQuery.CurrentUser?,
     project: GetMyProjectsPaginatedQuery.Project,
-    imageLoader: ImageLoader,navController: NavHostController
+    imageLoader: ImageLoader,
+    navController: NavHostController
 ) {
     val encodedId = URLEncoder.encode(project.fullPath, StandardCharsets.UTF_8.toString())
     Card(
@@ -104,7 +100,11 @@ fun ProjectItem(
             .height(120.dp)
     ) {
         Row(
-            modifier = Modifier.background(Color.Black).fillMaxWidth(), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.Center
+            modifier = Modifier
+                .background(Color.Black)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.Start
         ) {
             data?.let {
                 it.avatarUrl?.let { url ->
@@ -137,6 +137,8 @@ fun ProjectItem(
                     .fillMaxHeight()
                     .background(Background)
             ) {
+                project?.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+
                 project.let { project ->
                     Row(
                         horizontalArrangement = Arrangement.Center,
@@ -213,12 +215,7 @@ fun ProjectItem(
                 }
             }
         }
-        Box(modifier =  Modifier.offset(110.dp,20.dp)){
-            Icon(
-                painter = painterResource(R.drawable.status_failed),
-                contentDescription = null, tint = Color.Red,
-            )
-        }}
+    }
 
 }/*
 
