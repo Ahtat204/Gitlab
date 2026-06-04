@@ -36,10 +36,11 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.presentation.ui.theme.Background
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
-import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
+
 
 /**
  * Composable that renders a single GitLab project item card.
@@ -83,8 +84,8 @@ import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
  */
 @Composable
 fun ProjectItem(
-    data: GetMyProjectsQuery.CurrentUser?,
-    project: GetMyProjectsQuery.Project,
+    data: GetMyProjectsPaginatedQuery.CurrentUser?,
+    project: GetMyProjectsPaginatedQuery.Project,
     imageLoader: ImageLoader
 ) {
     Card(

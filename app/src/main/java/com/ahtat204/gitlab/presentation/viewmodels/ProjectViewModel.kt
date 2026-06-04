@@ -2,10 +2,10 @@ package com.ahtat204.gitlab.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.repositories.project.ProjectRepository
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.exception.CacheMissException
-import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -55,10 +55,10 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
 
     /** Backing state for contributed projects. */
-    private val _projects = MutableStateFlow<GetMyProjectsQuery.CurrentUser?>(null)
+    private val _projects = MutableStateFlow<GetMyProjectsPaginatedQuery.CurrentUser?>(null)
 
     /** Public immutable flow of contributed projects. */
-    val projects: StateFlow<GetMyProjectsQuery.CurrentUser?> = _projects.asStateFlow()
+    val projects: StateFlow<GetMyProjectsPaginatedQuery.CurrentUser?> = _projects.asStateFlow()
 
     /**
      * Loads all projects contributed by the authenticated user.

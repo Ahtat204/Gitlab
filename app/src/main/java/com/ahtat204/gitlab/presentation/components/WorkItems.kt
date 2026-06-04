@@ -1,5 +1,3 @@
-<<<<<<<< HEAD:app/src/main/java/com/asue24/gitlab/presentation/components/WorkItems.kt
-========
 package com.ahtat204.gitlab.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
@@ -46,4 +44,4 @@ fun MyWorkItems(navController: NavController) {
         }
     }
 }
->>>>>>>> f06ee42 (changed package name):app/src/main/java/com/ahtat204/gitlab/presentation/components/WorkItems.kt
+

@@ -1,12 +1,13 @@
 package com.ahtat204.gitlab.data.repositories.project
 
 import android.util.Log
+import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.apollographql.apollo.cache.normalized.watch
-import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
+
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +30,7 @@ import javax.inject.Inject
  *
  * ## Dependencies
  * - [ApolloClient]: Executes GraphQL queries and manages caching.
- * - [GetMyProjectsQuery], [GetProjectDetailsQuery]: Auto‑generated query classes.
+ * - [GetMyProjectsPaginatedQuery], [GetProjectDetailsQuery]: Auto‑generated query classes.
  * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
  */
 class ProjectRepositoryImpl @Inject constructor(
@@ -39,10 +40,10 @@ class ProjectRepositoryImpl @Inject constructor(
      * Streams all projects the authenticated user has contributed to.
      *
      * @param policy The [FetchPolicy] to control cache vs. network behavior.
-     * @return A [Flow] emitting [GetMyProjectsQuery.Data] objects.
+     * @return A [Flow] emitting [GetMyProjectsPaginatedQuery.Data] objects.
      *
      * ### Behavior
-     * - Executes [GetMyProjectsQuery] with the provided fetch policy.
+     * - Executes [GetMyProjectsPaginatedQuery] with the provided fetch policy.
      * - Uses Apollo’s `watch()` to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
@@ -56,8 +57,8 @@ class ProjectRepositoryImpl @Inject constructor(
      * ```
      */
     @OptIn(ApolloExperimental::class)
-    override suspend fun getAllProjects(policy: FetchPolicy): Flow<GetMyProjectsQuery.Data> {
-        return apolloClient.query(GetMyProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
+    override suspend fun getAllProjects(policy: FetchPolicy): Flow<GetMyProjectsPaginatedQuery.Data> {
+        return apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapNotNull { it.data }.catch { ex ->
                 Log.e("ProjectRepository", ex.cause.toString() + "\n" + ex.stackTrace)
                 if (ex is CancellationException) throw ex

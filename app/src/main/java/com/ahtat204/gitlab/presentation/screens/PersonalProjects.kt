@@ -115,7 +115,7 @@ fun PersonalProjects(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(nodes, key = { item -> item?.id ?: Any() }) { item ->
-                        item?.project?.let { ProjectItem(CurrUser, it, loader, navController) }
+                        item?.project?.let { ProjectItem(CurrUser, it, loader) }
                     }
                 }
             }

@@ -46,4 +46,3 @@ jobs:
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_ALIAS_PASSWORD }}
       - run: echo "Build status report=${{ job.status }}"
-      - run: ls -R
