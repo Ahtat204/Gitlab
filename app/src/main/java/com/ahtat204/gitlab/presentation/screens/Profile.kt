@@ -64,7 +64,7 @@ fun Profile(
     x: PaddingValues,
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
+    LaunchedEffect(1) {
         profileViewModel.loadProfile()
     }
     val user by profileViewModel.currentUser.collectAsState()
