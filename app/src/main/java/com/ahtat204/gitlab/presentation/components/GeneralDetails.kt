@@ -70,13 +70,8 @@ fun GeneralDetails(
             textAlign = TextAlign.Center
         )
 
-        Text(
-            description,
-            fontFamily = titleFont,
-            fontSize = 15.sp,
-            modifier = Modifier.padding(20.dp, 10.dp),
-            color = Color.White,
-            textAlign = TextAlign.Start
+        AutoLinkText(
+            description
         )
         Row(
             modifier = Modifier

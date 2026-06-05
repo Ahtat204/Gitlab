@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -76,8 +77,12 @@ fun PipeLineStatusIcon(status: PipelineStatusEnum) {
                     .background(Color(0xFFAF2A2A))                      // Optional inner padding
             )
         }
+        PipelineStatusEnum.UNKNOWN__ -> {
 
-        else -> {}
+        }
+        else -> {
+
+        }
     }
 
 }

@@ -137,7 +137,7 @@ fun ProjectItem(
                     .fillMaxHeight()
                     .background(Background)
             ) {
-                project?.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+                project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
 
                 project.let { project ->
                     Row(
@@ -170,7 +170,7 @@ fun ProjectItem(
                             text = it,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1,
-                            fontSize = 9.sp,
+                            fontSize = 10.sp,
                             color = Color.White,
                             modifier = Modifier
                                 .fillMaxWidth(0.8f)
