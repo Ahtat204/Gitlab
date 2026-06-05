@@ -2,10 +2,12 @@ package com.ahtat204.gitlab.presentation.activities
 
 import android.R
 import android.content.Intent
+import android.net.http.NetworkException
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresExtension
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
@@ -55,6 +57,7 @@ class LauncherActivity : ComponentActivity() {
 
     private lateinit var authenticationService: AuthorizationService
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         // Install splash screen before super.onCreate
@@ -87,7 +90,9 @@ class LauncherActivity : ComponentActivity() {
                         }
                     }
                     if (ex != null) {
-                        navigateTo(AuthenticationActivity::class.java)
+                        if(ex.code == NetworkException.ERROR_INTERNET_DISCONNECTED ) {navigateTo(
+                            MainActivity::class.java)
+                        }
                         throw ex
                     }
                 }
