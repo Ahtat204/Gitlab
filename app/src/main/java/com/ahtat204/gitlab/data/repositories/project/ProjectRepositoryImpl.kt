@@ -2,18 +2,18 @@ package com.ahtat204.gitlab.data.repositories.project
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
+import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.apollographql.apollo.cache.normalized.watch
-
-import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Implementation of [ProjectRepository] that integrates with GitLab via Apollo GraphQL.
@@ -22,6 +22,7 @@ import javax.inject.Inject
  * - Provides reactive streams of project data using Kotlin [Flow].
  * - Uses Apollo’s normalized caching with configurable [FetchPolicy].
  * - Annotated with `@Inject` for dependency injection, ensuring a singleton lifecycle.
+ * - Annotated with [Singleton] to avoid creating a new Repository everytime the ViewModel is created since this Dependency is just for fetching data , doesn't have a state to hold
  *
  * ## Responsibilities
  * - Fetch all projects contributed by the authenticated user.
@@ -30,9 +31,10 @@ import javax.inject.Inject
  *
  * ## Dependencies
  * - [ApolloClient]: Executes GraphQL queries and manages caching.
- * - [GetMyProjectsPaginatedQuery], [GetProjectDetailsQuery]: Auto‑generated query classes.
+ * - [GetMyProjectsQuery], [GetProjectDetailsQuery]: Auto‑generated query classes.
  * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
  */
+@Singleton
 class ProjectRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient
 ) : ProjectRepository {
@@ -40,10 +42,10 @@ class ProjectRepositoryImpl @Inject constructor(
      * Streams all projects the authenticated user has contributed to.
      *
      * @param policy The [FetchPolicy] to control cache vs. network behavior.
-     * @return A [Flow] emitting [GetMyProjectsPaginatedQuery.Data] objects.
+     * @return A [Flow] emitting [GetMyProjectsQuery.Data] objects.
      *
      * ### Behavior
-     * - Executes [GetMyProjectsPaginatedQuery] with the provided fetch policy.
+     * - Executes [GetMyProjectsQuery] with the provided fetch policy.
      * - Uses Apollo’s `watch()` to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
@@ -58,8 +60,8 @@ class ProjectRepositoryImpl @Inject constructor(
      */
     @OptIn(ApolloExperimental::class)
     override suspend fun getAllProjects(policy: FetchPolicy): Flow<GetMyProjectsPaginatedQuery.Data> {
-        return apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
-            .mapNotNull { it.data }.catch { ex ->
+        return apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst)
+            .watch().mapNotNull { it.data }.catch { ex ->
                 Log.e("ProjectRepository", ex.cause.toString() + "\n" + ex.stackTrace)
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
@@ -94,4 +96,5 @@ class ProjectRepositoryImpl @Inject constructor(
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
     }
+
 }
