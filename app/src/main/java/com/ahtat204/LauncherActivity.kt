@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:app/src/main/java/com/ahtat204/gitlab/presentation/activities/LauncherActivity.kt
 package com.ahtat204.gitlab.presentation.activities
+========
+package com.ahtat204
+>>>>>>>> f06ee42 (changed package name):app/src/main/java/com/ahtat204/LauncherActivity.kt
 
 import android.R
 import android.content.Intent
@@ -10,6 +14,11 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+<<<<<<<< HEAD:app/src/main/java/com/ahtat204/gitlab/presentation/activities/LauncherActivity.kt
+========
+import com.ahtat204.gitlab.presentation.activities.AuthenticationActivity
+import com.ahtat204.gitlab.presentation.activities.MainActivity
+>>>>>>>> f06ee42 (changed package name):app/src/main/java/com/ahtat204/LauncherActivity.kt
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

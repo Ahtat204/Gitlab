@@ -50,6 +50,7 @@ fun BottomNavigationGraph(
         composable(route = BottomBarScreen.Profile.route) {
             Profile(navController,x)
         }
+        composable(route = BottomBarScreen.Profile.route) {}
         composable(route = "personal") {
             PersonalProjects(navController, x)
         }
