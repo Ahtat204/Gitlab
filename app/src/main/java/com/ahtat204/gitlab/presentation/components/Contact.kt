@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
 
 @Composable
-fun ContactLinks(vararg links: Pair<String?, Int?>) {
+fun Contact(vararg links: Pair<String?, Int?>) {
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start,

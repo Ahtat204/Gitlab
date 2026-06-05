@@ -1,5 +1,8 @@
 package com.ahtat204.gitlab.presentation.viewmodels
 
+import android.net.http.NetworkException
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
@@ -46,6 +49,7 @@ class ProfileViewModel @Inject constructor(
      * @param userName Optional username to fetch a specific profile. If null,
      * it fetches the currently authenticated user's profile.
      */
+  //  @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun loadProfile(userName: String? = null) {
         if (userName == null) {
             viewModelScope.launch {
@@ -58,6 +62,7 @@ class ProfileViewModel @Inject constructor(
                             .collect { profile.value = it.currentUser }
                     }
                     if (e is CancellationException) throw e
+            //        if(e is NetworkException) throw e
                 }
             }
         }

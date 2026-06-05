@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cases
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,18 +22,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
-import com.ahtat204.gitlab.presentation.components.ContactLinks
+import com.ahtat204.gitlab.presentation.components.Contact
 import com.ahtat204.gitlab.presentation.components.Header
+import com.ahtat204.gitlab.presentation.components.Info
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
@@ -89,32 +90,28 @@ fun Profile(
                 loader,
                 profile.avatarUrl
             )
-            //="https://github.com/${profile.github?:""}"
-            val github=if(profile.github !=null)Pair("https://github.com/${profile.github?:""}",R.drawable.github) else Pair(null,null)
-            Text(
-                profile.jobTitle ?: "",
-                fontFamily = titleFont,
-                fontSize = 20.sp,
-                letterSpacing = 1.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(2.dp, 5.dp),
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
+            val github = if (profile.github != null) Pair(
+                "https://github.com/${profile.github ?: ""}", R.drawable.github
+            ) else Pair(null, null)
             Text(
                 text = profile.bio ?: "",
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 10,
                 fontSize = 16.sp,
-                fontStyle = FontStyle.Italic,
-                color = Color.White,
+                fontStyle = FontStyle.Normal,
+                color = Color(0xFFDCCECE),
                 modifier = Modifier.fillMaxWidth(0.9f),
                 fontFamily = customFontFamily,
             )
-
-            val linked:Pair<String?,Int?> =if(profile.linkedin==null) Pair(null,null) else Pair(profile.linkedin,R.drawable.linkedin)
-            ContactLinks(linked,github)
-
+            Info(
+                Pair(profile.jobTitle ?: "", Icons.Default.Cases),
+                Pair(profile.location, Icons.Default.LocationOn)
+            )
+            val linked: Pair<String?, Int?> =
+                if (profile.linkedin == null) Pair(null, null) else Pair(
+                    profile.linkedin, R.drawable.linkedin
+                )
+            Contact(linked, github)
         }
     }
 
