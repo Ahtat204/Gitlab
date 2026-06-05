@@ -1,6 +1,5 @@
 package com.ahtat204.gitlab.presentation.components
 
-//import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -132,6 +131,8 @@ fun ProjectItem(
                     .fillMaxHeight()
                     .background(Background)
             ) {
+            //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+
                 project.let { project ->
                     Row(
                         horizontalArrangement = Arrangement.Center,
@@ -163,7 +164,7 @@ fun ProjectItem(
                             text = it,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1,
-                            fontSize = 9.sp,
+                            fontSize = 10.sp,
                             color = Color.White,
                             modifier = Modifier
                                 .fillMaxWidth(0.8f)

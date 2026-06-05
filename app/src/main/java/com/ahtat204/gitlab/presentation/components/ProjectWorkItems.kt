@@ -89,7 +89,7 @@ fun ProjectWorkItems(item: Item, openScreen: () -> Unit) {
             Text(
                 text = "${item.count}",
                 fontSize = 20.sp,
-                color = Orange,
+                color = Color.White,
                 textAlign = TextAlign.End,
                 fontFamily = topBarFont,
                 modifier = Modifier.weight(0.9f).padding(10.dp)
