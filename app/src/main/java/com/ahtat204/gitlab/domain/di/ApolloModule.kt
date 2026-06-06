@@ -11,6 +11,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
@@ -53,10 +54,9 @@ object ApolloModule {
      */
     @Singleton
     @Provides
-    fun getApolloService(): ApolloClient {
+    fun getApolloService(okHttpClient: OkHttpClient): ApolloClient {
         return ApolloClient.Builder().serverUrl("https://gitlab.com/api/graphql")
-            .addHttpHeader("Authorization", "Bearer ${Tokens.accessToken}")
-            .okHttpClient(OkHttpClient()).normalizedCache(
+            .okHttpClient(okHttpClient).normalizedCache(
                 cacheFactory, writeToCacheAsynchronously = false
             ).build()
     }

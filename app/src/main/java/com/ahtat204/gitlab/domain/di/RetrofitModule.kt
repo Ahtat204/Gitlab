@@ -15,7 +15,7 @@ import java.lang.reflect.Modifier
 @Module
 class RetrofitModule {
     @Provides
-    fun provideRetrofit(): RetrofitClient {
+    fun provideRetrofit(okHttpClient: OkHttpClient): RetrofitClient {
     /*    val json = Json {
             ignoreUnknownKeys = true
             isLenient = true
@@ -24,7 +24,7 @@ class RetrofitModule {
         val gson= GsonBuilder().setLenient()/*.excludeFieldsWithModifiers(Modifier.TRANSIENT).addDeserializationExclusionStrategy()*/.create()
         val module= Retrofit.Builder().baseUrl("https://gitlab.com/api/v4/")
             .addConverterFactory(GsonConverterFactory.create(gson))//.addCallAdapterFactory(CoroutineCallAdapterFactory())
-            .client(OkHttpClient()).build().create(RetrofitClient::class.java)
+            .client(okHttpClient).build().create(RetrofitClient::class.java)
         return module
     }
 }
