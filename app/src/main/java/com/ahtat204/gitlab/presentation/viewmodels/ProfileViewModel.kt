@@ -1,8 +1,5 @@
 package com.ahtat204.gitlab.presentation.viewmodels
 
-import android.net.http.NetworkException
-import android.os.Build
-import androidx.annotation.RequiresExtension
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery

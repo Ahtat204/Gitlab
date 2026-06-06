@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cases
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.rounded.Work
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -104,14 +105,17 @@ fun Profile(
                 fontFamily = customFontFamily,
             )
             Info(
-                Pair(profile.jobTitle ?: "", Icons.Default.Cases),
+                Pair(profile.jobTitle ?: "", Icons.Rounded.Work),
                 Pair(profile.location, Icons.Default.LocationOn)
             )
             val linked: Pair<String?, Int?> =
                 if (profile.linkedin == null) Pair(null, null) else Pair(
                     profile.linkedin, R.drawable.linkedin
                 )
-            Contact(linked, github)
+            val email:Pair<String?,Int?> =if(profile.publicEmail==null)Pair(null, null) else Pair(
+                profile.publicEmail, R.drawable.mail
+            )
+            Contact(linked, github,email)
         }
     }
 

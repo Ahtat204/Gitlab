@@ -18,5 +18,7 @@ query GetMyProfile{
         jobTitle
         projectCount
         linkedin
+        email
+
     }
 }

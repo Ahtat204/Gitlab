@@ -30,7 +30,7 @@ fun Contact(vararg links: Pair<String?, Int?>) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
-            .padding(1.dp, 10.dp)
+            .padding(1.dp, 1.dp)
             .fillMaxWidth()
     ) {
         links.forEach { link ->
