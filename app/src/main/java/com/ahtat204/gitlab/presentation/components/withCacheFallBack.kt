@@ -1,0 +1,19 @@
+package com.ahtat204.gitlab.presentation.components
+
+import com.apollographql.apollo.exception.CacheMissException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
+
+/**
+ * this extension is used to avoid try-catch mess on the [CacheMissException]  inside the ViewModel.
+ */
+fun <T> Flow<T>.withCacheFallback(
+    fallback: suspend () -> Flow<T>
+): Flow<T> = this.catch { e ->
+    if (e is CacheMissException) {
+        emitAll(fallback())
+    } else {
+        throw e
+    }
+}

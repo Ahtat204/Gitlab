@@ -1,26 +1,34 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrains.kotlin.serialization)
-    id("com.apollographql.apollo") version "4.4.2"
-    id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
-    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    alias(libs.plugins.apollo)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.secrets.gradle)
 }
 
 android {
-    namespace = "com.asue24.gitlab"
+    namespace = "com.ahtat204.gitlab"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.asue24.gitlab"
+        applicationId = "com.ahtat204.gitlab"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
         manifestPlaceholders.putIfAbsent("appAuthRedirectScheme", "com.asue24.gitlab   ")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val dateFormat = SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault())
+        val formattedDate = dateFormat.format(Date())
+        val fileName = "${rootProject.name}_v${versionName}_${versionCode}_${formattedDate}"
+        setProperty("archivesBaseName", rootProject.name)
     }
 
     buildTypes {
@@ -50,11 +58,11 @@ android {
 }
 
 apollo {
-    service("service") {
-        packageName.set("com.asue24.gitlab")
+    service("gitlab") {
+        packageName.set("com.ahtat204.gitlab.data.queries")
         introspection {
             endpointUrl.set("https://gitlab.com/api/graphql")
-            schemaFile.set(file("app/src/main/graphql/com/pranav/schema.graphqls"))
+            schemaFile.set(file("app/src/main/graphql/com/ahtat204/schema.graphqls"))
             addTypename.set("always")
         }
     }
@@ -93,6 +101,9 @@ dependencies {
     implementation(libs.androidx.material.icons.core)
     implementation(libs.apollo.normalized.cache)
     implementation(libs.apollo.http.cache)
-    implementation("io.coil-kt:coil-compose:2.7.0")
-    implementation("io.coil-kt:coil-svg:2.7.0")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.hilt.navigation.compose)
 }
