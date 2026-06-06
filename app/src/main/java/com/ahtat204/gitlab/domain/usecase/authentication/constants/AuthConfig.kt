@@ -55,7 +55,7 @@ object AuthConfig {
     const val RESPONSE_TYPE = ResponseTypeValues.CODE
 
     /** Requested scopes: API, user info, repository access, and OpenID. */
-    const val SCOPE = "read_api read_user read_repository openid "
+    const val SCOPE = "read_api read_user read_repository openid api"
 
     /** Client ID registered in GitLab, injected from BuildConfig. */
     const val CLIENT_ID = BuildConfig.CLIENT_ID

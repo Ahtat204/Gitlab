@@ -34,7 +34,7 @@ class ActivityViewModel @Inject constructor(private val gitlab: RetrofitClient):
 
                 }
                 else{
-                    Log.e("RetrofitError",result.errorBody().toString())
+                    Log.e("RetrofitError", result.errorBody()?.source().toString())
                 }
             }
             catch (e: Throwable){
