@@ -65,7 +65,7 @@ object OkHttpModule {
         )
         )
             .readTimeout(15, TimeUnit.SECONDS).addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.HEADERS
+                level = HttpLoggingInterceptor.Level.BODY
             }).addInterceptor(AuthenticationInterceptor()).build()
     }
 }

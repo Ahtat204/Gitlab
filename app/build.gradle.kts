@@ -99,4 +99,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.converter.gson)
 }

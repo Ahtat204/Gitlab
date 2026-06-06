@@ -6,8 +6,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.ahtat204.gitlab.presentation.viewmodels.ActivityViewModel
 
 @Composable
-fun Events(activityViewModel: ActivityViewModel = hiltViewModel()) {
-    LaunchedEffect(Unit) {
+fun Activity(activityViewModel: ActivityViewModel = hiltViewModel()) {
+    LaunchedEffect(1) {
         activityViewModel.loadEvents()
     }
 }

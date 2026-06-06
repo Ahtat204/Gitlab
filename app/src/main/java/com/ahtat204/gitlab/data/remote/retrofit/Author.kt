@@ -4,7 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Author(
-    val id: Int,
-    val name: String,
-    val username: String
+    val id: Int, val name: String, val username: String
 )

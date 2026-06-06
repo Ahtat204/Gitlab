@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.Callback
 import java.io.File
 import javax.inject.Inject
 
@@ -19,15 +20,18 @@ class ActivityViewModel @Inject constructor(private val gitlab: RetrofitClient):
     private val _events = MutableStateFlow<Events?>(null)
 
     /** Public immutable flow of [Events] */
-    val events: StateFlow<Events?> = _events.asStateFlow()
+    val events: StateFlow<Events?> get() = _events.asStateFlow()
 
     fun loadEvents(){
         viewModelScope.launch {
             try {
                 val result=gitlab.getEvents()
                 if(result.isSuccessful){
-                    _events.value=result.body()
-                    Log.d("reponseEvents",result.body().toString())
+                    result.body()?.let { body->
+                        _events.value=body
+                        Log.d("reponseEvents",body.toString())
+                    }
+
                 }
                 else{
                     Log.e("RetrofitError",result.errorBody().toString())

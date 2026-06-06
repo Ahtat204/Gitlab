@@ -5,6 +5,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 interface RetrofitClient {
-    @GET("/events")
-    fun getEvents(): Response<Events>
+    @GET("events")
+    suspend fun getEvents(): Response<Events>
 }
