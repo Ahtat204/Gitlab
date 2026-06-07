@@ -20,14 +20,5 @@ query GetProjectDetails($projectPath: ID!) {
         id
         name
         description
-        repository {
-            __typename
-            branchNames(searchPattern: "*", offset: 0, limit: 100)
-            rootRef
-            lastCommit{
-                id
-                name
-            }
-        }
     }
 }

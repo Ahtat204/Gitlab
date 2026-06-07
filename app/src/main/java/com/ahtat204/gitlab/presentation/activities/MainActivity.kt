@@ -2,7 +2,6 @@ package com.ahtat204.gitlab.presentation.activities
 
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -16,11 +15,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
-import com.ahtat204.gitlab.presentation.components.BottomBar
+import com.ahtat204.gitlab.presentation.navigation.BottomBar
 import com.ahtat204.gitlab.presentation.navigation.BottomNavigationGraph
 import com.ahtat204.gitlab.presentation.ui.theme.GitlabTheme
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 
 /**
  * The main entry point of the GitLab Android application(only after Authentication)
@@ -60,12 +58,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         WindowCompat.setDecorFitsSystemWindows(window, true)
-
-        val mFolder = File(Environment.getExternalStorageDirectory().path + "gitlab/httpCache")
-        if (!mFolder.exists()) {
-            mFolder.mkdir()
-        }
-
         setContent {
             val navController = rememberNavController()
             GitlabTheme(darkTheme = true) {

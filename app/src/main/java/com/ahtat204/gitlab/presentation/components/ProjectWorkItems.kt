@@ -81,10 +81,10 @@ fun ProjectWorkItems(item: Item, openScreen: () -> Unit) {
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = item.name,
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 fontFamily = topBarFont,
                 modifier = Modifier.weight(0.9f).padding(10.dp),
-                letterSpacing = 4.sp
+                letterSpacing = 1.sp
             )
             Text(
                 text = "${item.count}",

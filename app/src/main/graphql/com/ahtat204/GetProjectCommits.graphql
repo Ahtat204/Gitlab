@@ -1,0 +1,12 @@
+query GetProjectCommits($project: ID!){
+    project(fullPath: $project){
+        repository {
+            commits(ref:""){
+                nodes {
+                    name
+                    message
+                }
+            }
+        }
+    }
+}
