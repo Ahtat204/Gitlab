@@ -58,7 +58,6 @@ object ApolloModule {
     fun getApolloService(): ApolloClient {
         return ApolloClient.Builder()
             .serverUrl("https://gitlab.com/api/graphql")
-            .addHttpHeader("Authorization", "Bearer ${Tokens.accessToken}")
             .okHttpClient(
                 OkHttpClient.Builder()
                     .addInterceptor(HttpLoggingInterceptor().apply {
