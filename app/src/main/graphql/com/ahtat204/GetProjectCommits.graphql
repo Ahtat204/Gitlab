@@ -1,8 +1,9 @@
-query GetProjectCommits($project: ID!){
+query GetProjectCommits($project: ID!,$offset:String){ ## we can use one query with a nullable (apollo almost always uses nullable types like String?)$cursor variable and just pass null for the first page
     project(fullPath: $project){
         repository {
-            commits(ref:""){
+            commits(ref:"",first: 10,after:$offset){
                 nodes {
+                    id
                     name
                     message
                     authorName
@@ -10,6 +11,11 @@ query GetProjectCommits($project: ID!){
                     signature {
                         verificationStatus
                     }
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                    startCursor
                 }
             }
         }

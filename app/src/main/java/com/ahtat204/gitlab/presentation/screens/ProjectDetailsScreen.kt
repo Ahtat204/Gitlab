@@ -110,8 +110,14 @@ fun ProjectDetailScreen(
                 )
             }*/
             CollaborationDetails(
-                pro.openIssuesCount ?: 0, pro.openMergeRequestsCount ?: 0, 2, 2, 2,
-                project?.statistics?.commitCount,navController
+                pro.openIssuesCount ?: 0,
+                pro.openMergeRequestsCount ?: 0,
+                2,
+                2,
+                2,
+                project?.statistics?.commitCount,
+                navController,
+                pro.fullPath
             )
         }
     }

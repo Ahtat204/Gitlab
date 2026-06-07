@@ -10,7 +10,7 @@ query GetProjectDetails($projectPath: ID!) {
             commitCount
 
         }
-
+        fullPath
         openMergeRequestsCount
         namespace {
             path

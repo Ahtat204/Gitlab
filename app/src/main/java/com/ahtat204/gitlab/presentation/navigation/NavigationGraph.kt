@@ -8,8 +8,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.ahtat204.gitlab.presentation.components.CommitCard
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
+import com.ahtat204.gitlab.presentation.screens.ProjectCommits
 import com.ahtat204.gitlab.presentation.screens.ProjectDetailScreen
 
 /**
@@ -53,6 +55,10 @@ fun BottomNavigationGraph(
         }
         composable(route = BottomBarScreen.Activity.route) {
             // Activity screen placeholder
+        }
+        composable(route = "commits?projectId={projectsId}",arguments = listOf(navArgument("projectId") { defaultValue = "" })) {backStackEntry ->
+            val projectId = backStackEntry.arguments?.getString("projectId")
+            projectId?.let { ProjectCommits(navController,x,it) }
         }
         composable(
             route = "project?projectId={projectId}",

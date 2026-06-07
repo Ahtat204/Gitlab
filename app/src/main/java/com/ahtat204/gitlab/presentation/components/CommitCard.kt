@@ -14,36 +14,25 @@ import androidx.compose.ui.unit.dp
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 
 @Composable
-fun CommitCard(sha:String,message:String){
+fun CommitCard(sha: String?, message: String?) {
     Card(
-        {},
-        modifier = Modifier
+        {}, modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp, 10.dp)
             .background(Color.Black)
     ) {
+        if (sha == null || message == null) return@Card
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Black)
                 .height(50.dp)
         ) {
-           /* Icon(
-                painter = painterResource(item.Id),
-                contentDescription = item.name,
-                Modifier.size(30.dp).padding(3.dp),
-                tint = Orange
-            )
-            Spacer(modifier = Modifier.width(10.dp))*/
             Text(
-                text = sha,
-                fontFamily = customFontFamily,
-                modifier = Modifier
+                text = sha, fontFamily = customFontFamily, modifier = Modifier
             )
             Text(
-                text = sha,
-                fontFamily = customFontFamily,
-                modifier = Modifier
+                text = sha, fontFamily = customFontFamily, modifier = Modifier
             )
         }
     }
