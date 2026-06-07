@@ -19,7 +19,8 @@
             android:name=".presentation.activities.LauncherActivity"
             android:exported="true"
             android:label="@string/title_activity_launcher"
-            android:theme="@style/Theme.Gitlab">
+            android:theme="@style/Theme.Gitlab"
+            android:banner="@drawable/logo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
