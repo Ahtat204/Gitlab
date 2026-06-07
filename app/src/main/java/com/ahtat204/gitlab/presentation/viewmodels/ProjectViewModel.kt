@@ -68,8 +68,8 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     @OptIn(ExperimentalCoroutinesApi::class)
     fun loadAllProjects() {
         viewModelScope.launch {
-            projectRepository.getAllProjects(FetchPolicy.CacheFirst)
-                .withCacheFallback { projectRepository.getAllProjects(FetchPolicy.NetworkFirst) }
+            projectRepository.getAllProjects()
+                .withCacheFallback { projectRepository.getAllProjects() }
                 .collect { _projects.value = it.currentUser }
         }
     }
@@ -81,10 +81,9 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      */
     fun loadProject(id: String) {
         viewModelScope.launch {
-            projectRepository.getProjectById(id, FetchPolicy.CacheFirst).withCacheFallback {
+            projectRepository.getProjectById(id).withCacheFallback {
                 projectRepository.getProjectById(
-                    id, FetchPolicy.NetworkFirst
-                )
+                    id)
             }.collect { currentProject.value = it?.project }
         }
     }

@@ -2,6 +2,7 @@ package com.ahtat204.gitlab.data.repositories.project
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
+import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
@@ -42,10 +43,10 @@ class ProjectRepositoryImpl @Inject constructor(
      * Streams all projects the authenticated user has contributed to.
      *
      * @param policy The [FetchPolicy] to control cache vs. network behavior.
-     * @return A [Flow] emitting [GetMyProjectsQuery.Data] objects.
+     * @return A [Flow] emitting [GetMyProjectsPaginatedQuery.Data] objects.
      *
      * ### Behavior
-     * - Executes [GetMyProjectsQuery] with the provided fetch policy.
+     * - Executes [GetMyProjectsPaginatedQuery] with the provided fetch policy.
      * - Uses Apollo’s `watch()` to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
@@ -59,7 +60,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * ```
      */
     @OptIn(ApolloExperimental::class)
-    override suspend fun getAllProjects(policy: FetchPolicy): Flow<GetMyProjectsPaginatedQuery.Data> {
+    override suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data> {
         return apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst)
             .watch().mapNotNull { it.data }.catch { ex ->
                 Log.e("ProjectRepository", ex.cause.toString() + "\n" + ex.stackTrace)
@@ -88,13 +89,16 @@ class ProjectRepositoryImpl @Inject constructor(
      * ```
      */
     override suspend fun getProjectById(
-        id: String, policy: FetchPolicy
+        id: String
     ): Flow<GetProjectDetailsQuery.Data?> {
-        return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(policy).watch()
+        return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapNotNull { it.data }.catch { ex ->
                 Log.e("ProjectRepository", ex.cause.toString() + "\n" + ex.stackTrace)
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
+    }
+    override suspend fun getProjectCommits(id: String): Flow<GetProjectCommitsQuery.Data?> {
+        TODO("Not yet implemented")
     }
 
 }

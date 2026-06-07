@@ -5,6 +5,11 @@ query GetProjectCommits($project: ID!){
                 nodes {
                     name
                     message
+                    authorName
+                    committedDate
+                    signature {
+                        verificationStatus
+                    }
                 }
             }
         }

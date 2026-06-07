@@ -18,6 +18,9 @@ import androidx.compose.ui.unit.sp
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 
+/**
+ * 
+ */
 @Composable
 fun AutoLinkText(
     text: String, fontFamily: FontFamily = FontFamily.Default
