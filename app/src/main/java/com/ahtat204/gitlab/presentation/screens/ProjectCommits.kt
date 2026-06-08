@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.presentation.screens
 
 import android.util.Log
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,10 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,10 +38,20 @@ fun ProjectCommits(
     id: String,
     projectViewModel: ProjectViewModel = hiltViewModel()
 ) {
-    val commitsState = rememberLazyListState()
+    val listState = rememberLazyListState()
+    val scrolstate: ScrollState=rememberScrollState()
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                ?: return@derivedStateOf false
+            lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - 3
+        }
+    }
     val commits by projectViewModel.commits.collectAsStateWithLifecycle()
+
+
     if(id!=""){
-        LaunchedEffect(Unit) {
+        LaunchedEffect(shouldLoadMore.value) {
             projectViewModel.loadProjectCommits(id)
         }
     }
@@ -58,7 +73,7 @@ fun ProjectCommits(
                     modifier = Modifier
                 )
                 LazyColumn(
-                    state = commitsState,
+                    state = listState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = x,
                     verticalArrangement = Arrangement.spacedBy(0.dp),

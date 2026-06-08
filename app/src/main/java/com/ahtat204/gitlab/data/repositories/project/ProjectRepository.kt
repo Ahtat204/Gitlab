@@ -49,6 +49,6 @@ interface ProjectRepository {
      * ```
      */
     suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?>
-    suspend fun getProjectCommits(id: String): Flow<GetProjectCommitsQuery.Data?>
+    suspend fun getProjectCommits(id: String,count:Int): Flow<GetProjectCommitsQuery.Data?>
 
 }

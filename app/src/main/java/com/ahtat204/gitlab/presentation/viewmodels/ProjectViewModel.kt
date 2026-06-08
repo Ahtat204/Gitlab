@@ -93,11 +93,21 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     }
 
     fun loadProjectCommits(id: String) {
+        Log.d("LoadingCmmits",id)
         viewModelScope.launch {
-            projectRepository.getProjectCommits(id)
-                .withCacheFallback { projectRepository.getProjectCommits(id) }.collect {
-                    _commits.value = it?.project?.repository?.commits
-                }
+            if(_commits.value==null){
+                projectRepository.getProjectCommits(id,20)
+                    .withCacheFallback { projectRepository.getProjectCommits(id,20) }.collect {
+                        _commits.value = it?.project?.repository?.commits
+                    }
+            }
+          else{
+           _commits.value?.nodes?.size?.let {  projectRepository.getProjectCommits(id,20+it)
+               .withCacheFallback { projectRepository.getProjectCommits(id,20+it) }.collect {
+                   _commits.value = it?.project?.repository?.commits
+               }  }
+
+          }
         }
     }
 

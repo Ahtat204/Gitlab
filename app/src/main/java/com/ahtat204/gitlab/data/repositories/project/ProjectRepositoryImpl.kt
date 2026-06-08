@@ -54,8 +54,8 @@ class ProjectRepositoryImpl @Inject constructor(
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
     }
-    override suspend fun getProjectCommits(id: String ): Flow<GetProjectCommitsQuery.Data?> {
-        return apolloClient.query(GetProjectCommitsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst).watch()
+    override suspend fun getProjectCommits(id: String,count:Int): Flow<GetProjectCommitsQuery.Data?>{
+        return apolloClient.query(GetProjectCommitsQuery(id,count)).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapNotNull { it.data }.catch { ex ->
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
