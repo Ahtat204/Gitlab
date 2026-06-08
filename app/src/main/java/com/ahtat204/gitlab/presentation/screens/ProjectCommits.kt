@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,12 @@ fun ProjectCommits(
     projectViewModel: ProjectViewModel = hiltViewModel()
 ) {
     val commitsState = rememberLazyListState()
+    val commits by projectViewModel.commits.collectAsStateWithLifecycle()
+    if(id!=""){
+        LaunchedEffect(Unit) {
+            projectViewModel.loadProjectCommits(id)
+        }
+    }
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -40,11 +47,9 @@ fun ProjectCommits(
             .padding(x)
             .background(Color.Black)
     ) {
-        LaunchedEffect(commitsState) {
-            projectViewModel.loadProjectCommits(id, null)
-        }
-        val commits by projectViewModel.commits.collectAsStateWithLifecycle()
-        commits?.nodes?.let {nodes->
+
+
+        commits?.nodes?.let { nodes ->
             if (!nodes.isEmpty()) {
                 Text(
                     text = "Your Projects",
@@ -59,8 +64,8 @@ fun ProjectCommits(
                     verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(items=nodes, key = { item -> item?.id ?: Any() }) { commit ->
-                        CommitCard(commit?.name,commit?.message)
+                    items(items = nodes, key = { item -> item?.id ?: Any() }) { commit ->
+                        CommitCard(commit?.name, commit?.message)
                     }
                 }
             }

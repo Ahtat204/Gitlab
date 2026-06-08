@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.presentation.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -62,9 +63,9 @@ fun CollaborationDetails(
     pipelinesCount: Int?,
     workItemsCount: Int?,
     commitCount: Double?,
-    navController: NavController,fullPath:String?
+    navController: NavController,encodedId:String
 ) {
-    val encodedId = URLEncoder.encode(fullPath, StandardCharsets.UTF_8.toString())
+
     Column(
         modifier = Modifier
             .padding(0.dp)

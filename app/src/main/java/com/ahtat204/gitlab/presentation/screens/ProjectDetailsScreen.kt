@@ -29,6 +29,8 @@ import com.ahtat204.gitlab.presentation.components.GeneralDetails
 import com.ahtat204.gitlab.presentation.components.ProjectItem
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.time.ZoneId
 
@@ -76,6 +78,7 @@ fun ProjectDetailScreen(
     path: String,
     projectViewModel: ProjectViewModel = hiltViewModel()
 ) {
+
     val project by projectViewModel.currentProject.collectAsStateWithLifecycle()
     LaunchedEffect(true) {
         projectViewModel.loadProject(path)
@@ -89,7 +92,9 @@ fun ProjectDetailScreen(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {
+
         project?.let { pro ->
+            val encodedId = URLEncoder.encode(pro.fullPath, StandardCharsets.UTF_8.toString())
             Text(
                 text = pro.namespace?.path ?: "",
                 fontFamily = titleFont,
@@ -117,7 +122,7 @@ fun ProjectDetailScreen(
                 2,
                 project?.statistics?.commitCount,
                 navController,
-                pro.fullPath
+                encodedId
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
@@ -7,7 +8,6 @@ import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.presentation.components.withCacheFallback
-import com.apollographql.apollo.api.Optional
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,11 +92,13 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
         }.collect { currentProject.value = it?.project }
     }
 
-    fun loadProjectCommits(id: String,cursor:String?) = viewModelScope.launch {
-        projectRepository.getProjectCommits(id, Optional.present(cursor))
-            .withCacheFallback { projectRepository.getProjectCommits(id) }.collect {
-                _commits.value = it?.project?.repository?.commits
-            }
+    fun loadProjectCommits(id: String) {
+        viewModelScope.launch {
+            projectRepository.getProjectCommits(id)
+                .withCacheFallback { projectRepository.getProjectCommits(id) }.collect {
+                    _commits.value = it?.project?.repository?.commits
+                }
+        }
     }
 
 }

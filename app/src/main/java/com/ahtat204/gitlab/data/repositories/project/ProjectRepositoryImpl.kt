@@ -41,62 +41,21 @@ import javax.inject.Singleton
 class ProjectRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient
 ) : ProjectRepository {
-    /**
-     * Streams all projects the authenticated user has contributed to.
-     * @return A [Flow] emitting [GetMyProjectsPaginatedQuery.Data] objects.
-     *
-     * ### Behavior
-     * - Executes [GetMyProjectsPaginatedQuery] with the provided fetch policy.
-     * - Uses Apollo’s `watch()` to continuously observe changes.
-     * - Filters out null results with `mapNotNull`.
-     * - Logs exceptions with [Log.e] while keeping the stream alive.
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getAllProjects(FetchPolicy.CacheFirst)
-     *         .collect { projects -> renderProjects(projects) }
-     * }
-     * ```
-     */
     @OptIn(ApolloExperimental::class)
-    override suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data> {
-        return apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst)
+    override suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data> =
+        apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst)
             .watch().mapNotNull { it.data }.catch { ex ->
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
-    }
 
-    /**
-     * Retrieves the repository tree for a given project.
-     *
-     * @param id The unique identifier of the project.
-     * @return A [Flow] emitting [GetProjectDetailsQuery.Data] objects, or null if unavailable.
-     *
-     * ### Behavior
-     * - Executes [GetProjectDetailsQuery] with the provided project ID.
-     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
-     * - Emits results reactively via Flow.
-     * - Logs errors without terminating the stream.
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectById("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
-     */
-    override suspend fun getProjectById(
-        id: String
-    ): Flow<GetProjectDetailsQuery.Data?> {
+    override suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?> {
         return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapNotNull { it.data }.catch { ex ->
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
     }
-    override suspend fun getProjectCommits(id: String, offset: Optional<String?> ): Flow<GetProjectCommitsQuery.Data?> {
-        return apolloClient.query(GetProjectCommitsQuery(id,offset)).fetchPolicy(FetchPolicy.CacheFirst).watch()
+    override suspend fun getProjectCommits(id: String ): Flow<GetProjectCommitsQuery.Data?> {
+        return apolloClient.query(GetProjectCommitsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapNotNull { it.data }.catch { ex ->
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
