@@ -47,7 +47,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ApolloModule {
-    // In‑memory cache: 10 MB, entries expire after 60 seconds
     private val cacheFactory = MemoryCacheFactory(
         maxSizeBytes = 20 * 1024 * 1024, expireAfterMillis = 600000
     )

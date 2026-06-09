@@ -1,12 +1,10 @@
 package com.ahtat204.gitlab.data.repositories.project
 
-import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
-import com.apollographql.apollo.api.Optional
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.apollographql.apollo.cache.normalized.watch
@@ -14,7 +12,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapNotNull
-
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -49,14 +46,18 @@ class ProjectRepositoryImpl @Inject constructor(
             }.mapNotNull { it }
 
     override suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?> {
-        return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst).watch()
-            .mapNotNull { it.data }.catch { ex ->
+        return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
+            .watch().mapNotNull { it.data }.catch { ex ->
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
     }
-    override suspend fun getProjectCommits(id: String,count:Int): Flow<GetProjectCommitsQuery.Data?>{
-        return apolloClient.query(GetProjectCommitsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst).watch()
-            .mapNotNull { it.data }.catch { ex ->
+
+    override suspend fun getProjectCommits(
+        id: String,
+        count: Int
+    ): Flow<GetProjectCommitsQuery.Data?> {
+        return apolloClient.query(GetProjectCommitsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
+            .watch().mapNotNull { it.data }.catch { ex ->
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
     }
