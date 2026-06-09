@@ -102,7 +102,8 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
                     }
             }
           else{
-           _commits.value?.nodes?.size?.let {  projectRepository.getProjectCommits(id,20+it)
+           _commits.value?.nodes?.size?.let { it ->
+               projectRepository.getProjectCommits(id,20+it)
                .withCacheFallback { projectRepository.getProjectCommits(id,20+it) }.collect {
                    _commits.value = it?.project?.repository?.commits
                }  }
