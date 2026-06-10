@@ -1,44 +1,47 @@
 package com.ahtat204.gitlab.data.remote
 
-import androidx.paging.PagingSource
+import android.net.http.HttpException
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadType
 import androidx.paging.PagingState
+import androidx.paging.RemoteMediator
 import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
-import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery.Node
+import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery.Commits
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.cache.normalized.FetchPolicy
-import com.apollographql.apollo.cache.normalized.fetchPolicy
+import okio.IOException
 import javax.inject.Inject
 
-typealias Commits = Node
-
+@OptIn(ExperimentalPagingApi::class)
 class CommitsPagination @Inject constructor(private val apolloClient: ApolloClient) :
-    PagingSource<Int, Node>() {
-    private var projectId: String? = null
-    fun setProjectId(id: String) {
-        projectId = id
+    RemoteMediator<Int, Commits>() {
+    private var _projectPath: String? = null
+    public fun setProjectPath(path: String) {
+        _projectPath = path
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Node> {
-        val pageIndex = params.key ?: 1
-        val pageSize = params.loadSize
+    override suspend fun load(
+        loadType: LoadType, state: PagingState<Int, Commits>
+    ): MediatorResult {
+        if(_projectPath==null) return MediatorResult.Error(Exception("you must specify the project you want to load its commits,call CommitsPagination::setProjectPath(path: String) "))
         return try {
-            val responseData = apolloClient.query(GetProjectCommitsQuery(projectId!!))
-                .fetchPolicy(FetchPolicy.CacheFirst).execute().data?.project?.repository?.commits!!
-            val nodes = responseData.nodes!! as List<Node>
-            nodes.let {
-                LoadResult.Page(
-                    data = it,
-                    prevKey = if (pageIndex == 1) null else pageIndex - 1,
-                    nextKey = if (it.isEmpty()) null else pageIndex + 1
-                )
+            val loadKey = when (loadType) {
+                LoadType.REFRESH -> 1
+                LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
+                LoadType.APPEND -> {
+                    val lastItem = state.lastItemOrNull()
+                    if (lastItem == null) {
+                        1
+                    } else {
+                        lastItem?.pageInfo.startCursor.toInt()
+                    }
+                }
             }
-
-        } catch (e: Exception) {
-            LoadResult.Error(e)
+            val commits = apolloClient.query(GetProjectCommitsQuery(_projectPath!!))
+        } catch (e: IOException) {
+            MediatorResult.Error(e)
+        } catch (e: HttpException) {
+            MediatorResult.Error(e)
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, Commits>): Int? {
-        TODO("Not yet implemented")
-    }
 }
