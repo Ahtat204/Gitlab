@@ -13,9 +13,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.run
 
 typealias Commit = GetProjectCommitsQuery.Commits?
 
@@ -98,10 +98,9 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
         val pager = commits.value?.pageInfo?.endCursor
         if (pager == null) {
             viewModelScope.launch {
-                projectRepository.getProjectCommits(id, null)
-                    .withCacheFallback { projectRepository.getProjectCommits(id, null) }.collect {
-                        _commits.value = it?.project?.repository?.commits
-                    }
+                projectRepository.getProjectCommits(id, null).collect {
+                    _commits.value = it?.project?.repository?.commits
+                }
             }
             return
         } else {
@@ -110,17 +109,13 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
 
                 _commits.value?.nodes?.size?.let { it ->
                     Log.d("CursorPagerFromViewModel", pager)
-                    projectRepository.getProjectCommits(id, pager)
-                        .withCacheFallback { projectRepository.getProjectCommits(id, pager) }
-                        .collect { newCommit ->
-                            val newCom =
-                                newCommit?.project?.repository?.commits?.nodes?.get(0)?.message
-                                    ?: "nothing found"
-                            Log.d("newCommits", newCom)
-                            _commits.value?.nodes.run {
-                                val update = newCommit?.project?.repository?.commits?.nodes
-                                if(!update.isNullOrEmpty()){
-
+                    projectRepository.getProjectCommits(id, pager).collect { newCommits ->
+                            val newNodes = newCommits?.project?.repository?.commits?.nodes
+                            if (newNodes != null) {
+                                _commits.update { currentState ->
+                                    currentState?.copy(
+                                        nodes = currentState.nodes?.plus(newNodes)?.distinctBy { item -> item?.id }
+                                    )
                                 }
                             }
                         }

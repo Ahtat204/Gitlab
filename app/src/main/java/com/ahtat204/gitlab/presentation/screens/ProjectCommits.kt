@@ -12,9 +12,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,9 +26,6 @@ import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.components.CommitCard
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-
 @Composable
 fun ProjectCommits(
     navController: NavController,
@@ -36,13 +33,27 @@ fun ProjectCommits(
     id: String,
     projectViewModel: ProjectViewModel = hiltViewModel()
 ) {
-    val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
+    if (id == "") return
+
     val commits by projectViewModel.commits.collectAsStateWithLifecycle()
 
+    // 1. Trigger the initial load safely when the 'id' changes
+    LaunchedEffect(id) {
+        projectViewModel.loadProjectCommits(id)
+    }
 
-    if (id != "") {
-        LaunchedEffect(Unit) {
+    if (commits?.nodes?.isEmpty() == true) return
+    val listState = rememberLazyListState()
+  val shouldLoadMore = remember {
+        derivedStateOf {
+            val totalItems = listState.layoutInfo.totalItemsCount
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            // Trigger load when user is 3 items away from the bottom
+            totalItems > 0 && lastVisibleItem >= totalItems - 5
+        }
+    }
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value) {
             projectViewModel.loadProjectCommits(id)
         }
     }
@@ -54,23 +65,14 @@ fun ProjectCommits(
             .background(Color.Black)
     ) {
         commits?.nodes?.let { nodes ->
-            if (!nodes.isEmpty()) {
+            if (nodes.isNotEmpty()) {
                 Text(
                     text = "Your Projects",
                     fontFamily = titleFont,
                     fontSize = 20.sp,
                     modifier = Modifier
                 )
-                 LaunchedEffect(listState) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .collect { lastVisibleIndex ->
-                if (lastVisibleIndex != null && lastVisibleIndex >= nodes.size - 3 ) {
-                    coroutineScope.launch {
-                        projectViewModel.loadProjectCommits(id)
-                    }
-                }
-            }
-    }
+
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
@@ -78,14 +80,11 @@ fun ProjectCommits(
                     verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(items = nodes, key = { item -> item?.id ?: Any() }) { commit ->
+                    items(items = nodes, key =  { item -> item?.id ?: "fallback-key-${null}" }) { commit ->
                         CommitCard(commit?.name, commit?.message)
                     }
-                    item {
-                        LaunchedEffect(Unit) {
-                            projectViewModel.loadProjectCommits(id)
-                        }
-                    }
+
+                    // REMOVED: projectViewModel.loadProjectCommits(id) was deleted from here
                 }
             }
         }
