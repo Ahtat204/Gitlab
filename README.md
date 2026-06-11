@@ -9,9 +9,9 @@
 
 ## 📸 Screenshots
 
-| Home Screen | Project List |
-|:---:|:---:|
-| ![Home Screen](homescreen.jpg) | ![Project List](projectlist.jpg) |
+|          Home Screen           |             Project List              |            Project Overview            |              Profile               | 
+|:------------------------------:|:-------------------------------------:|:--------------------------------------:|:----------------------------------:| 
+| ![Home Screen](homescreen.jpg) | ![Project List](personalprojects.jpg) | ![Project Details](projectdetails.jpg) | ![Developper Profile](profile.jpg) | 
 
 ---
 

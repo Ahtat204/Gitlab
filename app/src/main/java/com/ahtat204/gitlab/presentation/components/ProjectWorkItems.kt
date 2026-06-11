@@ -87,7 +87,7 @@ fun ProjectWorkItems(item: Item, openScreen: () -> Unit) {
                 letterSpacing = 1.sp
             )
             Text(
-                text = "${item.count}",
+                text = item.count?.toString()?:"",
                 fontSize = 20.sp,
                 color = Color.White,
                 textAlign = TextAlign.End,

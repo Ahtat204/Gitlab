@@ -55,9 +55,7 @@ import com.ahtat204.gitlab.R
 fun CollaborationDetails(
     issuesCount: Int?,
     mergeRequestCount: Int?,
-    membersCount: Int?,
     pipelinesCount: Int?,
-    workItemsCount: Int?,
     navController: NavController,
 ) {
     Column(
@@ -75,27 +73,27 @@ fun CollaborationDetails(
                 )
             ) {}
         }
-        membersCount?.let {
+
             ProjectWorkItems(
                 Item(
-                    "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, it
+                    "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, null
                 )
             ) {}
-        }
+
         pipelinesCount?.let {
             ProjectWorkItems(
                 Item(
-                    "WorkItems", "project/{id]/workitems", R.drawable.workitems, it
+                    "WorkItems", "project/{id]/workitems", R.drawable.workitems, null
                 )
             ) {}
         }
-        workItemsCount?.let {
+
             ProjectWorkItems(
                 Item(
-                    "Members", "project/{id}/members", R.drawable.members, it
+                    "Members", "project/{id}/members", R.drawable.members, null
                 )
             ) {}
-        }
+
 
      /*   commitCount?.let {
             ProjectWorkItems(

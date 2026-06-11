@@ -1,20 +1,17 @@
 query GetProjectDetails($projectPath: ID!) {
     project(fullPath: $projectPath) {
+
         __typename
         pipelineCounts{
             pending
             running
         }
-        openIssuesCount
-        statistics {
-            commitCount
-
-        }
-        fullPath
-        openMergeRequestsCount
         namespace {
             path
         }
+        openIssuesCount
+        fullPath
+        openMergeRequestsCount
         forksCount
         starCount
         id
