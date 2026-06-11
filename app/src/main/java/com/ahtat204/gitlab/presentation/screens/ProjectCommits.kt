@@ -25,13 +25,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.components.CommitCard
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.RepositoryViewModel
+
 @Composable
 fun ProjectCommits(
     navController: NavController,
     x: PaddingValues,
     id: String,
-    projectViewModel: ProjectViewModel = hiltViewModel()
+    projectViewModel: RepositoryViewModel = hiltViewModel()
 ) {
     if (id == "") return
 
@@ -67,7 +68,7 @@ fun ProjectCommits(
         commits?.nodes?.let { nodes ->
             if (nodes.isNotEmpty()) {
                 Text(
-                    text = "Your Projects",
+                    text = "Commits",
                     fontFamily = titleFont,
                     fontSize = 20.sp,
                     modifier = Modifier
@@ -80,8 +81,8 @@ fun ProjectCommits(
                     verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(items = nodes, key =  { item -> item?.id ?: "fallback-key-${null}" }) { commit ->
-                        CommitCard(commit?.name, commit?.message)
+                    items(items = nodes, key =  { item -> item?.id ?: item?.sha?: null.hashCode() }) { commit ->
+                        CommitCard(commit?.sha, commit?.message)
                     }
 
                     // REMOVED: projectViewModel.loadProjectCommits(id) was deleted from here

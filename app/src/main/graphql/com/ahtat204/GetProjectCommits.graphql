@@ -9,6 +9,7 @@ query GetProjectCommits($projectPath: ID!,$cursor:String){ ## we can use one que
                 nodes {
                     __typename
                     id
+                    sha
                     name
                     message
                     authorName

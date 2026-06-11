@@ -1,10 +1,8 @@
 package com.ahtat204.gitlab.presentation.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
-import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.presentation.components.withCacheFallback
@@ -13,11 +11,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-typealias Commit = GetProjectCommitsQuery.Commits?
 
 /**
  * ViewModel responsible for exposing GitLab project data to the UI layer.
@@ -63,12 +58,6 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     /** Public immutable flow of contributed projects. */
     val projects: StateFlow<GetMyProjectsPaginatedQuery.CurrentUser?> = _projects.asStateFlow()
 
-    /** Backing state for contributed commits. */
-    private var _commits = MutableStateFlow<Commit>(null)
-
-    /** Public immutable flow of contributed commits. */
-    val commits: StateFlow<Commit> = _commits.asStateFlow()
-
     /**
      * Loads all projects contributed by the authenticated user.
      *
@@ -91,39 +80,6 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
                 id
             )
         }.collect { currentProject.value = it?.project }
-    }
-
-    fun loadProjectCommits(id: String) {
-        Log.d("LoadingCmmits", id)
-        val pager = commits.value?.pageInfo?.endCursor
-        if (pager == null) {
-            viewModelScope.launch {
-                projectRepository.getProjectCommits(id, null).collect {
-                    _commits.value = it?.project?.repository?.commits
-                }
-            }
-            return
-        } else {
-            viewModelScope.launch {
-                Log.d("LoadingCmmits2", id)
-
-                _commits.value?.nodes?.size?.let { it ->
-                    Log.d("CursorPagerFromViewModel", pager)
-                    projectRepository.getProjectCommits(id, pager).collect { newCommits ->
-                            val newNodes = newCommits?.project?.repository?.commits?.nodes
-                            if (newNodes != null) {
-                                _commits.update { currentState ->
-                                    currentState?.copy(
-                                        nodes = currentState.nodes?.plus(newNodes)?.distinctBy { item -> item?.id }
-                                    )
-                                }
-                            }
-                        }
-                }
-            }
-            return
-        }
-
     }
 
 }

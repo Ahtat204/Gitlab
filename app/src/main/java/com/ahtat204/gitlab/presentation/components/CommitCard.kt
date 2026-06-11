@@ -29,7 +29,7 @@ fun CommitCard(sha: String?, message: String?) {
                 .height(50.dp)
         ) {
             Text(
-                text = sha, fontFamily = customFontFamily, modifier = Modifier
+                text = message, fontFamily = customFontFamily, modifier = Modifier
             )
             Text(
                 text = sha, fontFamily = customFontFamily, modifier = Modifier

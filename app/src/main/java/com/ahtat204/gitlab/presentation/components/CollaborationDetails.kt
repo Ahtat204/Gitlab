@@ -58,9 +58,7 @@ fun CollaborationDetails(
     membersCount: Int?,
     pipelinesCount: Int?,
     workItemsCount: Int?,
-    commitCount: Double?,
     navController: NavController,
-    encodedId: String
 ) {
     Column(
         modifier = Modifier
@@ -99,15 +97,13 @@ fun CollaborationDetails(
             ) {}
         }
 
-        commitCount?.let {
+     /*   commitCount?.let {
             ProjectWorkItems(
-                Item(
-                    "Commits", "project/{id}/commits", R.drawable.commit, it.toInt()
-                )
+                Item("Commits", "project/{id}/commits", R.drawable.commit, it.toInt())
             ) {
                 navController.navigate("commits?projectId=$encodedId")
             }
-        }
+        }*/
     }
 
 }
