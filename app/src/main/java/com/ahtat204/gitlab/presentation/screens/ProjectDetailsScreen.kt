@@ -1,7 +1,6 @@
 package com.ahtat204.gitlab.presentation.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,11 +38,8 @@ import coil.ImageLoader
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.presentation.components.CollaborationDetails
 import com.ahtat204.gitlab.presentation.components.GeneralDetails
-import com.ahtat204.gitlab.presentation.components.Item
 import com.ahtat204.gitlab.presentation.components.ProjectItem
-import com.ahtat204.gitlab.presentation.components.ProjectWorkItems
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
 import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
@@ -120,16 +116,7 @@ fun ProjectDetailScreen(
             )
             GeneralDetails(
                 pro.forksCount, pro.starCount, pro.name, pro.description ?: ""
-            )/*       TextButton( onClick = {},
-                modifier = Modifier.fillMaxSize(0.27f),
-                colors = ButtonColors(Orange, Color.White, Color.Black, Color.Black)) {
-                Text(
-                    text = "Languages",
-                    fontSize = 15.sp,
-                    fontFamily = topBarFont,
-                    color = Color.White
-                )
-            }*/
+            )
             CollaborationDetails(
                 pro.openIssuesCount ?: 0,
                 pro.openMergeRequestsCount ?: 0,
@@ -141,39 +128,40 @@ fun ProjectDetailScreen(
 
             Card(
                 {}, modifier = Modifier
-            .fillMaxWidth()
-            .padding(15.dp, 1.dp)
-            .background(Color.Black)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black)
-                .height(60.dp).fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp)),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.repository),
-                contentDescription = null,
-                Modifier
-                    .size(27.dp)
-                    .padding(0.dp,3.dp),
-                tint = Orange
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(
-                text = "Repository",
-                fontSize = 18.sp,
-                fontFamily = topBarFont,
-                modifier = Modifier.weight(0.9f).padding(10.dp),
-                letterSpacing = 1.sp
-            )
-
-        }
-    }
-           // ProjectWorkItems(Item("Repository","repository",R.drawable.repository),{})
+                    .fillMaxWidth()
+                    .padding(15.dp, 1.dp)
+                    .background(Color.Black)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Black)
+                        .height(60.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(20.dp)),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.repository),
+                        contentDescription = null,
+                        Modifier
+                            .size(27.dp)
+                            .padding(0.dp, 3.dp),
+                        tint = Orange
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = "Repository",
+                        fontSize = 18.sp,
+                        fontFamily = topBarFont,
+                        modifier = Modifier
+                            .weight(0.9f)
+                            .padding(10.dp),
+                        letterSpacing = 1.sp
+                    )
+                }
+            }
         }
     }
 }

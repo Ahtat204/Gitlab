@@ -139,6 +139,8 @@ fun ProjectItem(
             ) {
                 project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
 
+            //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+
                 project.let { project ->
                     Row(
                         horizontalArrangement = Arrangement.Center,

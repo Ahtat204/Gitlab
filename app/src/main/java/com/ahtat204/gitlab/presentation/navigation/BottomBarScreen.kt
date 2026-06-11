@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 sealed class BottomBarScreen(
     val route: String, val title: String, val icon: ImageVector
 ) {
-    /** Home screen, represented by a home icon. */
     data object Home : BottomBarScreen("home", "Home", Icons.Default.Home)
     data object Explore : BottomBarScreen("explore", "Explore", Icons.Filled.Explore)
     data object Profile : BottomBarScreen("profile", "Profile", Icons.TwoTone.Person)

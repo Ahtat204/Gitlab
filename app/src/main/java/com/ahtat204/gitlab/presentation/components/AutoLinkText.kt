@@ -19,7 +19,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 
 /**
- * 
+ *
  */
 @Composable
 fun AutoLinkText(

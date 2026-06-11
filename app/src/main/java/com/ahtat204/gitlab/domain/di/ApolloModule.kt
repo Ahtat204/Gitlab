@@ -1,17 +1,13 @@
 package com.ahtat204.gitlab.domain.di
 
-import android.util.Log
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig.GRAPHQL_URL
+import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
-import com.apollographql.apollo.api.http.HttpMethod
 import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
-import com.apollographql.apollo.cache.normalized.logCacheMisses
 import com.apollographql.apollo.cache.normalized.normalizedCache
 import com.apollographql.apollo.network.http.DefaultHttpEngine
 import com.apollographql.apollo.network.http.HttpNetworkTransport
-import com.apollographql.apollo.network.okHttpClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,11 +56,11 @@ object ApolloModule {
     @Singleton
     @Provides
     fun getApolloService(okHttpClient: OkHttpClient): ApolloClient {
-        val httpEngine= DefaultHttpEngine { okHttpClient }
-        val requestComposer= DefaultHttpRequestComposer(GRAPHQL_URL)
-        val networkTransport= HttpNetworkTransport.Builder().httpEngine(httpEngine).httpRequestComposer(requestComposer).build()
-        return ApolloClient.Builder().networkTransport(networkTransport)
-            .normalizedCache(
+        val httpEngine = DefaultHttpEngine { okHttpClient }
+        val requestComposer = DefaultHttpRequestComposer(GRAPHQL_URL)
+        val networkTransport = HttpNetworkTransport.Builder().httpEngine(httpEngine)
+            .httpRequestComposer(requestComposer).build()
+        return ApolloClient.Builder().networkTransport(networkTransport).normalizedCache(
                 cacheFactory, writeToCacheAsynchronously = false
             ).build()
     }

@@ -36,3 +36,34 @@ query GetMyProjectsPaginated { ## this in case the user has large number of proj
         }
     }
 }
+#query GetMoreProjects($cursor: String){
+#    currentUser {
+#        avatarUrl
+#        projectMemberships(after: $cursor) {
+#            __typename
+#            nodes {
+#
+#                __typename
+#                id
+#                project {
+#                    topics
+#                    lastActivityAt
+#                    __typename
+#                    languages {
+#                        color
+#                        name
+#                    }
+#                    name
+#                    fullPath
+#                    description
+#                    visibility
+#                }
+#            }
+#            pageInfo {
+#                __typename
+#                hasNextPage
+#                endCursor
+#            }
+#        }
+#    }
+#}
