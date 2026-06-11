@@ -1,8 +1,6 @@
 package com.ahtat204.gitlab.presentation.components
 
-import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -13,8 +11,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.R
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 /**
  * Displays a summary of collaboration-related metrics for a GitLab project.
@@ -63,9 +59,9 @@ fun CollaborationDetails(
     pipelinesCount: Int?,
     workItemsCount: Int?,
     commitCount: Double?,
-    navController: NavController,encodedId:String
+    navController: NavController,
+    encodedId: String
 ) {
-
     Column(
         modifier = Modifier
             .padding(0.dp)
@@ -109,7 +105,7 @@ fun CollaborationDetails(
                     "Commits", "project/{id}/commits", R.drawable.commit, it.toInt()
                 )
             ) {
-                 navController.navigate("commits?projectId=$encodedId")
+                navController.navigate("commits?projectId=$encodedId")
             }
         }
     }

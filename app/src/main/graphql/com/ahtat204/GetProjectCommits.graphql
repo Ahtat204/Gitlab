@@ -4,7 +4,7 @@ query GetProjectCommits($projectPath: ID!,$cursor:String){ ## we can use one que
         repository {
             __typename
             branchNames(searchPattern: "*", offset: 0, limit: 100)
-            commits(ref:"main",first: 20,after: $cursor) {
+            commits(ref:"main",first: 10,after: $cursor) {
                 __typename
                 nodes {
                     __typename
@@ -17,6 +17,7 @@ query GetProjectCommits($projectPath: ID!,$cursor:String){ ## we can use one que
                         __typename
                         verificationStatus
                     }
+
                 }
                 pageInfo {
                     __typename

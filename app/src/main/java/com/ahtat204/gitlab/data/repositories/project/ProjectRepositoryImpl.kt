@@ -1,10 +1,12 @@
 package com.ahtat204.gitlab.data.repositories.project
 
+import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
+import com.apollographql.apollo.api.Optional
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.apollographql.apollo.cache.normalized.watch
@@ -53,11 +55,17 @@ class ProjectRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getProjectCommits(
-        id: String,
-        count: Int
+        id: String, cursor: String?
     ): Flow<GetProjectCommitsQuery.Data?> {
-        return apolloClient.query(GetProjectCommitsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
-            .watch().mapNotNull { it.data }.catch { ex ->
+        return if (cursor == null) apolloClient.query(GetProjectCommitsQuery(id))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull { it.data }.catch { ex ->
+                if (ex is CancellationException) throw ex
+            }.mapNotNull { it }
+        else apolloClient.query(GetProjectCommitsQuery(id, Optional.Present(cursor)))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
+                Log.d("PagingCursor", cursor)
+                it.data
+            }.catch { ex ->
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
     }

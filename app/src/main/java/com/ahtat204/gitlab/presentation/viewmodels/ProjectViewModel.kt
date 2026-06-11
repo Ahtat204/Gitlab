@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.run
 
 typealias Commit = GetProjectCommitsQuery.Commits?
 
@@ -63,7 +64,7 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     val projects: StateFlow<GetMyProjectsPaginatedQuery.CurrentUser?> = _projects.asStateFlow()
 
     /** Backing state for contributed commits. */
-    private val _commits = MutableStateFlow<Commit>(null)
+    private var _commits = MutableStateFlow<Commit>(null)
 
     /** Public immutable flow of contributed commits. */
     val commits: StateFlow<Commit> = _commits.asStateFlow()
@@ -93,23 +94,41 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     }
 
     fun loadProjectCommits(id: String) {
-        Log.d("LoadingCmmits",id)
-        viewModelScope.launch {
-            if(_commits.value==null){
-                projectRepository.getProjectCommits(id,20)
-                    .withCacheFallback { projectRepository.getProjectCommits(id,20) }.collect {
+        Log.d("LoadingCmmits", id)
+        val pager = commits.value?.pageInfo?.endCursor
+        if (pager == null) {
+            viewModelScope.launch {
+                projectRepository.getProjectCommits(id, null)
+                    .withCacheFallback { projectRepository.getProjectCommits(id, null) }.collect {
                         _commits.value = it?.project?.repository?.commits
                     }
             }
-          else{
-           _commits.value?.nodes?.size?.let { it ->
-               projectRepository.getProjectCommits(id,20+it)
-               .withCacheFallback { projectRepository.getProjectCommits(id,20+it) }.collect {
-                   _commits.value = it?.project?.repository?.commits
-               }  }
+            return
+        } else {
+            viewModelScope.launch {
+                Log.d("LoadingCmmits2", id)
 
-          }
+                _commits.value?.nodes?.size?.let { it ->
+                    Log.d("CursorPagerFromViewModel", pager)
+                    projectRepository.getProjectCommits(id, pager)
+                        .withCacheFallback { projectRepository.getProjectCommits(id, pager) }
+                        .collect { newCommit ->
+                            val newCom =
+                                newCommit?.project?.repository?.commits?.nodes?.get(0)?.message
+                                    ?: "nothing found"
+                            Log.d("newCommits", newCom)
+                            _commits.value?.nodes.run {
+                                val update = newCommit?.project?.repository?.commits?.nodes
+                                if(!update.isNullOrEmpty()){
+
+                                }
+                            }
+                        }
+                }
+            }
+            return
         }
+
     }
 
 }
