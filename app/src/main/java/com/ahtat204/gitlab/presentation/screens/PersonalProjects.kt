@@ -99,7 +99,6 @@ fun PersonalProjects(
         ) {
             if (CurrUser?.projectMemberships?.nodes?.isEmpty() == true || CurrUser?.avatarUrl == null) {
                 CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
-                Log.d("size", nodes.size.toString())
 
             } else {
                 Text(

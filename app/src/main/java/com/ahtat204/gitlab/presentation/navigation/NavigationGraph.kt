@@ -11,6 +11,7 @@ import androidx.navigation.navArgument
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
+import com.ahtat204.gitlab.presentation.screens.ProjectCommits
 import com.ahtat204.gitlab.presentation.screens.ProjectDetailScreen
 
 /**
@@ -56,12 +57,19 @@ fun BottomNavigationGraph(
         composable(route = BottomBarScreen.Activity.route) {
             // Activity screen placeholder
         }
+        composable(route = "commits?projectId={projectId}",
+            arguments = listOf(navArgument("projectId") { defaultValue = "" }))
+        {backStackEntry ->
+            val projectId = backStackEntry.arguments?.getString("projectId")
+            projectId?.let { ProjectCommits(navController,x,it) }
+        }
         composable(
             route = "project?projectId={projectId}",
             arguments = listOf(navArgument("projectId") { defaultValue = "" })
         ) { backStackEntry ->
             val projectId = backStackEntry.arguments?.getString("projectId")
-            projectId?.let { ProjectDetailScreen(navController,x, it) }
+            projectId?.let { ProjectDetailScreen(navController,x, it)
+            }
         }
     }
 }

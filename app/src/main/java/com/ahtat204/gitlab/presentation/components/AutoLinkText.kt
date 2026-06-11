@@ -12,19 +12,18 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import java.util.regex.Pattern
 
+/**
+ *
+ */
 @Composable
 fun AutoLinkText(
-    text: String,
-    modifier: Modifier = Modifier,
-    fontFamily: FontFamily = FontFamily.Default
+    text: String, fontFamily: FontFamily = FontFamily.Default
 ) {
     val urlRegex = "(https?://[\\w-]+(\\.[\\w-]+)+[/#?]?.*)".toRegex()
     val annotatedString = buildAnnotatedString {
@@ -33,8 +32,7 @@ fun AutoLinkText(
             append(text.substring(lastIndex, match.range.first))
             withLink(
                 LinkAnnotation.Url(
-                    url = match.value,
-                    styles = TextLinkStyles(
+                    url = match.value, styles = TextLinkStyles(
                         style = SpanStyle(
                             fontFamily = fontFamily,
                             fontSize = 14.sp,
@@ -44,12 +42,10 @@ fun AutoLinkText(
                     )
                 )
             ) {
-                append(match.value)
+                append("\n" + match.value)
             }
-
             lastIndex = match.range.last + 1
         }
-        // Append remaining text
         append(text.substring(lastIndex))
     }
 

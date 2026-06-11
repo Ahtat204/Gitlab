@@ -1,7 +1,7 @@
 package com.ahtat204.gitlab.presentation.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -58,7 +58,7 @@ fun ProjectWorkItems(item: Item, openScreen: () -> Unit) {
     Card(
         openScreen, modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp, 1.dp)
+            .padding(15.dp, 1.dp).clickable(onClick = openScreen)
             .background(Color.Black)
     ) {
         Row(
@@ -81,13 +81,13 @@ fun ProjectWorkItems(item: Item, openScreen: () -> Unit) {
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = item.name,
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 fontFamily = topBarFont,
                 modifier = Modifier.weight(0.9f).padding(10.dp),
-                letterSpacing = 4.sp
+                letterSpacing = 1.sp
             )
             Text(
-                text = "${item.count}",
+                text = item.count?.toString()?:"",
                 fontSize = 20.sp,
                 color = Color.White,
                 textAlign = TextAlign.End,

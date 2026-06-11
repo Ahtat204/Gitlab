@@ -4,10 +4,10 @@ query GetMyProjectsPaginated { ## this in case the user has large number of proj
         projectMemberships(first: 10) {
             __typename
             nodes {
-
                 __typename
                 id
                 project {
+
                     topics
                     lastActivityAt
                     __typename
@@ -19,6 +19,13 @@ query GetMyProjectsPaginated { ## this in case the user has large number of proj
                     fullPath
                     description
                     visibility
+                    pipelines(first: 1){
+                        nodes {
+                            __typename
+                            id
+                            status
+                        }
+                    }
                 }
             }
             pageInfo {
