@@ -1,0 +1,15 @@
+query GetProjectRepository($projectPath:ID!){
+    project(fullPath: $projectPath){
+        id
+        repository {
+
+        tree{
+            blobs{
+                nodes {
+                    id
+                }
+            }
+        }
+        }
+    }
+}
