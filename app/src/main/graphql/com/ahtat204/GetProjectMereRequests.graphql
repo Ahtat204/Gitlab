@@ -1,0 +1,11 @@
+query GetProjectMergeRequests($projectPath:ID!){
+    project(fullPath: $projectPath){
+       mergeRequests{
+           nodes {
+               id
+               name
+
+           }
+       }
+    }
+}

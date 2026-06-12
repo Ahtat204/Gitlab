@@ -3,6 +3,8 @@ package com.ahtat204.gitlab.domain.usecase.authentication.constants
 import android.content.Context
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationService
+import kotlin.concurrent.Volatile
+
 /**
  * Singleton object that manages authentication tokens and application context.
  *
@@ -34,6 +36,7 @@ import net.openid.appauth.AuthorizationService
  * - This object is designed to be thread-safe and used across the entire app lifecycle.
  */
 object Tokens {
+    @Volatile
     var accessToken: String? = null
     var CurrentAuthState: AuthState? = null
     private var appContext: Context? = null
