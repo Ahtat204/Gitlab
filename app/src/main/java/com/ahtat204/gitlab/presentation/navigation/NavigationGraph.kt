@@ -11,8 +11,8 @@ import androidx.navigation.navArgument
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
-import com.ahtat204.gitlab.presentation.screens.ProjectCommits
-import com.ahtat204.gitlab.presentation.screens.ProjectDetailScreen
+import com.ahtat204.gitlab.presentation.screens.project.ProjectCommits
+import com.ahtat204.gitlab.presentation.screens.project.ProjectDetailScreen
 
 /**
  * Defines the navigation graph for the bottom navigation bar.

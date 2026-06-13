@@ -1,14 +1,20 @@
-query GetProjectRepository($projectPath:ID!){
+query GetProjectRepository($projectPath:ID!,$branch:String,$skip:Int!){
     project(fullPath: $projectPath){
         id
         repository {
-
-        tree{
+            branchNames(searchPattern: "*",limit: 20,offset: $skip)
+            rootRef
+        tree(ref: $branch){
             blobs{
                 nodes {
                     id
+                    name
+                    webUrl
+                    path
                 }
+
             }
+
         }
         }
     }

@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.presentation.screens
+package com.ahtat204.gitlab.presentation.screens.project
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
