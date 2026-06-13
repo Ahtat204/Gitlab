@@ -4,6 +4,7 @@ import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.Optional
@@ -28,6 +29,8 @@ import javax.inject.Singleton
  *
  * ## Responsibilities
  * - Fetch all projects contributed by the authenticated user.
+ * - Fetch a Project Commits ,Git Repository ,Merge Requests ...(might look like violating SRP ,but I'm not trying to be 100% elegant ,
+     creating another repository for the sake of SRP is just unjustified class and interface that adds up Hilt reflection overhead ,tens of extra .java files )
  * - Retrieve repository tree data for a specific project by ID.
  * - Handle errors gracefully with logging and structured concurrency.
  *
@@ -68,6 +71,15 @@ class ProjectRepositoryImpl @Inject constructor(
             }.catch { ex ->
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
+    }
+
+    override suspend fun getProjectMergeRequests(projectPath: String): Flow<GetProjectMergeRequestsQuery.Data> {
+        return apolloClient.query(GetProjectMergeRequestsQuery(projectPath))
+            .fetchPolicy(FetchPolicy.CacheFirst)
+            .watch()
+            .mapNotNull { it.data }.catch { ex ->
+            if (ex is CancellationException) throw ex
+        }.mapNotNull { it }
     }
 
 }

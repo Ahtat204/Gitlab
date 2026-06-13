@@ -1,11 +1,17 @@
 query GetProjectMergeRequests($projectPath:ID!){
     project(fullPath: $projectPath){
-       mergeRequests{
+       mergeRequests(sort: CREATED_DESC){
            nodes {
                id
                name
-
+               sourceBranch
+               targetBranch
+               author {
+                   name
+               }
+               state
            }
+           count
        }
     }
 }
