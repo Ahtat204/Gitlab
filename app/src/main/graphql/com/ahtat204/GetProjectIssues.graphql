@@ -1,0 +1,15 @@
+query GetProjectIssues($projectPath:ID!){
+    project(fullPath: $projectPath){
+        issues(sort: CREATED_DESC){
+            nodes {
+                __typename
+                state
+                name
+                id
+                author {
+                   name
+                }
+            }
+        }
+    }
+}

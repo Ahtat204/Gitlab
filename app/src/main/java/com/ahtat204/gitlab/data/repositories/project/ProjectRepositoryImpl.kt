@@ -4,6 +4,7 @@ import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.Optional
@@ -53,7 +54,6 @@ class ProjectRepositoryImpl @Inject constructor(
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
     }
-
     override suspend fun getProjectCommits(
         id: String, cursor: String?
     ): Flow<GetProjectCommitsQuery.Data?> {
@@ -68,6 +68,16 @@ class ProjectRepositoryImpl @Inject constructor(
             }.catch { ex ->
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
+    }
+
+    override suspend fun getProjectIssues(id: String): Flow<GetProjectIssuesQuery.Data?> {
+        return apolloClient.
+        query(GetProjectIssuesQuery(id))
+            .fetchPolicy(FetchPolicy.CacheFirst)
+            .watch()
+            .mapNotNull { it.data }.catch { ex ->
+            if (ex is CancellationException) throw ex
+        }.mapNotNull { it }
     }
 
 }
