@@ -21,7 +21,7 @@ interface ProjectRepository {
      *
      * ### Behavior
      * - Executes [GetMyProjectsPaginatedQuery] with the provided fetch policy.
-     * - Uses Apollo’s `watch()` to continuously observe changes.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
@@ -86,6 +86,7 @@ interface ProjectRepository {
      * - Executes [GetProjectDetailsQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      *
@@ -129,6 +130,7 @@ interface ProjectRepository {
  * - Executes [GetProjectRepositoryQuery] with the provided project ID.
  * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
  * - Emits results reactively via Flow.
+ * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
  * - Logs errors without terminating the stream.
  * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
  *
