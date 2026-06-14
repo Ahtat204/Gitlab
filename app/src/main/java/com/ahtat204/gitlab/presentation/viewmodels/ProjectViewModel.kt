@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
-import com.ahtat204.gitlab.data.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.presentation.components.withCacheFallback
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel

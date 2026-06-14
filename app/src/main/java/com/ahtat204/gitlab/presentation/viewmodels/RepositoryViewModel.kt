@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
-import com.ahtat204.gitlab.data.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,10 +19,10 @@ typealias Commit = GetProjectCommitsQuery.Commits?
 typealias Repository= GetProjectRepositoryQuery.Repository?
 @HiltViewModel
 class RepositoryViewModel @Inject constructor(private val projectRepository: ProjectRepository): ViewModel() {
-    /** Backing state for contributed commits. */
+    /** Backing state for  commits. */
     private val _commits = MutableStateFlow<Commit>(null)
 
-    /** Public immutable flow of contributed commits. */
+    /** Public immutable flow of  commits. */
     val commits: StateFlow<Commit> = _commits.asStateFlow()
     private val _repository= MutableStateFlow<Repository>(null)
 
@@ -31,7 +31,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
     fun loadProjectRepository(projectPath:String){
         viewModelScope.launch{
             projectRepository
-                .getProjectRepository(projectPath,null,0)
+                .getProjectRepository(projectPath, branch = null, skip = 0)
                 .collect { _repository.value=it?.project?.repository }
         }
     }

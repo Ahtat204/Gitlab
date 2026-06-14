@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.data.repositories.project
+package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
@@ -70,7 +70,7 @@ class ProjectRepositoryImpl @Inject constructor(
             }.mapNotNull { it }
     }
 
-    override suspend fun getProjectRepository(id: String,branch:String?,skip:Int): Flow<GetProjectRepositoryQuery.Data?> {
+    override suspend fun getProjectRepository(id: String,skip:Int,branch:String?): Flow<GetProjectRepositoryQuery.Data?> {
       return  if(branch==null) {
             apolloClient.query(GetProjectRepositoryQuery(id,skip = skip))
                 .fetchPolicy(FetchPolicy.CacheFirst)
