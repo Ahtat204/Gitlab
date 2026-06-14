@@ -24,6 +24,7 @@ interface ProjectRepository {
      * - Uses Apollo’s `watch()` to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      *
      * ### Example
      * ```kotlin
@@ -86,6 +87,7 @@ interface ProjectRepository {
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
      * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      *
      * ### Example
      * ```kotlin
@@ -128,6 +130,7 @@ interface ProjectRepository {
  * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
  * - Emits results reactively via Flow.
  * - Logs errors without terminating the stream.
+ * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
  *
  * ### Example
  * ```kotlin
