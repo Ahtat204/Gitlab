@@ -4,17 +4,16 @@ query GetProjectRepository($projectPath:ID!,$branch:String,$skip:Int!){
         repository {
             branchNames(searchPattern: "*",limit: 20,offset: $skip)
             rootRef
-            blobs(ref: $branch,paths: ""){
-                nodes {
-                    rawTextBlob
-                    rawBlob
-                }
-                pageInfo {
-                    startCursor
-                }
-            }
+#            blobs(ref: $branch,paths: ""){ to fetch raw content of the blob(file)
+#                nodes {
+#                    rawTextBlob
+#                    rawBlob
+#                }
+#                pageInfo {
+#                    startCursor
+#                }
+#            }
             lastCommit{
-                name
                 message
             }
             tree(ref: $branch){
@@ -37,12 +36,9 @@ query GetProjectRepository($projectPath:ID!,$branch:String,$skip:Int!){
                         id
                         name
                         path
-                        webUrl
-
                     }
                     pageInfo {
                         startCursor
-
                     }
                     edges {
                         cursor
