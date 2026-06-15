@@ -1,10 +1,7 @@
 package com.ahtat204.gitlab.domain.di
 
-import android.util.Log
 import com.ahtat204.gitlab.data.security.AuthenticationInterceptor
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.accessToken
-import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
 import dagger.Module
 import dagger.Provides
@@ -13,9 +10,9 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
+
 /**
  * Dagger Hilt module that provides a preconfigured singleton instance of [OkHttpClient].
  *
@@ -61,14 +58,13 @@ object OkHttpModule {
     @Singleton
     @Provides
     fun provieOkHttp(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .connectTimeout(15, TimeUnit.SECONDS).cache(cache = Cache(
-            Tokens.context.cacheDir,
-            10L * 1024 * 1024))
-            .readTimeout(15, TimeUnit.SECONDS)
-            .addInterceptor(HttpLoggingInterceptor() .apply {
-
+        return OkHttpClient.Builder().connectTimeout(15, TimeUnit.SECONDS).cache(
+            cache = Cache(
+                Tokens.context.cacheDir, 10L * 1024 * 1024
+            )
+        ).readTimeout(15, TimeUnit.SECONDS).addInterceptor(AuthenticationInterceptor())
+            .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
-            }).addInterceptor(AuthenticationInterceptor()).build()
+            }).build()
     }
 }

@@ -165,6 +165,66 @@ interface ProjectRepository {
  * ```
  */
     suspend fun getProjectRepository(id: String,skip:Int,branch:String?): Flow<Data?>
+    /**
+     * Retrieves the repository tree for a given project.
+     *
+     * @param id The unique identifier of the project.
+     * @param cursor the pagination index to load commits after this cursor ,its match in Gitlab GraphQL is `startCursor`.
+     * note :this parameter is optional
+     * @return A [Flow] emitting [GetProjectCommitsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetProjectCommitsQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getProjectCommits("12345")
+     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL
+     *    project(fullPath: $projectPath){
+     *         __typename
+     *         repository {
+     *             __typename
+     *             branchNames(searchPattern: "*", offset: 0, limit: 100)
+     *             commits(ref:"main",first: 20,after: $cursor) {
+     *                 __typename
+     *                 nodes {
+     *                     __typename
+     *                     id
+     *                     sha
+     *                     name
+     *                     message
+     *                     authorName
+     *                     committedDate
+     *                     signature {
+     *                         __typename
+     *                         verificationStatus
+     *                     }
+     *
+     *                 }
+     *                 pageInfo {
+     *                     __typename
+     *                     endCursor
+     *                     hasNextPage
+     *                     startCursor
+     *                 }
+     *             }
+     *             __typename
+     *
+     *         }
+     *
+     *     }
+     * ```
+     */
     suspend fun getProjectCommits(id: String, cursor: String?): Flow<GetProjectCommitsQuery.Data?>
 
 }
