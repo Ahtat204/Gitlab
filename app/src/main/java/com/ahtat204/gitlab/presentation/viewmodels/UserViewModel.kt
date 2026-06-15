@@ -2,7 +2,7 @@ package com.ahtat204.gitlab.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahtat204.gitlab.data.repositories.user.UserRepository
+import com.ahtat204.gitlab.data.remote.repositories.user.UserRepository
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.exception.CacheMissException
 import dagger.hilt.android.lifecycle.HiltViewModel

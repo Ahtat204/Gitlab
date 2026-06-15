@@ -1,10 +1,10 @@
-package com.ahtat204.gitlab.data.repositories.project
+package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
-import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
+import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.Optional
@@ -70,14 +70,22 @@ class ProjectRepositoryImpl @Inject constructor(
             }.mapNotNull { it }
     }
 
-    override suspend fun getProjectIssues(id: String): Flow<GetProjectIssuesQuery.Data?> {
-        return apolloClient.
-        query(GetProjectIssuesQuery(id))
-            .fetchPolicy(FetchPolicy.CacheFirst)
-            .watch()
-            .mapNotNull { it.data }.catch { ex ->
-            if (ex is CancellationException) throw ex
-        }.mapNotNull { it }
+    override suspend fun getProjectRepository(id: String,skip:Int,branch:String?): Flow<GetProjectRepositoryQuery.Data?> {
+      return  if(branch==null) {
+            apolloClient.query(GetProjectRepositoryQuery(id,skip = skip))
+                .fetchPolicy(FetchPolicy.CacheFirst)
+                .watch().mapNotNull { it.data }
+                .catch { ex ->
+                if (ex is CancellationException) throw ex
+            }.mapNotNull { it }
+        }
+        else{
+          apolloClient.query(GetProjectRepositoryQuery(id,skip = skip, branch = Optional.present(branch)))
+              .fetchPolicy(FetchPolicy.CacheFirst).watch()
+              .mapNotNull { it.data }.catch { ex ->
+              if (ex is CancellationException) throw ex
+          }.mapNotNull { it }
+        }
     }
 
 }

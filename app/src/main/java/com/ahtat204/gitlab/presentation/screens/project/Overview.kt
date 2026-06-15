@@ -1,6 +1,7 @@
-package com.ahtat204.gitlab.presentation.screens
+package com.ahtat204.gitlab.presentation.screens.project
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -96,6 +97,7 @@ fun ProjectDetailScreen(
     LaunchedEffect(true) {
         projectViewModel.loadProject(path)
     }
+    val encodedId = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())
     Column(
         modifier = Modifier
             .background(Color.Black)
@@ -125,7 +127,7 @@ fun ProjectDetailScreen(
             )
 
             Card(
-                {}, modifier = Modifier
+                {navController.navigate("repository?projectId=$encodedId") }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(15.dp, 1.dp)
                     .background(Color.Black)
