@@ -1,0 +1,56 @@
+query GetProjectRepository($projectPath:ID!,$branch:String,$skip:Int!){
+    project(fullPath: $projectPath){
+        id
+        repository {
+            branchNames(searchPattern: "*",limit: 20,offset: $skip)
+            rootRef
+            blobs(ref: $branch,paths: ""){
+                nodes {
+                    rawTextBlob
+                    rawBlob
+                }
+                pageInfo {
+                    startCursor
+                }
+            }
+            lastCommit{
+                name
+                message
+            }
+            tree(ref: $branch){
+                trees{
+                    __typename
+                    nodes {
+                        name
+                        path
+
+                    }
+                    pageInfo {
+                        startCursor
+                    }
+                    edges {
+                        cursor
+                    }
+                }
+                blobs{
+                    nodes {
+                        id
+                        name
+                        path
+                        webUrl
+
+                    }
+                    pageInfo {
+                        startCursor
+
+                    }
+                    edges {
+                        cursor
+                    }
+
+                }
+
+            }
+        }
+    }
+}

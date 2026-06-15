@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.presentation.screens
+package com.ahtat204.gitlab.presentation.screens.project
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +26,50 @@ import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.components.CommitCard
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.RepositoryViewModel
-
+/**
+ * Displays a paginated list of commits for a given GitLab project.
+ *
+ * ## Purpose
+ * - Fetches and renders project commits using [RepositoryViewModel].
+ * - Supports infinite scrolling: automatically loads more commits when the user
+ *   approaches the bottom of the list.
+ * - Provides a simple UI with a title and a scrollable list of commit cards.
+ *
+ * ## Parameters
+ * @param navController Navigation controller used for handling navigation actions.
+ * @param x Padding values applied to the layout.
+ * @param id The unique project identifier. If empty, the composable returns immediately.
+ * @param projectViewModel ViewModel responsible for loading and exposing commit data.
+ * Defaults to [hiltViewModel] injection.
+ *
+ * ## Behavior
+ * - If [id] is empty, the composable exits early.
+ * - Observes commits via [collectAsStateWithLifecycle].
+ * - Triggers [RepositoryViewModel.loadProjectCommits] when [id] changes or when
+ *   the user scrolls near the bottom of the list.
+ * - Skips rendering if no commits are available.
+ *
+ * ## Layout
+ * - Root container: [Column] with black background and applied padding.
+ * - Title: "Commits" displayed at the top if commits exist.
+ * - List: [LazyColumn] showing each commit via [CommitCard].
+ * - Infinite scroll: Loads more commits when the last visible item index is within
+ *   5 items of the total count.
+ *
+ * ## Example
+ * ```
+ * ProjectCommits(
+ *     navController = navController,
+ *     x = PaddingValues(16.dp),
+ *     id = "project123"
+ * )
+ * ```
+ *
+ * ## Notes
+ * - Keys for list items are derived from commit `id` or `sha` to ensure stable rendering.
+ * - The `contentDescription` for icons inside [CommitCard] should be provided
+ *   if accessibility is required.
+ */
 @Composable
 fun ProjectCommits(
     navController: NavController,
@@ -35,14 +78,10 @@ fun ProjectCommits(
     projectViewModel: RepositoryViewModel = hiltViewModel()
 ) {
     if (id == "") return
-
     val commits by projectViewModel.commits.collectAsStateWithLifecycle()
-
-    // 1. Trigger the initial load safely when the 'id' changes
     LaunchedEffect(id) {
         projectViewModel.loadProjectCommits(id)
     }
-
     if (commits?.nodes?.isEmpty() == true) return
     val listState = rememberLazyListState()
   val shouldLoadMore = remember {
@@ -73,7 +112,6 @@ fun ProjectCommits(
                     fontSize = 20.sp,
                     modifier = Modifier
                 )
-
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
@@ -84,8 +122,6 @@ fun ProjectCommits(
                     items(items = nodes, key =  { item -> item?.id ?: item?.sha?: null.hashCode() }) { commit ->
                         CommitCard(commit?.sha, commit?.message)
                     }
-
-                    // REMOVED: projectViewModel.loadProjectCommits(id) was deleted from here
                 }
             }
         }

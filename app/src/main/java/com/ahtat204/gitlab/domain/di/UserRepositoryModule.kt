@@ -1,14 +1,12 @@
 package com.ahtat204.gitlab.domain.di
 
-import com.ahtat204.gitlab.data.repositories.project.ProjectRepository
-import com.ahtat204.gitlab.data.repositories.project.ProjectRepositoryImpl
-import com.ahtat204.gitlab.data.repositories.user.UserRepository
-import com.ahtat204.gitlab.data.repositories.user.UserRepositoryImpl
+import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.user.UserRepository
+import com.ahtat204.gitlab.data.remote.repositories.user.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Singleton
 
 /**

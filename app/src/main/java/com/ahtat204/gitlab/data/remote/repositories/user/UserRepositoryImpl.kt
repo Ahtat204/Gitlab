@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.data.repositories.user
+package com.ahtat204.gitlab.data.remote.repositories.user
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery

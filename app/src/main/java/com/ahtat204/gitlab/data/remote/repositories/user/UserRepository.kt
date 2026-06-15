@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.data.repositories.user
+package com.ahtat204.gitlab.data.remote.repositories.user
 
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
 import com.apollographql.apollo.cache.normalized.FetchPolicy

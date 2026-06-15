@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.data.repositories.profile
+package com.ahtat204.gitlab.data.remote.repositories.profile
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
