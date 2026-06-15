@@ -12,15 +12,51 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.R
 
+/**
+ * Displays a summary of collaboration-related metrics for a GitLab project.
+ *
+ * This composable arranges multiple [ProjectWorkItems] in a vertical column,
+ * each representing a specific aspect of project collaboration such as issues,
+ * merge requests, members, pipelines, work items, and commits.
+ *
+ * ## Purpose
+ * - Provides a quick overview of project activity and participation.
+ * - Each metric is represented by an [Item] with an icon, label, and count.
+ * - Designed to be used within a project details screen.
+ *
+ * ## Parameters
+ * @param issuesCount Number of issues in the project (nullable).
+ * @param mergeRequestCount Number of merge requests (nullable).
+ * @param membersCount Number of project members (nullable).
+ * @param pipelinesCount Number of pipelines (nullable).
+ * @param workItemsCount Number of work items (nullable).
+ * @param commitCount Number of commits (nullable, converted to Int).
+ * @param navController Navigation controller used for handling navigation actions.
+ *
+ * ## Behavior
+ * - Each non-null parameter is rendered as a [ProjectWorkItems] entry.
+ * - Entries are displayed in a vertical [Column] with centered alignment.
+ * - Background is styled with [Color.Black].
+ *
+ * ## Example
+ * ```
+ * CollaborationDetails(
+ *     issuesCount = 42,
+ *     mergeRequestCount = 10,
+ *     membersCount = 5,
+ *     pipelinesCount = 3,
+ *     workItemsCount = 7,
+ *     commitCount = 120.0,
+ *     navController = navController
+ * )
+ * ```
+ */
 @Composable
 fun CollaborationDetails(
     issuesCount: Int?,
     mergeRequestCount: Int?,
-    membersCount: Int?,
     pipelinesCount: Int?,
-    workItemsCount: Int?,
-    commitCount: Double?,
-    navController: NavController
+    navController: NavController,
 ) {
     Column(
         modifier = Modifier
@@ -37,35 +73,35 @@ fun CollaborationDetails(
                 )
             ) {}
         }
-        membersCount?.let {
+
             ProjectWorkItems(
                 Item(
-                    "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, it
+                    "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, null
                 )
             ) {}
-        }
+
         pipelinesCount?.let {
             ProjectWorkItems(
                 Item(
-                    "WorkItems", "project/{id]/workitems", R.drawable.workitems, it
-                )
-            ) {}
-        }
-        workItemsCount?.let {
-            ProjectWorkItems(
-                Item(
-                    "Members", "project/{id}/members", R.drawable.members, it
+                    "WorkItems", "project/{id]/workitems", R.drawable.workitems, null
                 )
             ) {}
         }
 
-        commitCount?.let {
             ProjectWorkItems(
                 Item(
-                    "Commits", "project/{id}/commits", R.drawable.commit, it.toInt()
+                    "Members", "project/{id}/members", R.drawable.members, null
                 )
             ) {}
-        }
+
+
+     /*   commitCount?.let {
+            ProjectWorkItems(
+                Item("Commits", "project/{id}/commits", R.drawable.commit, it.toInt())
+            ) {
+                navController.navigate("commits?projectId=$encodedId")
+            }
+        }*/
     }
 
 }

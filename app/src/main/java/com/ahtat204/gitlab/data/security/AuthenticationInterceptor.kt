@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.data.remote
+package com.ahtat204.gitlab.data.security
 
 import android.util.Log
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
@@ -15,7 +15,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 /**
- * An OkHttp [Interceptor] that attaches and refreshes OAuth access tokens
+ * An OkHttp [okhttp3.Interceptor] that attaches and refreshes OAuth access tokens
  * for authenticated requests against the GitLab API.
  *
  * This interceptor ensures that every outgoing request includes a valid
@@ -27,7 +27,7 @@ import okhttp3.Response
  * - If the response is `401 Unauthorized`:
  *   - Synchronizes on a lock to prevent concurrent refresh attempts.
  *   - Uses [net.openid.appauth.AuthState.performActionWithFreshTokens] to refresh the token.
- *   - Updates [Tokens.accessToken] and persists the new state via [AuthStorage].
+ *   - Updates [com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.accessToken] and persists the new state via [com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage].
  *   - Retries the request with the refreshed token.
  *   - Logs an error if the retry still fails with `401`.
  *
@@ -37,7 +37,7 @@ import okhttp3.Response
  *
  * ## Persistence
  * - After a successful refresh, the updated [AuthState] is saved into
- *   [AuthStorage] using DataStore, ensuring the new token is available
+ *   [com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage] using DataStore, ensuring the new token is available
  *   for future requests.
  *
  * ## Usage
@@ -69,9 +69,7 @@ class AuthenticationInterceptor : Interceptor {
             synchronized(Locker) {
                 val state = Tokens.CurrentAuthState
                 val accessToken = Tokens.accessToken
-                if (accessToken != null && accessToken == token &&
-                    state != null
-                ) {
+                if (accessToken != null && accessToken == token && state != null) {
                     val deferred = CompletableDeferred<String?>()
                     runBlocking {
                         state.performActionWithFreshTokens(AuthorizationService(Tokens.context)) { token, _, ex ->

@@ -7,11 +7,15 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import androidx.navigation.navigation
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
-import com.ahtat204.gitlab.presentation.screens.ProjectDetailScreen
+import com.ahtat204.gitlab.presentation.screens.project.ProjectCommits
+import com.ahtat204.gitlab.presentation.screens.project.ProjectDetailScreen
+import com.ahtat204.gitlab.presentation.screens.project.RepositoryScreen
 
 /**
  * Defines the navigation graph for the bottom navigation bar.
@@ -56,12 +60,28 @@ fun BottomNavigationGraph(
         composable(route = BottomBarScreen.Activity.route) {
             // Activity screen placeholder
         }
-        composable(
-            route = "project?projectId={projectId}",
-            arguments = listOf(navArgument("projectId") { defaultValue = "" })
-        ) { backStackEntry ->
+        composable(route = "commits?projectId={projectId}",
+            arguments = listOf(navArgument("projectId") { defaultValue = "" }))
+        {backStackEntry ->
             val projectId = backStackEntry.arguments?.getString("projectId")
-            projectId?.let { ProjectDetailScreen(navController,x, it) }
+            projectId?.let { ProjectCommits(navController,x,it) }
+        }
+
+        navigation(startDestination ="Project", route = "project" ){
+            composable(route = "repository?projectId={projectId}",
+                arguments = listOf(navArgument("projectId") { defaultValue = "" }))
+            {backStackEntry ->
+                val projectId = backStackEntry.arguments?.getString("projectId")
+                projectId?.let { RepositoryScreen(it) }
+            }
+            composable(
+                route = "project?projectId={projectId}",
+                arguments = listOf(navArgument("projectId") { defaultValue = "" })
+            ) { backStackEntry ->
+                val projectId = backStackEntry.arguments?.getString("projectId")
+                projectId?.let { ProjectDetailScreen(navController,x, it)
+                }
+            }
         }
     }
 }

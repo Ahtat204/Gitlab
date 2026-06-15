@@ -88,7 +88,8 @@ import java.nio.charset.StandardCharsets
 fun ProjectItem(
     data: GetMyProjectsPaginatedQuery.CurrentUser?,
     project: GetMyProjectsPaginatedQuery.Project,
-    imageLoader: ImageLoader,navController: NavHostController
+    imageLoader: ImageLoader,
+    navController: NavHostController
 ) {
     val encodedId = URLEncoder.encode(project.fullPath, StandardCharsets.UTF_8.toString())
     Card(
@@ -99,11 +100,16 @@ fun ProjectItem(
             .height(120.dp)
     ) {
         Row(
-            modifier = Modifier.background(Color.Black), verticalAlignment = Alignment.Top
+            modifier = Modifier
+                .background(Color.Black)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.Start
         ) {
             data?.let {
                 it.avatarUrl?.let { url ->
                     val avatar = "https://gitlab.com/$url"
+
                     AsyncImage(
                         imageLoader = imageLoader,
                         model = ImageRequest.Builder(LocalContext.current).data(avatar) // Image URL
@@ -131,6 +137,8 @@ fun ProjectItem(
                     .fillMaxHeight()
                     .background(Background)
             ) {
+                project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+
             //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
 
                 project.let { project ->

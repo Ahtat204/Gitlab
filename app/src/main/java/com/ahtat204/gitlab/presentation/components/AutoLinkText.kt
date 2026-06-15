@@ -12,19 +12,56 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import java.util.regex.Pattern
-
+/**
+ * Renders text with automatically detected hyperlinks.
+ *
+ * ## Purpose
+ * - Scans the input [text] for URLs using a regex pattern.
+ * - Converts detected URLs into clickable links with styled annotations.
+ * - Displays the full text with links highlighted and underlined.
+ *
+ * ## Parameters
+ * @param text The input string to render. Any substring matching the URL regex
+ *             will be converted into a clickable link.
+ * @param fontFamily The font family applied to link styling. Defaults to [FontFamily.Default].
+ *
+ * ## Behavior
+ * - Uses a regex to detect URLs starting with `http://` or `https://`.
+ * - Non-URL text is appended normally.
+ * - Each detected URL is wrapped in a [LinkAnnotation.Url] with custom [TextLinkStyles].
+ * - Links are styled with:
+ *   - Orange color
+ *   - Underline decoration
+ *   - Font size of 14sp
+ *   - Provided [fontFamily]
+ * - The entire text block is rendered with:
+ *   - White color
+ *   - Font size of 15sp
+ *   - [titleFont] family
+ *   - Padding of (20.dp, 10.dp)
+ *   - Left alignment
+ *
+ * ## Example
+ * ```
+ * AutoLinkText(
+ *     text = "Check out https://gitlab.com for more info",
+ *     fontFamily = FontFamily.Serif
+ * )
+ * ```
+ *
+ * ## Notes
+ * - Each URL is prepended with a newline (`\n`) before being appended.
+ * - The `contentDescription` for links is omitted since they are textual.
+ * - Extend the regex if you want to support additional link formats (e.g., mailto, ftp).
+ */
 @Composable
 fun AutoLinkText(
-    text: String,
-    modifier: Modifier = Modifier,
-    fontFamily: FontFamily = FontFamily.Default
+    text: String, fontFamily: FontFamily = FontFamily.Default
 ) {
     val urlRegex = "(https?://[\\w-]+(\\.[\\w-]+)+[/#?]?.*)".toRegex()
     val annotatedString = buildAnnotatedString {
@@ -33,8 +70,7 @@ fun AutoLinkText(
             append(text.substring(lastIndex, match.range.first))
             withLink(
                 LinkAnnotation.Url(
-                    url = match.value,
-                    styles = TextLinkStyles(
+                    url = match.value, styles = TextLinkStyles(
                         style = SpanStyle(
                             fontFamily = fontFamily,
                             fontSize = 14.sp,
@@ -44,12 +80,10 @@ fun AutoLinkText(
                     )
                 )
             ) {
-                append(match.value)
+                append("\n" + match.value)
             }
-
             lastIndex = match.range.last + 1
         }
-        // Append remaining text
         append(text.substring(lastIndex))
     }
 

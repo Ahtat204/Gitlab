@@ -4,11 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
-import com.ahtat204.gitlab.data.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.presentation.components.withCacheFallback
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -65,13 +64,9 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      * - First attempts with [FetchPolicy.CacheFirst].
      * - On exception, retries with [FetchPolicy.NetworkFirst].
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun loadAllProjects() {
-        viewModelScope.launch {
-            projectRepository.getAllProjects(FetchPolicy.CacheFirst)
-                .withCacheFallback { projectRepository.getAllProjects(FetchPolicy.NetworkFirst) }
-                .collect { _projects.value = it.currentUser }
-        }
+    fun loadAllProjects() = viewModelScope.launch {
+        projectRepository.getAllProjects().withCacheFallback { projectRepository.getAllProjects() }
+            .collect { _projects.value = it.currentUser }
     }
 
     /**
@@ -79,13 +74,12 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      *
      * @param id The unique project identifier.
      */
-    fun loadProject(id: String) {
-        viewModelScope.launch {
-            projectRepository.getProjectById(id, FetchPolicy.CacheFirst).withCacheFallback {
-                projectRepository.getProjectById(
-                    id, FetchPolicy.NetworkFirst
-                )
-            }.collect { currentProject.value = it?.project }
-        }
+    fun loadProject(id: String) = viewModelScope.launch {
+        projectRepository.getProjectById(id).withCacheFallback {
+            projectRepository.getProjectById(
+                id
+            )
+        }.collect { currentProject.value = it?.project }
     }
+
 }

@@ -1,33 +1,41 @@
 query GetProjectDetails($projectPath: ID!) {
     project(fullPath: $projectPath) {
+
         __typename
         pipelineCounts{
             pending
             running
         }
-        openIssuesCount
-        statistics {
-            commitCount
-
-        }
-
-        openMergeRequestsCount
         namespace {
             path
         }
+        openIssuesCount
+        fullPath
+        openMergeRequestsCount
         forksCount
         starCount
         id
         name
         description
-        repository {
-            __typename
-            branchNames(searchPattern: "*", offset: 0, limit: 100)
-            rootRef
-            lastCommit{
-                id
-                name
-            }
-        }
+#        repository {
+#            branchNames(searchPattern: "*", offset: 0, limit: 100)
+#            commits(ref:"main",first: 10){
+#                nodes {
+#                    id
+#                    name
+#                    message
+#                    authorName
+#                    committedDate
+#                    signature {
+#                        verificationStatus
+#                    }
+#                }
+#                pageInfo {
+#                    endCursor
+#                    hasNextPage
+#                    startCursor
+#                }
+#            }
+#        }
     }
 }

@@ -85,8 +85,8 @@ fun PersonalProjects(
     LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
     }
-    val CurrUser by projectViewModel.projects.collectAsState()
-    CurrUser?.projectMemberships?.nodes?.sortedByDescending {
+    val currUser by projectViewModel.projects.collectAsState()
+    currUser?.projectMemberships?.nodes?.sortedByDescending {
         Instant.parse(it?.project?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
             .toLocalDate()
     }?.let { nodes ->
@@ -97,9 +97,8 @@ fun PersonalProjects(
                 .padding(x)
                 .background(Color.Black)
         ) {
-            if (CurrUser?.projectMemberships?.nodes?.isEmpty() == true || CurrUser?.avatarUrl == null) {
+            if (currUser?.projectMemberships?.nodes?.isEmpty() == true || currUser?.avatarUrl == null) {
                 CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
-                Log.d("size", nodes.size.toString())
 
             } else {
                 Text(
@@ -115,7 +114,7 @@ fun PersonalProjects(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(nodes, key = { item -> item?.id ?: Any() }) { item ->
-                        item?.project?.let { ProjectItem(CurrUser, it, loader, navController) }
+                        item?.project?.let { ProjectItem(currUser, it, loader, navController) }
                     }
                 }
             }
