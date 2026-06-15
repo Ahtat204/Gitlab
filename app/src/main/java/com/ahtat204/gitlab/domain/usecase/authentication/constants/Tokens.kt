@@ -34,7 +34,9 @@ import net.openid.appauth.AuthorizationService
  * - This object is designed to be thread-safe and used across the entire app lifecycle.
  */
 object Tokens {
+    @Volatile
     var accessToken: String? = null
+    @Volatile
     var CurrentAuthState: AuthState? = null
     private var appContext: Context? = null
     val context: Context
