@@ -3,3 +3,9 @@
 ../keystore
 release
 app/src/main/graphql/com/pranav/schema.graphqls
+
+
+
+../.kotlin
+../test.json
+../reflog.sh

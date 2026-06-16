@@ -2,58 +2,40 @@ query GetProjectDetails($projectPath: ID!) {
     project(fullPath: $projectPath) {
 
         __typename
-        statistics {
-            commitCount
-
+        pipelineCounts{
+            pending
+            running
         }
         namespace {
-            name
-            fullPath
+            path
         }
-
-        statistics {
-            commitCount
-        }
-
-        projectMembers{
-            nodes {
-
-                user {
-                    name
-                }
-            }
-        }
+        openIssuesCount
+        fullPath
+        openMergeRequestsCount
         forksCount
         starCount
         id
         name
-        topics
         description
-        lastActivityAt
-        issues{
-            count
-        }
-        mergeRequests{
-            count
-        }
-        pipelines{
-            count
-        }
-        topics
-        languages {
-            color
-            name
-            share
-        }
-        repository {
-
-            __typename
-            branchNames(searchPattern: "*", offset: 0, limit: 100)
-            rootRef
-            lastCommit{
-                id
-                name
-            }
-        }
+#        repository {
+#            branchNames(searchPattern: "*", offset: 0, limit: 100)
+#            commits(ref:"main",first: 10){
+#                nodes {
+#                    id
+#                    name
+#                    message
+#                    authorName
+#                    committedDate
+#                    signature {
+#                        verificationStatus
+#                    }
+#                }
+#                pageInfo {
+#                    endCursor
+#                    hasNextPage
+#                    startCursor
+#                }
+#            }
+#        }
     }
 }

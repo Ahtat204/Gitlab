@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
@@ -83,6 +84,7 @@ class AuthenticationActivity : ComponentActivity() {
             AuthConfig.AUTH_URI.toUri(), AuthConfig.TOKEN_URI.toUri()
         )
 
+    private var response: AuthorizationResponse?=null
     private var authRequest: AuthorizationRequest? = AuthorizationRequest.Builder(
         serviceConfig!!,
         AuthConfig.CLIENT_ID,
@@ -116,14 +118,15 @@ class AuthenticationActivity : ComponentActivity() {
                         .padding(0.dp), tint = Orange
                 )
                 Spacer(modifier = Modifier.height(120.dp))
-                Button(onClick = {
+                if(response==null)       Button(onClick = {
                     val authIntent = getService().getAuthorizationRequestIntent(authRequest!!)
                         ?: throw NullPointerException("Intent is null")
                     launcher.launch(authIntent)
                     authState = AuthState(serviceConfig!!)
                 }) {
-                    Text(text = "Login With Gitlab", fontSize = 30.sp)
+                   Text(text = "Login With Gitlab", fontSize = 30.sp)
                 }
+                else CircularProgressIndicator()
             }
         }
     }
@@ -146,12 +149,12 @@ class AuthenticationActivity : ComponentActivity() {
      */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        val response = buildResponse(intent, authRequest, this)
+         response = buildResponse(intent, authRequest, this)
         if (response == null) {
             Log.e("AuthenticationActivity", "OAUTH_ERROR")
             return
         }
-        runBlocking { exchangeCodeForToken(getService(), response, authState!!) }
+      response?.let {runBlocking { exchangeCodeForToken(getService(), it, authState!!) }  }
     }
 
     /**

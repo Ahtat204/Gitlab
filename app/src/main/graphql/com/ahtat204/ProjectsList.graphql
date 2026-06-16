@@ -1,29 +1,31 @@
-query GetMyProjects {
+query GetMyProjectsPaginated { ## this in case the user has large number of projects ,in my case , I currently don't
     currentUser {
-        id
         avatarUrl
-        projectMemberships(first: 20) {
+        projectMemberships(first: 10) {
             __typename
             nodes {
-
                 __typename
                 id
                 project {
+
                     topics
                     lastActivityAt
-                    avatarUrl
                     __typename
                     languages {
                         color
                         name
                     }
-                    id
                     name
                     fullPath
                     description
                     visibility
-                    starCount
-                    lastActivityAt
+                    pipelines(first: 1){
+                        nodes {
+                            __typename
+                            id
+                            status
+                        }
+                    }
                 }
             }
             pageInfo {
@@ -34,3 +36,34 @@ query GetMyProjects {
         }
     }
 }
+#query GetMoreProjects($cursor: String){
+#    currentUser {
+#        avatarUrl
+#        projectMemberships(after: $cursor) {
+#            __typename
+#            nodes {
+#
+#                __typename
+#                id
+#                project {
+#                    topics
+#                    lastActivityAt
+#                    __typename
+#                    languages {
+#                        color
+#                        name
+#                    }
+#                    name
+#                    fullPath
+#                    description
+#                    visibility
+#                }
+#            }
+#            pageInfo {
+#                __typename
+#                hasNextPage
+#                endCursor
+#            }
+#        }
+#    }
+#}

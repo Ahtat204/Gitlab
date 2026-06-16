@@ -1,6 +1,6 @@
 package com.ahtat204.gitlab.presentation.activities
 
-import android.R
+import android.R.anim
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
-import java.io.File
 
 /**
  * LauncherActivity is the entry point of the application.
@@ -52,36 +51,25 @@ import java.io.File
  */
 @AndroidEntryPoint
 class LauncherActivity : ComponentActivity() {
-
     private lateinit var authenticationService: AuthorizationService
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Install splash screen before super.onCreate
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-
-        // Ensure cache directory exists
-        val existed = File("gitlab/httpCache")
-        if (!existed.exists()) {
-            existed.mkdir()
-        }
         authenticationService = AuthorizationService(this)
-
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
-
-        // Check stored authentication state
         CoroutineScope(Dispatchers.IO).launch {
             val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
-
-            if (storedState.refreshToken != null) {
+            if (storedState.isAuthorized) {
                 storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
                     if (token != null && ex == null) {
                         Tokens.accessToken = token
                         Tokens.CurrentAuthState = storedState
                         lifecycleScope.launch {
-                            AuthStorage.getAuthState(this@LauncherActivity).updateData { storedState }
+                            AuthStorage.getAuthState(this@LauncherActivity)
+                                .updateData { storedState }
                             isReady = true
                             navigateTo(MainActivity::class.java)
                         }
@@ -97,12 +85,11 @@ class LauncherActivity : ComponentActivity() {
         }
     }
 
-    /** Navigates to the given destination activity with transition animation. */
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private fun navigateTo(destination: Class<*>) {
         startActivity(Intent(this, destination))
-        overridePendingTransition(
-            R.anim.overshoot_interpolator,
-            R.anim.fade_out
+        overrideActivityTransition(
+            OVERRIDE_TRANSITION_OPEN, anim.fade_in, anim.fade_out
         )
         finish()
     }

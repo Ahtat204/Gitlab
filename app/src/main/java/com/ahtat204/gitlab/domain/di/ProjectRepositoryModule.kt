@@ -6,6 +6,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
+import javax.inject.Singleton
 
 /**
  * Dagger Hilt module that binds [ProjectRepositoryImpl] to the [ProjectRepository] interface.
@@ -38,10 +40,10 @@ import dagger.hilt.android.components.ViewModelComponent
 abstract class ProjectRepositoryModule {
 
     /**
-     * Binds [ProjectRepositoryImpl] as the concrete implementation of [ProjectRepository].
-     *
+     * Binds [ProjectRepositoryImpl] as the concrete implementation of [ProjectRepository].<br>
      * @param impl The injected implementation.
      * @return The bound [ProjectRepository] interface.
+     *
      */
     @Binds
     abstract fun provideProjectRepository(impl: ProjectRepositoryImpl): ProjectRepository
