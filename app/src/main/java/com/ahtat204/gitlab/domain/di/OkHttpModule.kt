@@ -51,6 +51,7 @@ import javax.inject.Singleton
  * - This module does not configure caching (e.g., [MemoryCacheFactory]) directly,
  *   but the provided client can be extended with caching if required.
  * - Interceptors are applied in the order they are added: logging first, then authentication.
+ * @author Lahcen AHTAT
  */
 @InstallIn(SingletonComponent::class)
 @Module

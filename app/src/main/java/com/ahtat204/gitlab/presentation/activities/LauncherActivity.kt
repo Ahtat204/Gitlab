@@ -48,6 +48,7 @@ import net.openid.appauth.AuthorizationService
  * ## Usage
  * This activity is automatically launched at app startup. It should not be
  * started manually from other parts of the app.
+ * @author Lahcen AHTAT
  */
 @AndroidEntryPoint
 class LauncherActivity : ComponentActivity() {

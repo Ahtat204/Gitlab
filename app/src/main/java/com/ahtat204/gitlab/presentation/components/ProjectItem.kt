@@ -83,6 +83,7 @@ import java.nio.charset.StandardCharsets
  * - Uses Coil’s [AsyncImage] for image loading with memory and disk caching.
  * - Applies custom font family and colors for consistent styling.
  * - Topics and languages are optional and only shown if available.
+ * @author Lahcen AHTAT
  */
 @Composable
 fun ProjectItem(

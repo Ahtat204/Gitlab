@@ -36,6 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint
  * Dependency injection is enabled via [AndroidEntryPoint] for Hilt.
  *
  * @constructor Creates the main activity for the GitLab app.
+ * @author Lahcen AHTAT
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

@@ -39,6 +39,7 @@ import javax.inject.Singleton
  *
  * val projects = apolloClient.query(GetMyProjectsQuery()).execute()
  * ```
+ * @author Lahcen AHTAT
  */
 @Module
 @InstallIn(SingletonComponent::class)

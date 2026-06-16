@@ -32,6 +32,7 @@ import java.io.OutputStream
  *
  * @property defaultValue The default [AuthState] returned when no persisted
  * data is available or when the input stream is empty.
+ * @author Lahcen AHTAT
  */
 object AuthStateSerializer : Serializer<AuthState> {
 

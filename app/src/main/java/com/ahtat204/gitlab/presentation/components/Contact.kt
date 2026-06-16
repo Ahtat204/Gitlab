@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -62,6 +62,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
  * ## Notes
  * - The `contentDescription` for icons is set to `null` since they are decorative.
  * - Extend this composable to support non-URL text (e.g., email addresses) by adjusting the regex or annotation logic.
+ * @author Lahcen AHTAT
  */
 @Composable
 fun Contact(vararg links: Pair<String?, Int?>) {

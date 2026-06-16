@@ -76,6 +76,7 @@ import net.openid.appauth.ResponseTypeValues
  * ## Usage
  * This activity is launched when authentication is required. It should not be
  * started directly unless the user is unauthenticated.
+ * @author Lahcen AHTAT
  */
 class AuthenticationActivity : ComponentActivity() {
 

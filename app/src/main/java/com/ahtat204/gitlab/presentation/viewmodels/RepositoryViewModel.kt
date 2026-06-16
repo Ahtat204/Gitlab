@@ -17,6 +17,39 @@ import kotlin.collections.distinctBy
 import kotlin.collections.plus
 typealias Commit = GetProjectCommitsQuery.Commits?
 typealias Repository= GetProjectRepositoryQuery.Repository?
+/**
+ * ViewModel responsible for exposing GitLab project's Repository tree data to the UI layer.
+ *
+ * ## Overview
+ * - Integrates with [ProjectRepository] to fetch project commits and repository trees.
+ * - Uses Kotlin [StateFlow] to provide reactive, lifecycle‑aware state to the UI.
+ * - Scoped with [HiltViewModel] for dependency injection and lifecycle management.
+ *
+ * ## State
+ * - [commits]: Holds the authenticated user’s contributed projects.
+ * - [repository]: Holds the currently selected project’s repository tree.
+ *
+ * ## Behavior
+ * - **loadProjectRepository()**: Fetches a project repository tree using Apollo caching. Falls back
+ *   to `NetworkFirst` policy if cache retrieval fails.
+ * - **loadProjectCommits(id)**: Retrieves a specific project’s repository commits by ID.
+ *
+ * ## Error Handling
+ * - Exceptions during data collection are caught. The ViewModel retries with
+ *   a network fetch to ensure data availability.
+ *
+ * ## Usage
+ * Inject into a UI controller (e.g., Activity/Fragment) and collect flows:
+ * ```kotlin
+ * @Composable
+ * fun screen(projectVM:ProjectViewModel=hiltViewModel) {
+ *  LaunchedEffect(1) {
+ *         projectViewModel.loadProjectRepository("OrderService") //Id must be encoded
+ *     }
+ * }
+ * ```
+ * @author Lahcen AHTAT
+ */
 @HiltViewModel
 class RepositoryViewModel @Inject constructor(private val projectRepository: ProjectRepository): ViewModel() {
     /** Backing state for  commits. */
@@ -28,6 +61,10 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
 
     val repository:StateFlow<Repository> = _repository.asStateFlow()
 
+    /**
+     * currently it just fetch blobs,trees for the default branch,name of rootRef(default branch),first 20 branch names,
+     * @see "graphql/com/ahtat204/GetProjectRepository.graphql"
+     */
     fun loadProjectRepository(projectPath:String){
         viewModelScope.launch{
             projectRepository
@@ -36,6 +73,9 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
         }
     }
 
+    /**
+     *
+     */
     fun loadProjectCommits(id: String) {
         Log.d("LoadingCmmits", id)
         val pager = commits.value?.pageInfo?.endCursor

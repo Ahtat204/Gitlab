@@ -56,6 +56,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.titleFont
  * avatar = "uploads/user/avatar.png"
  * )
  * ```
+ * @author Lahcen AHTAT
  */
 @Composable
 fun Header(

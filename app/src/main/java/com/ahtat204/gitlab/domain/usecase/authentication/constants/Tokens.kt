@@ -32,6 +32,7 @@ import net.openid.appauth.AuthorizationService
  * ## Notes
  * - Attempting to access [context] before calling [initialize] will throw an exception.
  * - This object is designed to be thread-safe and used across the entire app lifecycle.
+ * @author Lahcen AHTAT
  */
 object Tokens {
     @Volatile

@@ -50,6 +50,7 @@ import okhttp3.Response
  *
  * @constructor Creates an interceptor that manages authentication headers
  * and token refresh logic for GitLab API requests.
+ * @author Lahcen AHTAT
  */
 class AuthenticationInterceptor : Interceptor {
     private val Locker = Any()

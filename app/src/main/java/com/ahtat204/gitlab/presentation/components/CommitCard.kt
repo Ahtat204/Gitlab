@@ -37,7 +37,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
  * - Both texts use [customFontFamily] for styling.
  *
  * ## Example
- * ```
+ * ``` Kotlin
  * CommitCard(
  *     sha = "abc123def",
  *     message = "Fix bug in authentication flow"
@@ -47,6 +47,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
  * ## Notes
  * - Consider adding spacing or alignment between the message and SHA for improved readability.
  * - Accessibility: Provide meaningful descriptions if commit details are critical for screen readers.
+ * @author Lahcen AHTAT
  */
 @Composable
 fun CommitCard(sha: String?, message: String?) {

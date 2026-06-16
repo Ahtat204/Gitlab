@@ -39,6 +39,7 @@ import net.openid.appauth.AuthorizationResponse
  *
  * @return A valid [AuthorizationResponse] if the URI is present and parsed
  * successfully, or `null` if no URI is found.
+ * @author Lahcen AHTAT
  */
 fun buildResponse(
     intent: Intent,

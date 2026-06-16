@@ -36,6 +36,7 @@ import javax.inject.Singleton
  * - [ApolloClient]: Executes GraphQL queries and manages caching.
  * - [GetMyProjectsPaginatedQuery], [GetProjectDetailsQuery]: Auto‑generated query classes.
  * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
+ * @author Lahcen AHTAT
  */
 @Singleton
 class ProjectRepositoryImpl @Inject constructor(

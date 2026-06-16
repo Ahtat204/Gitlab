@@ -13,6 +13,13 @@ import kotlinx.coroutines.flow.Flow
  *
  * Provides reactive streams of project lists, details, and repository trees.
  * Implementations are expected to use Apollo GraphQL client with caching policies.
+ *
+ * ### Contracts:
+ * - [ProjectRepository.getAllProjects]: Streams all projects the authenticated user has contributed to.
+ * - [ProjectRepository.getProjectById]: Retrieves a project overview for a given project (full description, star count, fork count, ...).
+ * - [ProjectRepository.getProjectRepository]: Retrieves the repository tree (blobs, trees,..) for a given project.
+ * - [ProjectRepository.getProjectCommits]: Retrieves the repository commits for a given project.
+ * @author Lahcen AHTAT
  */
 interface ProjectRepository {
     /**
@@ -166,7 +173,7 @@ interface ProjectRepository {
  */
     suspend fun getProjectRepository(id: String,skip:Int,branch:String?): Flow<Data?>
     /**
-     * Retrieves the repository tree for a given project.
+     * Retrieves the repository commits for a given project.
      *
      * @param id The unique identifier of the project.
      * @param cursor the pagination index to load commits after this cursor ,its match in Gitlab GraphQL is `startCursor`.

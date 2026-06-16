@@ -24,12 +24,12 @@ import javax.inject.Inject
  *
  * ## State
  * - [projects]: Holds the authenticated user’s contributed projects.
- * - [currentProject]: Holds the currently selected project’s repository tree.
+ * - [currentProject]: Holds the currently selected project’s details.
  *
  * ## Behavior
  * - **loadAllProjects()**: Fetches all projects using Apollo caching. Falls back
  *   to `NetworkFirst` policy if cache retrieval fails.
- * - **loadProject(id)**: Retrieves a specific project’s repository tree by ID.
+ * - **loadProject(id)**: Retrieves a specific project’s repository details by ID.
  *
  * ## Error Handling
  * - Exceptions during data collection are caught. The ViewModel retries with
@@ -45,11 +45,12 @@ import javax.inject.Inject
  *     }
  * }
  * ```
+ * @author Lahcen AHTAT
  */
 @HiltViewModel
 class ProjectViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
     ViewModel() {
-    /** Currently selected project’s repository tree. */
+    /** Currently selected project’s overview/details */
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
 
     /** Backing state for contributed projects. */
