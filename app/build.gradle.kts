@@ -23,7 +23,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-        manifestPlaceholders.putIfAbsent("appAuthRedirectScheme", "com.asue24.gitlab   ")
+        manifestPlaceholders.putIfAbsent("appAuthRedirectScheme", "com.ahtat204.gitlab   ")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault())
         val formattedDate = dateFormat.format(Date())

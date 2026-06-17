@@ -32,8 +32,19 @@ interface ProjectRepository {
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     * ### Implementation Example
+     * ```
+     * override suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data> =
+     *         apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst)
+     *             .watch().mapNotNull { it.data }.catch { ex ->
+     *                 if (ex is CancellationException) throw ex
+     *                 else Log.d(ex.cause,ex.message)
+     *             }.mapNotNull { it }
      *
-     * ### Example
+     * ```
+     *
+     *
+     * ### Usage example in ViewModel
      * ```kotlin
      * viewModelScope.launch {
      *     projectRepository.getAllProjects(FetchPolicy.CacheFirst)
@@ -96,8 +107,18 @@ interface ProjectRepository {
      * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     * ### Implementation Example
+     * ```kotlin
+     *  override suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?> {
+     *         return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
+     *             .watch().mapNotNull { it.data }.catch { ex ->
+     *                 if (ex is CancellationException) throw ex
+     *             }.mapNotNull { it }
+     *     }
+     * ```
      *
-     * ### Example
+     *
+     * ### Usage Example in ViewModel
      * ```kotlin
      * viewModelScope.launch {
      *     projectRepository.getProjectById("12345")
@@ -140,7 +161,26 @@ interface ProjectRepository {
  * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
  * - Logs errors without terminating the stream.
  * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
- *
+ * ### Implementation Example
+ * ```kotlin
+ *     override suspend fun getProjectRepository(id: String,skip:Int,branch:String?): Flow<GetProjectRepositoryQuery.Data?> {
+ *       return  if(branch==null) {
+ *             apolloClient.query(GetProjectRepositoryQuery(id,skip = skip))
+ *                 .fetchPolicy(FetchPolicy.CacheFirst)
+ *                 .watch().mapNotNull { it.data }
+ *                 .catch { ex ->
+ *                 if (ex is CancellationException) throw ex
+ *             }.mapNotNull { it }
+ *         }
+ *         else{
+ *           apolloClient.query(GetProjectRepositoryQuery(id,skip = skip, branch = Optional.present(branch)))
+ *               .fetchPolicy(FetchPolicy.CacheFirst).watch()
+ *               .mapNotNull { it.data }.catch { ex ->
+ *               if (ex is CancellationException) throw ex
+ *           }.mapNotNull { it }
+ *         }
+ *     }
+ * ```
  * ### Example
  * ```kotlin
  * viewModelScope.launch {
@@ -188,6 +228,26 @@ interface ProjectRepository {
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      *
+     *
+     * ### Implementation Example
+     * ```kotlin
+     *     override suspend fun getProjectCommits(
+     *         id: String, cursor: String?
+     *     ): Flow<GetProjectCommitsQuery.Data?> {
+     *         return if (cursor == null) apolloClient.query(GetProjectCommitsQuery(id))
+     *             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull { it.data }.catch { ex ->
+     *                 if (ex is CancellationException) throw ex
+     *             }.mapNotNull { it }
+     *         else apolloClient.query(GetProjectCommitsQuery(id, Optional.Present(cursor)))
+     *             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
+     *                 Log.d("PagingCursor", cursor)
+     *                 it.data
+     *             }.catch { ex ->
+     *                 if (ex is CancellationException) throw ex
+     *             }.mapNotNull { it }
+     *     }
+     *
+     * ```
      * ### Example
      * ```kotlin
      * viewModelScope.launch {
