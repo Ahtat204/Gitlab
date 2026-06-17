@@ -1,9 +1,8 @@
-query GetProjectRepository($projectPath:ID!,$branch:String,$skip:Int!){
+query GetProjectRepository($projectPath:ID!,$branch:String){
     project(fullPath: $projectPath){
         id
         repository {
-
-            branchNames(searchPattern: "*",limit: 20,offset: $skip)
+           ## branchNames(searchPattern: "*",limit: 20,offset: $skip)
             rootRef
 #            blobs(ref: $branch,paths: ""){ to fetch raw content of the blob(file)
 #                nodes {
@@ -22,9 +21,18 @@ query GetProjectRepository($projectPath:ID!,$branch:String,$skip:Int!){
                 }
             }
             tree(ref: $branch){
+                lastCommit(ref: $branch){
+                    message
+                    committedDate
+                    author {
+                        name
+                    }
+                }
                 trees{
                     __typename
+
                     nodes {
+                        id
                         name
                         path
 
@@ -48,9 +56,7 @@ query GetProjectRepository($projectPath:ID!,$branch:String,$skip:Int!){
                     edges {
                         cursor
                     }
-
                 }
-
             }
         }
     }

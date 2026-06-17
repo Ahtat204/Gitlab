@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -68,7 +69,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
     fun loadProjectRepository(projectPath:String){
         viewModelScope.launch{
             projectRepository
-                .getProjectRepository(projectPath, branch = null, skip = 0)
+                .getProjectRepository(projectPath, branch = null)
                 .collect { _repository.value=it?.project?.repository }
         }
     }
@@ -77,7 +78,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
      *
      */
     fun loadProjectCommits(id: String) {
-        Log.d("LoadingCmmits", id)
+        logger("LoadingCmmits", id)
         val pager = commits.value?.pageInfo?.endCursor
         if (pager == null) {
             viewModelScope.launch {
@@ -88,7 +89,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
             return
         } else {
             viewModelScope.launch {
-                Log.d("LoadingCmmits2", id)
+                logger(id)
                 _commits.value?.nodes?.size?.let { it ->
                     Log.d("CursorPagerFromViewModel", pager)
                     projectRepository.getProjectCommits(id, pager).collect { newCommits ->

@@ -32,6 +32,7 @@ import com.ahtat204.gitlab.domain.usecase.authentication.authStateStore
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.ahtat204.gitlab.domain.usecase.authentication.utility.buildResponse
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -152,7 +153,7 @@ class AuthenticationActivity : ComponentActivity() {
         super.onNewIntent(intent)
          response = buildResponse(intent, authRequest, this)
         if (response == null) {
-            Log.e("AuthenticationActivity", "OAUTH_ERROR")
+            logger("AuthenticationActivity", "OAUTH_ERROR")
             return
         }
       response?.let {runBlocking { exchangeCodeForToken(getService(), it, authState!!) }  }

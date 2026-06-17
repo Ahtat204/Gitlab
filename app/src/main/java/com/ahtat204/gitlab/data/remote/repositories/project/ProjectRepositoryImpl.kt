@@ -5,6 +5,8 @@ import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
+import com.ahtat204.gitlab.data.queries.GetRepositoryTreeQuery
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.Optional
@@ -46,13 +48,13 @@ class ProjectRepositoryImpl @Inject constructor(
     override suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data> =
         apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst)
             .watch().mapNotNull { it.data }.catch { ex ->
-                if (ex is CancellationException) throw ex
+                if (ex is CancellationException) throw ex else logger(ex.message)
             }.mapNotNull { it }
 
     override suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?> {
         return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
             .watch().mapNotNull { it.data }.catch { ex ->
-                if (ex is CancellationException) throw ex
+                if (ex is CancellationException) throw ex else logger(ex.message)
             }.mapNotNull { it }
     }
     override suspend fun getProjectCommits(
@@ -60,31 +62,36 @@ class ProjectRepositoryImpl @Inject constructor(
     ): Flow<GetProjectCommitsQuery.Data?> {
         return if (cursor == null) apolloClient.query(GetProjectCommitsQuery(id))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull { it.data }.catch { ex ->
-                if (ex is CancellationException) throw ex
+                if (ex is CancellationException) throw ex else logger(ex.message)
             }.mapNotNull { it }
         else apolloClient.query(GetProjectCommitsQuery(id, Optional.Present(cursor)))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
                 Log.d("PagingCursor", cursor)
                 it.data
             }.catch { ex ->
-                if (ex is CancellationException) throw ex
+                if (ex is CancellationException) throw ex else logger(ex.message)
             }.mapNotNull { it }
     }
+    override suspend fun getRepositoryTree(
+        project: String, treePath: String, branch: String?
+    ): Flow<GetRepositoryTreeQuery.Data> {
+        TODO("Not yet implemented")
+    }
 
-    override suspend fun getProjectRepository(id: String,skip:Int,branch:String?): Flow<GetProjectRepositoryQuery.Data?> {
+    override suspend fun getProjectRepository(id: String,branch:String?): Flow<GetProjectRepositoryQuery.Data?> {
       return  if(branch==null) {
-            apolloClient.query(GetProjectRepositoryQuery(id,skip = skip))
+            apolloClient.query(GetProjectRepositoryQuery(id))
                 .fetchPolicy(FetchPolicy.CacheFirst)
                 .watch().mapNotNull { it.data }
                 .catch { ex ->
-                if (ex is CancellationException) throw ex
-            }.mapNotNull { it }
+                if (ex is CancellationException) throw ex else logger(ex.message)
+                }.mapNotNull { it }
         }
         else{
-          apolloClient.query(GetProjectRepositoryQuery(id,skip = skip, branch = Optional.present(branch)))
+          apolloClient.query(GetProjectRepositoryQuery(id, branch = Optional.present(branch)))
               .fetchPolicy(FetchPolicy.CacheFirst).watch()
               .mapNotNull { it.data }.catch { ex ->
-              if (ex is CancellationException) throw ex
+                  if (ex is CancellationException) throw ex else logger(ex.message)
           }.mapNotNull { it }
         }
     }

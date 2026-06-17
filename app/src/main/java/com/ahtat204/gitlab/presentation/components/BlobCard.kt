@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FileOpen
 import androidx.compose.material.icons.rounded.Folder
@@ -141,7 +143,7 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node?){
                     Icons.Rounded.Folder,
                     contentDescription = it,
                     Modifier.size(30.dp).padding(3.dp),
-                    tint = Color(0xFF443D3D)
+                    tint = Orange
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
