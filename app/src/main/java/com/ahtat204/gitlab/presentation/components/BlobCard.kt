@@ -22,12 +22,38 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
+import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 
 /**
- * for files
+ * Displays a repository tree item representing a file.
+ *
+ * ## Purpose
+ * - Renders a card with an icon and filename for a given file node.
+ * - Intended for use in project repository views where files are listed.
+ *
+ * ## Parameters
+ * @param item The file node from [GetProjectRepositoryQuery.Node1].
+ *             If `null` or has no name, nothing is rendered.
+ *
+ * ## Behavior
+ * - Shows a file icon tinted with [Orange].
+ * - Displays the file name using [customFontFamily].
+ * - Card has a black background, padding, and fixed height.
+ *
+ * ## Layout
+ * - Root: [Card] with full width and padding.
+ * - Content: [Row] containing:
+ *   - File icon (30.dp size).
+ *   - Spacer for separation.
+ *   - File name text.
+ *
+ * ## Example
+ * ```
+ * TreeItemCard(item = fileNode)
+ * ```
  */
 @Composable
 fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?){
@@ -48,7 +74,7 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?){
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    Icons.Rounded.FileOpen,
+                    painter = painterResource(R.drawable.file),
                     contentDescription = item.id,
                     Modifier.size(30.dp).padding(3.dp),
                     tint = Orange
@@ -66,7 +92,32 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?){
 }
 
 /**
- * for folders
+ * Displays a repository tree item representing a folder.
+ *
+ * ## Purpose
+ * - Renders a card with an icon and folder name for a given directory node.
+ * - Intended for use in project repository views where folders are listed.
+ *
+ * ## Parameters
+ * @param item The folder node from [GetProjectRepositoryQuery.Node].
+ *             If `null` or has no name, nothing is rendered.
+ *
+ * ## Behavior
+ * - Shows a folder icon tinted with a dark gray color.
+ * - Displays the folder name using [customFontFamily].
+ * - Card has a black background, padding, and fixed height.
+ *
+ * ## Layout
+ * - Root: [Card] with full width and padding.
+ * - Content: [Row] containing:
+ *   - Folder icon (30.dp size).
+ *   - Spacer for separation.
+ *   - Folder name text.
+ *
+ * ## Example
+ * ```
+ * TreeItemCard(item = folderNode)
+ * ```
  */
 @Composable
 fun TreeItemCard(item: GetProjectRepositoryQuery.Node?){
@@ -90,7 +141,7 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node?){
                     Icons.Rounded.Folder,
                     contentDescription = it,
                     Modifier.size(30.dp).padding(3.dp),
-                    tint = Orange
+                    tint = Color(0xFF443D3D)
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(

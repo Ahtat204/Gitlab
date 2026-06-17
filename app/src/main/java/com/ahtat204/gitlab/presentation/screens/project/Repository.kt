@@ -1,5 +1,7 @@
 package com.ahtat204.gitlab.presentation.screens.project
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,26 +18,81 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahtat204.gitlab.presentation.components.FileExplorer
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
+import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
 import com.ahtat204.gitlab.presentation.viewmodels.RepositoryViewModel
-
+import java.time.format.DateTimeFormatter
+/**
+ * Displays the repository screen for a given project.
+ *
+ * ## Purpose
+ * - Provides a UI for exploring a project’s repository contents.
+ * - Shows the repository header with branch, commit message, and timeline.
+ * - Renders the repository tree via [FileExplorer].
+ *
+ * ## Parameters
+ * @param projectPath The unique path of the project whose repository should be displayed.
+ * @param x Padding values applied to the screen layout.
+ * @param repositoryViewModel ViewModel responsible for loading and exposing repository data.
+ * Defaults to [hiltViewModel] injection.
+ *
+ * ## Behavior
+ * - On first composition, triggers [RepositoryViewModel.loadProjectRepository] with [projectPath].
+ * - Observes repository state via [collectAsStateWithLifecycle].
+ * - If repository data is available:
+ *   - Displays [RepositoryHead] with commit message, author, timeline, and branch reference.
+ *   - Displays [FileExplorer] with the repository tree.
+ * - Dates are formatted using [iso8601ToRelative] for relative time display (e.g., "2 hours ago").
+ *
+ * ## Layout
+ * - Root: [Column] with black background, applied padding, and full height.
+ * - Top section: [RepositoryHead] showing branch and commit info.
+ * - Bottom section: [FileExplorer] rendering the repository tree.
+ *
+ * ## Example
+ * ```
+ * RepositoryScreen(
+ *     projectPath = "my-group/my-project",
+ *     x = PaddingValues(16.dp)
+ * )
+ * ```
+ *
+ * ## Notes
+ * - Requires API level [Build.VERSION_CODES.O] for date formatting.
+ * - The timeline string combines author name and relative commit time.
+ * - Ensure [RepositoryViewModel] is properly provided via Hilt for dependency injection.
+ */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun RepositoryScreen(projectPath:String, x: PaddingValues, repositoryViewModel: RepositoryViewModel= hiltViewModel()){
+fun RepositoryScreen(
+    projectPath: String,
+    x: PaddingValues,
+    repositoryViewModel: RepositoryViewModel = hiltViewModel()
+) {
     LaunchedEffect(Unit) {
         repositoryViewModel.loadProjectRepository(projectPath)
     }
     val repository by repositoryViewModel.repository.collectAsStateWithLifecycle()
     Column(
-        modifier = Modifier.padding(x)
+        modifier = Modifier
+            .padding(x)
             .fillMaxHeight()
             .background(Color.Black),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
-        repository?.lastCommit?.message?.let {
-            repository?.rootRef?.let {
-                RepositoryHead(commitMessage = it, timeline = "${repository?.lastCommit?.author?.name} authored ${repository?.lastCommit?.committedDate}", rootRef = it)
-            }
+    ) {
+        repository?.lastCommit?.message?.let { message ->
+            repository?.rootRef?.let { rootRef ->
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                repository?.lastCommit?.committedDate.let { date ->
+                    val parsedDateTime = iso8601ToRelative(date as String)
 
+                    RepositoryHead(
+                        commitMessage = message,
+                        timeline = "${repository?.lastCommit?.author?.name} authored $parsedDateTime",
+                        rootRef = rootRef
+                    )
+                }
+            }
         }
 
         repository?.tree?.let {
