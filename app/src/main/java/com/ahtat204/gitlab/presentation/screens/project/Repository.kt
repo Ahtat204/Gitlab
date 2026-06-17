@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahtat204.gitlab.presentation.components.FileExplorer
+import com.ahtat204.gitlab.presentation.components.RepositoryHead
 import com.ahtat204.gitlab.presentation.viewmodels.RepositoryViewModel
 
 @Composable
@@ -30,6 +31,13 @@ fun RepositoryScreen(projectPath:String, x: PaddingValues, repositoryViewModel: 
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
+        repository?.lastCommit?.message?.let {
+            repository?.rootRef?.let {
+                RepositoryHead(commitMessage = it, timeline = "${repository?.lastCommit?.author?.name} authored ${repository?.lastCommit?.committedDate}", rootRef = it)
+            }
+
+        }
+
         repository?.tree?.let {
             FileExplorer(it)
         }
