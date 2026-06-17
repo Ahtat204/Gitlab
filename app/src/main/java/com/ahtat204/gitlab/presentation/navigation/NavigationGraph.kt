@@ -72,7 +72,7 @@ fun BottomNavigationGraph(
                 arguments = listOf(navArgument("projectId") { defaultValue = "" }))
             {backStackEntry ->
                 val projectId = backStackEntry.arguments?.getString("projectId")
-                projectId?.let { RepositoryScreen(it) }
+                projectId?.let { RepositoryScreen(it,x) }
             }
             composable(
                 route = "project?projectId={projectId}",

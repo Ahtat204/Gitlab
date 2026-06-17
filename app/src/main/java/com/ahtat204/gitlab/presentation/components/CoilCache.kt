@@ -4,6 +4,9 @@ import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
+import kotlinx.coroutines.Dispatchers
+import okhttp3.OkHttpClient
+import javax.inject.Inject
 
 object CoilCache {
 
@@ -16,5 +19,11 @@ object CoilCache {
                 .maxSizeBytes(50L * 1024 * 1024) // 50 MB
                 .build()
         }.build()
+    lateinit var loader: ImageLoader
+        private set
+
+    fun init(coilLoader: ImageLoader) {
+        loader = coilLoader
+    }
 }
 

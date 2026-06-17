@@ -1,12 +1,15 @@
 package com.ahtat204.gitlab.domain.di
 
+import coil.ImageLoader
 import com.ahtat204.gitlab.data.security.AuthenticationInterceptor
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -67,5 +70,11 @@ object OkHttpModule {
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             }).build()
+    }
+    @Singleton
+    @Provides
+    fun provideImageLoader(okHttpClient: OkHttpClient):ImageLoader{
+        return ImageLoader.Builder(context).crossfade(true).dispatcher(Dispatchers.IO)
+            .respectCacheHeaders(false).okHttpClient(okHttpClient).build()
     }
 }

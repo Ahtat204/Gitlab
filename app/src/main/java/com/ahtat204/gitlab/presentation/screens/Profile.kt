@@ -29,6 +29,7 @@ import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
+import com.ahtat204.gitlab.presentation.components.CoilCache.loader
 import com.ahtat204.gitlab.presentation.components.Contact
 import com.ahtat204.gitlab.presentation.components.Header
 import com.ahtat204.gitlab.presentation.components.Info
@@ -68,9 +69,6 @@ fun Profile(
         profileViewModel.loadProfile()
     }
     val user by profileViewModel.currentUser.collectAsState()
-    val loader: ImageLoader =
-        ImageLoader.Builder(context).crossfade(true).dispatcher(Dispatchers.IO)
-            .respectCacheHeaders(false).build()
     user?.let { profile ->
         Column(
             verticalArrangement = Arrangement.Top,
