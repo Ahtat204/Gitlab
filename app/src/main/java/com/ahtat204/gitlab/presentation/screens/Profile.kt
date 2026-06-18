@@ -58,6 +58,7 @@ import kotlinx.coroutines.Dispatchers
  *
  * @see ProfileViewModel
  * @see Header
+ * @see <img src="file:///C:/Users/lahce/AndroidStudioProjects/Gitlab/profile.jpg" width="300" height="700"/>
  */
 @Composable
 fun Profile(

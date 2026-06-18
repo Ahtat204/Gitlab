@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +64,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.RepositoryViewModel
  * - Requires API level [Build.VERSION_CODES.O] for date formatting.
  * - The timeline string combines author name and relative commit time.
  * - Ensure [RepositoryViewModel] is properly provided via Hilt for dependency injection.
+ *  @see <img src="file:///C:/Users/lahce/AndroidStudioProjects/Gitlab/repository.jpg"  width="300" height="700"/>
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -78,9 +78,6 @@ fun RepositoryScreen(
         repositoryViewModel.loadProjectRepository(projectPath,branch.value)
     }
     val repository by repositoryViewModel.repository.collectAsStateWithLifecycle()
-  // repository?.rootRef?.let {remember{mutableStateOf(it)}}
-    val validBranch=repository?.rootRef?:""
-   // val branch=remember { mutableStateOf(repository?.rootRef) }
     Column(
         modifier = Modifier
             .padding(x)
