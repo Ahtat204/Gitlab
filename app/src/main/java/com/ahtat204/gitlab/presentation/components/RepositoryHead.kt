@@ -5,19 +5,19 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +39,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
  * ## Parameters
  * @param commitMessage The latest commit message to display. Truncated if too long.
  * @param timeline A string representing the commit timeline (e.g., "2 hours ago").
- * @param rootRef The root reference (branch name) of the repository.
+ * @param branch The root reference (branch name) of the repository.
  *
  * ## Behavior
  * - Left section: A [TextButton] showing the branch icon and branch name.
@@ -70,7 +70,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
  * - Text elements use [customFontFamily] for consistent styling.
  */
 @Composable
-fun RepositoryHead(commitMessage: String,timeline:String,rootRef:String) {
+fun RepositoryHead(commitMessage: String, timeline:String, branch: MutableState<String?>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -81,7 +81,7 @@ fun RepositoryHead(commitMessage: String,timeline:String,rootRef:String) {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextButton(onClick = {}) {
+        TextButton(onClick = {branch.value="feature/authenticationbranch"}) {
 
             Icon(
                 painter = painterResource(R.drawable.branch),
@@ -90,11 +90,11 @@ fun RepositoryHead(commitMessage: String,timeline:String,rootRef:String) {
                 tint =Orange
             )
             Text(
-                text = rootRef,
+                text = branch.value?:"",
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 15.sp,
                 color = White,
-                modifier = Modifier,
+                modifier = Modifier.width(60.dp),
                 fontFamily = customFontFamily,
             )
         }
@@ -110,7 +110,7 @@ fun RepositoryHead(commitMessage: String,timeline:String,rootRef:String) {
                 fontSize = 14.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                color = Color.White,
+                color = White,
                 modifier = Modifier
                     .fillMaxWidth(0.8f).offset(0.dp,10.dp),
                 fontFamily = customFontFamily,
@@ -120,7 +120,7 @@ fun RepositoryHead(commitMessage: String,timeline:String,rootRef:String) {
                 text = timeline,
                 maxLines = 1,
                 fontSize = 10.sp,
-                color = Color.White,
+                color = White,
                 modifier = Modifier.offset(0.dp,(10).dp).fillMaxWidth(0.8f),
                 fontFamily = customFontFamily,
             )
@@ -129,7 +129,7 @@ fun RepositoryHead(commitMessage: String,timeline:String,rootRef:String) {
             Text(
                 text = "history",
                 fontSize = 15.sp,
-                color = Color.White,
+                color = White,
                 modifier = Modifier,
                 fontFamily = customFontFamily,
             )

@@ -66,7 +66,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
      * currently it just fetch blobs,trees for the default branch,name of rootRef(default branch),first 20 branch names,
      * @see "graphql/com/ahtat204/GetProjectRepository.graphql"
      */
-    fun loadProjectRepository(projectPath:String){
+    fun loadProjectRepository(projectPath:String,branch:String?=null){
         viewModelScope.launch{
             projectRepository
                 .getProjectRepository(projectPath, branch = null)

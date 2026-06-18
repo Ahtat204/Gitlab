@@ -2,8 +2,8 @@ query GetProjectRepository($projectPath:ID!,$branch:String){
     project(fullPath: $projectPath){
         id
         repository {
-           ## branchNames(searchPattern: "*",limit: 20,offset: $skip)
             rootRef
+            ## branchNames(searchPattern: "*",limit: 20,offset: $skip)
 #            blobs(ref: $branch,paths: ""){ to fetch raw content of the blob(file)
 #                nodes {
 #                    rawTextBlob

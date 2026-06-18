@@ -8,25 +8,23 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahtat204.gitlab.presentation.components.FileExplorer
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.RepositoryViewModel
 /**
  * Displays the repository screen for a given project.
@@ -75,10 +73,14 @@ fun RepositoryScreen(
     x: PaddingValues,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        repositoryViewModel.loadProjectRepository(projectPath)
+    val branch=remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(branch.value) {
+        repositoryViewModel.loadProjectRepository(projectPath,branch.value)
     }
     val repository by repositoryViewModel.repository.collectAsStateWithLifecycle()
+  // repository?.rootRef?.let {remember{mutableStateOf(it)}}
+    val validBranch=repository?.rootRef?:""
+   // val branch=remember { mutableStateOf(repository?.rootRef) }
     Column(
         modifier = Modifier
             .padding(x)
@@ -87,15 +89,15 @@ fun RepositoryScreen(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         repository?.lastCommit?.message?.let { message ->
             repository?.rootRef?.let { rootRef ->
                 repository?.lastCommit?.committedDate.let { date ->
                     val parsedDateTime = iso8601ToRelative(date as String)
+                    if (branch.value==null) branch.value=rootRef
                     RepositoryHead(
                         commitMessage = message,
                         timeline = "${repository?.lastCommit?.author?.name} authored $parsedDateTime",
-                        rootRef = rootRef
+                        branch = branch
                     )
                 }
             }
