@@ -40,7 +40,7 @@ import com.ahtat204.gitlab.presentation.components.MyWorkItems
  * ## Notes
  * - This composable acts as a wrapper for [MyWorkItems], ensuring consistent
  *   layout and styling across the home screen.
- *   @see <img src="file:///C:/Users/lahce/AndroidStudioProjects/Gitlab/homescreen.jpg"  width="300" height="700"/>
+ *   @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/repository/homescreen.jpg"  width="300" height="700"/>
  */
 @Composable
 fun Home(navController: NavHostController,x: PaddingValues) {

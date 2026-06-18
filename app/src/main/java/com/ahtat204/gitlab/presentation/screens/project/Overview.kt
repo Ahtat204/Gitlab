@@ -84,6 +84,7 @@ import java.time.ZoneId
  * - Uses [Instant] and [ZoneId] to sort projects by activity date.
  * - Relies on [ProjectItem] composable to render individual project details.
  * - Displays up to all available projects; topics and languages are shown if present.
+ *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/repository/projectdetails.jpg"  width="300" height="700"/>
  */
 @Composable
 fun ProjectDetailScreen(
