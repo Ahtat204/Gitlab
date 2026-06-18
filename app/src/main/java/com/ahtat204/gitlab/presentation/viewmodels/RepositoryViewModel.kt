@@ -2,9 +2,9 @@ package com.ahtat204.gitlab.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
+import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.domain.usecase.logging.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-typealias Commits = GetProjectCommitsQuery.Commits?
+typealias Commits = GetRepositoryCommitsQuery.Commits?
 typealias Repository = GetProjectRepositoryQuery.Repository?
 typealias Branches = GetRepositoryBranchesQuery.Repository?
 
@@ -79,9 +79,9 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
 
     fun loadRepositoryBranches(id: String) {
         if (_branches.value != null && _branches?.value?.branchNames?.isNotEmpty() == true) {
-            _branches.value?.branchNames?.size?.let {size->
+            _branches.value?.branchNames?.size?.let { size ->
                 viewModelScope.launch {
-                    projectRepository.getRepositoryBranches(id,size )
+                    projectRepository.getRepositoryBranches(id, size)
                         .collect { _branches.value = it.project?.repository }
                 }
             }

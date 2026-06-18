@@ -82,13 +82,6 @@ fun Header(
                     .padding(4.dp)
                     .size(80.dp)
                     .clip(RoundedCornerShape(40.dp)),
-                /*   onState = { state ->
-                       when (state) {
-                           is AsyncImagePainter.State.Loading -> {}
-                           is AsyncImagePainter.State.Success -> {}
-                           else -> {}
-                       }
-                   }*/
             )
         }
         Column(

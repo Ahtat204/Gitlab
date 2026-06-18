@@ -33,26 +33,6 @@ import kotlin.coroutines.cancellation.CancellationException
 @Singleton
 class ProfileRepositoryImpl @Inject constructor(private val apolloClient: ApolloClient) :
     ProfileRepository {
-    /**
-     * Retrieves the repository tree for a given project.
-     *
-     * @param policy The policy to use to fetch data ,ex:from cache first or from network first ,etc... .
-     * @return A [Flow] emitting [GetMyProfileQuery.Data] objects, or null if unavailable.
-     *
-     * ### Behavior
-     * - Executes [GetMyProfileQuery].
-     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
-     * - Emits results reactively via Flow.
-     * - Logs errors without terminating the stream.
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     profileRepository.getMyProfile(FetchPolicy.CacheFirst)
-     *         .collect { myProfile=it.CurrentUser }
-     * }
-     * ```
-     */
     override fun getMyProfile(policy: FetchPolicy): Flow<GetMyProfileQuery.Data> {
         return apolloClient.query(GetMyProfileQuery()).fetchPolicy(policy).watch()
             .mapNotNull { it.data }.catch { ex ->

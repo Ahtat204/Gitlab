@@ -1,8 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
-import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
-import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
+import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -37,7 +36,7 @@ import javax.inject.Singleton
  *
  * ## Dependencies
  * - [ApolloClient]: Executes GraphQL queries and manages caching.
- * - [GetMyProjectsPaginatedQuery], [GetProjectDetailsQuery]: Auto‑generated query classes.
+ * - [GetMyProjectsPaginatedQuery], [GetProjectDetailsQuery],[GetProjectRepositoryQuery],[GetRepositoryCommitsQuery]: Auto‑generated query classes.
  * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
  * @author Lahcen AHTAT
  */
@@ -60,12 +59,12 @@ class ProjectRepositoryImpl @Inject constructor(
     }
     override suspend fun getProjectCommits(
         id: String, cursor: String?
-    ): Flow<GetProjectCommitsQuery.Data?> {
-        return if (cursor == null) apolloClient.query(GetProjectCommitsQuery(id))
+    ): Flow<GetRepositoryCommitsQuery.Data?> {
+        return if (cursor == null) apolloClient.query(GetRepositoryCommitsQuery(id))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull { it.data }.catch { ex ->
                 if (ex is CancellationException) throw ex else logger(ex.message)
             }.mapNotNull { it }
-        else apolloClient.query(GetProjectCommitsQuery(id, Optional.Present(cursor)))
+        else apolloClient.query(GetRepositoryCommitsQuery(id, Optional.Present(cursor)))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
                 logger(cursor,"PagingCursor")
                 it.data
