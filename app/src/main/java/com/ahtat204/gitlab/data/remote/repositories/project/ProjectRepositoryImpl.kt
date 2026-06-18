@@ -5,6 +5,7 @@ import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
+import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryTreeQuery
 import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.apollographql.apollo.ApolloClient
@@ -66,16 +67,26 @@ class ProjectRepositoryImpl @Inject constructor(
             }.mapNotNull { it }
         else apolloClient.query(GetProjectCommitsQuery(id, Optional.Present(cursor)))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
-                Log.d("PagingCursor", cursor)
+                logger(cursor,"PagingCursor")
                 it.data
             }.catch { ex ->
                 if (ex is CancellationException) throw ex else logger(ex.message)
             }.mapNotNull { it }
     }
-    override suspend fun getRepositoryTree(
+    override suspend fun getRepositorySubTree(
         project: String, treePath: String, branch: String?
     ): Flow<GetRepositoryTreeQuery.Data> {
         TODO("Not yet implemented")
+    }
+    override suspend fun getRepositoryBranches(
+        project: String, skip: Int
+    ): Flow<GetRepositoryBranchesQuery.Data> {
+       return apolloClient.query(GetRepositoryBranchesQuery(project,skip)).fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
+           logger("getRepositoryBranches","PagingCursor")
+           it.data
+       }.catch { ex ->
+           if (ex is CancellationException) throw ex else logger(ex.message)
+       }.mapNotNull { it }
     }
 
     override suspend fun getProjectRepository(id: String,branch:String?): Flow<GetProjectRepositoryQuery.Data?> {

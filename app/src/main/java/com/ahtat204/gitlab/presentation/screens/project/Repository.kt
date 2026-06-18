@@ -90,6 +90,7 @@ fun RepositoryScreen(
             repository?.rootRef?.let { rootRef ->
                 repository?.lastCommit?.committedDate.let { date ->
                     val parsedDateTime = iso8601ToRelative(date as String)
+
                     if (branch.value==null) branch.value=rootRef
                     RepositoryHead(
                         commitMessage = message,

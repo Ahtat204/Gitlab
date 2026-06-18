@@ -1,10 +1,10 @@
 package com.ahtat204.gitlab.presentation.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
+import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.domain.usecase.logging.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,10 +14,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.distinctBy
-import kotlin.collections.plus
-typealias Commit = GetProjectCommitsQuery.Commits?
-typealias Repository= GetProjectRepositoryQuery.Repository?
+
+typealias Commits = GetProjectCommitsQuery.Commits?
+typealias Repository = GetProjectRepositoryQuery.Repository?
+typealias Branches = GetRepositoryBranchesQuery.Repository?
+
 /**
  * ViewModel responsible for exposing GitLab project's Repository tree data to the UI layer.
  *
@@ -29,6 +30,7 @@ typealias Repository= GetProjectRepositoryQuery.Repository?
  * ## State
  * - [commits]: Holds the authenticated user’s contributed projects.
  * - [repository]: Holds the currently selected project’s repository tree.
+ * - [branches]: Holds the currently selected project’s list of branches.
  *
  * ## Behavior
  * - **loadProjectRepository()**: Fetches a project repository tree using Apollo caching. Falls back
@@ -52,26 +54,40 @@ typealias Repository= GetProjectRepositoryQuery.Repository?
  * @author Lahcen AHTAT
  */
 @HiltViewModel
-class RepositoryViewModel @Inject constructor(private val projectRepository: ProjectRepository): ViewModel() {
+class RepositoryViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
+    ViewModel() {
     /** Backing state for  commits. */
-    private val _commits = MutableStateFlow<Commit>(null)
+    private val _commits = MutableStateFlow<Commits>(null)
 
     /** Public immutable flow of  commits. */
-    val commits: StateFlow<Commit> = _commits.asStateFlow()
-    private val _repository= MutableStateFlow<Repository>(null)
-
-    val repository:StateFlow<Repository> = _repository.asStateFlow()
+    val commits: StateFlow<Commits> = _commits.asStateFlow()
+    private val _repository = MutableStateFlow<Repository>(null)
+    val repository: StateFlow<Repository> = _repository.asStateFlow()
+    private val _branches = MutableStateFlow<Branches>(null)
+    val branches: StateFlow<Branches> = _branches.asStateFlow()
 
     /**
      * currently it just fetch blobs,trees for the default branch,name of rootRef(default branch),first 20 branch names,
-     * @see "graphql/com/ahtat204/GetProjectRepository.graphql"
+     * [See GraphQL query](file:///C:/Users/lahce/AndroidStudioProjects/Gitlab/app/src/main/graphql/com/ahtat204/GetProjectRepository.graphql)
      */
-    fun loadProjectRepository(projectPath:String,branch:String?=null){
-        viewModelScope.launch{
-            projectRepository
-                .getProjectRepository(projectPath, branch = null)
-                .collect { _repository.value=it?.project?.repository }
+    fun loadProjectRepository(projectPath: String, branch: String? = null) {
+        viewModelScope.launch {
+            projectRepository.getProjectRepository(projectPath, branch = null)
+                .collect { _repository.value = it?.project?.repository }
         }
+    }
+
+    fun loadRepositoryBranches(id: String) {
+        if (_branches.value != null && _branches?.value?.branchNames?.isNotEmpty() == true) {
+            _branches.value?.branchNames?.size?.let {size->
+                viewModelScope.launch {
+                    projectRepository.getRepositoryBranches(id,size )
+                        .collect { _branches.value = it.project?.repository }
+                }
+            }
+
+        }
+
     }
 
     /**
@@ -91,14 +107,14 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
             viewModelScope.launch {
                 logger(id)
                 _commits.value?.nodes?.size?.let { it ->
-                    Log.d("CursorPagerFromViewModel", pager)
+                    logger("CursorPagerFromViewModel", pager)
                     projectRepository.getProjectCommits(id, pager).collect { newCommits ->
                         val newNodes = newCommits?.project?.repository?.commits?.nodes
                         if (newNodes != null) {
                             _commits.update { currentState ->
                                 currentState?.copy(
-                                    nodes = currentState.nodes?.plus(newNodes)?.distinctBy { item -> item?.id }
-                                )
+                                    nodes = currentState.nodes?.plus(newNodes)
+                                        ?.distinctBy { item -> item?.id })
                             }
                         }
                     }

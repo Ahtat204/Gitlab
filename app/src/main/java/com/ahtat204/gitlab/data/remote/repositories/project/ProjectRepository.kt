@@ -6,6 +6,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
+import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryTreeQuery
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import kotlinx.coroutines.flow.Flow
@@ -297,6 +298,7 @@ interface ProjectRepository {
      * ```
      */
     suspend fun getProjectCommits(id: String, cursor: String?): Flow<GetProjectCommitsQuery.Data?>
-    suspend fun getRepositoryTree(project: String, treePath: String, branch: String?): Flow<GetRepositoryTreeQuery.Data>
+    suspend fun getRepositorySubTree(project: String, treePath: String, branch: String?): Flow<GetRepositoryTreeQuery.Data>
+    suspend fun getRepositoryBranches(project:String,skip:Int):Flow<GetRepositoryBranchesQuery.Data>
 
 }
