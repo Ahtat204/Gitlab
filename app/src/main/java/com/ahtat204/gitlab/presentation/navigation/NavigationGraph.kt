@@ -9,11 +9,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import androidx.navigation.navigation
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
-import com.ahtat204.gitlab.presentation.screens.project.ProjectCommits
+import com.ahtat204.gitlab.presentation.screens.ProjectCommits
 import com.ahtat204.gitlab.presentation.screens.project.ProjectDetailScreen
 import com.ahtat204.gitlab.presentation.screens.project.RepositoryScreen
 

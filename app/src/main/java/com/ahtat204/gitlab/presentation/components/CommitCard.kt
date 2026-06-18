@@ -48,6 +48,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
  * - Consider adding spacing or alignment between the message and SHA for improved readability.
  * - Accessibility: Provide meaningful descriptions if commit details are critical for screen readers.
  */
+
 @Composable
 fun CommitCard(sha: String?, message: String?) {
     Card(

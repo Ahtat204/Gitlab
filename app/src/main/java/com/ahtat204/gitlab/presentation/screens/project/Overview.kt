@@ -97,7 +97,6 @@ fun ProjectDetailScreen(
     LaunchedEffect(true) {
         projectViewModel.loadProject(path)
     }
-    val encodedId = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())
     Column(
         modifier = Modifier
             .background(Color.Black)
