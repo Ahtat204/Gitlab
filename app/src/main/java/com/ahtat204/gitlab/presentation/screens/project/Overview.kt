@@ -43,7 +43,7 @@ import com.ahtat204.gitlab.presentation.components.ProjectItem
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
-import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectViewModel
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.Instant

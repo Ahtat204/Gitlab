@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.presentation.viewmodels
+package com.ahtat204.gitlab.presentation.viewmodels.project.repository
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

@@ -29,7 +29,7 @@ import coil.ImageLoader
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.ahtat204.gitlab.presentation.components.ProjectItem
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectViewModel
 import kotlinx.coroutines.Dispatchers
 import java.time.Instant
 import java.time.ZoneId
