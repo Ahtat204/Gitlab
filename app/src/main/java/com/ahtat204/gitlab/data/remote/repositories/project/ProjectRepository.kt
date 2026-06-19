@@ -4,6 +4,7 @@ import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.apollographql.apollo.cache.normalized.FetchPolicy
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.Flow
  *  * - [ProjectRepository.getProjectById]: Retrieves a project overview for a given project (full description, star count, fork count, ...).
  *  * - [ProjectRepository.getProjectRepository]: Retrieves the repository tree (blobs, trees,..) for a given project.
  *  * - [ProjectRepository.getProjectCommits]: Retrieves the repository commits for a given project.
+ *  * - [ProjectRepository.getProjectMergeRequests]:Retrieves project Merge Requests
  */
 interface ProjectRepository {
     /**
@@ -233,5 +235,52 @@ interface ProjectRepository {
      */
 
     suspend fun getProjectCommits(id: String, cursor: String?): Flow<GetRepositoryCommitsQuery.Data?>
+
+    /**
+     * Retrieves the repository tree for a given project.
+     *
+     * @param id The unique identifier of the project.
+     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
+     * @return A [Flow] emitting [GetProjectMergeRequestsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetProjectMergeRequestsQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getProjectMergeRequests("12345")
+     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL
+     *  project(fullPath: $project){
+     *         mergeRequests(sort: CREATED_DESC,first: 20,after:$cursor ){
+     *             nodes{
+     *                 id
+     *                 name
+     *                 author {
+     *                     name
+     *                 }
+     *                 createdAt
+     *                 state
+     *                 sourceBranch
+     *                 targetBranch
+     *             }
+     *             pageInfo {
+     *                 startCursor
+     *                 hasNextPage
+     *             }
+     *         }
+     *     }
+     * ```
+     */
+    suspend fun getProjectMergeRequests(id: String,cursor:String?=null):Flow<GetProjectMergeRequestsQuery.Data>
 
 }

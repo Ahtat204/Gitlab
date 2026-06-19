@@ -1,0 +1,21 @@
+query GetProjectMergeRequests($project:ID!,$cursor:String){
+    project(fullPath: $project){
+        mergeRequests(sort: CREATED_DESC,first: 20,after:$cursor ){
+            nodes{
+                id
+                name
+                author {
+                    name
+                }
+                createdAt
+                state
+                sourceBranch
+                targetBranch
+            }
+            pageInfo {
+                startCursor
+                hasNextPage
+            }
+        }
+    }
+}

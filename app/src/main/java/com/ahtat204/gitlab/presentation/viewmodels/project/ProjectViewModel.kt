@@ -7,6 +7,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.presentation.components.withCacheFallback
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -63,7 +64,7 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      * - First attempts with [com.apollographql.apollo.cache.normalized.FetchPolicy.CacheFirst].
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
-    fun loadAllProjects() = viewModelScope.launch {
+    fun loadAllProjects() = viewModelScope.launch(Dispatchers.IO) {
         projectRepository.getAllProjects().withCacheFallback { projectRepository.getAllProjects() }
             .collect { _projects.value = it.currentUser }
     }
@@ -73,7 +74,7 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      *
      * @param id The unique project identifier.
      */
-    fun loadProject(id: String) = viewModelScope.launch {
+    fun loadProject(id: String) = viewModelScope.launch(Dispatchers.IO) {
         projectRepository.getProjectById(id).withCacheFallback {
             projectRepository.getProjectById(
                 id
