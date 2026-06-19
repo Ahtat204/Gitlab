@@ -2,7 +2,7 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
-import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
+import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
@@ -13,6 +13,11 @@ import kotlinx.coroutines.flow.Flow
  *
  * Provides reactive streams of project lists, details, and repository trees.
  * Implementations are expected to use Apollo GraphQL client with caching policies.
+ *  * ### Contracts:
+ *  * - [ProjectRepository.getAllProjects]: Streams all projects the authenticated user has contributed to.
+ *  * - [ProjectRepository.getProjectById]: Retrieves a project overview for a given project (full description, star count, fork count, ...).
+ *  * - [ProjectRepository.getProjectRepository]: Retrieves the repository tree (blobs, trees,..) for a given project.
+ *  * - [ProjectRepository.getProjectCommits]: Retrieves the repository commits for a given project.
  */
 interface ProjectRepository {
     /**
@@ -165,6 +170,68 @@ interface ProjectRepository {
  * ```
  */
     suspend fun getProjectRepository(id: String,skip:Int,branch:String?): Flow<Data?>
-    suspend fun getProjectCommits(id: String, cursor: String?): Flow<GetProjectCommitsQuery.Data?>
+
+
+    /**
+     * Retrieves the repository tree for a given project.
+     *
+     * @param id The unique identifier of the project.
+     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
+     * @return A [Flow] emitting [GetRepositoryCommitsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetRepositoryCommitsQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getProjectCommits("12345")
+     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL
+     *    project(fullPath: $projectPath){
+     *         __typename
+     *         repository {
+     *             __typename
+     *             branchNames(searchPattern: "*", offset: 0, limit: 100)
+     *             commits(ref:"main",first: 20,after: $cursor) {
+     *                 __typename
+     *                 nodes {
+     *                     __typename
+     *                     id
+     *                     sha
+     *                     name
+     *                     message
+     *                     authorName
+     *                     committedDate
+     *                     signature {
+     *                         __typename
+     *                         verificationStatus
+     *                     }
+     *
+     *                 }
+     *                 pageInfo {
+     *                     __typename
+     *                     endCursor
+     *                     hasNextPage
+     *                     startCursor
+     *                 }
+     *             }
+     *             __typename
+     *
+     *         }
+     *
+     *     }
+     * ```
+     */
+
+    suspend fun getProjectCommits(id: String, cursor: String?): Flow<GetRepositoryCommitsQuery.Data?>
 
 }

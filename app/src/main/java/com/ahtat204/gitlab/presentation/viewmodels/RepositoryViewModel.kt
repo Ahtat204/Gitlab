@@ -3,7 +3,7 @@ package com.ahtat204.gitlab.presentation.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahtat204.gitlab.data.queries.GetProjectCommitsQuery
+import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.distinctBy
 import kotlin.collections.plus
-typealias Commit = GetProjectCommitsQuery.Commits?
+typealias Commit = GetRepositoryCommitsQuery.Commits?
 typealias Repository= GetProjectRepositoryQuery.Repository?
 @HiltViewModel
 class RepositoryViewModel @Inject constructor(private val projectRepository: ProjectRepository): ViewModel() {
@@ -49,7 +49,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
         } else {
             viewModelScope.launch {
                 Log.d("LoadingCmmits2", id)
-                _commits.value?.nodes?.size?.let { it ->
+                _commits.value?.nodes?.size?.let {
                     Log.d("CursorPagerFromViewModel", pager)
                     projectRepository.getProjectCommits(id, pager).collect { newCommits ->
                         val newNodes = newCommits?.project?.repository?.commits?.nodes
