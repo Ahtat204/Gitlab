@@ -55,7 +55,7 @@ import com.ahtat204.gitlab.presentation.components.RepositoryHead
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
-import com.ahtat204.gitlab.presentation.viewmodels.RepositoryViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
 import kotlinx.coroutines.launch
 
 /**

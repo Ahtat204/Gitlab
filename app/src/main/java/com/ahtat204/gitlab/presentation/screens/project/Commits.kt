@@ -25,7 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.components.CommitCard
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.viewmodels.RepositoryViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
 /**
  * Displays a paginated list of commits for a given GitLab project.
  *
