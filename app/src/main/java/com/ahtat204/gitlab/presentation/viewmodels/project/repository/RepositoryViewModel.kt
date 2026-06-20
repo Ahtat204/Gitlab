@@ -96,12 +96,12 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
     /**
      *
      */
-    fun loadProjectCommits(id: String) {
+    fun loadProjectCommits(id: String,branch: String) {
         logger("LoadingCmmits", id)
         val pager = commits.value?.pageInfo?.endCursor
         if (pager == null) {
             viewModelScope.launch {
-                projectRepository.getProjectCommits(id, null).collect {
+                projectRepository.getProjectCommits(id, cursor = null, branch = branch).collect {
                     _commits.value = it?.project?.repository?.commits
                 }
             }
@@ -111,7 +111,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
                 logger(id)
                 _commits.value?.nodes?.size?.let { it ->
                     logger("CursorPagerFromViewModel", pager)
-                    projectRepository.getProjectCommits(id, pager).collect { newCommits ->
+                    projectRepository.getProjectCommits(id, pager,branch).collect { newCommits ->
                         val newNodes = newCommits?.project?.repository?.commits?.nodes
                         if (newNodes != null) {
                             _commits.update { currentState ->

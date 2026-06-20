@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.presentation.components.FileExplorer
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
@@ -51,6 +52,8 @@ import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 /**
  * Displays the repository screen for a given project.
@@ -99,13 +102,14 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
 fun RepositoryScreen(
     projectPath: String,
     x: PaddingValues,
+    navController: NavController,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
-    val branch = remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(branch.value) {
-        repositoryViewModel.loadProjectRepository(projectPath, branch.value)
+    val currentBranch = remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(currentBranch.value) {
+        repositoryViewModel.loadProjectRepository(projectPath, currentBranch.value)
     }
     val repository by repositoryViewModel.repository.collectAsStateWithLifecycle()
     Column(
@@ -122,7 +126,7 @@ fun RepositoryScreen(
                 repository?.lastCommit?.committedDate.let { date ->
                     val parsedDateTime = iso8601ToRelative(date as String)
 
-                    if (branch.value == null) branch.value = rootRef
+                    if (currentBranch.value == null) currentBranch.value = rootRef
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -149,7 +153,7 @@ fun RepositoryScreen(
                                 tint = Orange
                             )
                             Text(
-                                text = branch.value ?: "",
+                                text = currentBranch.value ?: "",
                                 overflow = TextOverflow.Ellipsis,
                                 fontSize = 15.sp,
                                 color = White,
@@ -189,7 +193,13 @@ fun RepositoryScreen(
                                 fontFamily = customFontFamily,
                             )
                         }
-                        TextButton(onClick = {}) {
+                        val encodedId =
+                            URLEncoder.encode(projectPath, StandardCharsets.UTF_8.toString())
+                        val encodedBranch = URLEncoder.encode(
+                            currentBranch.value,
+                            StandardCharsets.UTF_8.toString()
+                        )
+                        TextButton(onClick = { navController.navigate("commits/$encodedId/$encodedBranch") }) {
                             Text(
                                 text = "history",
                                 fontSize = 15.sp,
@@ -211,7 +221,7 @@ fun RepositoryScreen(
                     onDismissRequest = { showSheet = false },
                     sheetState = sheetState
                 ) {
-                    LaunchedEffect(branch.value) {
+                    LaunchedEffect(currentBranch.value) {
                         repositoryViewModel.loadRepositoryBranches(projectPath)
                     }
                     val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
@@ -225,15 +235,13 @@ fun RepositoryScreen(
                             verticalArrangement = Arrangement.spacedBy(0.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            items(it) { newBranch ->
+                            items(it) { branch ->
                                 Card(
                                     {
                                         repositoryViewModel.loadProjectRepository(
-                                            projectPath,
-                                            newBranch
+                                            projectPath, branch
                                         )
-                                        branch.value=newBranch
-
+                                        currentBranch.value = branch
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -250,7 +258,7 @@ fun RepositoryScreen(
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.branch),
-                                            contentDescription = newBranch,
+                                            contentDescription = branch,
                                             Modifier
                                                 .size(30.dp)
                                                 .padding(3.dp),
@@ -258,7 +266,7 @@ fun RepositoryScreen(
                                         )
                                         Spacer(modifier = Modifier.width(10.dp))
                                         Text(
-                                            text = newBranch,
+                                            text = branch,
                                             fontFamily = customFontFamily,
                                             modifier = Modifier.weight(0.9f)
                                         )

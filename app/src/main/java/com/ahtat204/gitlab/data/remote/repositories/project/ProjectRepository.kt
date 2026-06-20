@@ -2,11 +2,11 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
-import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
+import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryTreeQuery
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import kotlinx.coroutines.flow.Flow
@@ -216,6 +216,7 @@ interface ProjectRepository {
      * ```
      */
     suspend fun getProjectRepository(id: String, branch: String?): Flow<Data?>
+
     /**
      * Retrieves the repository's SubTree(meaning ,subdirectory) for a given project .
      *
@@ -290,7 +291,12 @@ interface ProjectRepository {
      *     }
      * ```
      */
-    suspend fun getRepositorySubTree(project: String, treePath: String, branch: String?): Flow<GetRepositoryTreeQuery.Data>
+    suspend fun getRepositorySubTree(
+        project: String,
+        treePath: String,
+        branch: String?
+    ): Flow<GetRepositoryTreeQuery.Data>
+
     /**
      * Retrieves the repository tree for a given project.
      *
@@ -323,7 +329,11 @@ interface ProjectRepository {
      *     }
      * ```
      */
-    suspend fun getRepositoryBranches(project:String,skip:Int):Flow<GetRepositoryBranchesQuery.Data>
+    suspend fun getRepositoryBranches(
+        project: String,
+        skip: Int
+    ): Flow<GetRepositoryBranchesQuery.Data>
+
     /**
      * Retrieves the repository tree for a given project.
      *
@@ -383,6 +393,8 @@ interface ProjectRepository {
      *     }
      * ```
      */
-    suspend fun getProjectCommits(id: String, cursor: String?): Flow<GetRepositoryCommitsQuery.Data?>
+    suspend fun getProjectCommits(
+        id: String, branch: String, cursor: String?
+    ): Flow<GetRepositoryCommitsQuery.Data?>
 
 }

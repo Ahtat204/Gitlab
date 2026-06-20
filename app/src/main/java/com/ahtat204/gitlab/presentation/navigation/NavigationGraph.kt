@@ -5,9 +5,9 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.ahtat204.gitlab.presentation.screens.Home
@@ -60,19 +60,32 @@ fun BottomNavigationGraph(
         composable(route = BottomBarScreen.Activity.route) {
             // Activity screen placeholder
         }
-        composable(route = "commits?projectId={projectId}",
-            arguments = listOf(navArgument("projectId") { defaultValue = "" }))
-        {backStackEntry ->
+        composable(route = "commits/{projectId}/{branch}",
+            arguments = listOf(
+                navArgument("projectId") { type = NavType.StringType },
+                navArgument("branch") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        )
+        { backStackEntry ->
+
             val projectId = backStackEntry.arguments?.getString("projectId")
-            projectId?.let { ProjectCommits(navController,x,it) }
+            val branch=backStackEntry.arguments?.getString("branch")
+            if(branch!=null && projectId!=null) {
+                ProjectCommits(navController, x, branch,projectId)
+            }
         }
 
         navigation(startDestination ="Project", route = "project" ){
             composable(route = "repository?projectId={projectId}",
-                arguments = listOf(navArgument("projectId") { defaultValue = "" }))
+                arguments = listOf(navArgument("projectId") { defaultValue = "" })
+            )
             {backStackEntry ->
                 val projectId = backStackEntry.arguments?.getString("projectId")
-                projectId?.let { RepositoryScreen(it,x) }
+                projectId?.let { RepositoryScreen(it,x,navController) }
             }
             composable(
                 route = "project?projectId={projectId}",

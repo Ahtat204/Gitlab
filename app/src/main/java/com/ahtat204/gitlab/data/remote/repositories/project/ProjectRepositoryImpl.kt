@@ -47,26 +47,30 @@ class ProjectRepositoryImpl @Inject constructor(
     @OptIn(ApolloExperimental::class)
     override suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data> =
         apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst)
-            .watch().mapNotNull { it.data }.catch { ex ->
+            .watch()
+            .mapNotNull { it.data }
+            .catch { ex ->
                 if (ex is CancellationException) throw ex else logger(ex.message)
             }.mapNotNull { it }
 
     override suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?> {
         return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
-            .watch().mapNotNull { it.data }.catch { ex ->
+            .watch()
+            .mapNotNull { it.data }
+            .catch { ex ->
                 if (ex is CancellationException) throw ex else logger(ex.message)
             }.mapNotNull { it }
     }
     override suspend fun getProjectCommits(
-        id: String, cursor: String?
+        id: String, branch: String,cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?> {
-        return if (cursor == null) apolloClient.query(GetRepositoryCommitsQuery(id))
+        return if (cursor == null) apolloClient.query(GetRepositoryCommitsQuery(id, branch = branch))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull { it.data }.catch { ex ->
                 if (ex is CancellationException) throw ex else logger(ex.message)
             }.mapNotNull { it }
-        else apolloClient.query(GetRepositoryCommitsQuery(id, Optional.Present(cursor)))
+        else apolloClient.query(GetRepositoryCommitsQuery(id, Optional.Present(cursor),branch))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
-                logger(cursor,"PagingCursor")
+//                logger(cursor,"PagingCursor")
                 it.data
             }.catch { ex ->
                 if (ex is CancellationException) throw ex else logger(ex.message)

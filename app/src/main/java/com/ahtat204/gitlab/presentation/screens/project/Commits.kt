@@ -74,13 +74,14 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
 fun ProjectCommits(
     navController: NavController,
     x: PaddingValues,
+    branch:String,
     id: String,
     projectViewModel: RepositoryViewModel = hiltViewModel()
 ) {
     if (id == "") return
     val commits by projectViewModel.commits.collectAsStateWithLifecycle()
     LaunchedEffect(id) {
-        projectViewModel.loadProjectCommits(id)
+        projectViewModel.loadProjectCommits(id,branch)
     }
     if (commits?.nodes?.isEmpty() == true) return
     val listState = rememberLazyListState()
@@ -94,7 +95,7 @@ fun ProjectCommits(
     }
     LaunchedEffect(shouldLoadMore.value) {
         if (shouldLoadMore.value) {
-            projectViewModel.loadProjectCommits(id)
+            projectViewModel.loadProjectCommits(id,branch)
         }
     }
     Column(
