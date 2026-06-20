@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationResponse
@@ -51,12 +52,12 @@ fun buildResponse(
         response = AuthorizationResponse.Builder(authRequest!!).fromUri(uri).build()
         val ex = AuthorizationException.fromIntent(intent)
         if (ex != null) {
-            Log.e(
-                "OAUTH_ERROR", "Code: ${ex.code}, Type: ${ex.type}, Message: ${ex.errorDescription}"
+           logger(
+                 "Code: ${ex.code}, Type: ${ex.type}, Message: ${ex.errorDescription}"
             )
             Toast.makeText(context, "Error: ${ex.errorDescription}", Toast.LENGTH_SHORT).show()
         } else {
-            Log.e("error ", "OAUTH_ERROR")
+           logger( "OAUTH_ERROR")
         }
         return response
     }

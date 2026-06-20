@@ -6,6 +6,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.Optional
@@ -65,7 +66,7 @@ class ProjectRepositoryImpl @Inject constructor(
             }.mapNotNull { it }
         else apolloClient.query(GetRepositoryCommitsQuery(id, Optional.Present(cursor)))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
-                Log.d("PagingCursor", cursor)
+                logger("PagingCursor", cursor)
                 it.data
             }.catch { ex ->
                 if (ex is CancellationException) throw ex
@@ -81,7 +82,7 @@ class ProjectRepositoryImpl @Inject constructor(
             }.mapNotNull { it }
         else apolloClient.query(GetProjectMergeRequestsQuery(id, Optional.Present(cursor)))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
-                Log.d("PagingCursor", cursor)
+                logger("PagingCursor", cursor)
                 it.data
             }.catch { ex ->
                 if (ex is CancellationException) throw ex
