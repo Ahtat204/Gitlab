@@ -218,14 +218,23 @@ fun RepositoryScreen(
                     branches?.branchNames?.let {
                         branches
                         LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Black),
                             contentPadding = x,
                             verticalArrangement = Arrangement.spacedBy(0.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            items(it) { branch ->
+                            items(it) { newBranch ->
                                 Card(
-                                    {},
+                                    {
+                                        repositoryViewModel.loadProjectRepository(
+                                            projectPath,
+                                            newBranch
+                                        )
+                                        branch.value=newBranch
+
+                                    },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(20.dp, 10.dp)
@@ -241,7 +250,7 @@ fun RepositoryScreen(
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.branch),
-                                            contentDescription = branch,
+                                            contentDescription = newBranch,
                                             Modifier
                                                 .size(30.dp)
                                                 .padding(3.dp),
@@ -249,7 +258,7 @@ fun RepositoryScreen(
                                         )
                                         Spacer(modifier = Modifier.width(10.dp))
                                         Text(
-                                            text = branch,
+                                            text = newBranch,
                                             fontFamily = customFontFamily,
                                             modifier = Modifier.weight(0.9f)
                                         )

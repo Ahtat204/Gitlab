@@ -72,7 +72,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
      */
     fun loadProjectRepository(projectPath: String, branch: String? = null) {
         viewModelScope.launch {
-            projectRepository.getProjectRepository(projectPath, branch = null)
+            projectRepository.getProjectRepository(projectPath, branch = branch)
                 .collect { _repository.value = it?.project?.repository }
         }
     }
