@@ -1,3 +1,6 @@
+@file:OptIn(ApolloExperimental::class)
+
+import com.apollographql.apollo.annotations.ApolloExperimental
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -64,6 +67,7 @@ apollo {
             endpointUrl.set("https://gitlab.com/api/graphql")
             schemaFile.set(file("app/src/main/graphql/com/ahtat204/schema.graphqls"))
             addTypename.set("always")
+            generateDataBuilders.set(true)
         }
     }
 }
@@ -107,4 +111,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
     testImplementation(libs.apollo.mockserver)
+    testImplementation("com.apollographql.apollo:apollo-testing-support:4.4.2")
 }
