@@ -58,6 +58,7 @@ android {
         buildConfig = true
         compose = true
     }
+
 }
 
 apollo {
