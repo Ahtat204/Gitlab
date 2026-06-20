@@ -2,14 +2,10 @@ package com.ahtat204.gitlab.presentation.screens.project
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -25,8 +21,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -35,14 +33,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -56,7 +51,6 @@ import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
-import kotlinx.coroutines.launch
 
 /**
  * Displays the repository screen for a given project.
@@ -107,48 +101,22 @@ fun RepositoryScreen(
     x: PaddingValues,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
-    val scope = rememberCoroutineScope()
-    var isVisible by remember { mutableStateOf(false) }
-    val offsetY = remember { Animatable(1000f) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
-    var isBranchListVisible by remember { mutableStateOf(false) }
     val branch = remember { mutableStateOf<String?>(null) }
     LaunchedEffect(branch.value) {
         repositoryViewModel.loadProjectRepository(projectPath, branch.value)
-        repositoryViewModel.loadRepositoryBranches(projectPath)
-    }
-    LaunchedEffect(isVisible) {
-
     }
     val repository by repositoryViewModel.repository.collectAsStateWithLifecycle()
     Column(
         modifier = Modifier
             .padding(x)
             .fillMaxHeight()
-            .clickable(onClick = { isBranchListVisible = false })
+            .clickable(onClick = { })
             .background(Color.Black),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-
-     /*     if (showSheet) {
-        ModalBottomSheet(modifier = Modifier.fillMaxHeight(),
-            onDismissRequest = { showSheet = false },
-            sheetState = sheetState
-        ) {
-            Button(
-                onClick = {
-                    scope.launch { sheetState.hide() }
-                    showSheet = false
-                },
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text("Close")
-            }
-        }
-    }*/
         repository?.lastCommit?.message?.let { message ->
             repository?.rootRef?.let { rootRef ->
                 repository?.lastCommit?.committedDate.let { date ->
@@ -170,9 +138,7 @@ fun RepositoryScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextButton(onClick = {
-                            isVisible = !isVisible
-                            scope.launch {
-                                offsetY.animateTo(0f, tween(300)) }
+                            showSheet = !showSheet
                         }) {
                             Icon(
                                 painter = painterResource(R.drawable.branch),
@@ -232,80 +198,68 @@ fun RepositoryScreen(
                                 fontFamily = customFontFamily,
                             )
                         }
-                    }/* RepositoryHead(
-                        commitMessage = message,
-                        timeline = "${repository?.lastCommit?.author?.name} authored $parsedDateTime",
-                        branch = branch
-                    )*/
-                }/*   */
-            }
-        }
-        Spacer(modifier = Modifier.height(30.dp))
-        repository?.tree?.let {
-            FileExplorer(it)
-        }
-    }
-       Box(modifier = Modifier.fillMaxSize()) {
-        if (isVisible) {
-            // click anywhere in the box to slide the panel down
-         /*   Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Cyan.copy(alpha = 0.0f))
-                    .clickable {
-                        scope.launch {
-                            offsetY.animateTo(30f, tween(20))
-                            isVisible = false
-                        }
                     }
-            )*/
-            Box(
-                modifier = Modifier.clip(RoundedCornerShape(30.dp))
-                    .align(Alignment.BottomCenter)
-                    .offset(y = offsetY.value.dp)
-                    .fillMaxWidth().height(550.dp)
-                    .background(Color.DarkGray)
-                    .pointerInput(Unit) {
-                        detectDragGestures(
-                            onDrag = { change, dragAmount ->
-                                change.consume()
-                                val newOffset = (offsetY.value + dragAmount.y).coerceAtLeast(0f)
-                                scope.launch { offsetY.snapTo(newOffset) }
-                            },
-                            onDragEnd = {
-                                scope.launch {
-                                    if (offsetY.value > 150f) {
-                                        offsetY.animateTo(1000f, tween(1300))
-                                        isVisible = false
-                                    } else {
-                                        offsetY.animateTo(0f, tween(1200))
+                }
+            }
+            Spacer(modifier = Modifier.height(30.dp))
+            repository?.tree?.let {
+                FileExplorer(it)
+            }
+            if (showSheet) {
+                ModalBottomSheet(
+                    modifier = Modifier.fillMaxHeight(),
+                    onDismissRequest = { showSheet = false },
+                    sheetState = sheetState
+                ) {
+                    LaunchedEffect(branch.value) {
+                        repositoryViewModel.loadRepositoryBranches(projectPath)
+                    }
+                    val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
+                    branches?.branchNames?.let {
+                        branches
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = x,
+                            verticalArrangement = Arrangement.spacedBy(0.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            items(it) { branch ->
+                                Card(
+                                    {},
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(20.dp, 10.dp)
+                                        .background(Color.Black)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(Color.Black)
+                                            .height(50.dp),
+                                        horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.branch),
+                                            contentDescription = branch,
+                                            Modifier
+                                                .size(30.dp)
+                                                .padding(3.dp),
+                                            tint = Orange
+                                        )
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Text(
+                                            text = branch,
+                                            fontFamily = customFontFamily,
+                                            modifier = Modifier.weight(0.9f)
+                                        )
                                     }
                                 }
                             }
-                        )
+                        }
                     }
-            ) {
-                val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
-                branches?.branchNames?.let { branches
-                    LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = x,
-                    verticalArrangement = Arrangement.spacedBy(0.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ){
-                    items(it){
-                        Text(it)
-                    }
-                }}
-
-
+                }
             }
         }
     }
-
-
-
-
-
-
 }

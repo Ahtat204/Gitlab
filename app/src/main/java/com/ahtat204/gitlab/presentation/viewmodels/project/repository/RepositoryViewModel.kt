@@ -77,15 +77,18 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
         }
     }
 
-    fun loadRepositoryBranches(id: String) {
-        if (_branches.value != null && _branches?.value?.branchNames?.isNotEmpty() == true) {
-            _branches.value?.branchNames?.size?.let { size ->
-                viewModelScope.launch {
-                    projectRepository.getRepositoryBranches(id, size)
-                        .collect { _branches.value = it.project?.repository }
-                }
+    fun loadRepositoryBranches(id: String,skip:Int?=null) {
+        if (_branches.value != null && _branches.value?.branchNames?.isNotEmpty() == true && skip!=null) {
+            viewModelScope.launch {
+                projectRepository.getRepositoryBranches(id, skip)
+                    .collect { _branches.value = it.project?.repository }
             }
 
+        }
+        else{
+            viewModelScope.launch{
+                projectRepository.getRepositoryBranches(id,0).collect { _branches.value = it.project?.repository }
+            }
         }
 
     }

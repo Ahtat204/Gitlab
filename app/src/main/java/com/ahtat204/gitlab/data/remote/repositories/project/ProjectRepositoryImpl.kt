@@ -1,10 +1,10 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
-import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
+import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryTreeQuery
 import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.apollographql.apollo.ApolloClient
@@ -81,7 +81,7 @@ class ProjectRepositoryImpl @Inject constructor(
         project: String, skip: Int
     ): Flow<GetRepositoryBranchesQuery.Data> {
        return apolloClient.query(GetRepositoryBranchesQuery(project,skip)).fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
-           logger("getRepositoryBranches","PagingCursor")
+          // logger("getRepositoryBranches","PagingCursor")
            it.data
        }.catch { ex ->
            if (ex is CancellationException) throw ex else logger(ex.message)
