@@ -3,8 +3,8 @@ package com.ahtat204.gitlab.domain.di
 import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import com.ahtat204.gitlab.BuildConfig
 import com.ahtat204.gitlab.data.security.AuthenticationInterceptor
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
 import dagger.Module
@@ -66,11 +66,11 @@ object OkHttpModule {
     fun provieOkHttp(): OkHttpClient {
         return OkHttpClient.Builder().connectTimeout(15, TimeUnit.SECONDS).cache(
             cache = Cache(
-                Tokens.context.cacheDir, 10L * 1024 * 1024
+                context.cacheDir, 10L * 1024 * 1024
             )
         ).readTimeout(15, TimeUnit.SECONDS).addInterceptor(AuthenticationInterceptor())
             .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
+                level =if(BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
             }).build()
     }
 
@@ -79,10 +79,11 @@ object OkHttpModule {
      */
     @Singleton
     @Provides
-    fun provideImageLoader(okHttpClient: OkHttpClient):ImageLoader{
+    fun provideImageLoader(okHttpClient: OkHttpClient): ImageLoader {
         return ImageLoader.Builder(context).crossfade(true).dispatcher(Dispatchers.IO)
             .respectCacheHeaders(false).okHttpClient(okHttpClient).memoryCache {
-                MemoryCache.Builder(context).maxSizePercent(0.25) // Use 25% of app's memory for images
+                MemoryCache.Builder(context)
+                    .maxSizePercent(0.25) // Use 25% of app's memory for images
                     .build()
             }.diskCache {
                 DiskCache.Builder().directory(context.cacheDir?.resolve("image_cache")!!)

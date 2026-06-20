@@ -1,6 +1,6 @@
 package com.ahtat204.gitlab.data.security
 
-import android.util.Log
+
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.ahtat204.gitlab.domain.usecase.logging.logger
