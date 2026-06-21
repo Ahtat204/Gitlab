@@ -58,7 +58,6 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
     ViewModel() {
     /** Backing state for  commits. */
     private val _commits = MutableStateFlow<Commits>(null)
-
     /** Public immutable flow of  commits. */
     val commits: StateFlow<Commits> = _commits.asStateFlow()
     private val _repository = MutableStateFlow<Repository>(null)
@@ -92,12 +91,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
         }
 
     }
-
-    /**
-     *
-     */
     fun loadProjectCommits(id: String,branch: String) {
-        logger("LoadingCmmits", id)
         val pager = commits.value?.pageInfo?.endCursor
         if (pager == null) {
             viewModelScope.launch {
@@ -108,9 +102,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
             return
         } else {
             viewModelScope.launch {
-                logger(id)
                 _commits.value?.nodes?.size?.let { it ->
-                    logger("CursorPagerFromViewModel", pager)
                     projectRepository.getProjectCommits(id, pager,branch).collect { newCommits ->
                         val newNodes = newCommits?.project?.repository?.commits?.nodes
                         if (newNodes != null) {
