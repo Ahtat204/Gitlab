@@ -2,6 +2,7 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
@@ -76,6 +77,12 @@ class ProjectRepositoryImpl @Inject constructor(
                 if (ex is CancellationException) throw ex else logger(ex.message)
             }.mapNotNull { it }
     }
+    override suspend fun getProjectIssues(
+        id: String, cursor: String?
+    ): Flow<GetProjectIssuesQuery.Data> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun getRepositorySubTree(
         project: String, treePath: String, branch: String?
     ): Flow<GetRepositoryTreeQuery.Data> {

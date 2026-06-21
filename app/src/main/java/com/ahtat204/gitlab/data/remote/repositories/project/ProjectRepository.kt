@@ -3,6 +3,7 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -19,9 +20,10 @@ import kotlinx.coroutines.flow.Flow
  *
  * ### Contracts:
  * - [ProjectRepository.getAllProjects]: Streams all projects the authenticated user has contributed to.
- * - [ProjectRepository.getProjectById]: Retrieves a project overview for a given project (full description, star count, fork count, ...).
- * - [ProjectRepository.getProjectRepository]: Retrieves the repository tree (blobs, trees,..) for a given project.
- * - [ProjectRepository.getProjectCommits]: Retrieves the repository commits for a given project.
+ * - [ProjectRepository.getProjectById]: Streams a project overview for a given project (full description, star count, fork count, ...).
+ * - [ProjectRepository.getProjectRepository]: Streams the repository tree (blobs, trees,..) for a given project.
+ * - [ProjectRepository.getProjectCommits]: Streams the repository commits for a given project.
+ * - [ProjectRepository.getRepositoryBranches] Streams first 20 branches of a repository .
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
@@ -396,5 +398,5 @@ interface ProjectRepository {
     suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
-
+    suspend fun getProjectIssues(id:String,cursor:String?=null) :Flow<GetProjectIssuesQuery.Data>
 }
