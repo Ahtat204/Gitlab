@@ -125,7 +125,7 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?){
  * ```
  */
 @Composable
-fun TreeItemCard(item: GetProjectRepositoryQuery.Node?,repositoryViewModel: RepositoryViewModel,path:String?,project:String,branch:String?,/*open:(path: String?)->Unit*/){
+fun TreeItemCard(item: GetProjectRepositoryQuery.Node?,repositoryViewModel: RepositoryViewModel,path:String?,project:String,branch:String?){
     Card(
         onClick = {  repositoryViewModel.loadProjectRepository(
             branch =branch,

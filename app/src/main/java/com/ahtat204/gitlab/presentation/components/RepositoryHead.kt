@@ -26,71 +26,52 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+
 /**
  * Displays the header section for a repository view.
- *
- * ## Purpose
- * - Provides a compact summary of the repository’s current branch, latest commit message, and timeline.
- * - Includes interactive buttons for branch display and commit history navigation.
- *
- * ## Parameters
- * @param commitMessage The latest commit message to display. Truncated if too long.
- * @param timeline A string representing the commit timeline (e.g., "2 hours ago").
- * @param branch The root reference (branch name) of the repository.
- *
- * ## Behavior
- * - Left section: A [TextButton] showing the branch icon and branch name.
- * - Middle section: A [Column] displaying:
- *   - Commit message (max 2 lines, ellipsized).
- *   - Timeline (single line, ellipsized).
- * - Right section: A [TextButton] labeled "history".
- * - Entire row styled with black background, rounded border, and fixed height.
- *
- * ## Layout
- * - Root: [Row] with centered vertical alignment and border styling.
- * - Branch section: [Icon] + branch name text.
- * - Commit section: [Column] with commit message and timeline.
- * - History section: [TextButton] with "history" label.
- *
- * ## Example
- * ```
- * RepositoryHead(
- *     commitMessage = "Fix bug in authentication flow",
- *     timeline = "3 hours ago",
- *     rootRef = "main"
- * )
- * ```
- *
- * ## Notes
- * - The branch and history buttons currently have empty click handlers (`onClick = {}`).
- *   Implement navigation or actions as needed.
- * - Text elements use [customFontFamily] for consistent styling.
+
  */
 @Composable
-fun RepositoryHead(commitMessage: String, timeline:String, branch: MutableState<String?>) {
+fun RepositoryHead(
+    showSheet: () -> Unit,
+    currentBranch: MutableState<String?>,
+    message: String,
+    name: String?,
+    parsedDateTime: String,
+    navController: NavController,
+    projectPath: String
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF000000)).fillMaxWidth().border(
+            .background(Color(0xFF000000))
+            .fillMaxWidth()
+            .border(
                 width = (0.1f).dp, color = Color(0xFF675353), shape = RoundedCornerShape(10.dp)
             )
             .height(75.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextButton(onClick = {branch.value="feature/authenticationbranch"}) {
-
+        TextButton(
+            onClick = showSheet
+        ) {
             Icon(
                 painter = painterResource(R.drawable.branch),
                 contentDescription = "branch",
-                Modifier.size(25.dp).padding(3.dp),
-                tint =Orange
+                Modifier
+                    .size(25.dp)
+                    .padding(3.dp),
+                tint = Orange
             )
             Text(
-                text = branch.value?:"",
+                text = currentBranch.value ?: "",
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 15.sp,
                 color = White,
@@ -98,34 +79,43 @@ fun RepositoryHead(commitMessage: String, timeline:String, branch: MutableState<
                 fontFamily = customFontFamily,
             )
         }
-        Column (
+        Column(
             modifier = Modifier
-                .background(Color(0xFF000000)).weight(0.5f)
-                .fillMaxHeight().fillMaxWidth(0.75f),
-            verticalArrangement =  Arrangement.Top
-            , horizontalAlignment =Alignment.CenterHorizontally
+                .background(Color(0xFF000000))
+                .weight(0.5f)
+                .fillMaxHeight()
+                .fillMaxWidth(0.75f),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = commitMessage,
+                text = message,
                 fontSize = 14.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 color = White,
                 modifier = Modifier
-                    .fillMaxWidth(0.8f).offset(0.dp,10.dp),
+                    .fillMaxWidth(0.8f)
+                    .offset(0.dp, 10.dp),
                 fontFamily = customFontFamily,
             )
 
             Text(
-                text = timeline,
+                text = "$name authored $parsedDateTime",
                 maxLines = 1,
                 fontSize = 10.sp,
                 color = White,
-                modifier = Modifier.offset(0.dp,(10).dp).fillMaxWidth(0.8f),
+                modifier = Modifier
+                    .offset(0.dp, (10).dp)
+                    .fillMaxWidth(0.8f),
                 fontFamily = customFontFamily,
             )
         }
-        TextButton(onClick = {}) {
+        val encodedId = URLEncoder.encode(projectPath, StandardCharsets.UTF_8.toString())
+        val encodedBranch = URLEncoder.encode(
+            currentBranch.value, StandardCharsets.UTF_8.toString()
+        )
+        TextButton(onClick = { navController.navigate("commits/$encodedId/$encodedBranch") }) {
             Text(
                 text = "history",
                 fontSize = 15.sp,
