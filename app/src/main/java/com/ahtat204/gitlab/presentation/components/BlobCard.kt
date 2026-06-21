@@ -28,6 +28,7 @@ import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
+import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
 
 /**
  * Displays a repository tree item representing a file.
@@ -124,9 +125,13 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?){
  * ```
  */
 @Composable
-fun TreeItemCard(item: GetProjectRepositoryQuery.Node?,open:(path: String?)->Unit){
+fun TreeItemCard(item: GetProjectRepositoryQuery.Node?,repositoryViewModel: RepositoryViewModel,path:String?,project:String,branch:String?,/*open:(path: String?)->Unit*/){
     Card(
-        onClick = { open(item?.path) },
+        onClick = {  repositoryViewModel.loadProjectRepository(
+            branch =branch,
+            path = path,
+            projectPath = project
+        ) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp, 10.dp)

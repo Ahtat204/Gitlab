@@ -49,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.presentation.components.FileExplorer
+import com.ahtat204.gitlab.presentation.components.FolderTree
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
 import com.ahtat204.gitlab.presentation.components.TreeItemCard
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
@@ -70,6 +71,7 @@ import java.nio.charset.StandardCharsets
  * @param projectPath The unique path of the project whose repository should be displayed.
  * @param x Padding values applied to the screen layout.
  * @param repositoryViewModel ViewModel responsible for loading and exposing repository data.
+ * @param navController Navigation controller used for handling navigation actions.
  * Defaults to [hiltViewModel] injection.
  *
  * ## Behavior
@@ -78,6 +80,7 @@ import java.nio.charset.StandardCharsets
  * - If repository data is available:
  *   - Displays [RepositoryHead] with commit message, author, timeline, and branch reference.
  *   - Displays [FileExplorer] with the repository tree.
+ *   - Once a folder is Opened , it displays the previous tree to navigate back
  * - Dates are formatted using [iso8601ToRelative] for relative time display (e.g., "2 hours ago").
  *
  * ## Layout
@@ -108,11 +111,11 @@ fun RepositoryScreen(
     navController: NavController,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
-    var paths by remember { mutableStateOf(listOf<String>()) }
+    var directories by remember { mutableStateOf(FolderTree(null, null)) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
     val currentBranch = remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(currentBranch.value) {
+    LaunchedEffect(Unit) {
         repositoryViewModel.loadProjectRepository(projectPath, currentBranch.value)
     }
     val repository by repositoryViewModel.repository.collectAsStateWithLifecycle()
@@ -214,7 +217,7 @@ fun RepositoryScreen(
                     }
                 }
             }
-            FileExplorer(paths)
+
             Spacer(modifier = Modifier.height(30.dp))
             repository?.tree?.let {
                 Column(
@@ -231,23 +234,17 @@ fun RepositoryScreen(
                 ) {
                     it.trees.nodes?.let { folders ->
                         folders.forEach { folder ->
-                            TreeItemCard(
-                                folder
-                            ) {
-                                folder?.path?.let {path->
-                                    repositoryViewModel.loadProjectRepository(
-                                        branch = currentBranch.value,
-                                        path = path,
-                                        projectPath = projectPath
-                                    )
+                            TreeItemCard(folder,repositoryViewModel=repositoryViewModel, path = folder?.path,projectPath, branch = currentBranch.value)
+
+                                folder?.path?.let { path ->
+
                                 }
 
-                            }
                         }
                     }
                     it.blobs.nodes?.let { files ->
-                        files.forEach {
-                            TreeItemCard(it)
+                        files.forEach { file ->
+                            TreeItemCard(file)
                         }
                     }
                 }
