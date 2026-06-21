@@ -1,26 +1,38 @@
-query GetProjectRepository($projectPath:ID!,$branch:String,$skip:Int!){
+query GetProjectRepository($projectPath:ID!,$branch:String){
     project(fullPath: $projectPath){
         id
         repository {
-            branchNames(searchPattern: "*",limit: 20,offset: $skip)
             rootRef
-            blobs(ref: $branch,paths: ""){
-                nodes {
-                    rawTextBlob
-                    rawBlob
-                }
-                pageInfo {
-                    startCursor
-                }
-            }
-            lastCommit{
-                name
+            ## branchNames(searchPattern: "*",limit: 20,offset: $skip)
+#            blobs(ref: $branch,paths: ""){ to fetch raw content of the blob(file)
+#                nodes {
+#                    rawTextBlob
+#                    rawBlob
+#                }
+#                pageInfo {
+#                    startCursor
+#                }
+#            }
+            lastCommit(ref: $branch){
                 message
+                committedDate
+                author {
+                    name
+                }
             }
             tree(ref: $branch){
+                lastCommit(ref: $branch){
+                    message
+                    committedDate
+                    author {
+                        name
+                    }
+                }
                 trees{
                     __typename
+
                     nodes {
+                        id
                         name
                         path
 
@@ -37,19 +49,14 @@ query GetProjectRepository($projectPath:ID!,$branch:String,$skip:Int!){
                         id
                         name
                         path
-                        webUrl
-
                     }
                     pageInfo {
                         startCursor
-
                     }
                     edges {
                         cursor
                     }
-
                 }
-
             }
         }
     }
