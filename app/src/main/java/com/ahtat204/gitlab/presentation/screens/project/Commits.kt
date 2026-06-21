@@ -1,5 +1,7 @@
 package com.ahtat204.gitlab.presentation.screens.project
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +26,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.components.CommitCard
+import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.RepositoryViewModel
 /**
@@ -70,17 +73,19 @@ import com.ahtat204.gitlab.presentation.viewmodels.RepositoryViewModel
  * - The `contentDescription` for icons inside [CommitCard] should be provided
  *   if accessibility is required.
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProjectCommits(
     navController: NavController,
     x: PaddingValues,
+    branch:String,
     id: String,
     projectViewModel: RepositoryViewModel = hiltViewModel()
 ) {
     if (id == "") return
     val commits by projectViewModel.commits.collectAsStateWithLifecycle()
     LaunchedEffect(id) {
-        projectViewModel.loadProjectCommits(id)
+        projectViewModel.loadProjectCommits(id,branch)
     }
     if (commits?.nodes?.isEmpty() == true) return
     val listState = rememberLazyListState()
@@ -94,7 +99,7 @@ fun ProjectCommits(
     }
     LaunchedEffect(shouldLoadMore.value) {
         if (shouldLoadMore.value) {
-            projectViewModel.loadProjectCommits(id)
+            projectViewModel.loadProjectCommits(id,branch)
         }
     }
     Column(
@@ -120,7 +125,7 @@ fun ProjectCommits(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(items = nodes, key =  { item -> item?.id ?: item?.sha?: null.hashCode() }) { commit ->
-                        CommitCard(commit?.sha, commit?.message)
+                        CommitCard(commit?.sha?.substring(0,8), commit?.name,commit?.authorName?:"", iso8601ToRelative(commit?.committedDate as String))
                     }
                 }
             }

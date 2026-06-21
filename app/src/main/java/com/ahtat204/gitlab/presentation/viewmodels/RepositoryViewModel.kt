@@ -36,7 +36,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
         }
     }
 
-    fun loadProjectCommits(id: String) {
+    fun loadProjectCommits(id: String,branch:String) {
         Log.d("LoadingCmmits", id)
         val pager = commits.value?.pageInfo?.endCursor
         if (pager == null) {
