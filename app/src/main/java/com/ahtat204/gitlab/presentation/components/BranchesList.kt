@@ -28,7 +28,54 @@ import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Branches
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
-
+/**
+ * Displays a scrollable list of repository branches.
+ *
+ * ## Purpose
+ * - Provides a UI for selecting and switching between branches in a project repository.
+ * - Each branch is rendered as a card with an icon and branch name.
+ * - Selecting a branch reloads the repository data for that branch.
+ *
+ * ## Parameters
+ * @param branches The [Branches] object containing available branch names.
+ * @param repositoryViewModel The [RepositoryViewModel] used to load repository data when a branch is selected.
+ * @param projectPath The unique path of the project whose branches are being displayed.
+ * @param currentBranch A [MutableState] holding the currently selected branch name. Updated when a branch is clicked.
+ * @param x Padding values applied to the list layout.
+ *
+ * ## Behavior
+ * - Renders a [LazyColumn] with one card per branch.
+ * - Each card:
+ *   - Displays a branch icon tinted with [Orange].
+ *   - Shows the branch name using [customFontFamily].
+ *   - On click:
+ *     - Calls [RepositoryViewModel.loadProjectRepository] with the selected branch.
+ *     - Updates [currentBranch] with the new branch name.
+ * - The list has a black background and applies the provided padding.
+ *
+ * ## Layout
+ * - Root: [LazyColumn] with full size, black background, and padding.
+ * - Each item: [Card] containing a [Row] with:
+ *   - Branch icon (30.dp size).
+ *   - Spacer for separation.
+ *   - Branch name text.
+ *
+ * ## Example
+ * ```
+ * BranchesList(
+ *     branches = branches,
+ *     repositoryViewModel = repositoryViewModel,
+ *     projectPath = "my-group/my-project",
+ *     currentBranch = remember { mutableStateOf("main") },
+ *     x = PaddingValues(16.dp)
+ * )
+ * ```
+ *
+ * ## Notes
+ * - Ensure [branches] is non-null before rendering; otherwise, nothing is displayed.
+ * - The click handler directly reloads repository data for the selected branch.
+ * - Styling is consistent with other repository components (black background, custom font).
+ */
 @Composable
 fun BranchesList(
     branches: Branches,

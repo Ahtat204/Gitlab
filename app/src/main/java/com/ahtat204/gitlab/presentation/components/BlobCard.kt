@@ -97,23 +97,29 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?){
 }
 
 /**
- * Displays a repository tree item representing a folder.
+ * Displays a repository tree item representing a folder, with click-to-navigate behavior.
  *
  * ## Purpose
- * - Renders a card with an icon and folder name for a given directory node.
- * - Intended for use in project repository views where folders are listed.
+ * - Provides a UI element for rendering a folder node in the repository tree.
+ * - Allows users to click on a folder to load its contents via [RepositoryViewModel].
  *
  * ## Parameters
- * @param item The folder node from [GetProjectRepositoryQuery.Node].
- *             If `null` or has no name, nothing is rendered.
+ * @param item The folder node from [GetProjectRepositoryQuery.Node]. If `null` or has no name, nothing is rendered.
+ * @param repositoryViewModel The [RepositoryViewModel] used to load repository data when the folder is clicked.
+ * @param path The path of the folder within the repository. Passed to [RepositoryViewModel.loadProjectRepository].
+ * @param project The unique project path (e.g., "group/project").
+ * @param branch The branch reference to load the folder contents from.
  *
  * ## Behavior
- * - Shows a folder icon tinted with a dark gray color.
- * - Displays the folder name using [customFontFamily].
- * - Card has a black background, padding, and fixed height.
+ * - Renders a [Card] with:
+ *   - Folder icon tinted with [Orange].
+ *   - Folder name text styled with [customFontFamily].
+ * - On click:
+ *   - Calls [RepositoryViewModel.loadProjectRepository] with the given branch, path, and project.
+ *   - Updates the repository state to show the folder’s contents.
  *
  * ## Layout
- * - Root: [Card] with full width and padding.
+ * - Root: [Card] with full width, black background, and padding.
  * - Content: [Row] containing:
  *   - Folder icon (30.dp size).
  *   - Spacer for separation.
@@ -121,8 +127,18 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?){
  *
  * ## Example
  * ```
- * TreeItemCard(item = folderNode)
+ * TreeItemCard(
+ *     item = folderNode,
+ *     repositoryViewModel = repositoryViewModel,
+ *     path = folderNode?.path,
+ *     project = "my-group/my-project",
+ *     branch = "main"
+ * )
  * ```
+ *
+ * ## Notes
+ * - This overload is specifically for folder nodes. Use the file-node overload for rendering files.
+ * - Ensure [repositoryViewModel] is properly injected via Hilt or provided manually.
  */
 @Composable
 fun TreeItemCard(item: GetProjectRepositoryQuery.Node?,repositoryViewModel: RepositoryViewModel,path:String?,project:String,branch:String?){
@@ -162,6 +178,5 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node?,repositoryViewModel: Repo
                 )
             }
         }
-
     }
 }

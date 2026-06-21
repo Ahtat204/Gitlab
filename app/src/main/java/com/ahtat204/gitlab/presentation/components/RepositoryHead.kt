@@ -35,7 +35,53 @@ import java.nio.charset.StandardCharsets
 
 /**
  * Displays the header section for a repository view.
-
+ *
+ * ## Purpose
+ * - Provides a compact summary of the repository’s current branch, latest commit message, and timeline.
+ * - Includes interactive buttons for branch selection and commit history navigation.
+ *
+ * ## Parameters
+ * @param showSheet Callback invoked when the branch selector button is clicked.
+ *                  Typically toggles a modal bottom sheet for branch selection.
+ * @param currentBranch A [MutableState] holding the currently selected branch name.
+ * @param message The latest commit message to display. Truncated if too long.
+ * @param name The author of the latest commit. May be `null`.
+ * @param parsedDateTime A relative timestamp string (e.g., "2 hours ago").
+ * @param navController Navigation controller used to navigate to the commit history screen.
+ * @param projectPath The unique path of the project whose repository is being displayed.
+ *
+ * ## Behavior
+ * - Left section: A [TextButton] showing the branch icon and current branch name.
+ *   - Clicking toggles the branch selection sheet via [showSheet].
+ * - Middle section: A [Column] displaying:
+ *   - Commit message (max 2 lines, ellipsized).
+ *   - Timeline string combining author name and relative commit time.
+ * - Right section: A [TextButton] labeled "history" that navigates to the commits screen.
+ *   - Uses URL-encoded project path and branch name for safe routing.
+ *
+ * ## Layout
+ * - Root: [Row] with black background, rounded border, and fixed height.
+ * - Branch section: [Icon] + branch name text.
+ * - Commit section: [Column] with commit message and timeline.
+ * - History section: [TextButton] with "history" label.
+ *
+ * ## Example
+ * ```
+ * RepositoryHead(
+ *     showSheet = { showBranchSheet = true },
+ *     currentBranch = remember { mutableStateOf("main") },
+ *     message = "Fix bug in authentication flow",
+ *     name = "Alice",
+ *     parsedDateTime = "3 hours ago",
+ *     navController = navController,
+ *     projectPath = "my-group/my-project"
+ * )
+ * ```
+ *
+ * ## Notes
+ * - Branch names and project paths are URL-encoded before navigation.
+ * - Text elements use [customFontFamily] for consistent styling.
+ * - Ensure [navController] is properly configured with a "commits/{id}/{branch}" route.
  */
 @Composable
 fun RepositoryHead(

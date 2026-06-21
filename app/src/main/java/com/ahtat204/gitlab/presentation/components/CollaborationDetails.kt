@@ -68,13 +68,11 @@ fun CollaborationDetails(
                 )
             ) {}
         }
-
             ProjectWorkItems(
                 Item(
                     "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, null
                 )
             ) {}
-
         pipelinesCount?.let {
             ProjectWorkItems(
                 Item(
@@ -82,21 +80,11 @@ fun CollaborationDetails(
                 )
             ) {}
         }
-
             ProjectWorkItems(
                 Item(
                     "Members", "project/{id}/members", R.drawable.members, null
                 )
             ) {}
-
-
-     /*   commitCount?.let {
-            ProjectWorkItems(
-                Item("Commits", "project/{id}/commits", R.drawable.commit, it.toInt())
-            ) {
-                navController.navigate("commits?projectId=$encodedId")
-            }
-        }*/
     }
 
 }
