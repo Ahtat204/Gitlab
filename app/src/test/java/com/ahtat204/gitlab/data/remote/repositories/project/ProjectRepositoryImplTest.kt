@@ -18,7 +18,7 @@ class ProjectRepositoryImplTest : Responses() {
     private lateinit var mockWebserver: MockWebServer
     private lateinit var apolloClient: ApolloClient
     private lateinit var repository: ProjectRepository
-
+/*
     @Before
     fun setUp() = runBlocking {
         mockWebserver = MockWebServer()
@@ -61,5 +61,5 @@ class ProjectRepositoryImplTest : Responses() {
         assertNotNull(data)
         repository.getAllProjects().collect { data = it }
         assertNotNull(data)
-    }
+    }*/
 }

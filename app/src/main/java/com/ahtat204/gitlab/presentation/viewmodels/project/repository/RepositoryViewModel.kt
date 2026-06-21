@@ -6,7 +6,6 @@ import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
-import com.ahtat204.gitlab.domain.usecase.logging.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,9 +32,9 @@ typealias Branches = GetRepositoryBranchesQuery.Repository?
  * - [branches]: Holds the currently selected project’s list of branches.
  *
  * ## Behavior
- * - **loadProjectRepository()**: Fetches a project repository tree using Apollo caching. Falls back
- *   to `NetworkFirst` policy if cache retrieval fails.
- * - **loadProjectCommits(id)**: Retrieves a specific project’s repository commits by ID.
+ * - [loadProjectRepository]: Fetches a project repository tree using Apollo caching. Falls back to `NetworkFirst` policy if cache retrieval fails.
+ * - [loadProjectCommits]: Retrieves a specific project’s repository commits by ID.
+ * - []
  *
  * ## Error Handling
  * - Exceptions during data collection are caught. The ViewModel retries with
@@ -58,6 +57,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
     ViewModel() {
     /** Backing state for  commits. */
     private val _commits = MutableStateFlow<Commits>(null)
+
     /** Public immutable flow of  commits. */
     val commits: StateFlow<Commits> = _commits.asStateFlow()
     private val _repository = MutableStateFlow<Repository>(null)
@@ -67,31 +67,33 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
 
     /**
      * currently it just fetch blobs,trees for the default branch,name of rootRef(default branch),first 20 branch names,
-     * [See GraphQL query](file:///C:/Users/lahce/AndroidStudioProjects/Gitlab/app/src/main/graphql/com/ahtat204/GetProjectRepository.graphql)
+     * @param projectPath :don't get confused , this the project ID
+     * @param path this is the tree path , aka the path/name of the folder
      */
-    fun loadProjectRepository(projectPath: String, branch: String? = null) {
+    fun loadProjectRepository(projectPath: String, branch: String? = null,path:String?=null) {
         viewModelScope.launch {
-            projectRepository.getProjectRepository(projectPath, branch = branch)
+            projectRepository.getProjectRepository(projectPath, branch = branch,path=path)
                 .collect { _repository.value = it?.project?.repository }
         }
     }
 
-    fun loadRepositoryBranches(id: String,skip:Int?=null) {
-        if (_branches.value != null && _branches.value?.branchNames?.isNotEmpty() == true && skip!=null) {
+    fun loadRepositoryBranches(id: String, skip: Int? = null) {
+        if (_branches.value != null && _branches.value?.branchNames?.isNotEmpty() == true && skip != null) {
             viewModelScope.launch {
                 projectRepository.getRepositoryBranches(id, skip)
                     .collect { _branches.value = it.project?.repository }
             }
 
-        }
-        else{
-            viewModelScope.launch{
-                projectRepository.getRepositoryBranches(id,0).collect { _branches.value = it.project?.repository }
+        } else {
+            viewModelScope.launch {
+                projectRepository.getRepositoryBranches(id, 0)
+                    .collect { _branches.value = it.project?.repository }
             }
         }
 
     }
-    fun loadProjectCommits(id: String,branch: String) {
+
+    fun loadProjectCommits(id: String, branch: String) {
         val pager = commits.value?.pageInfo?.endCursor
         if (pager == null) {
             viewModelScope.launch {
@@ -103,7 +105,7 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
         } else {
             viewModelScope.launch {
                 _commits.value?.nodes?.size?.let { it ->
-                    projectRepository.getProjectCommits(id, pager,branch).collect { newCommits ->
+                    projectRepository.getProjectCommits(id, pager, branch).collect { newCommits ->
                         val newNodes = newCommits?.project?.repository?.commits?.nodes
                         if (newNodes != null) {
                             _commits.update { currentState ->

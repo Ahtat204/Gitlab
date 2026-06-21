@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -48,6 +50,7 @@ import androidx.navigation.NavController
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.presentation.components.FileExplorer
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
+import com.ahtat204.gitlab.presentation.components.TreeItemCard
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
@@ -105,6 +108,7 @@ fun RepositoryScreen(
     navController: NavController,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
+    var paths by remember { mutableStateOf(listOf<String>()) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
     val currentBranch = remember { mutableStateOf<String?>(null) }
@@ -196,8 +200,7 @@ fun RepositoryScreen(
                         val encodedId =
                             URLEncoder.encode(projectPath, StandardCharsets.UTF_8.toString())
                         val encodedBranch = URLEncoder.encode(
-                            currentBranch.value,
-                            StandardCharsets.UTF_8.toString()
+                            currentBranch.value, StandardCharsets.UTF_8.toString()
                         )
                         TextButton(onClick = { navController.navigate("commits/$encodedId/$encodedBranch") }) {
                             Text(
@@ -211,9 +214,43 @@ fun RepositoryScreen(
                     }
                 }
             }
+            FileExplorer(paths)
             Spacer(modifier = Modifier.height(30.dp))
             repository?.tree?.let {
-                FileExplorer(it)
+                Column(
+                    modifier = Modifier
+                        .border(
+                            width = (0.1f).dp,
+                            color = Color(0xFF675353),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(0.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    it.trees.nodes?.let { folders ->
+                        folders.forEach { folder ->
+                            TreeItemCard(
+                                folder
+                            ) {
+                                folder?.path?.let {path->
+                                    repositoryViewModel.loadProjectRepository(
+                                        branch = currentBranch.value,
+                                        path = path,
+                                        projectPath = projectPath
+                                    )
+                                }
+
+                            }
+                        }
+                    }
+                    it.blobs.nodes?.let { files ->
+                        files.forEach {
+                            TreeItemCard(it)
+                        }
+                    }
+                }
             }
             if (showSheet) {
                 ModalBottomSheet(

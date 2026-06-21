@@ -1,4 +1,4 @@
-query GetProjectRepository($projectPath:ID!,$branch:String){
+query GetProjectRepository($projectPath:ID!,$branch:String,$path:String){
     project(fullPath: $projectPath){
         id
         repository {
@@ -14,13 +14,15 @@ query GetProjectRepository($projectPath:ID!,$branch:String){
 #                }
 #            }
             lastCommit(ref: $branch){
+                id
                 message
                 committedDate
                 author {
                     name
                 }
             }
-            tree(ref: $branch){
+            tree(ref: $branch,path:$path ){
+
                 lastCommit(ref: $branch){
                     message
                     committedDate

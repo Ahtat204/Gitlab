@@ -78,7 +78,9 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?){
                 Icon(
                     painter = painterResource(R.drawable.file),
                     contentDescription = item.id,
-                    Modifier.size(30.dp).padding(3.dp),
+                    Modifier
+                        .size(30.dp)
+                        .padding(3.dp),
                     tint = Orange
                 )
                 Spacer(modifier = Modifier.width(10.dp))
@@ -122,9 +124,9 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?){
  * ```
  */
 @Composable
-fun TreeItemCard(item: GetProjectRepositoryQuery.Node?){
+fun TreeItemCard(item: GetProjectRepositoryQuery.Node?,open:(path: String?)->Unit){
     Card(
-        {},
+        onClick = { open(item?.path) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp, 10.dp)
@@ -142,7 +144,9 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node?){
                 Icon(
                     Icons.Rounded.Folder,
                     contentDescription = it,
-                    Modifier.size(30.dp).padding(3.dp),
+                    Modifier
+                        .size(30.dp)
+                        .padding(3.dp),
                     tint = Orange
                 )
                 Spacer(modifier = Modifier.width(10.dp))
