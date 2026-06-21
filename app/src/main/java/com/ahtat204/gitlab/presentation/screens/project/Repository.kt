@@ -157,8 +157,6 @@ fun RepositoryScreen(
                                 projectPath,
                                 branch = currentBranch.value
                             )
-                            folder?.path?.let { path ->
-                            }
                         }
                     }
                     it.blobs.nodes?.let { files ->
