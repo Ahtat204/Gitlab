@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.Flow
  * ### Contracts:
  * - [getAllProjects]: retrieves and Streams all projects the authenticated user has contributed to.
  * - [getProjectById]: Retrieves and streams a project overview for a given project (full description, star count, fork count, ...).
- * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,..) for a given project.
+ * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
  * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
  * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
  * @author Lahcen AHTAT
@@ -98,7 +98,7 @@ interface ProjectRepository {
     suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data>
 
     /**
-     * Retrieves a project overview  for a given project.(full description , star count, fork count ,)
+     * Retrieves a project overview  for a given project.(full description , star count, fork count )
      *
      * @param id The unique identifier of the project.
      * @return A [Flow] emitting [GetProjectDetailsQuery.Data] objects, or null if unavailable.

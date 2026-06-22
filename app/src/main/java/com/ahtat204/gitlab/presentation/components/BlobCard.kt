@@ -1,7 +1,6 @@
 package com.ahtat204.gitlab.presentation.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,9 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.FileOpen
 import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -23,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil.ImageLoader
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
@@ -59,11 +55,10 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
  * ```
  */
 @Composable
-fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?){
-    item?.name?.let{
+fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?) {
+    item?.name?.let {
         Card(
-            {},
-            modifier = Modifier
+            {}, modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp, 10.dp)
                 .background(Color.Black)
@@ -141,14 +136,23 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?){
  * - Ensure [repositoryViewModel] is properly injected via Hilt or provided manually.
  */
 @Composable
-fun TreeItemCard(item: GetProjectRepositoryQuery.Node?,repositoryViewModel: RepositoryViewModel,path:String?,project:String,branch:String?){
+fun TreeItemCard(
+    item: GetProjectRepositoryQuery.Node?,
+    repositoryViewModel: RepositoryViewModel,
+    path: String?,
+    name:String?,
+    project: String,
+    branch: String?,
+    addPath:()-> Unit,
+
+) {
     Card(
-        onClick = {  repositoryViewModel.loadProjectRepository(
-            branch =branch,
-            path = path,
-            projectPath = project
-        ) },
-        modifier = Modifier
+        onClick = {
+            repositoryViewModel.loadProjectRepository(
+                branch = branch, path = path, projectPath = project
+            )
+            addPath()
+        }, modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp, 10.dp)
             .background(Color.Black)
@@ -172,9 +176,7 @@ fun TreeItemCard(item: GetProjectRepositoryQuery.Node?,repositoryViewModel: Repo
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    text = it,
-                    fontFamily = customFontFamily,
-                    modifier = Modifier.weight(0.9f)
+                    text = it, fontFamily = customFontFamily, modifier = Modifier.weight(0.9f)
                 )
             }
         }

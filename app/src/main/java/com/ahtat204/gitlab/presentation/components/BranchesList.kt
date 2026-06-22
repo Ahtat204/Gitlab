@@ -97,6 +97,7 @@ fun BranchesList(
             items(it) { branch ->
                 Card(
                     {
+                        if(branch == currentBranch.value) return@Card
                         repositoryViewModel.loadProjectRepository(
                             projectPath, branch
                         )

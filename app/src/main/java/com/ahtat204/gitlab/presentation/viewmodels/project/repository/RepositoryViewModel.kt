@@ -1,11 +1,13 @@
 package com.ahtat204.gitlab.presentation.viewmodels.project.repository
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.presentation.screens.project.Folder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,6 +57,10 @@ typealias Branches = GetRepositoryBranchesQuery.Repository?
 @HiltViewModel
 class RepositoryViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
     ViewModel() {
+    val projectName = MutableStateFlow<String?>(null)
+
+    private val paths=mutableStateListOf<Folder>()
+    val items: List<Folder> get() = paths
     /** Backing state for  commits. */
     private val _commits = MutableStateFlow<Commits>(null)
 
@@ -70,13 +76,23 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
      * @param projectPath :don't get confused , this the project ID
      * @param path this is the tree path , aka the path/name of the folder
      */
-    fun loadProjectRepository(projectPath: String, branch: String? = null,path:String?=null) {
+    fun loadProjectRepository(projectPath: String, branch: String? = null, path: String? = null,name:String?=null) {
         viewModelScope.launch {
-            projectRepository.getProjectRepository(projectPath, branch = branch,path=path)
-                .collect { _repository.value = it?.project?.repository }
+            projectRepository.getProjectRepository(projectPath, branch = branch, path = path)
+                .collect {
+                    _repository.value = it?.project?.repository
+                    projectName.value = it?.project?.name
+                    if(path!=null && name!=null){
+                        paths.add(Folder(path=path, name = name))
+                    }
+                }
+
         }
     }
+    fun addPath(path:Folder){}
+    fun removePath(path:Folder){
 
+    }
     fun loadRepositoryBranches(id: String, skip: Int? = null) {
         if (_branches.value != null && _branches.value?.branchNames?.isNotEmpty() == true && skip != null) {
             viewModelScope.launch {
