@@ -12,10 +12,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -33,20 +32,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.ahtat204.gitlab.presentation.components.BranchesList
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
 import com.ahtat204.gitlab.presentation.components.TreeItemCard
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
-import kotlinx.coroutines.flow.asStateFlow
-import androidx.compose.runtime.collectAsState
 
-data class Folder(val name: String, val path: String)
+data class Folder(val name: String, val path: String?)
 
 /**
  * Displays the repository screen for a given project, including branch selection,
@@ -109,8 +104,7 @@ fun RepositoryScreen(
     navController: NavController,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
-
-    val trees=repositoryViewModel.items
+    val trees = repositoryViewModel.paths
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
     val currentBranch = remember { mutableStateOf<String?>(null) }
@@ -144,16 +138,43 @@ fun RepositoryScreen(
                     )
                 }
             }
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-
-            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {}
             Spacer(modifier = Modifier.height(30.dp))
-           if(trees.isNotEmpty()){
-               LazyRow() {
-                   items(trees) { item ->
-                       Text(text = item.name)
-                   }
-               }
+            if (trees.isNotEmpty()) {/* LazyRow(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top) {
+                    items(trees) { item ->
+                        Text(
+                            text = item.name,
+                            modifier = Modifier.clickable(onClick = {
+                                repositoryViewModel.loadProjectRepository(
+                                    projectPath = projectPath,
+                                    branch = currentBranch.value
+                                )
+                            })
+                        )
+                    }
+                }*/
+                if (trees.size > 1) {
+                }
+                repositoryViewModel?.items?.forEach { item ->
+                    Row() {
+                        Text(
+                            text = "${item.name} \b ${trees.size}/",
+                            modifier = Modifier
+                                .offset((0).dp, ((-20).dp))
+                                .clickable(
+                                    onClick = {
+                                       // if(trees.size==1) return@clickable
+                                    repositoryViewModel.loadProjectRepository(
+                                        projectPath = projectPath, branch = currentBranch.value
+                                    )
+                                }
+                            )
+                        )
+                    }
+                }
             }
 
             repository?.tree?.let {
@@ -173,14 +194,13 @@ fun RepositoryScreen(
                         folders.forEach { folder ->
                             TreeItemCard(
                                 name = folder?.name,
-                                item=folder,
+                                item = folder,
                                 repositoryViewModel = repositoryViewModel,
                                 path = folder?.path,
-                                project=projectPath,
+                                project = projectPath,
                                 branch = currentBranch.value,
                             ) {
-                                folder?.let {
-                                }
+                                folder?.let {}
                             }
                         }
                     }
