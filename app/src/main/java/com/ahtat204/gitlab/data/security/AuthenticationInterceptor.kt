@@ -1,8 +1,9 @@
 package com.ahtat204.gitlab.data.security
 
-import android.util.Log
+
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +14,7 @@ import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthorizationService
 import okhttp3.Interceptor
 import okhttp3.Response
+import okio.IOException
 
 /**
  * An OkHttp [okhttp3.Interceptor] that attaches and refreshes OAuth access tokens
@@ -50,53 +52,66 @@ import okhttp3.Response
  *
  * @constructor Creates an interceptor that manages authentication headers
  * and token refresh logic for GitLab API requests.
+ * @author Lahcen AHTAT
  */
 class AuthenticationInterceptor : Interceptor {
     private val Locker = Any()
 
     @OptIn(InternalCoroutinesApi::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-        var request = chain.request()
-        val builder = request.newBuilder()
-        val token = Tokens.accessToken
-        if (token != null) {
-            builder.header("Authorization", "Bearer $token")
-        }
-        request = builder.build()
-        var response = chain.proceed(request)
+        try {
+            var request = chain.request()
+            val builder = request.newBuilder()
+            val token = Tokens.accessToken
+            if (token != null) {
+                builder.header("Authorization", "Bearer $token")
+            }
+            request = builder.build()
+            var response = chain.proceed(request)
 
-        if (response.code == 401) {
-            synchronized(Locker) {
-                val state = Tokens.CurrentAuthState
-                val accessToken = Tokens.accessToken
-                if (accessToken != null && accessToken == token && state != null) {
-                    val deferred = CompletableDeferred<String?>()
-                    runBlocking {
-                        state.performActionWithFreshTokens(AuthorizationService(Tokens.context)) { token, _, ex ->
-                            if (token != null && ex == null) {
-                                Tokens.accessToken = token
-                                Tokens.CurrentAuthState = state
-                                deferred.complete(token)
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    AuthStorage.getAuthState(Tokens.context).updateData { state }
+            if (response.code == 401) {
+                synchronized(Locker) {
+                    val state = Tokens.CurrentAuthState
+                    val accessToken = Tokens.accessToken
+                    if (accessToken != null && accessToken == token && state != null) {
+                        val deferred = CompletableDeferred<String?>()
+                        runBlocking {
+                            state.performActionWithFreshTokens(AuthorizationService(Tokens.context)) { token, _, ex ->
+                                if (token != null && ex == null) {
+                                    Tokens.accessToken = token
+                                    Tokens.CurrentAuthState = state
+                                    deferred.complete(token)
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        AuthStorage.getAuthState(Tokens.context)
+                                            .updateData { state }
+                                    }
+                                }
+                                if (ex != null) {
+                                    deferred.completeExceptionally(ex)
                                 }
                             }
-                            if (ex != null) {
-                                deferred.completeExceptionally(ex)
-                            }
+                            deferred.await()
+                            response.close()
                         }
-                        deferred.await()
-                        response.close()
-                    }
-                    builder.header("Authorization", "Bearer ${Tokens.accessToken}")
-                    request = builder.build()
-                    response = chain.proceed(request)
-                    if (response.code == 401) {
-                        Log.e("RefreshError", "couldn't refresh")
+                        builder.header("Authorization", "Bearer ${Tokens.accessToken}")
+                        request = builder.build()
+                        response = chain.proceed(request)
+                        if (response.code == 401) {
+                            logger("RefreshError", "couldn't refresh")
+                        }
                     }
                 }
             }
+            return response
+        } catch (e: Exception) {
+            if(e is IOException){
+                logger(e.message)
+            }
+            else{
+                throw e
+            }
+            throw e
         }
-        return response
+
     }
 }

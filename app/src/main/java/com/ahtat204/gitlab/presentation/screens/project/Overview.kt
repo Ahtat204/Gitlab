@@ -1,7 +1,6 @@
 package com.ahtat204.gitlab.presentation.screens.project
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,7 +42,7 @@ import com.ahtat204.gitlab.presentation.components.ProjectItem
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
-import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectViewModel
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.Instant
@@ -85,6 +84,7 @@ import java.time.ZoneId
  * - Uses [Instant] and [ZoneId] to sort projects by activity date.
  * - Relies on [ProjectItem] composable to render individual project details.
  * - Displays up to all available projects; topics and languages are shown if present.
+ *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/repository/projectdetails.jpg"  width="300" height="700"/>
  */
 @Composable
 fun ProjectDetailScreen(
@@ -97,7 +97,6 @@ fun ProjectDetailScreen(
     LaunchedEffect(true) {
         projectViewModel.loadProject(path)
     }
-    val encodedId = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())
     Column(
         modifier = Modifier
             .background(Color.Black)
@@ -127,7 +126,8 @@ fun ProjectDetailScreen(
             )
 
             Card(
-                {navController.navigate("repository?projectId=$encodedId") }, modifier = Modifier
+                { navController.navigate("repository?projectId=$encodedId") },
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(15.dp, 1.dp)
                     .background(Color.Black)

@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.presentation.viewmodels
+package com.ahtat204.gitlab.presentation.viewmodels.project
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,7 +6,6 @@ import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.presentation.components.withCacheFallback
-import com.apollographql.apollo.cache.normalized.FetchPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,18 +17,18 @@ import javax.inject.Inject
  * ViewModel responsible for exposing GitLab project data to the UI layer.
  *
  * ## Overview
- * - Integrates with [ProjectRepository] to fetch project lists and repository trees.
- * - Uses Kotlin [StateFlow] to provide reactive, lifecycle‑aware state to the UI.
- * - Scoped with [HiltViewModel] for dependency injection and lifecycle management.
+ * - Integrates with [com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository] to fetch project lists and repository trees.
+ * - Uses Kotlin [kotlinx.coroutines.flow.StateFlow] to provide reactive, lifecycle‑aware state to the UI.
+ * - Scoped with [dagger.hilt.android.lifecycle.HiltViewModel] for dependency injection and lifecycle management.
  *
  * ## State
  * - [projects]: Holds the authenticated user’s contributed projects.
- * - [currentProject]: Holds the currently selected project’s repository tree.
+ * - [currentProject]: Holds the currently selected project’s details.
  *
  * ## Behavior
  * - **loadAllProjects()**: Fetches all projects using Apollo caching. Falls back
  *   to `NetworkFirst` policy if cache retrieval fails.
- * - **loadProject(id)**: Retrieves a specific project’s repository tree by ID.
+ * - **loadProject(id)**: Retrieves a specific project’s repository details by ID.
  *
  * ## Error Handling
  * - Exceptions during data collection are caught. The ViewModel retries with
@@ -45,11 +44,12 @@ import javax.inject.Inject
  *     }
  * }
  * ```
+ * @author Lahcen AHTAT
  */
 @HiltViewModel
 class ProjectViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
     ViewModel() {
-    /** Currently selected project’s repository tree. */
+    /** Currently selected project’s overview/details */
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
 
     /** Backing state for contributed projects. */
@@ -61,8 +61,8 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     /**
      * Loads all projects contributed by the authenticated user.
      *
-     * - First attempts with [FetchPolicy.CacheFirst].
-     * - On exception, retries with [FetchPolicy.NetworkFirst].
+     * - First attempts with [com.apollographql.apollo.cache.normalized.FetchPolicy.CacheFirst].
+     * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
     fun loadAllProjects() = viewModelScope.launch {
         projectRepository.getAllProjects().withCacheFallback { projectRepository.getAllProjects() }

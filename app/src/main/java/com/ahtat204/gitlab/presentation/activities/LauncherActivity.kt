@@ -10,6 +10,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +49,7 @@ import net.openid.appauth.AuthorizationService
  * ## Usage
  * This activity is automatically launched at app startup. It should not be
  * started manually from other parts of the app.
+ * @author Lahcen AHTAT
  */
 @AndroidEntryPoint
 class LauncherActivity : ComponentActivity() {
@@ -75,12 +77,14 @@ class LauncherActivity : ComponentActivity() {
                         }
                     }
                     if (ex != null) {
+                        logger(ex.message)
                         navigateTo(AuthenticationActivity::class.java)
                         throw ex
                     }
                 }
             } else {
                 navigateTo(AuthenticationActivity::class.java)
+
             }
         }
     }
