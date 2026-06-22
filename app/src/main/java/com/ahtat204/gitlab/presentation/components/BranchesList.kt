@@ -101,6 +101,7 @@ fun BranchesList(
                         repositoryViewModel.loadProjectRepository(
                             projectPath, branch
                         )
+                        repositoryViewModel.folders.value.clear()
                         currentBranch.value = branch
                     },
                     modifier = Modifier

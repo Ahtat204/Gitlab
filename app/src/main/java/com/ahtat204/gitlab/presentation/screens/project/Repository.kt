@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,7 +41,10 @@ import com.ahtat204.gitlab.presentation.components.BranchesList
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
 import com.ahtat204.gitlab.presentation.components.TreeItemCard
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
+import com.ahtat204.gitlab.presentation.components.removeAfterKey
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
+import kotlinx.coroutines.flow.forEach
+import androidx.compose.runtime.collectAsState
 
 data class Folder(val name: String, val path: String?)
 
@@ -104,7 +109,7 @@ fun RepositoryScreen(
     navController: NavController,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
-    val trees = repositoryViewModel.paths
+   val trees = repositoryViewModel.folders.collectAsState().value
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
     val currentBranch = remember { mutableStateOf<String?>(null) }
@@ -143,38 +148,35 @@ fun RepositoryScreen(
                 horizontalArrangement = Arrangement.Center
             ) {}
             Spacer(modifier = Modifier.height(30.dp))
-            if (trees.isNotEmpty()) {/* LazyRow(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top) {
-                    items(trees) { item ->
-                        Text(
-                            text = item.name,
-                            modifier = Modifier.clickable(onClick = {
-                                repositoryViewModel.loadProjectRepository(
-                                    projectPath = projectPath,
-                                    branch = currentBranch.value
-                                )
-                            })
-                        )
-                    }
-                }*/
-                if (trees.size > 1) {
-                }
-                repositoryViewModel?.items?.forEach { item ->
-                    Row() {
-                        Text(
-                            text = "${item.name} \b ${trees.size}/",
+                Row(modifier = Modifier.horizontalScroll(rememberScrollState())){
+                    trees.forEach { (name, path) ->
+
+                             Text(
+                            text = "$name \b /",
                             modifier = Modifier
                                 .offset((0).dp, ((-20).dp))
                                 .clickable(
                                     onClick = {
-                                       // if(trees.size==1) return@clickable
+
+                                            val value= repositoryViewModel.folders.value[name]
+                                            if(value==null){
+                                                repositoryViewModel.folders.value[name]=path
+                                                repositoryViewModel.folders.value.removeAfterKey(name)
+                                            }
+                                            else{
+                                                repositoryViewModel.folders.value.removeAfterKey(name)
+                                            }
+
                                     repositoryViewModel.loadProjectRepository(
-                                        projectPath = projectPath, branch = currentBranch.value
+                                        projectPath = projectPath, branch = currentBranch.value,FolderPath = path
                                     )
                                 }
                             )
                         )
-                    }
-                }
+
+
+
+                }}
             }
 
             repository?.tree?.let {
@@ -200,7 +202,15 @@ fun RepositoryScreen(
                                 project = projectPath,
                                 branch = currentBranch.value,
                             ) {
-                                folder?.let {}
+                                folder?.let {
+                                 val path= repositoryViewModel.folders.value[folder.name]
+                                    if(path==null){
+                                        repositoryViewModel.folders.value[folder.name]=folder.path
+                                    }
+                                    else{
+                                        repositoryViewModel.folders.value.removeAfterKey(folder.name)
+                                    }
+                                }
                             }
                         }
                     }
@@ -226,4 +236,3 @@ fun RepositoryScreen(
             }
         }
     }
-}
