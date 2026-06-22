@@ -1,6 +1,5 @@
 package com.ahtat204.gitlab.presentation.viewmodels.project.repository
 
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -8,7 +7,6 @@ import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.presentation.components.removeAfterKey
-import com.ahtat204.gitlab.presentation.screens.project.Folder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -58,9 +56,7 @@ typealias Branches = GetRepositoryBranchesQuery.Repository?
 @HiltViewModel
 class RepositoryViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
     ViewModel() {
-        var folders=MutableStateFlow(LinkedHashMap<String,String?>()).asStateFlow()
-  //  val paths = mutableStateListOf<Folder>()
-    //val folders=mutableStateMapOf<String,String?>()
+    val folders = MutableStateFlow(LinkedHashMap<String, String?>()).asStateFlow()
     /** Backing state for  commits. */
     private val _commits = MutableStateFlow<Commits>(null)
 
@@ -79,37 +75,25 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
     fun loadProjectRepository(
         projectPath: String,
         branch: String? = null,
-        FolderPath: String? = null,
-        FolderName: String? = null
+        folderName: String? = null,
+        folderPath: String? = null
     ) {
         viewModelScope.launch {
-            if(branch!=null && FolderPath!=null){
-
-            }
-            projectRepository.getProjectRepository(projectPath, branch = branch, path = FolderPath)
+            projectRepository.getProjectRepository(projectPath, branch = branch, path = folderName)
                 .collect {
                     _repository.value = it?.project?.repository
                     if (folders.value.isEmpty()) {
                         it?.project?.name?.let { name ->
-                            //paths.add(Folder(name = name, path = null))
-                          //  folders[name]=FolderPath
-                            folders.value[name]=FolderPath
+                            folders.value[name] = folderName
                             folders.value.removeAfterKey(name)
                         }
                     }
-                    if(FolderName!=null ) {
-                       // paths.add(Folder(path = path, name = name))
-                    //    folders[FolderName]=FolderPath
-                        folders.value[FolderName]=FolderPath
-                        folders.value.removeAfterKey(FolderName)
+                    if (folderPath != null) {
+                        folders.value[folderPath] = folderName
+                        folders.value.removeAfterKey(folderPath)
                     }
-            }
+                }
         }
-    }
-
-    fun addPath(path: Folder) {}
-    fun removePath(path: Folder) {
-
     }
 
     fun loadRepositoryBranches(id: String, skip: Int? = null) {

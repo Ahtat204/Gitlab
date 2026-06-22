@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +42,6 @@ import com.ahtat204.gitlab.presentation.components.TreeItemCard
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
 import com.ahtat204.gitlab.presentation.components.removeAfterKey
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
-import kotlinx.coroutines.flow.forEach
 import androidx.compose.runtime.collectAsState
 
 data class Folder(val name: String, val path: String?)
@@ -168,7 +166,7 @@ fun RepositoryScreen(
                                             }
 
                                     repositoryViewModel.loadProjectRepository(
-                                        projectPath = projectPath, branch = currentBranch.value,FolderPath = path
+                                        projectPath = projectPath, branch = currentBranch.value,folderName = path
                                     )
                                 }
                             )
