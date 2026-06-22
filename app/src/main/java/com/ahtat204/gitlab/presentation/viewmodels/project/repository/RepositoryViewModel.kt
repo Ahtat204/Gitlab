@@ -18,7 +18,8 @@ import javax.inject.Inject
 typealias Commits = GetRepositoryCommitsQuery.Commits?
 typealias Repository = GetProjectRepositoryQuery.Repository?
 typealias Branches = GetRepositoryBranchesQuery.Repository?
-
+typealias Path=String?
+typealias Name=String
 /**
  * ViewModel responsible for exposing GitLab project's Repository tree data to the UI layer.
  *
@@ -56,7 +57,7 @@ typealias Branches = GetRepositoryBranchesQuery.Repository?
 @HiltViewModel
 class RepositoryViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
     ViewModel() {
-    val folders = MutableStateFlow(LinkedHashMap<String, String?>()).asStateFlow()
+    val folders = MutableStateFlow(LinkedHashMap<Name, Path>()).asStateFlow()
     /** Backing state for  commits. */
     private val _commits = MutableStateFlow<Commits>(null)
 
@@ -85,12 +86,15 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
                     if (folders.value.isEmpty()) {
                         it?.project?.name?.let { name ->
                             folders.value[name] = folderName
-                            folders.value.removeAfterKey(name)
+                            if(folders.value.size>1) {
+                                folders.value.removeAfterKey(name)
+                            }
                         }
                     }
                     if (folderPath != null) {
                         folders.value[folderPath] = folderName
-                        folders.value.removeAfterKey(folderPath)
+                       if(folders.value.size>1) {
+                           if(folderName!=null) folders.value.removeAfterKey(folderName) }
                     }
                 }
         }

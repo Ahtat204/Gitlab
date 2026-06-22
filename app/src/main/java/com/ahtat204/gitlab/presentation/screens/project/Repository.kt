@@ -44,7 +44,7 @@ import com.ahtat204.gitlab.presentation.components.removeAfterKey
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
 import androidx.compose.runtime.collectAsState
 
-data class Folder(val name: String, val path: String?)
+
 
 /**
  * Displays the repository screen for a given project, including branch selection,
@@ -159,10 +159,10 @@ fun RepositoryScreen(
                                             val value= repositoryViewModel.folders.value[name]
                                             if(value==null){
                                                 repositoryViewModel.folders.value[name]=path
-                                                repositoryViewModel.folders.value.removeAfterKey(name)
+                                                if(repositoryViewModel.folders.value.size>1)repositoryViewModel.folders.value.removeAfterKey(name)
                                             }
                                             else{
-                                                repositoryViewModel.folders.value.removeAfterKey(name)
+                                                if(repositoryViewModel.folders.value.size>1)repositoryViewModel.folders.value.removeAfterKey(name)
                                             }
 
                                     repositoryViewModel.loadProjectRepository(

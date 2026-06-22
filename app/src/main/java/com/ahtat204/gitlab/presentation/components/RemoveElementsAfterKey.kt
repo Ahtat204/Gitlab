@@ -10,7 +10,9 @@ fun <K, V> LinkedHashMap<K, V>.removeAfterKey(targetKey: K) {
     while (iterator.hasNext()) {
         val key = iterator.next()
         if (removeFlag) {
+
             iterator.remove() // Safe removal during iteration
+
         }
         if (key == targetKey) {
             removeFlag = true
