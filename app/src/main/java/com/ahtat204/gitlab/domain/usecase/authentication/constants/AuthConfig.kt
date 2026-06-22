@@ -40,6 +40,7 @@ import net.openid.appauth.ResponseTypeValues
  *     Uri.parse(AuthConfig.CALLBACK_URL)
  * ).setScope(AuthConfig.SCOPE).build()
  * ```
+ * @author Lahcen AHTAT
  */
 object AuthConfig {
     /** GitLab authorization endpoint for initiating OAuth requests. */

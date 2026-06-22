@@ -48,6 +48,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.titleFont
  *     description = "This project demonstrates Compose UI with GitLab integration."
  * )
  * ```
+ * @author Lahcen AHTAT
  */
 @Composable
 fun GeneralDetails(

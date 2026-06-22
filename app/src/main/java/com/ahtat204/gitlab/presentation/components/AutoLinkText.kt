@@ -17,9 +17,48 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-
 /**
+ * Renders text with automatically detected hyperlinks.
  *
+ * ## Purpose
+ * - Scans the input [text] for URLs using a regex pattern.
+ * - Converts detected URLs into clickable links with styled annotations.
+ * - Displays the full text with links highlighted and underlined.
+ *
+ * ## Parameters
+ * @param text The input string to render. Any substring matching the URL regex
+ *             will be converted into a clickable link.
+ * @param fontFamily The font family applied to link styling. Defaults to [FontFamily.Default].
+ *
+ * ## Behavior
+ * - Uses a regex to detect URLs starting with `http://` or `https://`.
+ * - Non-URL text is appended normally.
+ * - Each detected URL is wrapped in a [LinkAnnotation.Url] with custom [TextLinkStyles].
+ * - Links are styled with:
+ *   - Orange color
+ *   - Underline decoration
+ *   - Font size of 14sp
+ *   - Provided [fontFamily]
+ * - The entire text block is rendered with:
+ *   - White color
+ *   - Font size of 15sp
+ *   - [titleFont] family
+ *   - Padding of (20.dp, 10.dp)
+ *   - Left alignment
+ *
+ * ## Example
+ * ```
+ * AutoLinkText(
+ *     text = "Check out https://gitlab.com for more info",
+ *     fontFamily = FontFamily.Serif
+ * )
+ * ```
+ *
+ * ## Notes
+ * - Each URL is prepended with a newline (`\n`) before being appended.
+ * - The `contentDescription` for links is omitted since they are textual.
+ * - Extend the regex if you want to support additional link formats (e.g., mailto, ftp).
+ * @author Lahcen AHTAT
  */
 @Composable
 fun AutoLinkText(

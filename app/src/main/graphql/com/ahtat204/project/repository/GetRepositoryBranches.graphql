@@ -1,0 +1,8 @@
+query GetRepositoryBranches($projectPath:ID!,$skip:Int!){
+    project(fullPath: $projectPath){
+        id
+        repository{
+            branchNames(searchPattern: "*",limit: 20,offset:$skip)
+        }
+    }
+}
