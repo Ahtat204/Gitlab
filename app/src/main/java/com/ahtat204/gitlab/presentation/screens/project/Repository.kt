@@ -105,6 +105,7 @@ fun RepositoryScreen(
     navController: NavController,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
+
     val trees = repositoryViewModel.folders.collectAsState().value
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
@@ -135,14 +136,11 @@ fun RepositoryScreen(
                         repository?.tree?.lastCommit?.author?.name,
                         parsedDateTime,
                         navController,
-                        projectPath
+                        projectPath,
+                        {}
                     )
                 }
             }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {}
             Spacer(modifier = Modifier.height(30.dp))
             Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
                 trees.forEach { (path, name) ->

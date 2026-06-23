@@ -68,7 +68,9 @@ class AuthenticationInterceptor : Interceptor {
             }
             request = builder.build()
             var response = chain.proceed(request)
-
+            if(response.code==429){
+                logger("slow down there champ")
+            }
             if (response.code == 401) {
                 synchronized(Locker) {
                     val state = Tokens.CurrentAuthState
@@ -105,9 +107,11 @@ class AuthenticationInterceptor : Interceptor {
             return response
         } catch (e: Exception) {
             if(e is IOException){
-                logger(e.message)
+                logger("issue:${e.cause}+${e.message}")
             }
+
             else{
+                logger(e.cause?.message)
                 throw e
             }
             throw e

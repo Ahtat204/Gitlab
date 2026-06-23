@@ -49,6 +49,7 @@ import java.nio.charset.StandardCharsets
  * @param parsedDateTime A relative timestamp string (e.g., "2 hours ago").
  * @param navController Navigation controller used to navigate to the commit history screen.
  * @param projectPath The unique path of the project whose repository is being displayed.
+ * @param clear lambda to clear the LinkedHashMap
  *
  * ## Behavior
  * - Left section: A [TextButton] showing the branch icon and current branch name.
@@ -91,7 +92,8 @@ fun RepositoryHead(
     name: String?,
     parsedDateTime: String,
     navController: NavController,
-    projectPath: String
+    projectPath: String,
+    clear:()->Unit
 ) {
     Row(
         modifier = Modifier
@@ -161,7 +163,10 @@ fun RepositoryHead(
         val encodedBranch = URLEncoder.encode(
             currentBranch.value, StandardCharsets.UTF_8.toString()
         )
-        TextButton(onClick = { navController.navigate("commits/$encodedId/$encodedBranch") }) {
+        TextButton(onClick = {
+            navController.navigate("commits/$encodedId/$encodedBranch")
+            clear()
+        }) {
             Text(
                 text = "history",
                 fontSize = 15.sp,
