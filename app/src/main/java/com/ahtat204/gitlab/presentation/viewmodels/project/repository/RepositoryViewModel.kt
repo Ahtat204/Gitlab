@@ -6,6 +6,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.ahtat204.gitlab.presentation.components.removeAfterKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,7 +58,12 @@ typealias Name=String
 @HiltViewModel
 class RepositoryViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
     ViewModel() {
-    val folders = MutableStateFlow(LinkedHashMap<Name, Path>()).asStateFlow()
+        // remember to have only 1 null key
+    /**
+     * the key [Path] is the path of the folder ,ex:src/main
+     * the value [Name] is the name of the folder : main
+     */
+    val folders = MutableStateFlow(LinkedHashMap<Path, Name>()).asStateFlow()
     /** Backing state for  commits. */
     private val _commits = MutableStateFlow<Commits>(null)
 
@@ -80,21 +86,25 @@ class RepositoryViewModel @Inject constructor(private val projectRepository: Pro
         folderPath: String? = null
     ) {
         viewModelScope.launch {
-            projectRepository.getProjectRepository(projectPath, branch = branch, path = folderName)
+            projectRepository.getProjectRepository(projectPath, branch = branch, path = folderPath)
                 .collect {
                     _repository.value = it?.project?.repository
                     if (folders.value.isEmpty()) {
-                        it?.project?.name?.let { name ->
-                            folders.value[name] = folderName
-                            if(folders.value.size>1) {
-                                folders.value.removeAfterKey(name)
+                        it?.project?.name?.let { projectName ->
+                            // the root directory is root "." ,
+                            folders.value["."] = projectName // we're using the projectName as the root directory name here,that's why it's the key
+                            if(folders.value.size>1 || folderPath==null) {
+                                folders.value.removeAfterKey(".")
                             }
                         }
                     }
                     if (folderPath != null) {
-                        folders.value[folderPath] = folderName
+                   folderName?.let {
+                       folders.value[folderPath] = folderName
+                   }
                        if(folders.value.size>1) {
-                           if(folderName!=null) folders.value.removeAfterKey(folderName) }
+                           folders.value.removeAfterKey(folderPath) // to never remove the rootDirectory
+                       }
                     }
                 }
         }

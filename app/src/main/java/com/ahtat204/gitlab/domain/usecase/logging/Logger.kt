@@ -6,7 +6,7 @@ import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.contex
 
 fun logger( message: String?,tag: String?=null) {
    message?.let {
-       Log.d(tag?:"com.ahtat204.gitlab.logger", it)
+       Log.d("com.ahtat204.gitlab.logger", it)
        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
    }
 }

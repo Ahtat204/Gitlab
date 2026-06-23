@@ -156,6 +156,8 @@ interface ProjectRepository {
      * Retrieves the repository tree for a given project.
      *
      * @param id The unique identifier of the project.
+     * @param path the path of the folder you want to open
+     * @param branch the branch of the repository
      * @return A [Flow] emitting [GetProjectDetailsQuery.Data] objects, or null if unavailable.
      *
      * ### Behavior

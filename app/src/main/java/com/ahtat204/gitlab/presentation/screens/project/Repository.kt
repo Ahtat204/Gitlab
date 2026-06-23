@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,9 +43,6 @@ import com.ahtat204.gitlab.presentation.components.TreeItemCard
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
 import com.ahtat204.gitlab.presentation.components.removeAfterKey
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
-import androidx.compose.runtime.collectAsState
-
-
 
 /**
  * Displays the repository screen for a given project, including branch selection,
@@ -107,7 +105,7 @@ fun RepositoryScreen(
     navController: NavController,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
-   val trees = repositoryViewModel.folders.collectAsState().value
+    val trees = repositoryViewModel.folders.collectAsState().value
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
     val currentBranch = remember { mutableStateOf<String?>(null) }
@@ -146,91 +144,91 @@ fun RepositoryScreen(
                 horizontalArrangement = Arrangement.Center
             ) {}
             Spacer(modifier = Modifier.height(30.dp))
-                Row(modifier = Modifier.horizontalScroll(rememberScrollState())){
-                    trees.forEach { (name, path) ->
-
-                             Text(
-                            text = "$name \b /",
-                            modifier = Modifier
-                                .offset((0).dp, ((-20).dp))
-                                .clickable(
-                                    onClick = {
-
-                                            val value= repositoryViewModel.folders.value[name]
-                                            if(value==null){
-                                                repositoryViewModel.folders.value[name]=path
-                                                if(repositoryViewModel.folders.value.size>1)repositoryViewModel.folders.value.removeAfterKey(name)
-                                            }
-                                            else{
-                                                if(repositoryViewModel.folders.value.size>1)repositoryViewModel.folders.value.removeAfterKey(name)
-                                            }
+            Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                trees.forEach { (path, name) ->
+                    Text(
+                        text = "$name \b /",
+                        modifier = Modifier
+                            .offset((0).dp, ((-20).dp))
+                            .clickable(
+                                onClick = {
+                                    val value = repositoryViewModel.folders.value[path]
+                                    if (value == null) {
+                                        repositoryViewModel.folders.value[path] = name
+                                        if (repositoryViewModel.folders.value.size > 1) repositoryViewModel.folders.value.removeAfterKey(
+                                            path
+                                        )
+                                    } else {
+                                        if (repositoryViewModel.folders.value.size > 1) repositoryViewModel.folders.value.removeAfterKey(
+                                            path
+                                        )
+                                    }
 
                                     repositoryViewModel.loadProjectRepository(
-                                        projectPath = projectPath, branch = currentBranch.value,folderName = path
+                                        projectPath = projectPath,
+                                        branch = currentBranch.value,
+                                        folderName = name,
+                                        folderPath = path
                                     )
-                                }
-                            )
-                        )
-
-
-
-                }}
+                                })
+                    )
+                }
             }
+        }
 
-            repository?.tree?.let {
-                Column(
-                    modifier = Modifier
-                        .border(
-                            width = (0.1f).dp,
-                            color = Color(0xFF675353),
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                        .padding(0.dp)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    it.trees.nodes?.let { folders ->
-                        folders.forEach { folder ->
-                            TreeItemCard(
-                                name = folder?.name,
-                                item = folder,
-                                repositoryViewModel = repositoryViewModel,
-                                path = folder?.path,
-                                project = projectPath,
-                                branch = currentBranch.value,
-                            ) {
-                                folder?.let {
-                                 val path= repositoryViewModel.folders.value[folder.name]
-                                    if(path==null){
-                                        repositoryViewModel.folders.value[folder.name]=folder.path
-                                    }
-                                    else{
-                                        repositoryViewModel.folders.value.removeAfterKey(folder.name)
-                                    }
+        repository?.tree?.let {
+            Column(
+                modifier = Modifier
+                    .border(
+                        width = (0.1f).dp,
+                        color = Color(0xFF675353),
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                    .padding(0.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                it.trees.nodes?.let { folders ->
+                    folders.forEach { folder ->
+                        TreeItemCard(
+                            name = folder?.name,
+                            item = folder,
+                            repositoryViewModel = repositoryViewModel,
+                            path = folder?.path,
+                            project = projectPath,
+                            branch = currentBranch.value,
+                        ) {
+                            folder?.let {
+                                val path = repositoryViewModel.folders.value[folder.path]
+                                if (path == null) {
+                                    repositoryViewModel.folders.value[folder.path] = folder.name
+                                } else {
+                                    repositoryViewModel.folders.value.removeAfterKey(folder.path)
                                 }
                             }
                         }
                     }
-                    it.blobs.nodes?.let { files ->
-                        files.forEach { file ->
-                            TreeItemCard(file)
-                        }
-                    }
                 }
-            }
-            if (showSheet) {
-                ModalBottomSheet(
-                    modifier = Modifier.fillMaxHeight(),
-                    onDismissRequest = { showSheet = false },
-                    sheetState = sheetState
-                ) {
-                    LaunchedEffect(currentBranch.value) {
-                        repositoryViewModel.loadRepositoryBranches(projectPath)
+                it.blobs.nodes?.let { files ->
+                    files.forEach { file ->
+                        TreeItemCard(file)
                     }
-                    val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
-                    BranchesList(branches, repositoryViewModel, projectPath, currentBranch, x)
                 }
             }
         }
+        if (showSheet) {
+            ModalBottomSheet(
+                modifier = Modifier.fillMaxHeight(),
+                onDismissRequest = { showSheet = false },
+                sheetState = sheetState
+            ) {
+                LaunchedEffect(currentBranch.value) {
+                    repositoryViewModel.loadRepositoryBranches(projectPath)
+                }
+                val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
+                BranchesList(branches, repositoryViewModel, projectPath, currentBranch, x)
+            }
+        }
     }
+}
