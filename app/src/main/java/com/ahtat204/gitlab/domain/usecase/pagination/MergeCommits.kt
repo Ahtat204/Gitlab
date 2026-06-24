@@ -20,7 +20,8 @@ suspend fun mergeCommits(
                         nodes = mergedNodes
                     )
                 )
-            })
+            }
+        )
     }
     apollo.apolloStore.writeOperation(
         query, existing.copy(project = updated)

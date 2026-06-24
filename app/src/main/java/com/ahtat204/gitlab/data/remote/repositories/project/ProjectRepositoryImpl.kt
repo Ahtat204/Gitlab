@@ -80,6 +80,7 @@ class ProjectRepositoryImpl @Inject constructor(
                     GetRepositoryCommitsQuery(id, Optional.Present(cursor), branch),
                     it
                 )
+                //you're merging paginated data with another paginated data ,
                 it
             }
     }
