@@ -80,7 +80,10 @@ class ProjectRepositoryImpl @Inject constructor(
     override suspend fun getProjectIssues(
         id: String, cursor: String?
     ): Flow<GetProjectIssuesQuery.Data> {
-        TODO("Not yet implemented")
+        return if(cursor==null) apolloClient.query(GetProjectIssuesQuery(id)).fetchPolicy(
+            FetchPolicy.CacheFirst).watch().mapNotNull { it.data }.catch { ex-> if (ex is CancellationException) throw ex else logger(ex.message) }.mapNotNull { it }
+        else  apolloClient.query(GetProjectIssuesQuery(id, Optional.present(cursor))).fetchPolicy(
+            FetchPolicy.CacheFirst).watch().mapNotNull { it.data }.catch { ex-> if (ex is CancellationException) throw ex else logger(ex.message) }.mapNotNull { it }
     }
 
     override suspend fun getRepositorySubTree(
