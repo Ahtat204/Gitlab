@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.ahtat204.gitlab.presentation.components.BranchesList
 import com.ahtat204.gitlab.presentation.components.FileBrowser
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
@@ -97,6 +98,7 @@ fun RepositoryScreen(
     navController: NavController,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
+    val history = remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
     val currentBranch = remember { mutableStateOf<String?>(null) }
@@ -127,11 +129,20 @@ fun RepositoryScreen(
                         parsedDateTime,
                         navController,
                         projectPath,
-                        {})
+                        history)
                 }
             }
             Spacer(modifier = Modifier.height(30.dp))
-            FileBrowser(repositoryViewModel, currentBranch, projectPath, repository)
+
+            if(!history.value){
+                FileBrowser(repositoryViewModel, currentBranch, projectPath, repository)
+            }
+            if(history.value==true){
+             currentBranch.value?.let{
+                 ProjectCommits(navController = navController, branch = it, id = projectPath)
+             }
+            }
+
         }
 
         if (showSheet) {

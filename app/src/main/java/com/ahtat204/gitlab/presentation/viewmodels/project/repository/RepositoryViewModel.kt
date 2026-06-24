@@ -220,7 +220,7 @@ class RepositoryViewModel @Inject constructor(
         } else {
             viewModelScope.launch {
                 _commits.value?.nodes?.size?.let {
-                    projectRepository.getProjectCommits(id, pager, branch).collect { newCommits ->
+                    projectRepository.getProjectCommits(id, cursor=pager,branch= branch).collect { newCommits ->
                         val newNodes = newCommits?.project?.repository?.commits?.nodes
                         if (newNodes != null) {
                             _commits.update { currentState ->

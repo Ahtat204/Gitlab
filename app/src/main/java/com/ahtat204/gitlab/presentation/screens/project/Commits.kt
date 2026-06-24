@@ -5,9 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -40,9 +38,8 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
  *
  * ## Parameters
  * @param navController Navigation controller used for handling navigation actions.
- * @param x Padding values applied to the layout.
  * @param id The unique project identifier. If empty, the composable returns immediately.
- * @param projectViewModel ViewModel responsible for loading and exposing commit data.
+ * @param repositoryViewModel ViewModel responsible for loading and exposing commit data.
  * Defaults to [hiltViewModel] injection.
  *
  * ## Behavior
@@ -77,15 +74,14 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
 @Composable
 fun ProjectCommits(
     navController: NavController,
-    x: PaddingValues,
     branch:String,
     id: String,
-    projectViewModel: RepositoryViewModel = hiltViewModel()
+    repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
     if (id == "") return
-    val commits by projectViewModel.commits.collectAsStateWithLifecycle()
+    val commits by repositoryViewModel.commits.collectAsStateWithLifecycle()
     LaunchedEffect(id) {
-        projectViewModel.loadProjectCommits(id,branch)
+        repositoryViewModel.loadProjectCommits(id,branch)
     }
     if (commits?.nodes?.isEmpty() == true) return
     val listState = rememberLazyListState()
@@ -99,28 +95,20 @@ fun ProjectCommits(
     }
     LaunchedEffect(shouldLoadMore.value) {
         if (shouldLoadMore.value) {
-            projectViewModel.loadProjectCommits(id,branch)
+            repositoryViewModel.loadProjectCommits(id,branch)
         }
     }
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .padding(x)
             .background(Color.Black)
     ) {
         commits?.nodes?.let { nodes ->
             if (nodes.isNotEmpty()) {
-                Text(
-                    text = "Commits",
-                    fontFamily = titleFont,
-                    fontSize = 20.sp,
-                    modifier = Modifier
-                )
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = x,
                     verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {

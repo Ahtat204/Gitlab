@@ -14,7 +14,7 @@ import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthorizationService
 import okhttp3.Interceptor
 import okhttp3.Response
-import okio.IOException
+import java.io.IOException
 
 /**
  * An OkHttp [okhttp3.Interceptor] that attaches and refreshes OAuth access tokens
