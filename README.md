@@ -9,9 +9,9 @@
 
 ## 📸 Screenshots
 
-|          Home Screen           |             Project List              |            Project Overview            |              Profile               | 
-|:------------------------------:|:-------------------------------------:|:--------------------------------------:|:----------------------------------:| 
-| ![Home Screen](homescreen.jpg) | ![Project List](personalprojects.jpg) | ![Project Details](projectdetails.jpg) | ![Developper Profile](profile.jpg) | 
+|       Home Screen        |             Project List              |            Project Overview            |              Profile               |              Repository               |              Commits               |  
+|:------------------------:|:-------------------------------------:|:--------------------------------------:|:----------------------------------:|:-------------------------------------:|:----------------------------------:|  
+| ![Home Screen](home.jpg) | ![Project List](personalprojects.jpg) | ![Project Details](projectdetails.jpg) | ![Developper Profile](profile.jpg) | ![Project Repository](repository.jpg) | ![Repository Commits](history.jpg) |  
 
 ---
 
@@ -59,7 +59,7 @@ The application leverages **Apollo Kotlin** for GraphQL queries and **OAuth2** f
 | **Data Layer** | Apollo Kotlin (GraphQL), OkHttp |
 | **Authentication** | OAuth2 |
 | **Security** | Crypto/Encryption utilities |
-| **Dependency Injection** | Hilt (inferred from structure) |
+| **Dependency Injection** | Hilt  |
 | **Image Loading** | Coil |
 | **Platform** | Android (Native) |
 | **Build System** | Gradle (Kotlin DSL) |
