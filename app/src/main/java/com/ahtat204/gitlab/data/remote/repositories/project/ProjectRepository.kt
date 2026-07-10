@@ -3,6 +3,7 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
  * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
  * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
  * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
+ * - [getProjectPipelines]: Retrieves and streams first 20 pipeline in a Gitlab Project.
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
@@ -215,7 +217,7 @@ interface ProjectRepository {
      *     }
      * ```
      */
-    suspend fun getProjectRepository(id: String,branch:String?,path:String?=null): Flow<Data?>
+    suspend fun getProjectRepository(id: String, branch: String?, path: String? = null): Flow<Data?>
 
     /**
      * Retrieves the repository tree for a given project.
@@ -250,8 +252,7 @@ interface ProjectRepository {
      * ```
      */
     suspend fun getRepositoryBranches(
-        project: String,
-        skip: Int
+        project: String, skip: Int
     ): Flow<GetRepositoryBranchesQuery.Data>
 
     /**
@@ -316,5 +317,65 @@ interface ProjectRepository {
     suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
+    /**
+     * Retrieves first 20 pipelines (currently fetch the running pipelines , later will add more method arguments).
+     *
+     * @param project The unique identifier of the project or the project path.
+     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
+     * @return A [Flow] emitting [GetProjectPipelinesQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetProjectPipelinesQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.GetProjectPipelinesQuery("12345")
+     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL
+     *     project(fullPath: $project){
+     *
+     *         pipelines(first: 20,status: RUNNING,after: $cursor){
+     *             nodes {
+     *                 status
+     *                 jobs{
+     *                     nodes {
+     *                         id
+     *                         name
+     *                         duration
+     *                         startedAt
+     *                         status
+     *
+     *                     }
+     *                 }
+     *                 committedAt
+     *                 createdAt
+     *                 startedAt
+     *                 duration
+     *                 id
+     *                 name
+     *
+     *             }
+     *             pageInfo {
+     *                 hasNextPage
+     *                 startCursor
+     *                 hasPreviousPage
+     *             }
+     *         }
+     *     }
+     * ```
+     */
+    suspend fun getProjectPipelines(
+        project: String,
+        cursor: String? = null
+    ): Flow<GetProjectPipelinesQuery.Data>
 
 }

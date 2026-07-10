@@ -2,6 +2,7 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
@@ -74,6 +75,23 @@ class ProjectRepositoryImpl @Inject constructor(
                 if (ex is CancellationException) throw ex else logger(ex.message)
             }.mapNotNull { it }
     }
+    override suspend fun getProjectPipelines(
+        project: String, cursor: String?
+    ): Flow<GetProjectPipelinesQuery.Data> {
+        return if (cursor == null) apolloClient.query(GetProjectPipelinesQuery(project=project))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull { it.data }.catch { ex ->
+                if (ex is CancellationException) throw ex else logger(ex.message)
+            }.mapNotNull { it }
+        else apolloClient.query(GetProjectPipelinesQuery(project, Optional.Present(cursor)))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
+                it.data
+            }.catch { ex ->
+                if (ex is CancellationException) throw ex else logger(ex.message)
+            }.mapNotNull { it }
+
+
+    }
+
     override suspend fun getRepositoryBranches(
         project: String, skip: Int
     ): Flow<GetRepositoryBranchesQuery.Data> {
