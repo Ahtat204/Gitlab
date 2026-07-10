@@ -16,7 +16,7 @@ typealias MergeRequests= GetProjectMergeRequestsQuery.MergeRequests?
 class ProjectMRsViewModel @Inject constructor(private val repository: ProjectRepository)
     : ViewModel() {
         private val _mrs=MutableStateFlow<MergeRequests>(null)
-        val mrs: StateFlow<MergeRequests> = _mrs.asStateFlow()
+    val mrs: StateFlow<MergeRequests> get()= _mrs.asStateFlow()
     fun loadProjectMRs(id: String){
         viewModelScope.launch(Dispatchers.IO) {
             repository.getProjectMergeRequests(id).collect { _mrs.value=it.project?.mergeRequests }

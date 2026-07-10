@@ -97,7 +97,6 @@ fun ProjectDetailScreen(
     LaunchedEffect(true) {
         projectViewModel.loadProject(path)
     }
-    val encodedId = URLEncoder.encode(path, StandardCharsets.UTF_8.toString())
     Column(
         modifier = Modifier
             .background(Color.Black)
@@ -123,7 +122,7 @@ fun ProjectDetailScreen(
                 pro.openIssuesCount ?: 0,
                 pro.openMergeRequestsCount ?: 0,
                 pro.pipelineCounts?.running,
-                navController,
+                navController,encodedId
             )
 
             Card(

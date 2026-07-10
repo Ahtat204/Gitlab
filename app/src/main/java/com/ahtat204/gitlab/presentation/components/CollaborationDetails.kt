@@ -57,6 +57,7 @@ fun CollaborationDetails(
     mergeRequestCount: Int?,
     pipelinesCount: Int?,
     navController: NavController,
+    encodedId: String
 ) {
     Column(
         modifier = Modifier
@@ -65,37 +66,29 @@ fun CollaborationDetails(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        issuesCount.let { ProjectWorkItems(Item("issues", "issues", R.drawable.issues, it)) {} }
-        mergeRequestCount?.let {
-            ProjectWorkItems(
-                Item(
-                    "Merge Requests", "merge_requests", R.drawable.mergerequest, it
-                )
-            ) {}
-        }
+        ProjectWorkItems(Item("issues", "issues", R.drawable.issues, issuesCount)) {}
+        ProjectWorkItems(
+            Item(
+                "Merge Requests", "merge_requests", R.drawable.mergerequest, mergeRequestCount
+            ), openScreen = { navController.navigate("mergerequests?projectId=$encodedId") })
 
-            ProjectWorkItems(
-                Item(
-                    "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, null
-                )
-            ) {}
+        ProjectWorkItems(
+            Item(
+                "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, null
+            )
+        ) {}
 
-        pipelinesCount?.let {
-            ProjectWorkItems(
-                Item(
-                    "WorkItems", "project/{id]/workitems", R.drawable.workitems, null
-                )
-            ) {}
-        }
+        ProjectWorkItems(
+            Item(
+                "WorkItems", "project/{id]/workitems", R.drawable.workitems, null
+            )
+        ) {}
 
-            ProjectWorkItems(
-                Item(
-                    "Members", "project/{id}/members", R.drawable.members, null
-                )
-            ) {}
-
-
-     /*   commitCount?.let {
+        ProjectWorkItems(
+            Item(
+                "Members", "project/{id}/members", R.drawable.members, null
+            )
+        ) {}/*   commitCount?.let {
             ProjectWorkItems(
                 Item("Commits", "project/{id}/commits", R.drawable.commit, it.toInt())
             ) {
