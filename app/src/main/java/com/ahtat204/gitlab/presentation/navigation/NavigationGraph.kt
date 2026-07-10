@@ -94,6 +94,14 @@ fun BottomNavigationGraph(
                 projectId?.let { ProjectDetailScreen(navController,x, it)
                 }
             }
+            composable(
+                route = "issues?projectId={projectId}",
+                arguments = listOf(navArgument("projectId") { defaultValue = "" })
+            ) { backStackEntry ->
+                val projectId = backStackEntry.arguments?.getString("projectId")
+                projectId?.let { ProjectDetailScreen(navController,x, it)
+                }
+            }
         }
     }
 }
