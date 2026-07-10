@@ -123,6 +123,7 @@ fun ProjectDetailScreen(
                 pro.openMergeRequestsCount ?: 0,
                 pro.pipelineCounts?.running,
                 navController,
+                encodedId
             )
 
             Card(

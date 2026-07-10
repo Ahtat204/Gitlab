@@ -3,6 +3,7 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -317,4 +318,5 @@ interface ProjectRepository {
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
 
+    suspend fun getProjectMembers(project:String,cursor:String?=null):Flow<GetProjectMembersQuery.Data>
 }
