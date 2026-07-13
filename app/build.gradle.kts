@@ -1,7 +1,3 @@
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -25,10 +21,6 @@ android {
         versionName = "1.0"
         manifestPlaceholders.putIfAbsent("appAuthRedirectScheme", "com.asue24.gitlab   ")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        val dateFormat = SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault())
-        val formattedDate = dateFormat.format(Date())
-        val fileName = "${rootProject.name}_v${versionName}_${versionCode}_${formattedDate}"
-        setProperty("archivesBaseName", rootProject.name)
     }
 
     buildTypes {
@@ -106,4 +98,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.converter.gson)
+
 }

@@ -52,18 +52,29 @@ import java.io.File
  */
 @AndroidEntryPoint
 class LauncherActivity : ComponentActivity() {
+
     private lateinit var authenticationService: AuthorizationService
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Install splash screen before super.onCreate
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        // Ensure cache directory exists
         val existed = File("gitlab/httpCache")
-        if (!existed.exists()) existed.mkdir()
+        if (!existed.exists()) {
+            existed.mkdir()
+        }
         authenticationService = AuthorizationService(this)
+
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
+
+        // Check stored authentication state
         CoroutineScope(Dispatchers.IO).launch {
             val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
+
             if (storedState.refreshToken != null) {
                 storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
                     if (token != null && ex == null) {

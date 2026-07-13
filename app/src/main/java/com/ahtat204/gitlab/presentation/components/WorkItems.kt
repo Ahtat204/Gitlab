@@ -3,8 +3,6 @@ package com.ahtat204.gitlab.presentation.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -57,18 +55,18 @@ import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 @Composable
 fun MyWorkItems(navController: NavController) {
     val myWorkItems = listOf(
-        Item("Issues", "issues",R.drawable.issues),
-        Item("Merge Requests ","mergerequests", R.drawable.mergerequest),
-        Item("Workspaces","workspaces", R.drawable.workspaces),
-        Item("Milestones","workspaces", R.drawable.milestone),
-        Item("Starred","starrted", R.drawable.star),
-        Item("Groups","groups", R.drawable.group),
-        Item("Personal projects", "personal",R.drawable.project),
-        Item("Contributed Projects", "contributed",R.drawable.project),
+        Item("Issues", "issues",R.drawable.issues, 1),
+        Item("Merge Requests ","mergerequests", R.drawable.mergerequest, 1),
+        Item("Workspaces","workspaces", R.drawable.workspaces, 1),
+        Item("Milestones","workspaces", R.drawable.milestone, 1),
+        Item("Starred","starrted", R.drawable.star, 1),
+        Item("Groups","groups", R.drawable.group, 1),
+        Item("Personal projects", "personal",R.drawable.project, 1),
+        Item("Contributed Projects", "contributed",R.drawable.project, 1),
     )
 
     Column(
-        modifier = Modifier.padding(0.dp).verticalScroll(rememberScrollState()),
+        modifier = Modifier.padding(0.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
