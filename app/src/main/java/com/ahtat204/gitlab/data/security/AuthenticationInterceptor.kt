@@ -1,8 +1,15 @@
 package com.ahtat204.gitlab.data.security
 
 
+import android.Manifest
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import androidx.annotation.RequiresPermission
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.isConnected
 import com.ahtat204.gitlab.domain.usecase.logging.logger
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -14,6 +21,7 @@ import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthorizationService
 import okhttp3.Interceptor
 import okhttp3.Response
+import net.openid.appauth.AuthState
 import okio.IOException
 
 /**
@@ -55,10 +63,13 @@ import okio.IOException
  * @author Lahcen AHTAT
  */
 class AuthenticationInterceptor : Interceptor {
+
+
     private val Locker = Any()
 
     @OptIn(InternalCoroutinesApi::class)
     override fun intercept(chain: Interceptor.Chain): Response {
+        if(!isConnected) logger("No Internet Connection")
         try {
             var request = chain.request()
             val builder = request.newBuilder()

@@ -1,6 +1,10 @@
 package com.ahtat204.gitlab.domain.usecase.authentication.constants
 
+import android.Manifest
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import androidx.annotation.RequiresPermission
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationService
 /**
@@ -35,6 +39,16 @@ import net.openid.appauth.AuthorizationService
  * @author Lahcen AHTAT
  */
 object Tokens {
+    val isConnected: Boolean
+        @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE) get() {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = connectivityManager.activeNetwork ?: return false
+            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+
+            return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+        }
     @Volatile
     var accessToken: String? = null
     @Volatile

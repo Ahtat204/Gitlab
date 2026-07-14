@@ -10,6 +10,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.isConnected
 import com.ahtat204.gitlab.domain.usecase.logging.logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -63,29 +64,36 @@ class LauncherActivity : ComponentActivity() {
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
         CoroutineScope(Dispatchers.IO).launch {
-            val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
-            if (storedState.isAuthorized) {
-                storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
-                    if (token != null && ex == null) {
-                        Tokens.accessToken = token
-                        Tokens.CurrentAuthState = storedState
-                        lifecycleScope.launch {
-                            AuthStorage.getAuthState(this@LauncherActivity)
-                                .updateData { storedState }
-                            isReady = true
-                            navigateTo(MainActivity::class.java)
+            if(isConnected){
+                val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
+                if (storedState.isAuthorized) {
+                    storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
+                        if (token != null && ex == null) {
+                            Tokens.accessToken = token
+                            Tokens.CurrentAuthState = storedState
+                            lifecycleScope.launch {
+                                AuthStorage.getAuthState(this@LauncherActivity)
+                                    .updateData { storedState }
+                                isReady = true
+                                navigateTo(MainActivity::class.java)
+                            }
+                        }
+                        if (ex != null) {
+                            logger(ex.message)
+                            navigateTo(AuthenticationActivity::class.java)
+                            throw ex
                         }
                     }
-                    if (ex != null) {
-                        logger(ex.message)
-                        navigateTo(AuthenticationActivity::class.java)
-                        throw ex
-                    }
-                }
-            } else {
-                navigateTo(AuthenticationActivity::class.java)
+                } else {
+                    navigateTo(AuthenticationActivity::class.java)
 
+                }
             }
+            else{
+                navigateTo(MainActivity::class.java)
+                logger("you're no connected")
+            }
+
         }
     }
 
