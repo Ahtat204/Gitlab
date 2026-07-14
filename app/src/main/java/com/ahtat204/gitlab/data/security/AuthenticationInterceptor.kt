@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.compose.ui.unit.IntOffset
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
@@ -67,10 +68,10 @@ class AuthenticationInterceptor : Interceptor {
 
     @OptIn(InternalCoroutinesApi::class)
     override fun intercept(chain: Interceptor.Chain): Response {
+
         try {
             if (!isConnected()) {
-                val e = IOException("Connection issues",Exception())
-                throw e
+                throw IOException("no internet connection")
             }
             var request = chain.request()
             val builder = request.newBuilder()
@@ -116,7 +117,7 @@ class AuthenticationInterceptor : Interceptor {
             }
             return response
         } catch (e: Exception) {
-            logger(tag = "InterceptorError", message = "${e.javaClass.simpleName}: ${e.message}")
+            Log.d("InterceptorError","${e.javaClass.simpleName}: ${e.message?:"Error Occurred"}")
             throw e
 
         }

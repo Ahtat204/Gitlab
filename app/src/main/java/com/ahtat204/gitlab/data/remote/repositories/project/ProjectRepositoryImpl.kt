@@ -49,7 +49,7 @@ class ProjectRepositoryImpl @Inject constructor(
             .watch()
             .mapNotNull { it.data }
             .catch { ex ->
-                if (ex is CancellationException) throw ex else logger(ex.message)
+                if (ex is CancellationException) throw ex else logger("an error occurred")
             }.mapNotNull { it }
 
     override suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?> {
@@ -57,7 +57,7 @@ class ProjectRepositoryImpl @Inject constructor(
             .watch()
             .mapNotNull { it.data }
             .catch { ex ->
-                if (ex is CancellationException) throw ex else logger(ex.message)
+                if (ex is CancellationException) throw ex else logger("an error occurred")
             }.mapNotNull { it }
     }
     override suspend fun getProjectCommits(
@@ -65,13 +65,13 @@ class ProjectRepositoryImpl @Inject constructor(
     ): Flow<GetRepositoryCommitsQuery.Data?> {
         return if (cursor == null) apolloClient.query(GetRepositoryCommitsQuery(id, branch = branch))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull { it.data }.catch { ex ->
-                if (ex is CancellationException) throw ex else logger(ex.message)
+                if (ex is CancellationException) throw ex else logger("an error occurred")
             }.mapNotNull { it }
         else apolloClient.query(GetRepositoryCommitsQuery(id, Optional.Present(cursor),branch))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
                 it.data
             }.catch { ex ->
-                if (ex is CancellationException) throw ex else logger(ex.message)
+                if (ex is CancellationException) throw ex else logger("an error occurred")
             }.mapNotNull { it }
     }
     override suspend fun getRepositoryBranches(
@@ -80,7 +80,7 @@ class ProjectRepositoryImpl @Inject constructor(
        return apolloClient.query(GetRepositoryBranchesQuery(project,skip)).fetchPolicy(FetchPolicy.CacheFirst).watch().mapNotNull {
            it.data
        }.catch { ex ->
-           if (ex is CancellationException) throw ex else logger(ex.message)
+           if (ex is CancellationException) throw ex else logger("an error occurred")
        }.mapNotNull { it }
     }
 
@@ -91,7 +91,7 @@ class ProjectRepositoryImpl @Inject constructor(
                   .fetchPolicy(FetchPolicy.CacheFirst)
                   .watch().mapNotNull { it.data }
                   .catch { ex ->
-                      if (ex is CancellationException) throw ex else logger(ex.message)
+                      if (ex is CancellationException) throw ex else logger("an error occurred")
                   }.mapNotNull { it }
           }
           else{
@@ -99,7 +99,7 @@ class ProjectRepositoryImpl @Inject constructor(
                   .fetchPolicy(FetchPolicy.CacheFirst)
                   .watch().mapNotNull { it.data }
                   .catch { ex ->
-                      if (ex is CancellationException) throw ex else logger(ex.message)
+                      if (ex is CancellationException) throw ex else logger("an error occurred")
                   }.mapNotNull { it }
           }
         }
@@ -108,14 +108,14 @@ class ProjectRepositoryImpl @Inject constructor(
               apolloClient.query(GetProjectRepositoryQuery(id, branch = Optional.present(branch),path= Optional.present(path)))
                   .fetchPolicy(FetchPolicy.CacheFirst).watch()
                   .mapNotNull { it.data }.catch { ex ->
-                      if (ex is CancellationException) throw ex else logger(ex.message)
+                      if (ex is CancellationException) throw ex else logger("an error occurred")
                   }.mapNotNull { it }
           }
           else{
               apolloClient.query(GetProjectRepositoryQuery(id, branch = Optional.present(branch)))
                   .fetchPolicy(FetchPolicy.CacheFirst).watch()
                   .mapNotNull { it.data }.catch { ex ->
-                      if (ex is CancellationException) throw ex else logger(ex.message)
+                      if (ex is CancellationException) throw ex else logger("an error occurred")
                   }.mapNotNull { it }
           }
         }
