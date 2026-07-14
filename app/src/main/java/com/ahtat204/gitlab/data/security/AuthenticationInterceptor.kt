@@ -1,8 +1,16 @@
 package com.ahtat204.gitlab.data.security
 
-
+import android.Manifest
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.util.Log
+import androidx.annotation.RequiresPermission
+import androidx.compose.ui.unit.IntOffset
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.isConnected
 import com.ahtat204.gitlab.domain.usecase.logging.logger
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -14,6 +22,7 @@ import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthorizationService
 import okhttp3.Interceptor
 import okhttp3.Response
+import net.openid.appauth.AuthState
 import okio.IOException
 
 /**
@@ -59,7 +68,11 @@ class AuthenticationInterceptor : Interceptor {
 
     @OptIn(InternalCoroutinesApi::class)
     override fun intercept(chain: Interceptor.Chain): Response {
+
         try {
+            if (!isConnected()) {
+                throw IOException("no internet connection")
+            }
             var request = chain.request()
             val builder = request.newBuilder()
             val token = Tokens.accessToken
@@ -76,7 +89,7 @@ class AuthenticationInterceptor : Interceptor {
                     if (accessToken != null && accessToken == token && state != null) {
                         val deferred = CompletableDeferred<String?>()
                         runBlocking {
-                            state.performActionWithFreshTokens(AuthorizationService(Tokens.context)) { token, _, ex ->
+                            state.performActionWithFreshTokens(AuthorizationService(context)) { token, _, ex ->
                                 if (token != null && ex == null) {
                                     Tokens.accessToken = token
                                     Tokens.CurrentAuthState = state
@@ -104,13 +117,9 @@ class AuthenticationInterceptor : Interceptor {
             }
             return response
         } catch (e: Exception) {
-            if(e is IOException){
-                logger(e.message)
-            }
-            else{
-                throw e
-            }
+
             throw e
+
         }
 
     }
