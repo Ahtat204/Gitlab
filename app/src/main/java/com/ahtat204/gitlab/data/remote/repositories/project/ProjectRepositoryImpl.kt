@@ -51,6 +51,9 @@ class ProjectRepositoryImpl @Inject constructor(
                 response.exception?.cause?.let {
                     throw it
                 }
+                response.errors?.forEach {
+                    logger(it.message)
+                }
                 response.data
 
             }

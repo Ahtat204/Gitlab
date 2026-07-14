@@ -6,5 +6,5 @@ import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.contex
 
 fun logger( message: String?,tag: String?=null) {
        Log.d(tag?:"com.ahtat204.gitlab.logger", message?:"an error occurred")
-       Toast.makeText(context, message?:"an error occurred", Toast.LENGTH_LONG).show();
+       Toast.makeText(context, message?:"an error occurred", Toast.LENGTH_SHORT).show();
 }
