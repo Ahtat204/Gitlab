@@ -1,11 +1,11 @@
 package com.ahtat204.gitlab.data.security
 
-
 import android.Manifest
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.annotation.RequiresPermission
+import androidx.compose.ui.unit.IntOffset
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
@@ -63,14 +63,15 @@ import okio.IOException
  * @author Lahcen AHTAT
  */
 class AuthenticationInterceptor : Interceptor {
-
-
     private val Locker = Any()
 
     @OptIn(InternalCoroutinesApi::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-        if(!isConnected) logger("No Internet Connection")
         try {
+            if (!isConnected()) {
+                val e = IOException("Connection issues",Exception())
+                throw e
+            }
             var request = chain.request()
             val builder = request.newBuilder()
             val token = Tokens.accessToken
@@ -87,7 +88,7 @@ class AuthenticationInterceptor : Interceptor {
                     if (accessToken != null && accessToken == token && state != null) {
                         val deferred = CompletableDeferred<String?>()
                         runBlocking {
-                            state.performActionWithFreshTokens(AuthorizationService(Tokens.context)) { token, _, ex ->
+                            state.performActionWithFreshTokens(AuthorizationService(context)) { token, _, ex ->
                                 if (token != null && ex == null) {
                                     Tokens.accessToken = token
                                     Tokens.CurrentAuthState = state
@@ -115,13 +116,9 @@ class AuthenticationInterceptor : Interceptor {
             }
             return response
         } catch (e: Exception) {
-            if(e is IOException){
-                logger(e.message)
-            }
-            else{
-                throw e
-            }
+            logger(tag = "InterceptorError", message = "${e.javaClass.simpleName}: ${e.message}")
             throw e
+
         }
 
     }

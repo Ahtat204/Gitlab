@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
+import okio.IOException
 
 /**
  * LauncherActivity is the entry point of the application.
@@ -63,37 +64,14 @@ class LauncherActivity : ComponentActivity() {
         authenticationService = AuthorizationService(this)
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
-        CoroutineScope(Dispatchers.IO).launch {
-            if(isConnected){
-                val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
-                if (storedState.isAuthorized) {
-                    storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
-                        if (token != null && ex == null) {
-                            Tokens.accessToken = token
-                            Tokens.CurrentAuthState = storedState
-                            lifecycleScope.launch {
-                                AuthStorage.getAuthState(this@LauncherActivity)
-                                    .updateData { storedState }
-                                isReady = true
-                                navigateTo(MainActivity::class.java)
-                            }
-                        }
-                        if (ex != null) {
-                            logger(ex.message)
-                            navigateTo(AuthenticationActivity::class.java)
-                            throw ex
-                        }
-                    }
-                } else {
-                    navigateTo(AuthenticationActivity::class.java)
-
-                }
+        if(!isConnected()){
+            navigateTo(MainActivity::class.java)
+            logger("no Internet Connection")
+        }
+        if(isConnected()){
+            CoroutineScope(Dispatchers.IO).launch {
+                refresh { isReady = true }
             }
-            else{
-                navigateTo(MainActivity::class.java)
-                logger("you're no connected")
-            }
-
         }
     }
 
@@ -110,4 +88,31 @@ class LauncherActivity : ComponentActivity() {
         authenticationService.dispose()
         super.onDestroy()
     }
+
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    private suspend fun refresh(isReady: () -> Unit) {
+        val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
+        if (storedState.isAuthorized) {
+            storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
+                if (token != null && ex == null) {
+                    Tokens.accessToken = token
+                    Tokens.CurrentAuthState = storedState
+                    lifecycleScope.launch {
+                        AuthStorage.getAuthState(this@LauncherActivity).updateData { storedState }
+                        isReady()
+                        navigateTo(MainActivity::class.java)
+                    }
+                }
+                if (ex != null) {
+                    logger(ex.message)
+                    navigateTo(AuthenticationActivity::class.java)
+                    throw ex
+                }
+            }
+        } else {
+            navigateTo(AuthenticationActivity::class.java)
+
+        }
+    }
+
 }
