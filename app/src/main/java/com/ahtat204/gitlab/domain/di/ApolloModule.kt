@@ -6,6 +6,7 @@ import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
 import com.apollographql.apollo.cache.normalized.normalizedCache
+import com.apollographql.apollo.interceptor.ApolloInterceptor
 import com.apollographql.apollo.network.http.DefaultHttpEngine
 import com.apollographql.apollo.network.http.HttpNetworkTransport
 import dagger.Module

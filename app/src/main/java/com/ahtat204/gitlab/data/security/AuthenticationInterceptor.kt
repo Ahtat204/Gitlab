@@ -117,7 +117,7 @@ class AuthenticationInterceptor : Interceptor {
             }
             return response
         } catch (e: Exception) {
-            Log.d("InterceptorError","${e.javaClass.simpleName}: ${e.message?:"Error Occurred"}")
+
             throw e
 
         }
