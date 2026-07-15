@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
+import com.ahtat204.gitlab.data.queries.GetCurrentUserGroupsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
  * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
  * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
  * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
+ * - [getCurrentUserGroups]: Retrieves and streams first 20 groups for the currentUser.
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
@@ -125,7 +127,7 @@ interface ProjectRepository {
      * ```kotlin
      * viewModelScope.launch {
      *     projectRepository.getProjectById("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     *         .collect {  }
      * }
      * ```
      * Query Example
@@ -189,7 +191,7 @@ interface ProjectRepository {
      * ```kotlin
      * viewModelScope.launch {
      *     projectRepository.getProjectRepository("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     *         .collect {  }
      * }
      * ```
      * query example
@@ -236,7 +238,7 @@ interface ProjectRepository {
      * ```kotlin
      * viewModelScope.launch {
      *     projectRepository.getRepositoryBranches("12345",20)
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     *         .collect {  }
      * }
      * ```
      * query example
@@ -273,7 +275,7 @@ interface ProjectRepository {
      * ```kotlin
      * viewModelScope.launch {
      *     projectRepository.getProjectCommits("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     *         .collect {  }
      * }
      * ```
      * query example
@@ -316,5 +318,43 @@ interface ProjectRepository {
     suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
-
+    /**
+     * Retrieves first 30 group of a user
+     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
+     * @return A [Flow] emitting [GetCurrentUserGroupsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetCurrentUserGroupsQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getCurrentUserGroups("12345")
+     *         .collect {  }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL
+     * currentUser {
+     *     groups(first: 30,after:$cursor,sort: CREATED_AT_ASC ){
+     *         pageInfo {
+     *             hasPreviousPage
+     *             hasNextPage
+     *             startCursor
+     *         }
+     *         nodes {
+     *             id
+     *             name
+     *             fullPath
+     *         }
+     *         count
+     *     }
+     * }
+     */
+    suspend fun getCurrentUserGroups(cursor: String?=null):Flow<GetCurrentUserGroupsQuery.Data>
 }

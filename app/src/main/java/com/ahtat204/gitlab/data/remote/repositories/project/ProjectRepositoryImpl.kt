@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
+import com.ahtat204.gitlab.data.queries.GetCurrentUserGroupsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -9,12 +10,14 @@ import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.Optional
+import com.apollographql.apollo.cache.normalized.ApolloStore
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.apollographql.apollo.cache.normalized.watch
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -74,6 +77,25 @@ class ProjectRepositoryImpl @Inject constructor(
                 if (ex is CancellationException) throw ex else logger(ex.message)
             }.mapNotNull { it }
     }
+    override suspend fun getCurrentUserGroups(cursor: String?): Flow<GetCurrentUserGroupsQuery.Data> {
+        return if(cursor==null) apolloClient.query(GetCurrentUserGroupsQuery()).fetchPolicy(
+            FetchPolicy.CacheFirst).watch().map { response->
+            response.exception?.cause?.let { throw it }
+            response.errors?.forEach { logger(it.message) }
+            response.data }
+            .catch { ex ->
+                if (ex is CancellationException) throw ex else logger(message=ex.message)
+            }.mapNotNull { it}
+        else apolloClient.query(GetCurrentUserGroupsQuery(Optional.present(cursor))).fetchPolicy(
+            FetchPolicy.CacheFirst).watch().map { response->
+            response.exception?.cause?.let { throw it }
+            response.errors?.forEach { logger(it.message) }
+            response.data }
+            .catch { ex ->
+                if (ex is CancellationException) throw ex else logger(message=ex.message)
+            }.mapNotNull { it}
+    }
+
     override suspend fun getRepositoryBranches(
         project: String, skip: Int
     ): Flow<GetRepositoryBranchesQuery.Data> {
