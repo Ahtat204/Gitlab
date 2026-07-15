@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
+import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -17,28 +18,92 @@ import kotlinx.coroutines.flow.Flow
  * Implementations are expected to use Apollo GraphQL client with caching policies.
  *
  * ### Contracts:
- * - [getAllProjects]: retrieves and Streams all projects the authenticated user has contributed to.
+ * - [getAllMyPersonalProjects]: retrieves and Streams all projects the authenticated user has contributed to.
  * - [getProjectById]: Retrieves and streams a project overview for a given project (full description, star count, fork count, ...).
  * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
  * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
  * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
+ * - [getAllMyContributedProjects] retrieves and streams first 20 contributed project paginated
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
     /**
-     * Streams all projects the authenticated user has contributed to.
-     * @return A [Flow] emitting [GetMyProjectsPaginatedQuery.Data] objects.
+     * Streams all Personal projects the authenticated user has contributed to.
+     * @return A [Flow] emitting [GetMyContributedProjectsQuery.Data] objects.
      *
      * ### Behavior
-     * - Executes [GetMyProjectsPaginatedQuery] with the provided fetch policy.
+     * - Executes [GetMyContributedProjectsQuery] with the provided fetch policy.
      * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      * ### Implementation Example
      * ```
-     * override suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data> =
-     *         apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst)
+     * override suspend fun getAllMyContributedProjects(): Flow<GetMyContributedProjectsQuery.Data> =
+     *         apolloClient.query(GetMyContributedProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst)
+     *             .watch().mapNotNull { it.data }.catch { ex ->
+     *                 if (ex is CancellationException) throw ex
+     *                 else Log.d(ex.cause,ex.message)
+     *             }.mapNotNull { it }
+     *
+     * ```
+     * ### Usage example in ViewModel
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getAllMyContributedProjects()
+     *         .collect { projects -> renderProjects(projects) }
+     * }
+     * ```
+     * Query Example:
+     * ```
+     *    currentUser {
+     *             contributedProjects(first: 20,includePersonal: true,after: $cursor){
+     *                 pageInfo {
+     *                     startCursor
+     *                     hasNextPage
+     *                     hasPreviousPage
+     *                 }
+     *                 nodes {
+     *                     id
+     *                     topics
+     *                     lastActivityAt
+     *                     __typename
+     *                     languages {
+     *                         color
+     *                         name
+     *                     }
+     *                     name
+     *                     fullPath
+     *                     description
+     *                     visibility
+     *                     pipelines(first: 1){
+     *                         nodes {
+     *                             __typename
+     *                             id
+     *                             status
+     *                         }
+     *                     }
+     *                 }
+     *             }
+     *
+     *     }
+     * ```
+     */
+    suspend fun getAllMyContributedProjects():Flow<GetMyContributedProjectsQuery.Data>
+    /**
+     * Streams all Personal projects the authenticated user has contributed to.
+     * @return A [Flow] emitting [GetMyPersonalProjectsQuery.Data] objects.
+     *
+     * ### Behavior
+     * - Executes [GetMyPersonalProjectsQuery] with the provided fetch policy.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Filters out null results with `mapNotNull`.
+     * - Logs exceptions with [Log.e] while keeping the stream alive.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     * ### Implementation Example
+     * ```
+     * override suspend fun getAllMyPersonalProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
+     *         apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst)
      *             .watch().mapNotNull { it.data }.catch { ex ->
      *                 if (ex is CancellationException) throw ex
      *                 else Log.d(ex.cause,ex.message)
@@ -50,7 +115,7 @@ interface ProjectRepository {
      * ### Usage example in ViewModel
      * ```kotlin
      * viewModelScope.launch {
-     *     projectRepository.getAllProjects(FetchPolicy.CacheFirst)
+     *     projectRepository.getAllMyPersonalProjects()
      *         .collect { projects -> renderProjects(projects) }
      * }
      * ```
@@ -95,7 +160,7 @@ interface ProjectRepository {
      * }
      * ```
      */
-    suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data>
+    suspend fun getAllMyPersonalProjects(): Flow<GetMyPersonalProjectsQuery.Data>
 
     /**
      * Retrieves a project overview  for a given project.(full description , star count, fork count )

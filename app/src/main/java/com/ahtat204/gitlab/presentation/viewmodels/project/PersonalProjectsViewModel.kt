@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * ViewModel responsible for exposing GitLab project data to the UI layer.
+ * ViewModel responsible for exposing user's personal projects data to the UI layer.
  *
  * ## Overview
  * - Integrates with [com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository] to fetch project lists and repository trees.
@@ -47,7 +47,7 @@ import javax.inject.Inject
  * @author Lahcen AHTAT
  */
 @HiltViewModel
-class ProjectViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
+class PersonalProjectsViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
     ViewModel() {
     /** Currently selected project’s overview/details */
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
@@ -65,7 +65,7 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
     fun loadAllProjects() = viewModelScope.launch {
-        projectRepository.getAllProjects().withCacheFallback { projectRepository.getAllProjects() }
+        projectRepository.getAllMyPersonalProjects().withCacheFallback { projectRepository.getAllMyPersonalProjects() }
             .collect { _projects.value = it.currentUser }
     }
 

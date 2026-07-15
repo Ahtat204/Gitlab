@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
+import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -44,8 +45,23 @@ import javax.inject.Singleton
 class ProjectRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient
 ) : ProjectRepository {
+    override suspend fun getAllMyContributedProjects(): Flow<GetMyContributedProjectsQuery.Data> {
+       return apolloClient.query(GetMyContributedProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch().map { response->
+            response.exception?.cause?.let {
+                throw it
+            }
+            response.errors?.forEach {
+                logger(it.message)
+            }
+            response.data
+        }
+            .catch { ex ->
+                if (ex is CancellationException) throw ex else logger(message=ex.message)
+            }.mapNotNull { it}
+    }
+
     @OptIn(ApolloExperimental::class)
-    override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
+    override suspend fun getAllMyPersonalProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
         apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst)
             .watch().map { response->
                 response.exception?.cause?.let {
@@ -160,7 +176,9 @@ class ProjectRepositoryImpl @Inject constructor(
           }
           else{
               apolloClient.query(GetProjectRepositoryQuery(id, branch = Optional.present(branch)))
-                  .fetchPolicy(FetchPolicy.CacheFirst).watch().map { response->
+                  .fetchPolicy(FetchPolicy.CacheFirst).
+                  watch().
+                  map { response->
                       response.exception?.cause?.let {
                           throw it
                       }
