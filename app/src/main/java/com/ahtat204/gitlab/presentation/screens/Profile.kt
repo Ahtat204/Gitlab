@@ -56,7 +56,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.ProfileViewModel
  *
  * @see ProfileViewModel
  * @see Header
- * @see <img src="file:///C:/Users/lahce/AndroidStudioProjects/Gitlab/profile.jpg" width="300" height="700"/>
+ * @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/repository/profile.jpg"  width="300" height="700"/>
  */
 @Composable
 fun Profile(

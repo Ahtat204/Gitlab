@@ -65,7 +65,7 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
     fun loadAllProjects() = viewModelScope.launch {
-        projectRepository.getAllProjects().withCacheFallback { projectRepository.getAllProjects() }
+        projectRepository.getAllPersonalProjects().withCacheFallback { projectRepository.getAllPersonalProjects() }
             .collect { _projects.value = it.currentUser }
     }
 

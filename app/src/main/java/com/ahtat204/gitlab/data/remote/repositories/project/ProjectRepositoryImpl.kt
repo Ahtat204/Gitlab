@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
+import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -45,7 +46,7 @@ class ProjectRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient
 ) : ProjectRepository {
     @OptIn(ApolloExperimental::class)
-    override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
+    override suspend fun getAllPersonalProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
         apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst)
             .watch().map { response->
                 response.exception?.cause?.let {
@@ -99,6 +100,24 @@ class ProjectRepositoryImpl @Inject constructor(
                 if (ex is CancellationException) throw ex else logger(message=ex.message)
             }.mapNotNull { it}
     }
+    override suspend fun getAllMyProjects(cursor: String?): Flow<GetAllProjectsQuery.Data> {
+        return if(cursor==null) apolloClient.query(GetAllProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch().map { response->
+            response.exception?.cause?.let { throw it }
+            response.data }
+            .catch { ex ->
+                if (ex is CancellationException) throw ex else logger(message=ex.message)
+            }.mapNotNull { it}
+        else apolloClient.
+        query(GetAllProjectsQuery(Optional.present(cursor))).
+            fetchPolicy(FetchPolicy.CacheFirst).
+            watch().map { response->
+            response.exception?.cause?.let { throw it }
+            response.data }
+            .catch { ex ->
+                if (ex is CancellationException) throw ex else logger(message=ex.message)
+            }.mapNotNull { it}
+    }
+
     override suspend fun getRepositoryBranches(
         project: String, skip: Int
     ): Flow<GetRepositoryBranchesQuery.Data> {

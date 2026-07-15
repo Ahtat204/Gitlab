@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
+import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.Flow
  * Implementations are expected to use Apollo GraphQL client with caching policies.
  *
  * ### Contracts:
- * - [getAllProjects]: retrieves and Streams all projects the authenticated user has contributed to.
+ * - [getAllPersonalProjects]: retrieves and Streams all projects the authenticated user has contributed to.
  * - [getProjectById]: Retrieves and streams a project overview for a given project (full description, star count, fork count, ...).
  * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
  * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
@@ -37,7 +38,7 @@ interface ProjectRepository {
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      * ### Implementation Example
      * ```
-     * override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
+     * override suspend fun getAllPersonalProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
      *         apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst)
      *             .watch().mapNotNull { it.data }.catch { ex ->
      *                 if (ex is CancellationException) throw ex
@@ -50,7 +51,7 @@ interface ProjectRepository {
      * ### Usage example in ViewModel
      * ```kotlin
      * viewModelScope.launch {
-     *     projectRepository.getAllProjects(FetchPolicy.CacheFirst)
+     *     projectRepository.getAllPersonalProjects(FetchPolicy.CacheFirst)
      *         .collect { projects -> renderProjects(projects) }
      * }
      * ```
@@ -95,7 +96,7 @@ interface ProjectRepository {
      * }
      * ```
      */
-    suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data>
+    suspend fun getAllPersonalProjects(): Flow<GetMyPersonalProjectsQuery.Data>
 
     /**
      * Retrieves a project overview  for a given project.(full description , star count, fork count )
@@ -317,4 +318,49 @@ interface ProjectRepository {
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
 
+
+    /**
+     * Retrieves first 20 projects for the authenticated user
+     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
+     * @return A [Flow] emitting [GetAllProjectsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetAllProjectsQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getAllMyProjects(cursor="12345")
+     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL
+     *     currentUser {
+     *         projectMemberships(first: 30,after:$cursor){
+     *             nodes {
+     *                 id
+     *                 project {
+     *                   id
+     *                     name
+     *                     topics
+     *                     fullPath
+     *
+     *                 }
+     *             }
+     *             pageInfo {
+     *                 startCursor
+     *                 hasNextPage
+     *             }
+     *         }
+     *     }
+     * ```
+     */
+
+    suspend fun getAllMyProjects(cursor: String?=null):Flow<GetAllProjectsQuery.Data>
 }
