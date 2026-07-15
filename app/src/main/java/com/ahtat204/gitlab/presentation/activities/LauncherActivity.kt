@@ -1,24 +1,24 @@
 package com.ahtat204.gitlab.presentation.activities
 
-import android.R
+import android.R.anim
 import android.content.Intent
-import android.net.http.NetworkException
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
-import androidx.annotation.RequiresExtension
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.isConnected
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
-import java.io.File
+import okio.IOException
 
 /**
  * LauncherActivity is the entry point of the application.
@@ -51,63 +51,35 @@ import java.io.File
  * ## Usage
  * This activity is automatically launched at app startup. It should not be
  * started manually from other parts of the app.
+ * @author Lahcen AHTAT
  */
 @AndroidEntryPoint
 class LauncherActivity : ComponentActivity() {
-
     private lateinit var authenticationService: AuthorizationService
 
-    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Install splash screen before super.onCreate
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-
-        // Ensure cache directory exists
-        val existed = File("gitlab/httpCache")
-        if (!existed.exists()) {
-            existed.mkdir()
-        }
         authenticationService = AuthorizationService(this)
-
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
-
-        // Check stored authentication state
-        CoroutineScope(Dispatchers.IO).launch {
-            val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
-
-            if (storedState.refreshToken != null) {
-                storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
-                    if (token != null && ex == null) {
-                        Tokens.accessToken = token
-                        Tokens.CurrentAuthState = storedState
-                        lifecycleScope.launch {
-                            AuthStorage.getAuthState(this@LauncherActivity).updateData { storedState }
-                            isReady = true
-                            navigateTo(MainActivity::class.java)
-                        }
-                    }
-                    if (ex != null) {
-                        if(ex.code == NetworkException.ERROR_INTERNET_DISCONNECTED ) {navigateTo(
-                            MainActivity::class.java)
-                        }
-                        throw ex
-                    }
-                }
-            } else {
-                navigateTo(AuthenticationActivity::class.java)
+        if(!isConnected()){
+            navigateTo(MainActivity::class.java)
+            logger("no Internet Connection")
+        }
+        if(isConnected()){
+            CoroutineScope(Dispatchers.IO).launch {
+                refresh { isReady = true }
             }
         }
     }
 
-    /** Navigates to the given destination activity with transition animation. */
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private fun navigateTo(destination: Class<*>) {
         startActivity(Intent(this, destination))
-        overridePendingTransition(
-            R.anim.overshoot_interpolator,
-            R.anim.fade_out
+        overrideActivityTransition(
+            OVERRIDE_TRANSITION_OPEN, anim.fade_in, anim.fade_out
         )
         finish()
     }
@@ -116,4 +88,31 @@ class LauncherActivity : ComponentActivity() {
         authenticationService.dispose()
         super.onDestroy()
     }
+
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    private suspend fun refresh(isReady: () -> Unit) {
+        val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
+        if (storedState.isAuthorized) {
+            storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
+                if (token != null && ex == null) {
+                    Tokens.accessToken = token
+                    Tokens.CurrentAuthState = storedState
+                    lifecycleScope.launch {
+                        AuthStorage.getAuthState(this@LauncherActivity).updateData { storedState }
+                        isReady()
+                        navigateTo(MainActivity::class.java)
+                    }
+                }
+                if (ex != null) {
+                    logger(ex.message)
+                    navigateTo(AuthenticationActivity::class.java)
+                    throw ex
+                }
+            }
+        } else {
+            navigateTo(AuthenticationActivity::class.java)
+
+        }
+    }
+
 }

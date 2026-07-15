@@ -15,8 +15,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ahtat204.gitlab.presentation.navigation.BottomBarScreen
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 
 @Composable
 fun TopAppBar(name: String?, navController: NavHostController) {

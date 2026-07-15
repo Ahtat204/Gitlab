@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cases
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.rounded.Work
 import androidx.compose.material3.Text
@@ -30,12 +29,12 @@ import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.components.Contact
 import com.ahtat204.gitlab.presentation.components.Header
 import com.ahtat204.gitlab.presentation.components.Info
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
+import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.ProfileViewModel
 import kotlinx.coroutines.Dispatchers
 
@@ -58,6 +57,7 @@ import kotlinx.coroutines.Dispatchers
  *
  * @see ProfileViewModel
  * @see Header
+ * @see <img src="file:///C:/Users/lahce/AndroidStudioProjects/Gitlab/profile.jpg" width="300" height="700"/>
  */
 @Composable
 fun Profile(

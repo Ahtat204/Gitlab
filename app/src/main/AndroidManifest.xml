@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:name=".GitlabApp"
         android:allowBackup="true"
@@ -19,7 +19,8 @@
             android:name=".presentation.activities.LauncherActivity"
             android:exported="true"
             android:label="@string/title_activity_launcher"
-            android:theme="@style/Theme.Gitlab">
+            android:theme="@style/Theme.Gitlab"
+            android:banner="@drawable/logo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

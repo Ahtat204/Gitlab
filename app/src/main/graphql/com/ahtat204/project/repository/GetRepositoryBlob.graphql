@@ -1,0 +1,12 @@
+query GetRepositoryBlob{
+    project(fullPath: ""){
+        repository {
+            blobs(ref: "",paths: ".gitignore"){
+                nodes {
+                    rawTextBlob
+                    rawBlob
+                }
+            }
+        }
+    }
+}

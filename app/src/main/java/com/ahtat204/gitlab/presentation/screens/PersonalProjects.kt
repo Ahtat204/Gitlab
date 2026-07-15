@@ -1,7 +1,6 @@
 package com.ahtat204.gitlab.presentation.screens
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,13 +23,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.ImageLoader
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
+import com.ahtat204.gitlab.presentation.components.CoilCache.loader
 import com.ahtat204.gitlab.presentation.components.ProjectItem
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.viewmodels.ProjectViewModel
-import kotlinx.coroutines.Dispatchers
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
+import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectViewModel
 import java.time.Instant
 import java.time.ZoneId
 
@@ -71,19 +69,21 @@ import java.time.ZoneId
  * - Uses [Instant] and [ZoneId] to sort projects by activity date.
  * - Relies on [ProjectItem] composable to render individual project details.
  * - Displays up to all available projects; topics and languages are shown if present.
+ *   @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/repository/personalprojects.jpg"  width="300" height="700"/>
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hiltViewModel()) {
-    val loader: ImageLoader =
-        ImageLoader.Builder(context!!).crossfade(true).dispatcher(Dispatchers.IO)
-            .respectCacheHeaders(false).build()
+fun PersonalProjects(
+    navController: NavHostController,
+    x: PaddingValues,
+    projectViewModel: ProjectViewModel = hiltViewModel()
+) {
     LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
     }
-    val CurrUser by projectViewModel.projects.collectAsState()
-    CurrUser?.projectMemberships?.nodes?.sortedByDescending {
-        Instant.parse(it?.project?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
+    val currUser by projectViewModel.projects.collectAsState()
+    currUser?.namespace?.projects?.nodes?.sortedByDescending {
+        Instant.parse(it?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
             .toLocalDate()
     }?.let { nodes ->
         Column(
@@ -93,16 +93,15 @@ fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hilt
                 .padding(x)
                 .background(Color.Black)
         ) {
-            if (CurrUser?.projectMemberships?.nodes?.isEmpty() == true || CurrUser?.avatarUrl == null) {
+            if (currUser?.namespace?.projects?.nodes?.isEmpty() == true || currUser?.avatarUrl == null) {
                 CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
-                Log.d("size", nodes.size.toString())
 
             } else {
                 Text(
                     text = "Your Projects",
                     fontFamily = titleFont,
                     fontSize = 20.sp,
-                    modifier = Modifier, color = Orange
+                    modifier = Modifier
                 )
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -111,7 +110,7 @@ fun PersonalProjects(x: PaddingValues, projectViewModel: ProjectViewModel = hilt
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(nodes, key = { item -> item?.id ?: Any() }) { item ->
-                        item?.project?.let { ProjectItem(CurrUser, it, loader) }
+                        item?.let { ProjectItem(currUser, it, loader, navController) }
                     }
                 }
             }

@@ -13,8 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.R
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 
 /**
  * Composable that displays a list of work items (issues, merge requests, groups, etc.)
@@ -54,26 +53,27 @@ import com.ahtat204.gitlab.presentation.ui.theme.titleFont
  * - Navigation routes should be defined in the app’s navigation graph to match
  *   the `item.route` values.
  * - The [WorkItem] composable is responsible for rendering individual items.
+ * @author Lahcen AHTAT
  */
 @Composable
 fun MyWorkItems(navController: NavController) {
     val myWorkItems = listOf(
-        Item("Issues", "issues",R.drawable.issues, 1),
-        Item("Merge Requests ","mergerequests", R.drawable.mergerequest, 1),
-        Item("Workspaces","workspaces", R.drawable.workspaces, 1),
-        Item("Milestones","workspaces", R.drawable.milestone, 1),
-        Item("Starred","starrted", R.drawable.star, 1),
-        Item("Groups","groups", R.drawable.group, 1),
-        Item("Personal projects", "personal",R.drawable.project, 1),
-        Item("Contributed Projects", "contributed",R.drawable.project, 1),
+        Item("Issues", "issues",R.drawable.issues),
+        Item("Merge Requests ","mergerequests", R.drawable.mergerequest),
+        Item("Workspaces","workspaces", R.drawable.workspaces),
+        Item("Milestones","workspaces", R.drawable.milestone),
+        Item("Starred","starrted", R.drawable.star),
+        Item("Groups","groups", R.drawable.group),
+        Item("Personal projects", "personal",R.drawable.project),
+        Item("Contributed Projects", "contributed",R.drawable.project),
     )
 
     Column(
-        modifier = Modifier.padding(0.dp),
+        modifier = Modifier.padding(0.dp).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Your Work", fontFamily = titleFont, fontSize = 20.sp, color = Orange)
+        Text(text = "Your Work", fontFamily = titleFont, fontSize = 20.sp)
         myWorkItems.forEach { item ->
             WorkItem(item) {
                 navController.navigate(item.route)

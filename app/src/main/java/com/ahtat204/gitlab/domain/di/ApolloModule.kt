@@ -1,10 +1,14 @@
 package com.ahtat204.gitlab.domain.di
+
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig.GRAPHQL_URL
+import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
 import com.apollographql.apollo.cache.normalized.normalizedCache
-import com.apollographql.apollo.network.okHttpClient
-import com.ahtat204.gitlab.data.remote.AuthenticationInterceptor
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.apollographql.apollo.interceptor.ApolloInterceptor
+import com.apollographql.apollo.network.http.DefaultHttpEngine
+import com.apollographql.apollo.network.http.HttpNetworkTransport
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,15 +40,13 @@ import javax.inject.Singleton
  *
  * val projects = apolloClient.query(GetMyProjectsQuery()).execute()
  * ```
+ * @author Lahcen AHTAT
  */
 @Module
 @InstallIn(SingletonComponent::class)
 object ApolloModule {
-
-    // In‑memory cache: 20 MB, entries expire after 5 minutes
     private val cacheFactory = MemoryCacheFactory(
-        maxSizeBytes = 20 * 1024 * 1024,
-        expireAfterMillis = 300000
+        maxSizeBytes = 20 * 1024 * 1024, expireAfterMillis = 600000
     )
 
     /**
@@ -55,22 +57,13 @@ object ApolloModule {
      */
     @Singleton
     @Provides
-    fun GetApolloService(): ApolloClient {
-        return ApolloClient.Builder()
-            .serverUrl("https://gitlab.com/api/graphql")
-            .addHttpHeader("Authorization", "Bearer ${Tokens.accessToken}")
-            .okHttpClient(
-                OkHttpClient.Builder()
-                    .addInterceptor(HttpLoggingInterceptor().apply {
-                        level = HttpLoggingInterceptor.Level.HEADERS
-                    })
-                    .addInterceptor(AuthenticationInterceptor())
-                    .build()
-            )
-            .normalizedCache(
-                cacheFactory,
-                writeToCacheAsynchronously = false
-            )
-            .build()
+    fun getApolloService(okHttpClient: OkHttpClient): ApolloClient {
+        val httpEngine = DefaultHttpEngine { okHttpClient }
+        val requestComposer = DefaultHttpRequestComposer(GRAPHQL_URL)
+        val networkTransport = HttpNetworkTransport.Builder().httpEngine(httpEngine)
+            .httpRequestComposer(requestComposer).build()
+        return ApolloClient.Builder().networkTransport(networkTransport).normalizedCache(
+                cacheFactory, writeToCacheAsynchronously = false
+            ).build()
     }
 }

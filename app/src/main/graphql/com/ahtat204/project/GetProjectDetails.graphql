@@ -1,0 +1,20 @@
+query GetProjectDetails($projectPath: ID!) {
+    project(fullPath: $projectPath) {
+        __typename
+        pipelineCounts{
+            pending
+            running
+        }
+        namespace {
+            path
+        }
+        openIssuesCount
+        fullPath
+        openMergeRequestsCount
+        forksCount
+        starCount
+        id
+        name
+        description
+    }
+}

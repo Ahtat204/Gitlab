@@ -1,0 +1,38 @@
+query GetUserProjectsByName($name:String!){
+
+        user(username: $name) {
+            id
+            avatarUrl
+            projectMemberships(first: 20) {
+                __typename
+                nodes {
+
+                    __typename
+                    id
+                    project {
+                        topics
+                        lastActivityAt
+                        avatarUrl
+                        __typename
+                        languages {
+                            color
+                            name
+                        }
+                        id
+                        name
+                        fullPath
+                        description
+                        visibility
+                        starCount
+                        lastActivityAt
+                    }
+                }
+                pageInfo {
+                    __typename
+                    hasNextPage
+                    endCursor
+                }
+            }
+        }
+    }
+

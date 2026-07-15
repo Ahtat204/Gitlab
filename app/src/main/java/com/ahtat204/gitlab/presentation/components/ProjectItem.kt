@@ -1,7 +1,7 @@
 package com.ahtat204.gitlab.presentation.components
 
-//import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,15 +31,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import androidx.navigation.NavHostController
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.ahtat204.gitlab.presentation.ui.theme.Background
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
-import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Background
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 /**
  * Composable that renders a single GitLab project item card.
@@ -53,9 +56,9 @@ import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
  * - Primary language with color indicator
  *
  * ## Parameters
- * @param data The [GetMyProjectsQuery.CurrentUser] object containing user metadata
+ * @param data The [com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery.CurrentUser] object containing user metadata
  *             (used to load avatar image if available).
- * @param project The [GetMyProjectsQuery.Project] object representing the project
+ * @param project The [com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery.Project] object representing the project
  *                whose details will be displayed.
  * @param imageLoader The [ImageLoader] instance used by Coil to load images asynchronously.
  *
@@ -80,25 +83,34 @@ import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
  * - Uses Coil’s [AsyncImage] for image loading with memory and disk caching.
  * - Applies custom font family and colors for consistent styling.
  * - Topics and languages are optional and only shown if available.
+ * @author Lahcen AHTAT
  */
 @Composable
 fun ProjectItem(
-    data: GetMyProjectsQuery.CurrentUser?,
-    project: GetMyProjectsQuery.Project,
-    imageLoader: ImageLoader
+    data: GetMyPersonalProjectsQuery.CurrentUser?,
+    project: GetMyPersonalProjectsQuery.Node,
+    imageLoader: ImageLoader,
+    navController: NavHostController
 ) {
+    val encodedId = URLEncoder.encode(project.fullPath, StandardCharsets.UTF_8.toString())
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = { navController.navigate("project?projectId=$encodedId") })
             .fillMaxHeight()
             .height(120.dp)
     ) {
         Row(
-            modifier = Modifier.background(Color.Black), verticalAlignment = Alignment.Top
+            modifier = Modifier
+                .background(Color.Black)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.Start
         ) {
             data?.let {
                 it.avatarUrl?.let { url ->
                     val avatar = "https://gitlab.com/$url"
+
                     AsyncImage(
                         imageLoader = imageLoader,
                         model = ImageRequest.Builder(LocalContext.current).data(avatar) // Image URL
@@ -126,6 +138,10 @@ fun ProjectItem(
                     .fillMaxHeight()
                     .background(Background)
             ) {
+                project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+
+            //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+
                 project.let { project ->
                     Row(
                         horizontalArrangement = Arrangement.Center,
@@ -157,7 +173,7 @@ fun ProjectItem(
                             text = it,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1,
-                            fontSize = 9.sp,
+                            fontSize = 10.sp,
                             color = Color.White,
                             modifier = Modifier
                                 .fillMaxWidth(0.8f)

@@ -1,7 +1,7 @@
 package com.ahtat204.gitlab.domain.di
 
-import com.ahtat204.gitlab.data.repositories.project.ProjectRepository
-import com.ahtat204.gitlab.data.repositories.project.ProjectRepositoryImpl
+import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -32,16 +32,17 @@ import dagger.hilt.android.components.ViewModelComponent
  *     // Use repository methods here
  * }
  * ```
+ * @author Lahcen AHTAT
  */
 @Module
 @InstallIn(ViewModelComponent::class)
 abstract class ProjectRepositoryModule {
 
     /**
-     * Binds [ProjectRepositoryImpl] as the concrete implementation of [ProjectRepository].
-     *
+     * Binds [ProjectRepositoryImpl] as the concrete implementation of [ProjectRepository].<br>
      * @param impl The injected implementation.
      * @return The bound [ProjectRepository] interface.
+     *
      */
     @Binds
     abstract fun provideProjectRepository(impl: ProjectRepositoryImpl): ProjectRepository

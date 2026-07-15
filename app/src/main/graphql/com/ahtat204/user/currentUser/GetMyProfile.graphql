@@ -1,0 +1,22 @@
+query GetMyProfile{
+    currentUser {
+        id
+        name
+        username
+        publicEmail
+        avatarUrl
+        webUrl
+        status {
+            availability
+            emoji
+            message
+
+        }
+        bio
+        location
+        github
+        jobTitle
+        projectCount
+        linkedin
+    }
+}
