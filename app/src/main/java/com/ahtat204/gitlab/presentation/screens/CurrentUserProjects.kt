@@ -8,7 +8,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.viewmodels.ProjectsViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 @Composable
 fun CurrentUserProjects(
