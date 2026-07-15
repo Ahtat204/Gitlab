@@ -52,6 +52,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
  *     openScreen = { navController.navigate(item.route) }
  * )
  * ```
+ * @author Lahcen AHTAT
  */
 @Composable
 fun ProjectWorkItems(item: Item, openScreen: () -> Unit) {

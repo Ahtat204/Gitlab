@@ -32,6 +32,7 @@ import dagger.hilt.android.components.ViewModelComponent
  *     // Use repository methods here
  * }
  * ```
+ * @author Lahcen AHTAT
  */
 @Module
 @InstallIn(ViewModelComponent::class)

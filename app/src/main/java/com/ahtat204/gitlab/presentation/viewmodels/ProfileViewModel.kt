@@ -50,19 +50,6 @@ class ProfileViewModel @Inject constructor(
     fun loadProfile(userName: String? = null) {
         if (userName == null) {
             viewModelScope.launch {
-             /*   try {
-                    profileRepository.getMyProfile(FetchPolicy.CacheFirst)
-                        .collect { profile.value = it.currentUser
-                        Log.d("ProfileValue",it.currentUser?.name!!)}
-                } catch (e: Exception) {
-                    if (e is CacheMissException) {
-                        profileRepository.getMyProfile(FetchPolicy.NetworkFirst)
-                            .collect { profile.value = it.currentUser
-                                Log.d("ProfileValue",it.currentUser?.name!!)}
-                    }
-                    if (e is CancellationException) throw e
-            //        if(e is NetworkException) throw e
-                }*/
                 profileRepository
                     .getMyProfile(FetchPolicy.CacheFirst)
                     .withCacheFallback { profileRepository.getMyProfile(FetchPolicy.NetworkFirst) }

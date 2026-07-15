@@ -56,6 +56,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.titleFont
  * avatar = "uploads/user/avatar.png"
  * )
  * ```
+ * @author Lahcen AHTAT
  */
 @Composable
 fun Header(
@@ -81,13 +82,6 @@ fun Header(
                     .padding(4.dp)
                     .size(80.dp)
                     .clip(RoundedCornerShape(40.dp)),
-                /*   onState = { state ->
-                       when (state) {
-                           is AsyncImagePainter.State.Loading -> {}
-                           is AsyncImagePainter.State.Success -> {}
-                           else -> {}
-                       }
-                   }*/
             )
         }
         Column(

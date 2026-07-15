@@ -1,14 +1,13 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
-import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
-import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
+import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
-import com.ahtat204.gitlab.data.queries.GetRepositoryTreeQuery
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import kotlinx.coroutines.flow.Flow
 
@@ -19,29 +18,28 @@ import kotlinx.coroutines.flow.Flow
  * Implementations are expected to use Apollo GraphQL client with caching policies.
  *
  * ### Contracts:
- * - [ProjectRepository.getAllProjects]: Streams all projects the authenticated user has contributed to.
- * - [ProjectRepository.getProjectById]: Streams a project overview for a given project (full description, star count, fork count, ...).
- * - [ProjectRepository.getProjectRepository]: Streams the repository tree (blobs, trees,..) for a given project.
- * - [ProjectRepository.getProjectCommits]: Streams the repository commits for a given project.
- * - [ProjectRepository.getRepositoryBranches] Streams first 20 branches of a repository .
- * - [ProjectRepository.getProjectIssues] Streams first 20 issues for a given project
+ * - [getAllProjects]: retrieves and Streams all projects the authenticated user has contributed to.
+ * - [getProjectById]: Retrieves and streams a project overview for a given project (full description, star count, fork count, ...).
+ * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
+ * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
+ * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
     /**
      * Streams all projects the authenticated user has contributed to.
-     * @return A [Flow] emitting [GetMyProjectsPaginatedQuery.Data] objects.
+     * @return A [Flow] emitting [GetMyPersonalProjectsQuery.Data] objects.
      *
      * ### Behavior
-     * - Executes [GetMyProjectsPaginatedQuery] with the provided fetch policy.
+     * - Executes [GetMyPersonalProjectsQuery] with the provided fetch policy.
      * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      * ### Implementation Example
      * ```
-     * override suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data> =
-     *         apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst)
+     * override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
+     *         apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst)
      *             .watch().mapNotNull { it.data }.catch { ex ->
      *                 if (ex is CancellationException) throw ex
      *                 else Log.d(ex.cause,ex.message)
@@ -98,10 +96,10 @@ interface ProjectRepository {
      * }
      * ```
      */
-    suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data>
+    suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data>
 
     /**
-     * Retrieves a project overview  for a given project.(full description , star count, fork count ,)
+     * Retrieves a project overview  for a given project.(full description , star count, fork count )
      *
      * @param id The unique identifier of the project.
      * @return A [Flow] emitting [GetProjectDetailsQuery.Data] objects, or null if unavailable.
@@ -218,87 +216,7 @@ interface ProjectRepository {
      *     }
      * ```
      */
-    suspend fun getProjectRepository(id: String, branch: String?): Flow<Data?>
-
-    /**
-     * Retrieves the repository's SubTree(meaning ,subdirectory) for a given project .
-     *
-     * @param project The project Id for whom you want to fetch the tree .
-     * @param treePath: path of the tree (you can get the tree bath from TreeEntry.path: String!)
-     * @param branch the ref for whom you want to fetch the tree(the folder)
-     * @return A [Flow] emitting [GetRepositoryTreeQuery.Data] objects, or null if unavailable.
-     *
-     * ### Behavior
-     * - Executes [GetRepositoryTreeQuery] with the provided project ID.
-     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
-     * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
-     * - Logs errors without terminating the stream.
-     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getRepositorySubTree(project="12345",branch="feature/authentication",treePath="src")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
-     * query example
-     * ``` GraphQL
-     *     project(fullPath: $projectPath){
-     *         repository{
-     *             tree(ref: $branch,path: $treePath){
-     *                 lastCommit(ref: $branch){
-     *                     message
-     *                     committedDate
-     *                     author {
-     *                         name
-     *                     }
-     *                 }
-     *                 trees(first: 10){
-     *                     __typename
-     *
-     *                     nodes {
-     *                         id
-     *                         name
-     *                         path
-     *
-     *                     }
-     *                     pageInfo {
-     *                         startCursor
-     *                     }
-     *                     edges {
-     *                         cursor
-     *                     }
-     *                 }
-     *                 blobs(first: 10 ){
-     *                     nodes {
-     *                         id
-     *                         name
-     *                         path
-     *                     }
-     *                     pageInfo {
-     *                         startCursor
-     *                     }
-     *                     edges {
-     *                         cursor
-     *                         node {
-     *                             id
-     *                             path
-     *                             name
-     *                         }
-     *                     }
-     *                 }
-     *             }
-     *         }
-     *     }
-     * ```
-     */
-    suspend fun getRepositorySubTree(
-        project: String,
-        treePath: String,
-        branch: String?
-    ): Flow<GetRepositoryTreeQuery.Data>
+    suspend fun getProjectRepository(id: String,branch:String?,path:String?=null): Flow<Data?>
 
     /**
      * Retrieves the repository tree for a given project.
