@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.presentation.components
 
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.apollographql.apollo.exception.CacheMissException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -14,6 +15,7 @@ fun <T> Flow<T>.withCacheFallback(
     if (e is CacheMissException) {
         emitAll(fallback())
     } else {
+        //logger(e.cause?.message)
         throw e
     }
 }
