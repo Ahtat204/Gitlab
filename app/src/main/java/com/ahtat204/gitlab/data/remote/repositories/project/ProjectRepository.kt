@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
+import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -27,18 +28,18 @@ import kotlinx.coroutines.flow.Flow
 interface ProjectRepository {
     /**
      * Streams all projects the authenticated user has contributed to.
-     * @return A [Flow] emitting [GetMyProjectsPaginatedQuery.Data] objects.
+     * @return A [Flow] emitting [GetMyPersonalProjectsQuery.Data] objects.
      *
      * ### Behavior
-     * - Executes [GetMyProjectsPaginatedQuery] with the provided fetch policy.
+     * - Executes [GetMyPersonalProjectsQuery] with the provided fetch policy.
      * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      * ### Implementation Example
      * ```
-     * override suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data> =
-     *         apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst)
+     * override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
+     *         apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst)
      *             .watch().mapNotNull { it.data }.catch { ex ->
      *                 if (ex is CancellationException) throw ex
      *                 else Log.d(ex.cause,ex.message)
@@ -316,5 +317,48 @@ interface ProjectRepository {
     suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
-
+    /**
+     * Retrieves the repository tree for a given project.
+     *
+     * @param id The unique identifier of the project.
+     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
+     * @return A [Flow] emitting [GetRepositoryCommitsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetProjectIssuesQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getProjectIssues("12345")
+     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL query GetProjectIssues($projectPath:ID!,$cursor:String){
+     *     project(fullPath: $projectPath){
+     *         issues(sort: CREATED_DESC,first: 20,after: $cursor){
+     *             nodes {
+     *                 id
+     *                 name
+     *                 title
+     *                 state
+     *                 createdAt
+     *                 assignees{
+     *                     nodes {
+     *                         name
+     *                     }
+     *                 }
+     *             }
+     *         }
+     *     }
+     * }
+     * ```
+     */
+    suspend fun getProjectIssues(id:String,cursor:String?=null) :Flow<GetProjectIssuesQuery.Data>
 }

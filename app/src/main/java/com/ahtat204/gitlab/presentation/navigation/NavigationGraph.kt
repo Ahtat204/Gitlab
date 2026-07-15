@@ -78,17 +78,23 @@ fun BottomNavigationGraph(
                 ProjectCommits(navController, x, branch,projectId)
             }
         }
-
         navigation(startDestination ="Project", route = "project" ){
             composable(route = "repository?projectId={projectId}",
-                arguments = listOf(navArgument("projectId") { defaultValue = "" })
-            )
+                arguments = listOf(navArgument("projectId") { defaultValue = "" }))
             {backStackEntry ->
                 val projectId = backStackEntry.arguments?.getString("projectId")
-                projectId?.let { RepositoryScreen(it,x,navController) }
+                projectId?.let {RepositoryScreen(it,x,navController)  }
             }
             composable(
                 route = "project?projectId={projectId}",
+                arguments = listOf(navArgument("projectId") { defaultValue = "" })
+            ) { backStackEntry ->
+                val projectId = backStackEntry.arguments?.getString("projectId")
+                projectId?.let { ProjectDetailScreen(navController,x, it)
+                }
+            }
+            composable(
+                route = "issues?projectId={projectId}",
                 arguments = listOf(navArgument("projectId") { defaultValue = "" })
             ) { backStackEntry ->
                 val projectId = backStackEntry.arguments?.getString("projectId")
