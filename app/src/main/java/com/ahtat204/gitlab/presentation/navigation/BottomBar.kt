@@ -1,3 +1,4 @@
+
 package com.ahtat204.gitlab.presentation.navigation
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.NavigationBar
@@ -12,8 +13,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
 
 /**
  * Composable that displays the bottom navigation bar.

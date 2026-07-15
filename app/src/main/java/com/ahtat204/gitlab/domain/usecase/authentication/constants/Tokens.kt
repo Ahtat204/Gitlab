@@ -1,12 +1,10 @@
 package com.ahtat204.gitlab.domain.usecase.authentication.constants
 
-import android.Manifest
+import androidx.datastore.core.DataStore
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import androidx.annotation.RequiresPermission
 import net.openid.appauth.AuthState
-import net.openid.appauth.AuthorizationService
 /**
  * Singleton object that manages authentication tokens and application context.
  *
@@ -46,8 +44,16 @@ object Tokens {
             val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
             return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
         }
+
+    /**
+     * Thread-safe cached access token updated on app launch (not every app start only if app start and access token is expired)
+     * it's [Volatile] to eliminate any race condition,cached to avoid reading it from disk ([DataStore] and [AuthState]) everytime
+     */
     @Volatile
     var accessToken: String? = null
+    /**
+     * an in-memory cached thread-safe(theoretically) Global instance of the OpenID [AuthState] to be used for getting new access tokens without hitting the disk ([DataStore])
+     */
     @Volatile
     var CurrentAuthState: AuthState? = null
     private var appContext: Context? = null

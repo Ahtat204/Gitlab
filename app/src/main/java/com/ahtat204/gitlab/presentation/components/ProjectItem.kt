@@ -38,9 +38,9 @@ import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
-import com.ahtat204.gitlab.presentation.ui.theme.Background
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Background
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 

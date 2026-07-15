@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.remote.repositories.profile.ProfileRepository
-import com.ahtat204.gitlab.presentation.components.withCacheFallback
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.exception.CacheMissException
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -50,10 +50,17 @@ class ProfileViewModel @Inject constructor(
     fun loadProfile(userName: String? = null) {
         if (userName == null) {
             viewModelScope.launch {
-                profileRepository
-                    .getMyProfile(FetchPolicy.CacheFirst)
-                    .withCacheFallback { profileRepository.getMyProfile(FetchPolicy.NetworkFirst) }
-                    .collect { profile.value = it.currentUser }
+                try {
+                    profileRepository.getMyProfile(FetchPolicy.CacheFirst)
+                        .collect { profile.value = it.currentUser }
+                } catch (e: Exception) {
+                    if (e is CacheMissException) {
+                        profileRepository.getMyProfile(FetchPolicy.NetworkFirst)
+                            .collect { profile.value = it.currentUser }
+                    }
+                    if (e is CancellationException) throw e
+            //        if(e is NetworkException) throw e
+                }
             }
         }
     }

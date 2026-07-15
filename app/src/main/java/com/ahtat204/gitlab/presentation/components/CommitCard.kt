@@ -17,9 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 
 /**
  * Displays a single commit entry inside a styled card.

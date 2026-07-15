@@ -16,10 +16,10 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
+import com.ahtat204.gitlab.presentation.activities.ui.theme.GitlabTheme
 import com.ahtat204.gitlab.presentation.components.CoilCache
 import com.ahtat204.gitlab.presentation.navigation.BottomBar
 import com.ahtat204.gitlab.presentation.navigation.BottomNavigationGraph
-import com.ahtat204.gitlab.presentation.ui.theme.GitlabTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
