@@ -33,6 +33,7 @@ import net.openid.appauth.AuthState
  *     currentState.apply { /* update tokens */ }
  * }
  * ```
+ * @author Lahcen AHTAT
  */
 val Context.authStateStore: DataStore<AuthState> by dataStore(
     fileName = "auth_state.txt", serializer = AuthStateSerializer

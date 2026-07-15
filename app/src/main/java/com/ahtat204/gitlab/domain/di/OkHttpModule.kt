@@ -1,12 +1,17 @@
 package com.ahtat204.gitlab.domain.di
 
+import coil.ImageLoader
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
+import com.ahtat204.gitlab.BuildConfig
 import com.ahtat204.gitlab.data.security.AuthenticationInterceptor
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -51,6 +56,7 @@ import javax.inject.Singleton
  * - This module does not configure caching (e.g., [MemoryCacheFactory]) directly,
  *   but the provided client can be extended with caching if required.
  * - Interceptors are applied in the order they are added: logging first, then authentication.
+ * @author Lahcen AHTAT
  */
 @InstallIn(SingletonComponent::class)
 @Module
@@ -58,15 +64,30 @@ object OkHttpModule {
     @Singleton
     @Provides
     fun provieOkHttp(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .connectTimeout(15, TimeUnit.SECONDS).cache(cache = Cache(
-                Tokens.context.cacheDir, 10L * 1024 * 1024
+        return OkHttpClient.Builder().connectTimeout(15, TimeUnit.SECONDS).cache(
+            cache = Cache(
+                context.cacheDir, 10L * 1024 * 1024
             )
-            )
-            .readTimeout(15, TimeUnit.SECONDS)
-            .addInterceptor(HttpLoggingInterceptor() .apply {
+        ).readTimeout(15, TimeUnit.SECONDS).addInterceptor(AuthenticationInterceptor())
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level =if(BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+            }).build()
+    }
 
-        level = HttpLoggingInterceptor.Level.BODY
-    }).addInterceptor(AuthenticationInterceptor()).build()
-}
+    /**
+     *
+     */
+    @Singleton
+    @Provides
+    fun provideImageLoader(okHttpClient: OkHttpClient): ImageLoader {
+        return ImageLoader.Builder(context).crossfade(true).dispatcher(Dispatchers.IO)
+            .respectCacheHeaders(false).okHttpClient(okHttpClient).memoryCache {
+                MemoryCache.Builder(context)
+                    .maxSizePercent(0.25) // Use 25% of app's memory for images
+                    .build()
+            }.diskCache {
+                DiskCache.Builder().directory(context.cacheDir?.resolve("image_cache")!!)
+                    .maxSizeBytes(50L * 1024 * 1024).build()
+            }.build()
+    }
 }

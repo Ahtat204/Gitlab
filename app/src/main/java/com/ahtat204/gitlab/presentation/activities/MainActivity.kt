@@ -15,10 +15,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
+import com.ahtat204.gitlab.presentation.components.CoilCache
 import com.ahtat204.gitlab.presentation.navigation.BottomBar
 import com.ahtat204.gitlab.presentation.navigation.BottomNavigationGraph
 import com.ahtat204.gitlab.presentation.ui.theme.GitlabTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * The main entry point of the GitLab Android application(only after Authentication)
@@ -36,9 +39,12 @@ import dagger.hilt.android.AndroidEntryPoint
  * Dependency injection is enabled via [AndroidEntryPoint] for Hilt.
  *
  * @constructor Creates the main activity for the GitLab app.
+ * @author Lahcen AHTAT
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+     lateinit var imageLoader: ImageLoader
 
     /**
      * Called when the activity is starting.
@@ -58,6 +64,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         WindowCompat.setDecorFitsSystemWindows(window, true)
+        CoilCache.init(imageLoader)
         setContent {
             val navController = rememberNavController()
             GitlabTheme(darkTheme = true) {

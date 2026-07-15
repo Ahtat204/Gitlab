@@ -1,17 +1,26 @@
 package com.ahtat204.gitlab.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
+import com.ahtat204.gitlab.presentation.ui.theme.titleFont
+
 /**
  * Displays a single commit entry inside a styled card.
  *
@@ -37,7 +46,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
  * - Both texts use [customFontFamily] for styling.
  *
  * ## Example
- * ```
+ * ``` Kotlin
  * CommitCard(
  *     sha = "abc123def",
  *     message = "Fix bug in authentication flow"
@@ -47,10 +56,10 @@ import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
  * ## Notes
  * - Consider adding spacing or alignment between the message and SHA for improved readability.
  * - Accessibility: Provide meaningful descriptions if commit details are critical for screen readers.
+ * @author Lahcen AHTAT
  */
-
 @Composable
-fun CommitCard(sha: String?, message: String?) {
+fun CommitCard(sha: String?, message: String?, author: String, date: String) {
     Card(
         {}, modifier = Modifier
             .fillMaxWidth()
@@ -58,17 +67,39 @@ fun CommitCard(sha: String?, message: String?) {
             .background(Color.Black)
     ) {
         if (sha == null || message == null) return@Card
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Black)
-                .height(50.dp)
+                .height(80.dp)
+                .padding(5.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            Column(
+                modifier = Modifier.background(Color(0xFF000000)),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = message,
+                    fontFamily = customFontFamily,
+                    modifier = Modifier.fillMaxWidth(0.7f),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 2
+                )
+                Text(
+                    text = "$author authored $date",
+                    fontFamily = titleFont,
+                    fontSize = 12.sp,
+                    color = Orange,
+                    modifier = Modifier.fillMaxWidth(0.6f),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 2
+                )
+            }
+
             Text(
-                text = message, fontFamily = customFontFamily, modifier = Modifier
-            )
-            Text(
-                text = sha, fontFamily = customFontFamily, modifier = Modifier
+                text = sha, fontFamily = customFontFamily, modifier = Modifier, color = Orange
             )
         }
     }
