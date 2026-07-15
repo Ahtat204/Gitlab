@@ -1,7 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
-import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
+import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
@@ -95,7 +95,7 @@ interface ProjectRepository {
      * }
      * ```
      */
-    suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data>
+    suspend fun getAllProjects(): Flow<GetMyProjectsQuery.Data>
 
     /**
      * Retrieves a project overview  for a given project.(full description , star count, fork count )
