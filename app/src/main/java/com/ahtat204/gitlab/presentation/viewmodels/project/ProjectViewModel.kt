@@ -2,7 +2,7 @@ package com.ahtat204.gitlab.presentation.viewmodels.project
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.presentation.components.withCacheFallback
@@ -53,10 +53,10 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
 
     /** Backing state for contributed projects. */
-    private val _projects = MutableStateFlow<GetMyProjectsQuery.CurrentUser?>(null)
+    private val _projects = MutableStateFlow<GetMyPersonalProjectsQuery.CurrentUser?>(null)
 
     /** Public immutable flow of contributed projects. */
-    val projects: StateFlow<GetMyProjectsQuery.CurrentUser?> = _projects.asStateFlow()
+    val projects: StateFlow<GetMyPersonalProjectsQuery.CurrentUser?> = _projects.asStateFlow()
 
     /**
      * Loads all projects contributed by the authenticated user.

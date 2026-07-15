@@ -1,13 +1,17 @@
-query GetMyProjects($cursor: String){
+query GetMyPersonalProjects($cursor: String){
     currentUser {
+        id
         avatarUrl
-        projectMemberships(first: 10,after: $cursor) {
-            __typename
-            nodes {
-                __typename
-                id
-                project {
+        namespace {
+            projects(first: 20,after: $cursor,sort: ACTIVITY_DESC){
 
+               pageInfo {
+                   startCursor
+                   hasNextPage
+                   hasPreviousPage
+               }
+                nodes {
+                    id
                     topics
                     lastActivityAt
                     __typename
@@ -27,11 +31,6 @@ query GetMyProjects($cursor: String){
                         }
                     }
                 }
-            }
-            pageInfo {
-                __typename
-                hasNextPage
-                endCursor
             }
         }
     }

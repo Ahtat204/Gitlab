@@ -37,7 +37,7 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.ahtat204.gitlab.data.queries.GetMyProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.presentation.ui.theme.Background
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
@@ -56,9 +56,9 @@ import java.nio.charset.StandardCharsets
  * - Primary language with color indicator
  *
  * ## Parameters
- * @param data The [com.ahtat204.gitlab.data.queries.GetMyProjectsQuery.CurrentUser] object containing user metadata
+ * @param data The [com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery.CurrentUser] object containing user metadata
  *             (used to load avatar image if available).
- * @param project The [com.ahtat204.gitlab.data.queries.GetMyProjectsQuery.Project] object representing the project
+ * @param project The [com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery.Project] object representing the project
  *                whose details will be displayed.
  * @param imageLoader The [ImageLoader] instance used by Coil to load images asynchronously.
  *
@@ -87,8 +87,8 @@ import java.nio.charset.StandardCharsets
  */
 @Composable
 fun ProjectItem(
-    data: GetMyProjectsQuery.CurrentUser?,
-    project: GetMyProjectsQuery.Project,
+    data: GetMyPersonalProjectsQuery.CurrentUser?,
+    project: GetMyPersonalProjectsQuery.Node,
     imageLoader: ImageLoader,
     navController: NavHostController
 ) {
