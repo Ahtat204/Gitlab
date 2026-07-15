@@ -1,9 +1,11 @@
 package com.ahtat204.gitlab.domain.usecase.authentication.constants
 
+import android.Manifest
 import androidx.datastore.core.DataStore
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import androidx.annotation.RequiresPermission
 import net.openid.appauth.AuthState
 /**
  * Singleton object that manages authentication tokens and application context.
@@ -37,6 +39,7 @@ import net.openid.appauth.AuthState
  * @author Lahcen AHTAT
  */
 object Tokens {
+    @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
     fun  isConnected(): Boolean
         {
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

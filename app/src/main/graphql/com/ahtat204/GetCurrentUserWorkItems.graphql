@@ -1,0 +1,19 @@
+query GetCurrentUserWorkItems($cursor:String){
+    currentUser {
+        workItems(first: 20,after: $cursor,sort: CREATED_ASC){
+           pageInfo {
+               hasNextPage
+               hasPreviousPage
+               startCursor
+           }
+            nodes {
+                name
+                id
+                createdAt
+                closedAt
+                description
+
+            }
+        }
+    }
+}
