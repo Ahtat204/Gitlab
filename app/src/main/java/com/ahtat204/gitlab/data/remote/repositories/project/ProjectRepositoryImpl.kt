@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -100,15 +101,15 @@ class ProjectRepositoryImpl @Inject constructor(
                 if (ex is CancellationException) throw ex else logger(message=ex.message)
             }.mapNotNull { it}
     }
-    override suspend fun getAllMyProjects(cursor: String?): Flow<GetAllProjectsQuery.Data> {
-        return if(cursor==null) apolloClient.query(GetAllProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch().map { response->
+    override suspend fun getContributedProjects(cursor: String?): Flow<GetMyContributedProjectsQuery.Data> {
+        return if(cursor==null) apolloClient.query(GetMyContributedProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch().map { response->
             response.exception?.cause?.let { throw it }
             response.data }
             .catch { ex ->
                 if (ex is CancellationException) throw ex else logger(message=ex.message)
             }.mapNotNull { it}
         else apolloClient.
-        query(GetAllProjectsQuery(Optional.present(cursor))).
+        query(GetMyContributedProjectsQuery(Optional.present(cursor))).
             fetchPolicy(FetchPolicy.CacheFirst).
             watch().map { response->
             response.exception?.cause?.let { throw it }

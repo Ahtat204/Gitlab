@@ -10,13 +10,13 @@ import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.viewmodels.ProjectsViewModel
 
 @Composable
-fun CurrentUserProjects(
+fun ContributedProjects(
     navController: NavController,
     x: PaddingValues,
     projectsViewModel: ProjectsViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
-        projectsViewModel.loadAllMyProjects()
+        projectsViewModel.loadContributedProjects()
     }
     val projects by projectsViewModel.projects.collectAsStateWithLifecycle()
 }

@@ -2,6 +2,7 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -362,5 +363,5 @@ interface ProjectRepository {
      * ```
      */
 
-    suspend fun getAllMyProjects(cursor: String?=null):Flow<GetAllProjectsQuery.Data>
+    suspend fun getContributedProjects(cursor: String?=null):Flow<GetMyContributedProjectsQuery.Data>
 }
