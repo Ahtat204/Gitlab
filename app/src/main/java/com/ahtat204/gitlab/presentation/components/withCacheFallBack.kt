@@ -18,7 +18,6 @@ fun <T> Flow<T>.withCacheFallback(
     if (e is CacheMissException) {
         emitAll(fallback())
     } else {
-        currentCoroutineContext().cancel()
         throw e
     }
 }

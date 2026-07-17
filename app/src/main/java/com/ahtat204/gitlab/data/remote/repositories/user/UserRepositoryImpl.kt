@@ -2,6 +2,7 @@ package com.ahtat204.gitlab.data.remote.repositories.user
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
+import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
 import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.cache.normalized.FetchPolicy
@@ -40,9 +41,6 @@ class UserRepositoryImpl @Inject constructor(
 ): UserRepository {
     override suspend fun getUserProjectsByName(userName: String,policy: FetchPolicy):Flow<GetUserProjectsByNameQuery.Data?>{
         return apolloClient.query(GetUserProjectsByNameQuery(userName)).fetchPolicy(policy).watch()
-            .mapNotNull { it.data }.catch { ex ->
-               logger("ProjectRepository", ex.cause.toString() + "\n" + ex.stackTrace)
-                if (ex is CancellationException) throw ex
-            }.mapNotNull { it }
+            .mapAndHandleErrors()
     }
 }

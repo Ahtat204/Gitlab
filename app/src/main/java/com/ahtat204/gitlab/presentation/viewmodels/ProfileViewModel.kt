@@ -52,7 +52,6 @@ class ProfileViewModel @Inject constructor(
             viewModelScope.launch {
                 profileRepository
                     .getMyProfile(FetchPolicy.CacheFirst)
-                    .withCacheFallback { profileRepository.getMyProfile(FetchPolicy.NetworkFirst) }
                     .collect { profile.value = it.currentUser }
             }
         }
