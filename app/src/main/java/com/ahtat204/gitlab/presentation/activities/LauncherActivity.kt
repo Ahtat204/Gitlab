@@ -64,15 +64,25 @@ class LauncherActivity : ComponentActivity() {
         authenticationService = AuthorizationService(this)
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
-        if(!isConnected()){
-            navigateTo(MainActivity::class.java)
-            logger("no Internet Connection")
-        }
-        if(isConnected()){
-            CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
+        val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
+
+        if (!storedState.isAuthorized) {
+            isReady = true
+            navigateTo(AuthenticationActivity::class.java)
+        } else {
+            // Even if offline, we load the cached state so tokens are ready
+            if (isConnected()) {
                 refresh { isReady = true }
+            } else {
+                // If offline, just load from cache and proceed
+                Tokens.CurrentAuthState = storedState
+                Tokens.accessToken = storedState.accessToken
+                isReady = true
+                navigateTo(MainActivity::class.java)
             }
         }
+    }
     }
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
