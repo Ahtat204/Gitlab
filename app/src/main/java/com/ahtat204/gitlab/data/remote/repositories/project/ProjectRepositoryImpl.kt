@@ -56,7 +56,6 @@ class ProjectRepositoryImpl @Inject constructor(
                 response.exception?.cause?.let {
                     throw it
                 }
-            }
             response.data
         }.catch { ex ->
                 if (ex is CancellationException) throw ex else logger(message = ex.message)
