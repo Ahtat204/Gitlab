@@ -1,6 +1,6 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
-import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
+import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -41,7 +41,7 @@ import javax.inject.Singleton
  *
  * ## Dependencies
  * - [ApolloClient]: Executes GraphQL queries and manages caching.
- * - [GetMyProjectsPaginatedQuery], [GetProjectDetailsQuery],[GetProjectRepositoryQuery],[GetRepositoryCommitsQuery],[GetRepositoryBranchesQuery]: Auto‑generated query classes.
+ * - [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery],[GetProjectRepositoryQuery],[GetRepositoryCommitsQuery],[GetRepositoryBranchesQuery]: Auto‑generated query classes.
  * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
  * @author Lahcen AHTAT
  */
@@ -50,11 +50,9 @@ class ProjectRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient
 ) : ProjectRepository {
     @OptIn(ApolloExperimental::class)
-    override suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data> =
-        apolloClient.query(GetMyProjectsPaginatedQuery()).
-        fetchPolicy(FetchPolicy.CacheFirst)
-            .watch().map { response ->
-            if (response.hasErrors()) {
+    override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
+        apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst)
+            .watch().map { response->
                 response.exception?.cause?.let {
                     throw it
                 }
