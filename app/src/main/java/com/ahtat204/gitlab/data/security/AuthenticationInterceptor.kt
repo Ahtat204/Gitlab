@@ -1,12 +1,5 @@
 package com.ahtat204.gitlab.data.security
 
-import android.Manifest
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.util.Log
-import androidx.annotation.RequiresPermission
-import androidx.compose.ui.unit.IntOffset
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
@@ -68,7 +61,6 @@ class AuthenticationInterceptor : Interceptor {
 
     @OptIn(InternalCoroutinesApi::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-
         try {
             if (!isConnected()) {
                 throw IOException("no internet connection")
@@ -117,9 +109,7 @@ class AuthenticationInterceptor : Interceptor {
             }
             return response
         } catch (e: Exception) {
-
             throw e
-
         }
 
     }

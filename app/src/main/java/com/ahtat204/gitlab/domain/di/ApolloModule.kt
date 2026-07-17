@@ -4,6 +4,7 @@ import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig.GR
 import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
 import com.apollographql.apollo.cache.normalized.normalizedCache
 import com.apollographql.apollo.interceptor.ApolloInterceptor
@@ -55,6 +56,7 @@ object ApolloModule {
      * @return A fully configured Apollo client with authentication, logging,
      *         and normalized caching enabled.
      */
+    @OptIn(ApolloExperimental::class)
     @Singleton
     @Provides
     fun getApolloService(okHttpClient: OkHttpClient): ApolloClient {
@@ -64,6 +66,6 @@ object ApolloModule {
             .httpRequestComposer(requestComposer).build()
         return ApolloClient.Builder().networkTransport(networkTransport).normalizedCache(
                 cacheFactory, writeToCacheAsynchronously = false
-            ).build()
+            ).retryOnError { true }.failFastIfOffline(true).build()
     }
 }
