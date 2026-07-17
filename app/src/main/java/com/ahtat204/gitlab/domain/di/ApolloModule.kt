@@ -66,6 +66,6 @@ object ApolloModule {
             .httpRequestComposer(requestComposer).build()
         return ApolloClient.Builder().networkTransport(networkTransport).normalizedCache(
                 cacheFactory, writeToCacheAsynchronously = false
-            ).retryOnError { true }.failFastIfOffline(true).build()
+            ).build()
     }
 }
