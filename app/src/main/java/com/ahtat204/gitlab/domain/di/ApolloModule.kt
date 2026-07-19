@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.domain.di
 
+
 import com.ahtat204.gitlab.data.queries.cache.Cache.cache
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig.GRAPHQL_URL
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
