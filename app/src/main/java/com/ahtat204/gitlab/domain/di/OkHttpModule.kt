@@ -6,7 +6,6 @@ import coil.memory.MemoryCache
 import com.ahtat204.gitlab.BuildConfig
 import com.ahtat204.gitlab.data.security.AuthenticationInterceptor
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
-import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -68,9 +67,11 @@ object OkHttpModule {
             cache = Cache(
                 context.cacheDir, 10L * 1024 * 1024
             )
-        ).retryOnConnectionFailure(true).readTimeout(15, TimeUnit.SECONDS).addInterceptor(AuthenticationInterceptor())
+        ).retryOnConnectionFailure(true).readTimeout(15, TimeUnit.SECONDS)
+            .addInterceptor(AuthenticationInterceptor())
             .addInterceptor(HttpLoggingInterceptor().apply {
-                level =if(BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+                level =
+                    if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
             }).build()
     }
 
