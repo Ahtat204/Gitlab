@@ -3,10 +3,12 @@ package com.ahtat204.gitlab.domain.di
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig.GRAPHQL_URL
 import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.isConnected
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
 import com.apollographql.apollo.cache.normalized.normalizedCache
+import com.apollographql.apollo.cache.normalized.refetchPolicy
 import com.apollographql.apollo.interceptor.ApolloInterceptor
 import com.apollographql.apollo.network.http.DefaultHttpEngine
 import com.apollographql.apollo.network.http.HttpNetworkTransport
@@ -65,7 +67,7 @@ object ApolloModule {
         val networkTransport = HttpNetworkTransport.Builder().httpEngine(httpEngine)
             .httpRequestComposer(requestComposer).build()
         return ApolloClient.Builder().networkTransport(networkTransport).normalizedCache(
-                cacheFactory, writeToCacheAsynchronously = false
-            ).build()
+                cacheFactory, writeToCacheAsynchronously = true
+            ).retryOnError { isConnected() }.failFastIfOffline(true).build()
     }
 }
