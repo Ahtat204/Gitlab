@@ -212,7 +212,7 @@ class RepositoryViewModel @Inject constructor(
     fun loadProjectCommits(id: String, branch: String) {
         val pager = commits.value?.pageInfo?.endCursor
         val hasNext=commits.value?.pageInfo?.hasNextPage
-        if (!hasNext) {
+        if (hasNext==false) {
             viewModelScope.launch {
                 projectRepository.getProjectCommits(id, cursor = null, branch = branch).collect {
                     _commits.value = it?.project?.repository?.commits

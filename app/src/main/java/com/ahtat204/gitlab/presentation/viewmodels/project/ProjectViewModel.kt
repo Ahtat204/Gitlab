@@ -2,7 +2,7 @@ package com.ahtat204.gitlab.presentation.viewmodels.project
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
+import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.presentation.components.withCacheFallback
@@ -53,10 +53,10 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
 
     /** Backing state for contributed projects. */
-    private val _projects = MutableStateFlow<GetMyProjectsPaginatedQuery.CurrentUser?>(null)
+    private val _projects = MutableStateFlow<GetMyPersonalProjectsQuery.CurrentUser?>(null)
 
     /** Public immutable flow of contributed projects. */
-    val projects: StateFlow<GetMyProjectsPaginatedQuery.CurrentUser?> = _projects.asStateFlow()
+    val projects: StateFlow<GetMyPersonalProjectsQuery.CurrentUser?> = _projects.asStateFlow()
 
     /**
      * Loads all projects contributed by the authenticated user.
@@ -65,8 +65,7 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
     fun loadAllProjects() = viewModelScope.launch {
-        projectRepository.getAllProjects().withCacheFallback { projectRepository.getAllProjects() }
-            .collect { _projects.value = it.currentUser }
+        projectRepository.getAllProjects().collect { _projects.value = it.currentUser }
     }
 
     /**
@@ -75,11 +74,7 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      * @param id The unique project identifier.
      */
     fun loadProject(id: String) = viewModelScope.launch {
-        projectRepository.getProjectById(id).withCacheFallback {
-            projectRepository.getProjectById(
-                id
-            )
-        }.collect { currentProject.value = it?.project }
+        projectRepository.getProjectById(id).collect { currentProject.value = it?.project }
     }
 
 }
