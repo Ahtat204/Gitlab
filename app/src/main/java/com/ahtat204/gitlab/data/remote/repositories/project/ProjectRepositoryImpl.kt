@@ -92,5 +92,5 @@ class ProjectRepositoryImpl @Inject constructor(
                     .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
             }
         }
-    }
+     }
 }

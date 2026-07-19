@@ -3,9 +3,7 @@ package com.ahtat204.gitlab.presentation.screens.project
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,15 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,15 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.ahtat204.gitlab.presentation.components.BranchesList
+import com.ahtat204.gitlab.presentation.components.FileBrowser
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
 import com.ahtat204.gitlab.presentation.components.TreeItemCard
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
-import com.ahtat204.gitlab.presentation.components.removeAfterKey
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
-import androidx.compose.runtime.collectAsState
-
-
 
 /**
  * Displays the repository screen for a given project, including branch selection,
@@ -107,7 +98,7 @@ fun RepositoryScreen(
     navController: NavController,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
-   val trees = repositoryViewModel.folders.collectAsState().value
+    val history = remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
     val currentBranch = remember { mutableStateOf<String?>(null) }
@@ -137,100 +128,35 @@ fun RepositoryScreen(
                         repository?.tree?.lastCommit?.author?.name,
                         parsedDateTime,
                         navController,
-                        projectPath
-                    )
+                        projectPath,
+                        history)
                 }
             }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {}
             Spacer(modifier = Modifier.height(30.dp))
-                Row(modifier = Modifier.horizontalScroll(rememberScrollState())){
-                    trees.forEach { (name, path) ->
 
-                             Text(
-                            text = "$name \b /",
-                            modifier = Modifier
-                                .offset((0).dp, ((-20).dp))
-                                .clickable(
-                                    onClick = {
-
-                                            val value= repositoryViewModel.folders.value[name]
-                                            if(value==null){
-                                                repositoryViewModel.folders.value[name]=path
-                                                if(repositoryViewModel.folders.value.size>1)repositoryViewModel.folders.value.removeAfterKey(name)
-                                            }
-                                            else{
-                                                if(repositoryViewModel.folders.value.size>1)repositoryViewModel.folders.value.removeAfterKey(name)
-                                            }
-
-                                    repositoryViewModel.loadProjectRepository(
-                                        projectPath = projectPath, branch = currentBranch.value,folderName = path
-                                    )
-                                }
-                            )
-                        )
-
-
-
-                }}
+            if(!history.value){
+                FileBrowser(repositoryViewModel, currentBranch, projectPath, repository)
+            }
+            if(history.value==true){
+             currentBranch.value?.let{
+                 ProjectCommits(navController = navController, branch = it, id = projectPath)
+             }
             }
 
-            repository?.tree?.let {
-                Column(
-                    modifier = Modifier
-                        .border(
-                            width = (0.1f).dp,
-                            color = Color(0xFF675353),
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                        .padding(0.dp)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    it.trees.nodes?.let { folders ->
-                        folders.forEach { folder ->
-                            TreeItemCard(
-                                name = folder?.name,
-                                item = folder,
-                                repositoryViewModel = repositoryViewModel,
-                                path = folder?.path,
-                                project = projectPath,
-                                branch = currentBranch.value,
-                            ) {
-                                folder?.let {
-                                 val path= repositoryViewModel.folders.value[folder.name]
-                                    if(path==null){
-                                        repositoryViewModel.folders.value[folder.name]=folder.path
-                                    }
-                                    else{
-                                        repositoryViewModel.folders.value.removeAfterKey(folder.name)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    it.blobs.nodes?.let { files ->
-                        files.forEach { file ->
-                            TreeItemCard(file)
-                        }
-                    }
+        }
+
+        if (showSheet) {
+            ModalBottomSheet(
+                modifier = Modifier.fillMaxHeight(),
+                onDismissRequest = { showSheet = false },
+                sheetState = sheetState
+            ) {
+                LaunchedEffect(currentBranch.value) {
+                    repositoryViewModel.loadRepositoryBranches(projectPath)
                 }
-            }
-            if (showSheet) {
-                ModalBottomSheet(
-                    modifier = Modifier.fillMaxHeight(),
-                    onDismissRequest = { showSheet = false },
-                    sheetState = sheetState
-                ) {
-                    LaunchedEffect(currentBranch.value) {
-                        repositoryViewModel.loadRepositoryBranches(projectPath)
-                    }
-                    val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
-                    BranchesList(branches, repositoryViewModel, projectPath, currentBranch, x)
-                }
+                val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
+                BranchesList(branches, repositoryViewModel, projectPath, currentBranch, x)
             }
         }
     }
+}

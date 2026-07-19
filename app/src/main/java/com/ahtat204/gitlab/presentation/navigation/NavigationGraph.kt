@@ -75,7 +75,7 @@ fun BottomNavigationGraph(
             val projectId = backStackEntry.arguments?.getString("projectId")
             val branch=backStackEntry.arguments?.getString("branch")
             if(branch!=null && projectId!=null) {
-                ProjectCommits(navController, x, branch,projectId)
+               // ProjectCommits(navController, x, branch,projectId)
             }
         }
 
