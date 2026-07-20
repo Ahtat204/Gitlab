@@ -10,7 +10,11 @@ import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
 import com.apollographql.apollo.network.http.DefaultHttpEngine
 import com.apollographql.apollo.network.http.HttpNetworkTransport
+import com.apollographql.cache.normalized.api.CacheResolver
+import com.apollographql.cache.normalized.api.FieldPolicies
+import com.apollographql.cache.normalized.api.ResolverContext
 import com.apollographql.cache.normalized.memory.MemoryCacheFactory
+import com.apollographql.cache.normalized.normalizedCache
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -50,7 +54,6 @@ object ApolloModule {
     private val cacheFactory = MemoryCacheFactory(
         maxSizeBytes = 20 * 1024 * 1024, expireAfterMillis = 600000
     )
-
     /**
      * Provides a singleton [ApolloClient] configured for GitLab GraphQL API.
      *

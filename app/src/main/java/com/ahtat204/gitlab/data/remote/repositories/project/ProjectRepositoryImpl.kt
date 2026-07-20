@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
+import com.ahtat204.gitlab.data.fetchAndMergeCommits
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -59,7 +60,7 @@ class ProjectRepositoryImpl @Inject constructor(
             )
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
         else apolloClient.query(GetRepositoryCommitsQuery(id, Optional.Present(cursor), branch))
-            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors().fetchAndMergeCommits(client = apolloClient,branch,id,cursor)
     }
 
     override suspend fun getRepositoryBranches(
@@ -92,5 +93,5 @@ class ProjectRepositoryImpl @Inject constructor(
                     .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
             }
         }
-     }
+    }
 }

@@ -90,7 +90,7 @@ fun ProjectCommits(
             val totalItems = listState.layoutInfo.totalItemsCount
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
             // Trigger load when user is 3 items away from the bottom
-            totalItems > 0 && lastVisibleItem >= totalItems - 5
+            totalItems > 0 && lastVisibleItem >= totalItems - 3
         }
     }
     LaunchedEffect(shouldLoadMore.value) {

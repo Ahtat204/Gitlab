@@ -210,27 +210,33 @@ class RepositoryViewModel @Inject constructor(
      * - Supports infinite scrolling by appending new commits.
      */
     fun loadProjectCommits(id: String, branch: String) {
-        val pager = commits.value?.pageInfo?.endCursor
-        val isFirstPage=commits.value?.pageInfo?.startCursor
+        val pageInfo= commits.value?.pageInfo
+        val pager = pageInfo?.endCursor
+        val isFirstPage=pageInfo?.startCursor
+        val hasNextPage=pageInfo?.hasNextPage
         if (isFirstPage==null) {
             viewModelScope.launch {
                 projectRepository.getProjectCommits(id, cursor = null, branch = branch).collect {
                     _commits.value = it?.project?.repository?.commits
                 }
             }
-        } else {
+        }
+        if(hasNextPage==true && pager!=null){
             viewModelScope.launch {
                 _commits.value?.nodes?.size?.let {
                     projectRepository.getProjectCommits(id, cursor=pager,branch= branch).collect { newCommits ->
-                        val newNodes = newCommits?.project?.repository?.commits?.nodes
-                        if (newNodes != null) {
-                            _commits.update { currentState ->
-                                currentState?.copy(
-                                    nodes = currentState.nodes?.plus(newNodes)
-                                        ?.distinctBy { item -> item?.id }
-                                )
-                            }
-                        }
+                        _commits.value=newCommits?.project?.repository?.commits
+
+//                        val newNodes = newCommits?.project?.repository?.commits?.nodes
+//                        val newPage=newCommits?.project?.repository?.commits?.pageInfo
+//                        if (newNodes != null && newPage!=null) {
+//                            _commits.update { currentState ->
+//                                currentState?.copy(
+//                                    nodes = currentState.nodes?.plus(newNodes)
+//                                        ?.distinctBy { item -> item?.id }, pageInfo = newPage
+//                                )
+//                            }
+//                        }
                     }
                 }
             }
