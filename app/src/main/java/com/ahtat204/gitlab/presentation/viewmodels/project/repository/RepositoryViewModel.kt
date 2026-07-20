@@ -145,8 +145,10 @@ class RepositoryViewModel @Inject constructor(
         folderName: String? = null,
         folderPath: String? = null
     ) {
+        val path=if(folderPath.equals("."))null  else folderPath
+       val newBranch= if(branch?.equals(_repository.value?.rootRef)==true) null else branch
         viewModelScope.launch {
-            projectRepository.getProjectRepository(projectPath, branch = branch, path = folderPath)
+            projectRepository.getProjectRepository(projectPath, branch = newBranch, path = path)
                 .collect {
                     _repository.value = it?.project?.repository
                     if (folders.value.isEmpty()) {
@@ -210,27 +212,22 @@ class RepositoryViewModel @Inject constructor(
      * - Supports infinite scrolling by appending new commits.
      */
     fun loadProjectCommits(id: String, branch: String) {
-        val pager = commits.value?.pageInfo?.endCursor
-        val isFirstPage=commits.value?.pageInfo?.startCursor
+        val pageInfo= commits.value?.pageInfo
+        val pager = pageInfo?.endCursor
+        val isFirstPage=pageInfo?.startCursor
+        val hasNextPage=pageInfo?.hasNextPage
         if (isFirstPage==null) {
             viewModelScope.launch {
                 projectRepository.getProjectCommits(id, cursor = null, branch = branch).collect {
                     _commits.value = it?.project?.repository?.commits
                 }
             }
-        } else {
+        }
+        if(hasNextPage==true && pager!=null){
             viewModelScope.launch {
                 _commits.value?.nodes?.size?.let {
                     projectRepository.getProjectCommits(id, cursor=pager,branch= branch).collect { newCommits ->
-                        val newNodes = newCommits?.project?.repository?.commits?.nodes
-                        if (newNodes != null) {
-                            _commits.update { currentState ->
-                                currentState?.copy(
-                                    nodes = currentState.nodes?.plus(newNodes)
-                                        ?.distinctBy { item -> item?.id }
-                                )
-                            }
-                        }
+                        _commits.value=newCommits?.project?.repository?.commits
                     }
                 }
             }
