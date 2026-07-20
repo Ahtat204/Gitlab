@@ -67,7 +67,7 @@ object OkHttpModule {
             cache = Cache(
                 context.cacheDir, 10L * 1024 * 1024
             )
-        ).retryOnConnectionFailure(true).readTimeout(15, TimeUnit.SECONDS)
+        ).retryOnConnectionFailure(true).readTimeout(15, TimeUnit.SECONDS).writeTimeout(15, TimeUnit.SECONDS)
             .addInterceptor(AuthenticationInterceptor())
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level =

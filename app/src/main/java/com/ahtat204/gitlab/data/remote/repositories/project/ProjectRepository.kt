@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
+import com.ahtat204.gitlab.data.queries.GetCommitDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
@@ -80,4 +81,5 @@ interface ProjectRepository {
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
 
+    suspend fun getCommitDetails(sha:String,project:String):Flow<GetCommitDetailsQuery.Data>
 }

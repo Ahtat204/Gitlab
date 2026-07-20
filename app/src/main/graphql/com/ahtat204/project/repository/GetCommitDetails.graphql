@@ -1,0 +1,14 @@
+query GetCommitDetails($sha:String!,$project:ID!){
+    project(fullPath: $project){
+        repository {
+            commit(ref:$sha ){
+                id
+                description
+                author {
+                    name
+                }
+
+            }
+        }
+    }
+}

@@ -5,6 +5,7 @@ import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.apollographql.apollo.api.ApolloResponse
 import com.apollographql.apollo.api.Operation
 import com.apollographql.apollo.api.Query
+import com.apollographql.apollo.exception.ApolloException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -37,7 +38,10 @@ import okio.IOException
  *
  * @param D The type of the GraphQL operation data (e.g., `Query.Data` or `Mutation.Data`).
  * @return A [Flow] emitting the raw data [D], with all errors intercepted and logged.
- *
+ *@see map
+ * @see catch
+ * @see mapNotNull
+ * @see com.apollographql.apollo.exception.ApolloException
  * @throws Exception Propagates exceptions caught during stream collection,
  *                   excluding [CancellationException] which is re-thrown to honor coroutine lifecycle.
  * @author Lahcen AHTAT
@@ -51,7 +55,7 @@ fun <D : Query.Data> Flow<ApolloResponse<D>>.mapAndHandleErrors(): Flow<D> {
         response.data
     }.catch { ex ->
         when (ex) {
-            is IOException ->logger(message = ex.message)
+            is ApolloException ->logger(message = ex.message)
             is CancellationException -> throw ex
             else -> logger(message = null)
         }

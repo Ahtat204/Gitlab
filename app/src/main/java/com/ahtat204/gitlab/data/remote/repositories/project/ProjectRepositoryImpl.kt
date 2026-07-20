@@ -2,6 +2,7 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.queries.GetCommitDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -116,6 +117,16 @@ class ProjectRepositoryImpl @Inject constructor(
     override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
         apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapAndHandleErrors()
+
+    override suspend fun getCommitDetails(
+        sha: String, project: String
+    ): Flow<GetCommitDetailsQuery.Data> {
+        return apolloClient.query(GetCommitDetailsQuery(project = project, sha = sha))
+            .fetchPolicy((FetchPolicy.CacheFirst))
+            .watch()
+            .mapAndHandleErrors()
+    }
+
     /**
      * Retrieves a project overview  for a given project.(full description , star count, fork count )
      *
@@ -233,7 +244,6 @@ class ProjectRepositoryImpl @Inject constructor(
      *     }
      * ```
      */
-
     override suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?> {
@@ -243,8 +253,10 @@ class ProjectRepositoryImpl @Inject constructor(
             )
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
         else apolloClient.query(GetRepositoryCommitsQuery(id, Optional.Present(cursor), branch))
-            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors().fetchAndMergeCommits(client = apolloClient,branch,id,cursor)
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+            .fetchAndMergeCommits(client = apolloClient, branch, id, cursor)
     }
+
     /**
      * Retrieves the repository tree for a given project.
      *
@@ -277,13 +289,13 @@ class ProjectRepositoryImpl @Inject constructor(
      *     }
      * ```
      */
-
     override suspend fun getRepositoryBranches(
         project: String, skip: Int
     ): Flow<GetRepositoryBranchesQuery.Data> {
         return apolloClient.query(GetRepositoryBranchesQuery(project, skip))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
+
     /**
      * Retrieves the repository tree for a given project.
      *
@@ -349,7 +361,6 @@ class ProjectRepositoryImpl @Inject constructor(
      *     }
      * ```
      */
-
     override suspend fun getProjectRepository(
         id: String, branch: String?, path: String?
     ): Flow<GetProjectRepositoryQuery.Data?> {

@@ -69,6 +69,6 @@ object ApolloModule {
         return ApolloClient.Builder().networkTransport(networkTransport)
             .logCacheMisses({ Log.e("cacheMiss", it) })
             .cache(normalizedCacheFactory = cacheFactory, writeToCacheAsynchronously = true)
-            .retryOnError { isConnected() }.failFastIfOffline(true).build()
+            .retryOnError { true }.build()
     }
 }
