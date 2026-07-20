@@ -145,8 +145,10 @@ class RepositoryViewModel @Inject constructor(
         folderName: String? = null,
         folderPath: String? = null
     ) {
+        val path=if(folderPath.equals("."))null  else folderPath
+       val newBranch= if(branch?.equals(_repository.value?.rootRef)==true) null else branch
         viewModelScope.launch {
-            projectRepository.getProjectRepository(projectPath, branch = branch, path = folderPath)
+            projectRepository.getProjectRepository(projectPath, branch = newBranch, path = path)
                 .collect {
                     _repository.value = it?.project?.repository
                     if (folders.value.isEmpty()) {
