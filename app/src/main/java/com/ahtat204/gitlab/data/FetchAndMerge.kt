@@ -1,6 +1,5 @@
 package com.ahtat204.gitlab.data
 
-import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.cache.normalized.FetchPolicy
@@ -46,7 +45,6 @@ suspend fun Flow<GetRepositoryCommitsQuery.Data>.fetchAndMergeCommits(
         } else return flowOf(cachedList)
     } catch (e: Exception) {
     throw e
-    //Log.e("FetchAndMergeCommits", "${e.cause} \n ${e.message}}")
     }
-  //  return flowOf()
+
 }

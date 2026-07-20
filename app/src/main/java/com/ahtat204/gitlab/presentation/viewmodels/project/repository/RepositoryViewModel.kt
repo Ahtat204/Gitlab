@@ -228,17 +228,6 @@ class RepositoryViewModel @Inject constructor(
                 _commits.value?.nodes?.size?.let {
                     projectRepository.getProjectCommits(id, cursor=pager,branch= branch).collect { newCommits ->
                         _commits.value=newCommits?.project?.repository?.commits
-
-//                        val newNodes = newCommits?.project?.repository?.commits?.nodes
-//                        val newPage=newCommits?.project?.repository?.commits?.pageInfo
-//                        if (newNodes != null && newPage!=null) {
-//                            _commits.update { currentState ->
-//                                currentState?.copy(
-//                                    nodes = currentState.nodes?.plus(newNodes)
-//                                        ?.distinctBy { item -> item?.id }, pageInfo = newPage
-//                                )
-//                            }
-//                        }
                     }
                 }
             }
