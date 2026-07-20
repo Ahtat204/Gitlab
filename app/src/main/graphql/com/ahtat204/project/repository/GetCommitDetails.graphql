@@ -1,11 +1,28 @@
-query GetCommitDetails($sha:String!,$project:ID!){
+query GetCommitDetails($sha:String!,$project:ID!,$cursor:String){
     project(fullPath: $project){
         repository {
             commit(ref:$sha ){
                 id
+                authorName
                 description
                 author {
                     name
+                }
+                parentSha
+                diffs{
+                    diff
+                    aMode
+                    deletedFile
+                    newFile
+                    renamedFile
+                }
+                pipelines(first: 20,after: $cursor){
+                    edges {
+                        node {
+                            id
+                            finishedAt
+                        }
+                    }
                 }
 
             }

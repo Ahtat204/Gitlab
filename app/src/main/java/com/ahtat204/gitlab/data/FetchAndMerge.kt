@@ -29,7 +29,7 @@ suspend fun Flow<GetRepositoryCommitsQuery.Data>.fetchAndMergeCommits(
         newList?.forEach { node ->
             mergedList += node
         }
-        if (mergedList?.isNotEmpty() == true) {
+        if (mergedList.isNotEmpty()) {
             val totalCommits = commits.copy(nodes = mergedList, pageInfo = page)
             val newData = GetRepositoryCommitsQuery.Data(
                 project.copy(

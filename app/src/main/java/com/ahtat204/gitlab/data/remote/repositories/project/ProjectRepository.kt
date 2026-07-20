@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
  * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
  * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
  * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
+ * - [getCommitDetails]: Retrieves and streams details of a specific commit (by its SHA)
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
@@ -75,11 +76,20 @@ interface ProjectRepository {
      * @param branch The targeted git branch line from which to trace commit milestones.
      * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
      * @return A reactive stream emitting the combined commit log historical records, or null if missing.
-     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
     suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
-
+    /**
+     * Streams a continuous, sequentially chunked record of repository commit histories.
+     *
+     * Implementations are expected to manage incremental page updates and item appending states.
+     *
+     * @param project The unique identifier or full path of the target GitLab project.
+     * @param sha The unique identifier of the commit.
+     * @return A reactive stream emitting specific information about the commit(ex:description,author.name,parentSha,authorName,pipelines,...)
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     */
     suspend fun getCommitDetails(sha:String,project:String):Flow<GetCommitDetailsQuery.Data>
 }

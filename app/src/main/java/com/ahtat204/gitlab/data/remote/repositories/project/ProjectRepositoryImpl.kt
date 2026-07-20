@@ -10,7 +10,6 @@ import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.Optional
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.fetchPolicy
@@ -113,18 +112,79 @@ class ProjectRepositoryImpl @Inject constructor(
      * }
      * ```
      */
-    @OptIn(ApolloExperimental::class)
     override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
         apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapAndHandleErrors()
 
+    /**
+     * Streams details about the commit with the [sha] identifier.
+     * @param project The unique identifier or full path of the target GitLab project.
+     * @param sha The unique identifier of the commit.
+     * @return A [Flow] emitting [GetCommitDetailsQuery.Data] objects.
+     *
+     * ### Behavior
+     * - Executes [GetCommitDetailsQuery] with the provided fetch policy.
+     * - Uses Apollo’s [watch] to continuously observe changes.
+     * - Filters out null results with `mapNotNull`.
+     * - Logs exceptions with [Log.e] while keeping the stream alive.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     * ### Implementation Example
+     * ```
+     * override suspend fun getCommitDetails(): Flow<GetCommitDetailsQuery.Data> =
+     *         apolloClient.query(GetCommitDetailsQuery()).fetchPolicy(FetchPolicy.CacheFirst)
+     *             .watch().mapNotNull { it.data }.catch { ex ->
+     *                 if (ex is CancellationException) throw ex
+     *                 else Log.d(ex.cause,ex.message)
+     *             }.mapNotNull { it }
+     *
+     * ```
+     *
+     *
+     * ### Usage example in ViewModel
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getCommitDetails("46803eb9","ahtat204/api-gateway")
+     *         .collect { projects -> renderProjects(projects) }
+     * }
+     * ```
+     * Query Example:
+     * ```
+     *    project(fullPath: $project){
+     *         repository {
+     *             commit(ref:$sha ){
+     *                 id
+     *                 authorName
+     *                 description
+     *                 author {
+     *                     name
+     *                 }
+     *                 parentSha
+     *                 diffs{
+     *                     diff
+     *                     aMode
+     *                     deletedFile
+     *                     newFile
+     *                     renamedFile
+     *                 }
+     *                 pipelines(first: 20,after: $cursor){
+     *                     edges {
+     *                         node {
+     *                             id
+     *                             finishedAt
+     *                         }
+     *                     }
+     *                 }
+     *
+     *             }
+     *         }
+     *     }
+     * ```
+     */
     override suspend fun getCommitDetails(
         sha: String, project: String
     ): Flow<GetCommitDetailsQuery.Data> {
         return apolloClient.query(GetCommitDetailsQuery(project = project, sha = sha))
-            .fetchPolicy((FetchPolicy.CacheFirst))
-            .watch()
-            .mapAndHandleErrors()
+            .fetchPolicy((FetchPolicy.CacheFirst)).watch().mapAndHandleErrors()
     }
 
     /**

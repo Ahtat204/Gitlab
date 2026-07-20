@@ -24,6 +24,9 @@ import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.components.CommitCard
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+
 /**
  * Displays a paginated list of commits for a given GitLab project.
  *
@@ -75,7 +78,7 @@ fun ProjectCommits(
     id: String,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
-    if (id == "") return
+    if (id.isEmpty()) return
     val commits by repositoryViewModel.commits.collectAsStateWithLifecycle()
     LaunchedEffect(id) {
         repositoryViewModel.loadProjectCommits(id,branch)
@@ -95,6 +98,7 @@ fun ProjectCommits(
             repositoryViewModel.loadProjectCommits(id,branch)
         }
     }
+    val encodedId = URLEncoder.encode(id, StandardCharsets.UTF_8.toString())
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -110,7 +114,10 @@ fun ProjectCommits(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(items = nodes, key =  { item -> item?.id ?: item?.sha?: null.hashCode() }) { commit ->
-                        CommitCard(commit?.sha?.substring(0,8), commit?.name,commit?.authorName?:"", iso8601ToRelative(commit?.committedDate as String))
+                        CommitCard(encodedId,commit?.sha?.substring(0,8),
+                            commit?.name,commit?.authorName?:"",
+                            iso8601ToRelative(commit?.committedDate as String),
+                            navController)
                     }
                 }
             }
