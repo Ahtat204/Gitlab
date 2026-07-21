@@ -1,8 +1,5 @@
 package com.ahtat204.gitlab.domain.di
 
-import coil.ImageLoader
-import coil.disk.DiskCache
-import coil.memory.MemoryCache
 import com.ahtat204.gitlab.BuildConfig
 import com.ahtat204.gitlab.data.security.AuthenticationInterceptor
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
@@ -10,7 +7,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -67,28 +63,11 @@ object OkHttpModule {
             cache = Cache(
                 context.cacheDir, 10L * 1024 * 1024
             )
-        ).retryOnConnectionFailure(true).readTimeout(15, TimeUnit.SECONDS)
-            .addInterceptor(AuthenticationInterceptor())
+        ).retryOnConnectionFailure(true).readTimeout(120, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS).addInterceptor(AuthenticationInterceptor())
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level =
                     if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
             }).build()
-    }
-
-    /**
-     *
-     */
-    @Singleton
-    @Provides
-    fun provideImageLoader(okHttpClient: OkHttpClient): ImageLoader {
-        return ImageLoader.Builder(context).crossfade(true).dispatcher(Dispatchers.IO)
-            .respectCacheHeaders(false).okHttpClient(okHttpClient).memoryCache {
-                MemoryCache.Builder(context)
-                    .maxSizePercent(0.25) // Use 25% of app's memory for images
-                    .build()
-            }.diskCache {
-                DiskCache.Builder().directory(context.cacheDir?.resolve("image_cache")!!)
-                    .maxSizeBytes(50L * 1024 * 1024).build()
-            }.build()
     }
 }

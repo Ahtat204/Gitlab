@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.ahtat204.gitlab.presentation.components.BranchesList
 import com.ahtat204.gitlab.presentation.components.FileBrowser
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
@@ -87,7 +86,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
  * - Ensure [RepositoryViewModel] is properly provided via Hilt for dependency injection.
  * - Requires API level [Build.VERSION_CODES.O] for date formatting.
  * - The timeline string combines author name and relative commit time.
- *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/repository/repository.jpg"  width="300" height="700"/>
+ *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/repository.jpg"  width="300" height="700"/>
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -129,20 +128,24 @@ fun RepositoryScreen(
                         parsedDateTime,
                         navController,
                         projectPath,
-                        history)
+                        history
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(30.dp))
 
-            if(!history.value){
-                FileBrowser(repositoryViewModel, currentBranch, projectPath, repository)
+            if (!history.value) {
+                FileBrowser(
+                    repositoryViewModel, currentBranch, projectPath, repository
+                )
             }
-            if(history.value==true){
-             currentBranch.value?.let{
-                 ProjectCommits(navController = navController, branch = it, id = projectPath)
-             }
+            if (history.value) {
+                currentBranch.value?.let {
+                    ProjectCommits(
+                        navController = navController, branch = it, id = projectPath
+                    )
+                }
             }
-
         }
 
         if (showSheet) {

@@ -13,7 +13,7 @@ import androidx.navigation.navigation
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
-import com.ahtat204.gitlab.presentation.screens.project.ProjectCommits
+import com.ahtat204.gitlab.presentation.screens.project.CommitDetails
 import com.ahtat204.gitlab.presentation.screens.project.ProjectDetailScreen
 import com.ahtat204.gitlab.presentation.screens.project.RepositoryScreen
 
@@ -87,12 +87,29 @@ fun BottomNavigationGraph(
                 val projectId = backStackEntry.arguments?.getString("projectId")
                 projectId?.let { RepositoryScreen(it,x,navController) }
             }
+
+
             composable(
                 route = "project?projectId={projectId}",
                 arguments = listOf(navArgument("projectId") { defaultValue = "" })
             ) { backStackEntry ->
                 val projectId = backStackEntry.arguments?.getString("projectId")
                 projectId?.let { ProjectDetailScreen(navController,x, it)
+                }
+            }
+
+            composable(route = "commit/{projectId}/{commit}", arguments = listOf(
+                navArgument("projectId") { type = NavType.StringType },
+                navArgument("commit") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )) {backStackEntry->
+                val projectId = backStackEntry.arguments?.getString("projectId")
+                val commit=backStackEntry.arguments?.getString("commit")
+                if(commit!=null && projectId!=null){
+                    CommitDetails(project = projectId, commitSha = commit, x = x, navController = navController)
                 }
             }
         }
