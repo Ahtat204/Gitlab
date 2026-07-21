@@ -9,8 +9,6 @@ import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.apollographql.cache.normalized.FetchPolicy
-import com.apollographql.cache.normalized.fetchPolicy
-import com.apollographql.cache.normalized.watch
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -31,11 +29,11 @@ import kotlinx.coroutines.flow.Flow
 interface ProjectRepository {
     /**
      * Streams all projects the authenticated user has contributed to.
-     * @return A [Flow] emitting [GetMyProjectsPaginatedQuery.Data] objects.
+     * @return A [Flow] emitting [GetMyPersonalProjectsQuery.Data] objects.
      *
      * ### Behavior
-     * - Executes [GetMyProjectsPaginatedQuery] with the provided fetch policy.
-     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Executes [GetMyPersonalProjectsQuery] with the provided fetch policy.
+     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
@@ -111,7 +109,7 @@ interface ProjectRepository {
      * - Executes [GetProjectDetailsQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      * ### Implementation Example
@@ -168,7 +166,7 @@ interface ProjectRepository {
      * - Executes [GetProjectRepositoryQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      * ### Implementation Example
@@ -234,7 +232,7 @@ interface ProjectRepository {
      * - Executes [GetRepositoryBranchesQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      *
@@ -270,7 +268,7 @@ interface ProjectRepository {
      * - Executes [GetRepositoryCommitsQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      *
@@ -332,7 +330,7 @@ interface ProjectRepository {
      * - Executes [GetProjectPipelinesQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      *

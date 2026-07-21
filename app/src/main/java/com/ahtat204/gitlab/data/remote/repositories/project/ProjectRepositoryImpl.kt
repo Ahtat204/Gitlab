@@ -53,15 +53,33 @@ class ProjectRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getProjectCommits(
-        id: String, branch: String,cursor: String?
+        id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?> {
         return if (cursor == null) apolloClient.query(
             GetRepositoryCommitsQuery(
                 id, branch = branch
             )
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-        else apolloClient.query(GetRepositoryCommitsQuery(id, Optional.Present(cursor),branch))
-            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors().fetchAndMergeCommits(client = apolloClient,branch,id,cursor)
+        else apolloClient.query(GetRepositoryCommitsQuery(id, Optional.Present(cursor), branch))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+            .fetchAndMergeCommits(client = apolloClient, branch, id, cursor)
+    }
+
+    override suspend fun getProjectPipelines(
+        project: String, cursor: String?
+    ): Flow<GetProjectPipelinesQuery.Data> {
+        return if (cursor == null) apolloClient.query(GetProjectPipelinesQuery(project = project))
+            .fetchPolicy(
+                FetchPolicy.CacheFirst
+            ).watch().mapAndHandleErrors()
+        else apolloClient.query(
+            GetProjectPipelinesQuery(
+                project = project,
+                cursor = Optional.present(cursor)
+            )
+        ).fetchPolicy(
+            FetchPolicy.CacheFirst
+        ).watch().mapAndHandleErrors()
     }
 
     override suspend fun getRepositoryBranches(
@@ -74,25 +92,25 @@ class ProjectRepositoryImpl @Inject constructor(
     override suspend fun getProjectRepository(
         id: String, branch: String?, path: String?
     ): Flow<GetProjectRepositoryQuery.Data?> {
-      return  if(branch==null) {
-          if(path!=null){
-              apolloClient.query(GetProjectRepositoryQuery(id, path = Optional.present(path)))
+        return if (branch == null) {
+            if (path != null) {
+                apolloClient.query(GetProjectRepositoryQuery(id, path = Optional.present(path)))
                     .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
             } else {
-              apolloClient.query(GetProjectRepositoryQuery(id))
+                apolloClient.query(GetProjectRepositoryQuery(id))
                     .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-          }
+            }
         } else {
-          if(path!=null){
+            if (path != null) {
                 apolloClient.query(
                     GetProjectRepositoryQuery(
                         id, branch = Optional.present(branch), path = Optional.present(path)
                     )
                 ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
             } else {
-              apolloClient.query(GetProjectRepositoryQuery(id, branch = Optional.present(branch)))
+                apolloClient.query(GetProjectRepositoryQuery(id, branch = Optional.present(branch)))
                     .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-          }
+            }
         }
-     }
+    }
 }
