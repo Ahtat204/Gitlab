@@ -34,6 +34,7 @@ import javax.inject.Singleton
  *     // Use repository methods here
  * }
  * ```
+ * @author Lahcen AHTAT
  */
 
 @Module

@@ -1,3 +1,6 @@
+@file:OptIn(ApolloExperimental::class)
+
+import com.apollographql.apollo.annotations.ApolloExperimental
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -23,7 +26,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-        manifestPlaceholders.putIfAbsent("appAuthRedirectScheme", "com.asue24.gitlab   ")
+        manifestPlaceholders.putIfAbsent("appAuthRedirectScheme", "com.ahtat204.gitlab   ")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault())
         val formattedDate = dateFormat.format(Date())
@@ -55,6 +58,7 @@ android {
         buildConfig = true
         compose = true
     }
+
 }
 
 apollo {
@@ -64,7 +68,10 @@ apollo {
             endpointUrl.set("https://gitlab.com/api/graphql")
             schemaFile.set(file("app/src/main/graphql/com/ahtat204/schema.graphqls"))
             addTypename.set("always")
+            generateDataBuilders.set(true)
         }
+        plugin("com.apollographql.cache:normalized-cache-apollo-compiler-plugin:1.0.4")
+        pluginArgument("com.apollographql.cache.packageName", packageName.get())
     }
 }
 dependencies {
@@ -106,4 +113,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
+    testImplementation(libs.apollo.mockserver)
+    testImplementation(libs.apollo.testing.support)
+    testImplementation(libs.mockwebserver)
 }

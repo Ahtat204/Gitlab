@@ -1,7 +1,6 @@
 package com.ahtat204.gitlab.presentation.screens.project
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -85,6 +84,7 @@ import java.time.ZoneId
  * - Uses [Instant] and [ZoneId] to sort projects by activity date.
  * - Relies on [ProjectItem] composable to render individual project details.
  * - Displays up to all available projects; topics and languages are shown if present.
+ *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/repository/projectdetails.jpg"  width="300" height="700"/>
  */
 @Composable
 fun ProjectDetailScreen(
@@ -122,11 +122,12 @@ fun ProjectDetailScreen(
                 pro.openIssuesCount ?: 0,
                 pro.openMergeRequestsCount ?: 0,
                 pro.pipelineCounts?.running,
-                navController,encodedId
+                navController,
             )
 
             Card(
-                {navController.navigate("repository?projectId=$encodedId") }, modifier = Modifier
+                { navController.navigate("repository?projectId=$encodedId") },
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(15.dp, 1.dp)
                     .background(Color.Black)

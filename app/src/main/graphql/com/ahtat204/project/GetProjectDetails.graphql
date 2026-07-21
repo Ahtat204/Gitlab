@@ -1,6 +1,5 @@
 query GetProjectDetails($projectPath: ID!) {
     project(fullPath: $projectPath) {
-
         __typename
         pipelineCounts{
             pending
@@ -17,25 +16,5 @@ query GetProjectDetails($projectPath: ID!) {
         id
         name
         description
-#        repository {
-#            branchNames(searchPattern: "*", offset: 0, limit: 100)
-#            commits(ref:"main",first: 10){
-#                nodes {
-#                    id
-#                    name
-#                    message
-#                    authorName
-#                    committedDate
-#                    signature {
-#                        verificationStatus
-#                    }
-#                }
-#                pageInfo {
-#                    endCursor
-#                    hasNextPage
-#                    startCursor
-#                }
-#            }
-#        }
     }
 }

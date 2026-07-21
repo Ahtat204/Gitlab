@@ -49,6 +49,7 @@ Pair(profile.location, Icons.Default.LocationOn)
  * ## Notes
  * - This composable is flexible and can be used for any list of labeled icons.
  * - The `contentDescription` of icons is set to `null` since they are decorative.
+ * @author Lahcen AHTAT
  */
 @Composable
 fun Info(vararg infos: Pair<String?, ImageVector>) {

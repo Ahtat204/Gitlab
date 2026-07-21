@@ -27,10 +27,7 @@ import com.ahtat204.gitlab.R
  * ## Parameters
  * @param issuesCount Number of issues in the project (nullable).
  * @param mergeRequestCount Number of merge requests (nullable).
- * @param membersCount Number of project members (nullable).
  * @param pipelinesCount Number of pipelines (nullable).
- * @param workItemsCount Number of work items (nullable).
- * @param commitCount Number of commits (nullable, converted to Int).
  * @param navController Navigation controller used for handling navigation actions.
  *
  * ## Behavior
@@ -43,13 +40,11 @@ import com.ahtat204.gitlab.R
  * CollaborationDetails(
  *     issuesCount = 42,
  *     mergeRequestCount = 10,
- *     membersCount = 5,
  *     pipelinesCount = 3,
- *     workItemsCount = 7,
- *     commitCount = 120.0,
  *     navController = navController
  * )
  * ```
+ * @author Lahcen AHTAT
  */
 @Composable
 fun CollaborationDetails(
@@ -57,7 +52,6 @@ fun CollaborationDetails(
     mergeRequestCount: Int?,
     pipelinesCount: Int?,
     navController: NavController,
-    encodedId: String
 ) {
     Column(
         modifier = Modifier
@@ -66,35 +60,31 @@ fun CollaborationDetails(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ProjectWorkItems(Item("issues", "issues", R.drawable.issues, issuesCount)) {}
-        ProjectWorkItems(
-            Item(
-                "Merge Requests", "merge_requests", R.drawable.mergerequest, mergeRequestCount
-            ), openScreen = { navController.navigate("mergerequests?projectId=$encodedId") })
-
-        ProjectWorkItems(
-            Item(
-                "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, null
-            )
-        ) {}
-
-        ProjectWorkItems(
-            Item(
-                "WorkItems", "project/{id]/workitems", R.drawable.workitems, null
-            )
-        ) {}
-
-        ProjectWorkItems(
-            Item(
-                "Members", "project/{id}/members", R.drawable.members, null
-            )
-        ) {}/*   commitCount?.let {
+        issuesCount.let { ProjectWorkItems(Item("issues", "issues", R.drawable.issues, it)) {} }
+        mergeRequestCount?.let {
             ProjectWorkItems(
-                Item("Commits", "project/{id}/commits", R.drawable.commit, it.toInt())
-            ) {
-                navController.navigate("commits?projectId=$encodedId")
-            }
-        }*/
+                Item(
+                    "Merge Requests", "merge_requests", R.drawable.mergerequest, it
+                )
+            ) {}
+        }
+            ProjectWorkItems(
+                Item(
+                    "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, null
+                )
+            ) {}
+        pipelinesCount?.let {
+            ProjectWorkItems(
+                Item(
+                    "WorkItems", "project/{id]/workitems", R.drawable.workitems, null
+                )
+            ) {}
+        }
+            ProjectWorkItems(
+                Item(
+                    "Members", "project/{id}/members", R.drawable.members, null
+                )
+            ) {}
     }
 
 }

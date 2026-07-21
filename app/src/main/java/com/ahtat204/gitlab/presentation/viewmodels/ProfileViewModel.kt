@@ -4,11 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.remote.repositories.profile.ProfileRepository
-import com.ahtat204.gitlab.presentation.components.withCacheFallback
-import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.exception.CacheMissException
+import com.apollographql.cache.normalized.FetchPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -50,10 +48,9 @@ class ProfileViewModel @Inject constructor(
   //  @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun loadProfile(userName: String? = null) {
         if (userName == null) {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 profileRepository
                     .getMyProfile(FetchPolicy.CacheFirst)
-                    .withCacheFallback { profileRepository.getMyProfile(FetchPolicy.NetworkFirst) }
                     .collect { profile.value = it.currentUser }
             }
         }

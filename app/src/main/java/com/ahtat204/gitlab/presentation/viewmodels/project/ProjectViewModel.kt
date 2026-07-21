@@ -2,12 +2,11 @@ package com.ahtat204.gitlab.presentation.viewmodels.project
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
+import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import com.ahtat204.gitlab.presentation.components.withCacheFallback
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,12 +23,12 @@ import javax.inject.Inject
  *
  * ## State
  * - [projects]: Holds the authenticated user’s contributed projects.
- * - [currentProject]: Holds the currently selected project’s repository tree.
+ * - [currentProject]: Holds the currently selected project’s details.
  *
  * ## Behavior
  * - **loadAllProjects()**: Fetches all projects using Apollo caching. Falls back
  *   to `NetworkFirst` policy if cache retrieval fails.
- * - **loadProject(id)**: Retrieves a specific project’s repository tree by ID.
+ * - **loadProject(id)**: Retrieves a specific project’s repository details by ID.
  *
  * ## Error Handling
  * - Exceptions during data collection are caught. The ViewModel retries with
@@ -45,18 +44,19 @@ import javax.inject.Inject
  *     }
  * }
  * ```
+ * @author Lahcen AHTAT
  */
 @HiltViewModel
 class ProjectViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
     ViewModel() {
-    /** Currently selected project’s repository tree. */
+    /** Currently selected project’s overview/details */
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
 
     /** Backing state for contributed projects. */
-    private val _projects = MutableStateFlow<GetMyProjectsPaginatedQuery.CurrentUser?>(null)
+    private val _projects = MutableStateFlow<GetMyPersonalProjectsQuery.CurrentUser?>(null)
 
     /** Public immutable flow of contributed projects. */
-    val projects: StateFlow<GetMyProjectsPaginatedQuery.CurrentUser?> = _projects.asStateFlow()
+    val projects: StateFlow<GetMyPersonalProjectsQuery.CurrentUser?> = _projects.asStateFlow()
 
     /**
      * Loads all projects contributed by the authenticated user.
@@ -64,9 +64,8 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      * - First attempts with [com.apollographql.apollo.cache.normalized.FetchPolicy.CacheFirst].
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
-    fun loadAllProjects() = viewModelScope.launch(Dispatchers.IO) {
-        projectRepository.getAllProjects().withCacheFallback { projectRepository.getAllProjects() }
-            .collect { _projects.value = it.currentUser }
+    fun loadAllProjects() = viewModelScope.launch {
+        projectRepository.getAllProjects().collect { _projects.value = it.currentUser }
     }
 
     /**
@@ -74,12 +73,8 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      *
      * @param id The unique project identifier.
      */
-    fun loadProject(id: String) = viewModelScope.launch(Dispatchers.IO) {
-        projectRepository.getProjectById(id).withCacheFallback {
-            projectRepository.getProjectById(
-                id
-            )
-        }.collect { currentProject.value = it?.project }
+    fun loadProject(id: String) = viewModelScope.launch {
+        projectRepository.getProjectById(id).collect { currentProject.value = it?.project }
     }
 
 }

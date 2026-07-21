@@ -58,6 +58,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.titleFont
  * - Each URL is prepended with a newline (`\n`) before being appended.
  * - The `contentDescription` for links is omitted since they are textual.
  * - Extend the regex if you want to support additional link formats (e.g., mailto, ftp).
+ * @author Lahcen AHTAT
  */
 @Composable
 fun AutoLinkText(
