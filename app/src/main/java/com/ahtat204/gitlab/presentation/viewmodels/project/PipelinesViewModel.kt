@@ -27,6 +27,7 @@ typealias Pipelines = GetProjectPipelinesQuery.Pipelines?
  * - Automatically updates when repository flows emit new data.
  *
  * @param projectRepository The data layer dependency used to fetch pipeline information.
+ * @see [ProjectRepository]
  * @author Lahcen AHTAT
  */
 @HiltViewModel
