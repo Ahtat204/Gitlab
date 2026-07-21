@@ -1,7 +1,9 @@
 package com.ahtat204.gitlab.data.remote.repositories.profile
 
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
-import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.cache.normalized.FetchPolicy
+import com.apollographql.cache.normalized.fetchPolicy
+import com.apollographql.cache.normalized.watch
 import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
