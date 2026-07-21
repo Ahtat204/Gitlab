@@ -8,6 +8,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
+import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.apollographql.cache.normalized.FetchPolicy
 import kotlinx.coroutines.flow.Flow
 
@@ -377,7 +378,8 @@ interface ProjectRepository {
      */
     suspend fun getProjectPipelines(
         project: String,
-        cursor: String? = null
+        cursor: String? = null,
+        status: PipelineStatusEnum?=null
     ): Flow<GetProjectPipelinesQuery.Data>
 
 }

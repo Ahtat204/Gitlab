@@ -7,6 +7,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
+import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
@@ -55,31 +56,27 @@ class ProjectRepositoryImpl @Inject constructor(
     override suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?> {
-        return if (cursor == null) apolloClient.query(
+        return apolloClient.query(
             GetRepositoryCommitsQuery(
-                id, branch = branch
+                id, branch = branch, cursor = Optional.presentIfNotNull(cursor)
             )
-        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-        else apolloClient.query(GetRepositoryCommitsQuery(id, Optional.Present(cursor), branch))
-            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-            .fetchAndMergeCommits(client = apolloClient, branch, id, cursor)
+        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors().fetchAndMergeCommits(client = apolloClient, branch, id, cursor)
+
     }
 
     override suspend fun getProjectPipelines(
-        project: String, cursor: String?
+        project: String, cursor: String?, status: PipelineStatusEnum?
     ): Flow<GetProjectPipelinesQuery.Data> {
-        return if (cursor == null) apolloClient.query(GetProjectPipelinesQuery(project = project))
-            .fetchPolicy(
-                FetchPolicy.CacheFirst
-            ).watch().mapAndHandleErrors()
-        else apolloClient.query(
+       return apolloClient.query(
             GetProjectPipelinesQuery(
+                status = Optional.presentIfNotNull(status),
                 project = project,
-                cursor = Optional.present(cursor)
+                cursor = Optional.presentIfNotNull(cursor)
             )
         ).fetchPolicy(
             FetchPolicy.CacheFirst
         ).watch().mapAndHandleErrors()
+
     }
 
     override suspend fun getRepositoryBranches(
@@ -92,25 +89,13 @@ class ProjectRepositoryImpl @Inject constructor(
     override suspend fun getProjectRepository(
         id: String, branch: String?, path: String?
     ): Flow<GetProjectRepositoryQuery.Data?> {
-        return if (branch == null) {
-            if (path != null) {
-                apolloClient.query(GetProjectRepositoryQuery(id, path = Optional.present(path)))
-                    .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-            } else {
-                apolloClient.query(GetProjectRepositoryQuery(id))
-                    .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-            }
-        } else {
-            if (path != null) {
-                apolloClient.query(
-                    GetProjectRepositoryQuery(
-                        id, branch = Optional.present(branch), path = Optional.present(path)
-                    )
-                ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-            } else {
-                apolloClient.query(GetProjectRepositoryQuery(id, branch = Optional.present(branch)))
-                    .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-            }
-        }
+        return apolloClient.query(
+            GetProjectRepositoryQuery(
+                id,
+                branch = Optional.presentIfNotNull(branch),
+                path = Optional.presentIfNotNull(path)
+            )
+        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+
     }
 }

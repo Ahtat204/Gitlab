@@ -1,7 +1,7 @@
-query GetProjectPipelines($project:ID!,$cursor:String){
+query GetProjectPipelines($project:ID!,$cursor:String,$status:PipelineStatusEnum){
     project(fullPath: $project){
 
-        pipelines(first: 20,status: RUNNING,after: $cursor){
+        pipelines(first: 20,status: $status,after: $cursor){
             nodes {
                 status
                 jobs{
