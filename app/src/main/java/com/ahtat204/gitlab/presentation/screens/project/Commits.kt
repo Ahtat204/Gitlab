@@ -76,7 +76,7 @@ fun ProjectCommits(
     id: String,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
-    if (id == "") return
+    if (id.isEmpty()) return
     val commits by repositoryViewModel.commits.collectAsStateWithLifecycle()
     LaunchedEffect(id) {
         repositoryViewModel.loadProjectCommits(id,branch)

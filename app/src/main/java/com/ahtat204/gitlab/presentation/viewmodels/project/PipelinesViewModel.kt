@@ -3,6 +3,7 @@ package com.ahtat204.gitlab.presentation.viewmodels.project
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
+import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +35,6 @@ typealias Pipelines = GetProjectPipelinesQuery.Pipelines?
 class PipelinesViewModel @Inject constructor(
     private val projectRepository: ProjectRepository
 ) : ViewModel() {
-
     private val _pipelines = MutableStateFlow<Pipelines>(null)
 
     /**
@@ -52,12 +52,14 @@ class PipelinesViewModel @Inject constructor(
      *
      * @param project The full path or unique identifier of the GitLab project.
      */
-    fun loadProjectPipelines(project: String) {
-        if (_pipelines.value?.pageInfo?.hasPreviousPage == false) {
-            viewModelScope.launch {
-                projectRepository.getProjectPipelines(project = project)
-                    .collect { _pipelines.value = it.project?.pipelines }
-            }
+    fun loadProjectPipelines(project: String, status: PipelineStatusEnum?) {
+        viewModelScope.launch {
+            projectRepository.getProjectPipelines(
+                project = project,
+                cursor = _pipelines.value?.pageInfo?.endCursor,
+                status = status
+            ).collect { _pipelines.value = it.project?.pipelines }
         }
+
     }
 }
