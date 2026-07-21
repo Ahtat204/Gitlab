@@ -15,6 +15,8 @@ query GetProjectMergeRequests($project:ID!,$cursor:String){
             pageInfo {
                 startCursor
                 hasNextPage
+                endCursor
+                hasPreviousPage
             }
         }
     }
