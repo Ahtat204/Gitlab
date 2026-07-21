@@ -13,6 +13,7 @@ import androidx.navigation.navigation
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
+import com.ahtat204.gitlab.presentation.screens.project.Pipelines
 import com.ahtat204.gitlab.presentation.screens.project.ProjectCommits
 import com.ahtat204.gitlab.presentation.screens.project.ProjectDetailScreen
 import com.ahtat204.gitlab.presentation.screens.project.RepositoryScreen
@@ -95,6 +96,15 @@ fun BottomNavigationGraph(
                 projectId?.let { ProjectDetailScreen(navController,x, it)
                 }
             }
+            composable(
+                route = "pipelines?projectId={projectId}",
+                arguments = listOf(navArgument("projectId") { defaultValue = "" })
+            ) { backStackEntry ->
+                val projectId = backStackEntry.arguments?.getString("projectId")
+                projectId?.let { Pipelines(navController = navController,x=x, project = it)
+                }
+            }
+
         }
     }
 }

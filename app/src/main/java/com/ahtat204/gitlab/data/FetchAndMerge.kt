@@ -13,6 +13,7 @@ suspend fun Flow<GetRepositoryCommitsQuery.Data>.fetchAndMergeCommits(
     client: ApolloClient, branch: String, id: String, cursor: String? = null
 ): Flow<GetRepositoryCommitsQuery.Data> {
     try {
+        if(cursor==null) return this
         val query = GetRepositoryCommitsQuery(
             projectPath = id, branch = branch
         )

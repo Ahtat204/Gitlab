@@ -1,0 +1,23 @@
+query GetProjectPipelines($project:ID!,$cursor:String,$status:PipelineStatusEnum){
+    project(fullPath: $project){
+        id
+        pipelines(first: 10,status: $status ,after: $cursor ){
+            nodes {
+                status
+                committedAt
+                createdAt
+                startedAt
+                duration
+                finishedAt
+                id
+                name
+            }
+            pageInfo {
+                hasNextPage
+                startCursor
+                endCursor
+                hasPreviousPage
+            }
+        }
+    }
+}
