@@ -2,6 +2,7 @@ package com.ahtat204.gitlab.data.remote.repositories.user
 
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
+import com.ahtat204.gitlab.domain.di.OnlineApolloClient
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.fetchPolicy
@@ -32,7 +33,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class UserRepositoryImpl @Inject constructor(
-    private val apolloClient: ApolloClient
+    @OnlineApolloClient private val apolloClient: ApolloClient
 ) : UserRepository {
     override suspend fun getUserProjectsByName(
         userName: String,

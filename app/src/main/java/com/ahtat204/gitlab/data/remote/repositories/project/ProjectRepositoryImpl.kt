@@ -7,6 +7,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
+import com.ahtat204.gitlab.domain.di.OnlineApolloClient
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.Optional
@@ -39,7 +40,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class ProjectRepositoryImpl @Inject constructor(
-    private val apolloClient: ApolloClient
+    @OnlineApolloClient private val apolloClient: ApolloClient
 ) : ProjectRepository {
     @OptIn(ApolloExperimental::class)
     override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =

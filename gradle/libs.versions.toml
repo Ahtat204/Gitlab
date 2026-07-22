@@ -43,6 +43,7 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 apollo-http-cache = { module = "com.apollographql.apollo:apollo-http-cache", version.ref = "apolloVersion" }
 apollo-mockserver = { module = "com.apollographql.mockserver:apollo-mockserver", version.ref = "apolloMockserver" }
 apollo-normalized-cache = { module = "com.apollographql.cache:normalized-cache", version.ref = "apolloCacheVersion" }
+apoolo-cache={module="com.apollographql.cache:normalized-cache-sqlite",version.ref ="apolloCacheVersion"}
 apollo-testing-support = { module = "com.apollographql.apollo:apollo-testing-support", version.ref = "apolloVersion" }
 appauth = { module = "net.openid:appauth", version.ref = "appauth" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }

@@ -10,9 +10,13 @@ import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
 import com.apollographql.apollo.network.http.DefaultHttpEngine
 import com.apollographql.apollo.network.http.HttpNetworkTransport
+import com.apollographql.cache.normalized.FetchPolicy
+import com.apollographql.cache.normalized.fetchPolicy
 import com.apollographql.cache.normalized.logCacheMisses
 import com.apollographql.cache.normalized.memory.MemoryCacheFactory
+import com.apollographql.cache.normalized.sql.SqlNormalizedCacheFactory
 import dagger.Module
+import kotlin.time.Duration
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -48,9 +52,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ApolloModule {
-    private val cacheFactory = MemoryCacheFactory(
+    private val memoryCacheFactory = MemoryCacheFactory(
         maxSizeBytes = 20 * 1024 * 1024, expireAfterMillis = 600000
     )
+    private val sqliteCacheFactory = SqlNormalizedCacheFactory("offline_database")
 
     /**
      * Provides a singleton [ApolloClient] configured for GitLab GraphQL API.
@@ -61,14 +66,32 @@ object ApolloModule {
     @OptIn(ApolloExperimental::class)
     @Singleton
     @Provides
-    fun getApolloService(okHttpClient: OkHttpClient): ApolloClient {
+    @OnlineApolloClient
+    fun getOnlineApolloService(okHttpClient: OkHttpClient): ApolloClient {
         val httpEngine = DefaultHttpEngine { okHttpClient }
         val requestComposer = DefaultHttpRequestComposer(GRAPHQL_URL)
         val networkTransport = HttpNetworkTransport.Builder().httpEngine(httpEngine)
             .httpRequestComposer(requestComposer).build()
         return ApolloClient.Builder().networkTransport(networkTransport)
             .logCacheMisses({ Log.e("cacheMiss", it) })
-            .cache(normalizedCacheFactory = cacheFactory, writeToCacheAsynchronously = true)
+            .cache(normalizedCacheFactory = memoryCacheFactory, writeToCacheAsynchronously = true)
             .retryOnError { isConnected() }.failFastIfOffline(true).build()
     }
+
+    /**
+     * Provides a singleton [ApolloClient] configured with SQLite cache only for Offline support
+     *
+     * @return An-offline only  Apollo client
+     */
+    @OptIn(ApolloExperimental::class)
+    @Singleton
+    @Provides
+    @OfflineApolloClient
+    fun getOfflineApolloService(): ApolloClient {
+        return ApolloClient.Builder().cache(
+            normalizedCacheFactory = sqliteCacheFactory,
+            writeToCacheAsynchronously = true
+        ).fetchPolicy(FetchPolicy.CacheOnly).build()
+    }
+
 }
