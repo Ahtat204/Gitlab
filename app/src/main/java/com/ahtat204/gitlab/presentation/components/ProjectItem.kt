@@ -138,7 +138,10 @@ fun ProjectItem(
                     .fillMaxHeight()
                     .background(Background)
             ) {
-                project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+                val pipelines=project.pipelines?.nodes
+                if(pipelines?.isNotEmpty()==true){
+                   pipelines[0]?.status?.let { PipeLineStatusIcon(it) }
+                }
 
             //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
 

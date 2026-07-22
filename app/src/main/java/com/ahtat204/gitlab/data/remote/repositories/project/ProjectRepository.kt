@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
  * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
  * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
  * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
+ * - [getProjectIssues]:Retrieves and streams first 20 issues for a given project
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
