@@ -47,7 +47,7 @@ import javax.inject.Inject
  * @author Lahcen AHTAT
  */
 @HiltViewModel
-class ProjectViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
+class PersonalProjectsViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
     ViewModel() {
     /** Currently selected project’s overview/details */
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)

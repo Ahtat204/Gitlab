@@ -42,7 +42,7 @@ import com.ahtat204.gitlab.presentation.components.ProjectItem
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
-import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.PersonalProjectsViewModel
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.Instant
@@ -52,19 +52,19 @@ import java.time.ZoneId
  * Composable that displays the details of a given project.
  *
  * ## Overview
- * - Fetches and observes project data via [ProjectViewModel].
+ * - Fetches and observes project data via [PersonalProjectsViewModel].
  * - Shows a loading indicator until projects data is available.
  * - Delegates rendering the project details to a set of Components.
  *
  * ## Parameters
  * @param x The [PaddingValues] applied to the container for spacing.
  * @param path the path of the project to show.
- * @param projectViewModel The [ProjectViewModel] instance used to load and observe project data. Defaults to Hilt‑provided instance via [hiltViewModel].
+ * @param personalProjectsViewModel The [PersonalProjectsViewModel] instance used to load and observe project data. Defaults to Hilt‑provided instance via [hiltViewModel].
  *
  * ## UI Behavior
  * - Initializes a Coil [ImageLoader] with caching and crossfade enabled.
- * - Calls [ProjectViewModel.loadAllProjects] inside [LaunchedEffect] to trigger data fetch.
- * - Collects current user data from [ProjectViewModel.projects] as state.
+ * - Calls [PersonalProjectsViewModel.loadAllProjects] inside [LaunchedEffect] to trigger data fetch.
+ * - Collects current user data from [PersonalProjectsViewModel.projects] as state.
  * - If no projects or avatar are available:
  *   - Displays a [CircularProgressIndicator].
  * - Otherwise:
@@ -84,18 +84,18 @@ import java.time.ZoneId
  * - Uses [Instant] and [ZoneId] to sort projects by activity date.
  * - Relies on [ProjectItem] composable to render individual project details.
  * - Displays up to all available projects; topics and languages are shown if present.
- *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/repository/projectdetails.jpg"  width="300" height="700"/>
+ *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/projectdetails.jpg"  width="300" height="700"/>
  */
 @Composable
 fun ProjectDetailScreen(
     navController: NavController,
     x: PaddingValues,
     path: String,
-    projectViewModel: ProjectViewModel = hiltViewModel()
+    personalProjectsViewModel: PersonalProjectsViewModel = hiltViewModel()
 ) {
-    val project by projectViewModel.currentProject.collectAsStateWithLifecycle()
+    val project by personalProjectsViewModel.currentProject.collectAsStateWithLifecycle()
     LaunchedEffect(true) {
-        projectViewModel.loadProject(path)
+        personalProjectsViewModel.loadProject(path)
     }
     Column(
         modifier = Modifier

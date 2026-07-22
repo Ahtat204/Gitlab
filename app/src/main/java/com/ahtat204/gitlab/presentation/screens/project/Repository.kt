@@ -87,7 +87,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
  * - Ensure [RepositoryViewModel] is properly provided via Hilt for dependency injection.
  * - Requires API level [Build.VERSION_CODES.O] for date formatting.
  * - The timeline string combines author name and relative commit time.
- *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/repository/repository.jpg"  width="300" height="700"/>
+ *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/repository.jpg"  width="300" height="700"/>
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -140,23 +140,23 @@ fun RepositoryScreen(
             if(history.value==true){
              currentBranch.value?.let{
                  ProjectCommits(navController = navController, branch = it, id = projectPath)
-             }
+                                            }
+                                            }
+
             }
 
-        }
-
-        if (showSheet) {
-            ModalBottomSheet(
-                modifier = Modifier.fillMaxHeight(),
-                onDismissRequest = { showSheet = false },
-                sheetState = sheetState
-            ) {
-                LaunchedEffect(currentBranch.value) {
-                    repositoryViewModel.loadRepositoryBranches(projectPath)
+            if (showSheet) {
+                ModalBottomSheet(
+                    modifier = Modifier.fillMaxHeight(),
+                    onDismissRequest = { showSheet = false },
+                    sheetState = sheetState
+                ) {
+                    LaunchedEffect(currentBranch.value) {
+                        repositoryViewModel.loadRepositoryBranches(projectPath)
+                    }
+                    val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
+                    BranchesList(branches, repositoryViewModel, projectPath, currentBranch, x)
                 }
-                val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
-                BranchesList(branches, repositoryViewModel, projectPath, currentBranch, x)
             }
         }
     }
-}

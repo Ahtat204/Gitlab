@@ -28,7 +28,7 @@ import coil.ImageLoader
 import com.ahtat204.gitlab.presentation.components.CoilCache.loader
 import com.ahtat204.gitlab.presentation.components.ProjectItem
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.PersonalProjectsViewModel
 import java.time.Instant
 import java.time.ZoneId
 
@@ -36,20 +36,20 @@ import java.time.ZoneId
  * Composable that displays the authenticated user's personal GitLab projects.
  *
  * ## Overview
- * - Fetches and observes project data via [ProjectViewModel].
+ * - Fetches and observes project data via [PersonalProjectsViewModel].
  * - Shows a loading indicator until projects and avatar are available.
  * - Displays a list of projects sorted by last activity date.
  * - Delegates rendering of each project to [ProjectItem].
  *
  * ## Parameters
  * @param x The [PaddingValues] applied to the container for spacing.
- * @param projectViewModel The [ProjectViewModel] instance used to load and observe
+ * @param personalProjectsViewModel The [PersonalProjectsViewModel] instance used to load and observe
  *                         project data. Defaults to Hilt‑provided instance via [hiltViewModel].
  *
  * ## UI Behavior
  * - Initializes a Coil [ImageLoader] with caching and crossfade enabled.
- * - Calls [ProjectViewModel.loadAllProjects] inside [LaunchedEffect] to trigger data fetch.
- * - Collects current user data from [ProjectViewModel.projects] as state.
+ * - Calls [PersonalProjectsViewModel.loadAllProjects] inside [LaunchedEffect] to trigger data fetch.
+ * - Collects current user data from [PersonalProjectsViewModel.projects] as state.
  * - If no projects or avatar are available:
  *   - Displays a [CircularProgressIndicator].
  * - Otherwise:
@@ -69,19 +69,19 @@ import java.time.ZoneId
  * - Uses [Instant] and [ZoneId] to sort projects by activity date.
  * - Relies on [ProjectItem] composable to render individual project details.
  * - Displays up to all available projects; topics and languages are shown if present.
- *   @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/repository/personalprojects.jpg"  width="300" height="700"/>
+ *   @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/personalprojects.jpg"  width="300" height="700"/>
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PersonalProjects(
     navController: NavHostController,
     x: PaddingValues,
-    projectViewModel: ProjectViewModel = hiltViewModel()
+    personalProjectsViewModel: PersonalProjectsViewModel = hiltViewModel()
 ) {
     LaunchedEffect(1) {
-        projectViewModel.loadAllProjects()
+        personalProjectsViewModel.loadAllProjects()
     }
-    val currUser by projectViewModel.projects.collectAsState()
+    val currUser by personalProjectsViewModel.projects.collectAsState()
     currUser?.namespace?.projects?.nodes?.sortedByDescending {
         Instant.parse(it?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
             .toLocalDate()

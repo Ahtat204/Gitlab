@@ -1,12 +1,13 @@
 query GetMyContributedProjects($cursor:String){
     currentUser {
-            contributedProjects(first: 20,includePersonal: true,after: $cursor){
+            contributedProjects(first: 20,after: $cursor){
                 pageInfo {
                     startCursor
                     hasNextPage
                     hasPreviousPage
                 }
                 nodes {
+                    avatarUrl
                     id
                     topics
                     lastActivityAt
