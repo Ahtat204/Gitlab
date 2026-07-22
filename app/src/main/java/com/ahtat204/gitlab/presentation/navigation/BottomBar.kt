@@ -1,6 +1,6 @@
-package com.ahtat204.gitlab.presentation.components
+package com.ahtat204.gitlab.presentation.navigation
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.BottomNavigation
+import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
@@ -12,7 +12,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.ahtat204.gitlab.presentation.navigation.BottomBarScreen
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 
 
@@ -33,7 +32,7 @@ fun BottomBar(navController: NavHostController) {
     // Observe the current back stack entry to highlight the selected item
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    BottomNavigation(backgroundColor = Color.Black) {
+    NavigationBar(contentColor = Color.Black, containerColor = Color.Black) {
         items.forEach { screen ->
             AddItem(
                 screen = screen,
