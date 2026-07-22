@@ -2,13 +2,12 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
-import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
-import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
@@ -50,7 +49,7 @@ class ProjectRepositoryImpl @Inject constructor(
      *
      * ### Behavior
      * - Executes [GetMyPersonalProjectsQuery] with the provided fetch policy.
-     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [watch] to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
@@ -129,7 +128,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Executes [GetProjectDetailsQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      * ### Implementation Example
@@ -181,6 +180,83 @@ class ProjectRepositoryImpl @Inject constructor(
      * Retrieves the repository tree for a given project.
      *
      * @param id The unique identifier of the project.
+     * @param path the path of the folder you want to open
+     * @param branch the branch of the repository
+     * @return A [Flow] emitting [GetProjectRepositoryQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetProjectRepositoryQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     * ### Implementation Example
+     * ```kotlin
+     *     override suspend fun getProjectRepository(id: String,skip:Int,branch:String?): Flow<GetProjectRepositoryQuery.Data?> {
+     *       return  if(branch==null) {
+     *             apolloClient.query(GetProjectRepositoryQuery(id,skip = skip))
+     *                 .fetchPolicy(FetchPolicy.CacheFirst)
+     *                 .watch().mapNotNull { it.data }
+     *                 .catch { ex ->
+     *                 if (ex is CancellationException) throw ex
+     *             }.mapNotNull { it }
+     *         }
+     *         else{
+     *           apolloClient.query(GetProjectRepositoryQuery(id,skip = skip, branch = Optional.present(branch)))
+     *               .fetchPolicy(FetchPolicy.CacheFirst).watch()
+     *               .mapNotNull { it.data }.catch { ex ->
+     *               if (ex is CancellationException) throw ex
+     *           }.mapNotNull { it }
+     *         }
+     *     }
+     * ```
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getProjectRepository("12345")
+     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL
+     *     project(fullPath: $projectPath){
+     *         id
+     *         repository {
+     *             branchNames(searchPattern: "*",limit: 20,offset: $skip)
+     *             rootRef
+     *         tree(ref: $branch){
+     *             blobs{
+     *                 nodes {
+     *                     id
+     *                     name
+     *                     webUrl
+     *                     path
+     *                 }
+     *
+     *             }
+     *
+     *         }
+     *         }
+     *     }
+     * ```
+     */
+    override suspend fun getProjectRepository(
+        id: String, branch: String?, path: String?
+    ): Flow<GetProjectRepositoryQuery.Data?> {
+        return apolloClient.query(
+            GetProjectRepositoryQuery(
+                id,
+                branch = Optional.presentIfNotNull(branch),
+                path = Optional.presentIfNotNull(path)
+            )
+        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
+    /**
+     * Retrieves the repository tree for a given project.
+     *
+     * @param id The unique identifier of the project.
      * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
      * @return A [Flow] emitting [GetRepositoryCommitsQuery.Data] objects, or null if unavailable.
      *
@@ -188,7 +264,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Executes [GetRepositoryCommitsQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      *
@@ -247,76 +323,71 @@ class ProjectRepositoryImpl @Inject constructor(
             .fetchAndMergeCommits(client = apolloClient, branch, id, cursor)
 
     }
-
     /**
-     * Retrieves first 20 pipelines (currently fetch the running pipelines , later will add more method arguments).
-     *
-     * @param project The unique identifier of the project or the project path.
-     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
-     * @return A [Flow] emitting [GetProjectPipelinesQuery.Data] objects, or null if unavailable.
+     * Streams all Personal projects the authenticated user has contributed to.
+     * @return A [Flow] emitting [GetMyContributedProjectsQuery.Data] objects.
      *
      * ### Behavior
-     * - Executes [GetProjectPipelinesQuery] with the provided project ID.
-     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
-     * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
-     * - Logs errors without terminating the stream.
+     * - Executes [GetMyContributedProjectsQuery] with the provided fetch policy.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Filters out null results with `mapNotNull`.
+     * - Logs exceptions with [Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     * ### Implementation Example
+     * ```
+     * override suspend fun getAllMyContributedProjects(): Flow<GetMyContributedProjectsQuery.Data> =
+     *         apolloClient.query(GetMyContributedProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst)
+     *             .watch().mapNotNull { it.data }.catch { ex ->
+     *                 if (ex is CancellationException) throw ex
+     *                 else Log.d(ex.cause,ex.message)
+     *             }.mapNotNull { it }
      *
-     * ### Example
+     * ```
+     * ### Usage example in ViewModel
      * ```kotlin
      * viewModelScope.launch {
-     *     projectRepository.GetProjectPipelinesQuery("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     *     projectRepository.getAllMyContributedProjects()
+     *         .collect { projects -> renderProjects(projects) }
      * }
      * ```
-     * query example
-     * ``` GraphQL
-     *     project(fullPath: $project){
-     *
-     *         pipelines(first: 20,status: RUNNING,after: $cursor){
-     *             nodes {
-     *                 status
-     *                 jobs{
-     *                     nodes {
-     *                         id
+     * Query Example:
+     * ```
+     *    currentUser {
+     *             contributedProjects(first: 20,includePersonal: true,after: $cursor){
+     *                 pageInfo {
+     *                     startCursor
+     *                     hasNextPage
+     *                     hasPreviousPage
+     *                 }
+     *                 nodes {
+     *                     id
+     *                     topics
+     *                     lastActivityAt
+     *                     __typename
+     *                     languages {
+     *                         color
      *                         name
-     *                         duration
-     *                         startedAt
-     *                         status
-     *
+     *                     }
+     *                     name
+     *                     fullPath
+     *                     description
+     *                     visibility
+     *                     pipelines(first: 1){
+     *                         nodes {
+     *                             __typename
+     *                             id
+     *                             status
+     *                         }
      *                     }
      *                 }
-     *                 committedAt
-     *                 createdAt
-     *                 startedAt
-     *                 duration
-     *                 id
-     *                 name
+     *             }
      *
-     *             }
-     *             pageInfo {
-     *                 hasNextPage
-     *                 startCursor
-     *                 hasPreviousPage
-     *             }
-     *         }
      *     }
      * ```
      */
-    override suspend fun getProjectPipelines(
-        project: String, cursor: String?, status: PipelineStatusEnum?
-    ): Flow<GetProjectPipelinesQuery.Data> {
-        return apolloClient.query(
-            GetProjectPipelinesQuery(
-                status = Optional.presentIfNotNull(status),
-                project = project,
-                cursor = Optional.presentIfNotNull(cursor)
-            )
-        ).fetchPolicy(
-            FetchPolicy.CacheFirst
-        ).watch().mapAndHandleErrors()
-
+    override suspend fun getAllMyContributedProjects(): Flow<GetMyContributedProjectsQuery.Data> {
+        return apolloClient.query(GetMyContributedProjectsQuery())
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
 
     /**
@@ -330,7 +401,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Executes [GetRepositoryBranchesQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      *
@@ -357,70 +428,6 @@ class ProjectRepositoryImpl @Inject constructor(
         return apolloClient.query(GetRepositoryBranchesQuery(project, skip))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
-    /**
-     * Retrieves the repository tree for a given project.
-     *
-     * @param id The unique identifier of the project.
-     * @param path the path of the folder you want to open
-     * @param branch the branch of the repository
-     * @return A [Flow] emitting [GetProjectDetailsQuery.Data] objects, or null if unavailable.
-     *
-     * ### Behavior
-     * - Executes [GetProjectRepositoryQuery] with the provided project ID.
-     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
-     * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
-     * - Logs errors without terminating the stream.
-     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Implementation Example
-     * ```kotlin
-     *     override suspend fun getProjectRepository(id: String,skip:Int,branch:String?): Flow<GetProjectRepositoryQuery.Data?> {
-     *       return  if(branch==null) {
-     *             apolloClient.query(GetProjectRepositoryQuery(id,skip = skip))
-     *                 .fetchPolicy(FetchPolicy.CacheFirst)
-     *                 .watch().mapNotNull { it.data }
-     *                 .catch { ex ->
-     *                 if (ex is CancellationException) throw ex
-     *             }.mapNotNull { it }
-     *         }
-     *         else{
-     *           apolloClient.query(GetProjectRepositoryQuery(id,skip = skip, branch = Optional.present(branch)))
-     *               .fetchPolicy(FetchPolicy.CacheFirst).watch()
-     *               .mapNotNull { it.data }.catch { ex ->
-     *               if (ex is CancellationException) throw ex
-     *           }.mapNotNull { it }
-     *         }
-     *     }
-     * ```
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectRepository("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
-     * query example
-     * ``` GraphQL
-     *     project(fullPath: $projectPath){
-     *         id
-     *         repository {
-     *             branchNames(searchPattern: "*",limit: 20,offset: $skip)
-     *             rootRef
-     *         tree(ref: $branch){
-     *             blobs{
-     *                 nodes {
-     *                     id
-     *                     name
-     *                     webUrl
-     *                     path
-     *                 }
-     *
-     *             }
-     *
-     *         }
-     *         }
-     *     }
-     * ```
-     */
+
 }
-}
+

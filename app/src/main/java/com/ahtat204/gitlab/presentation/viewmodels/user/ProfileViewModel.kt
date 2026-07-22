@@ -4,25 +4,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.remote.repositories.profile.ProfileRepository
-import com.ahtat204.gitlab.presentation.components.withCacheFallback
-import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.apollo.exception.CacheMissException
+import com.apollographql.cache.normalized.FetchPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 /**
  * ViewModel responsible for managing the user's profile state and data retrieval.
  *
- * This ViewModel acts as an intermediary between the UI layer and the [com.ahtat204.gitlab.data.remote.repositories.profile.ProfileRepository],
+ * This ViewModel acts as an intermediary between the UI layer and the [ProfileRepository],
  * handling data fetching, caching strategies, and state exposure. It utilizes [StateFlow]
  * to provide a thread-safe, observable stream of the current user's profile information.
  *
  * @property profileRepository The repository instance responsible for data access,
  * injected via Hilt.
  *
- * @see com.ahtat204.gitlab.data.queries.GetMyProfileQuery
+ * @see GetMyProfileQuery
  */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -39,9 +38,9 @@ class ProfileViewModel @Inject constructor(
     /**
      * Loads the profile information.
      *
-     * It attempts a [com.apollographql.apollo.cache.normalized.FetchPolicy.CacheFirst] strategy to minimize latency and data
-     * usage. If a [com.apollographql.apollo.exception.CacheMissException] occurs (meaning no local cache is available),
-     * it transparently falls back to [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
+     * It attempts a [FetchPolicy.CacheFirst] strategy to minimize latency and data
+     * usage. If a [CacheMissException] occurs (meaning no local cache is available),
+     * it transparently falls back to [FetchPolicy.NetworkFirst].
      *
      * @param userName Optional username to fetch a specific profile. If null,
      * it fetches the currently authenticated user's profile.
@@ -52,7 +51,6 @@ class ProfileViewModel @Inject constructor(
             viewModelScope.launch {
                 profileRepository
                     .getMyProfile(FetchPolicy.CacheFirst)
-                    .withCacheFallback { profileRepository.getMyProfile(FetchPolicy.NetworkFirst) }
                     .collect { profile.value = it.currentUser }
             }
         }
