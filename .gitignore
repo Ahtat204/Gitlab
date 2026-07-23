@@ -23,13 +23,13 @@ test.json
 Runtree.py
 .kotlin/
 app/test.json
-jobs.json
-projects.json
-clean.sh
 AndroidStudio.vbs
+clean.sh
+projects.json
+firstcommits.json
+jobs.json
 events.json
 Screenshot_20260605_132603_Gitlab.jpg
-firstcommits.json
 
 app/src/main/graphql/com/ahtat204/graphql.config.yml
 git.csv
