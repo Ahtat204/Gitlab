@@ -12,7 +12,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.IssuesViewModel
 @Composable
 fun Issues(
     navHostController: NavHostController,
-    x:  PaddingValues,
+    x:   PaddingValues,
     project: String,
     issuesViewModel: IssuesViewModel = hiltViewModel()
 ) {

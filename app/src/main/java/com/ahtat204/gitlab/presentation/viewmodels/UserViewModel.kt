@@ -3,8 +3,8 @@ package com.ahtat204.gitlab.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.remote.repositories.user.UserRepository
-import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.exception.CacheMissException
+import com.apollographql.cache.normalized.FetchPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch

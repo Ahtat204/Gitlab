@@ -1,14 +1,13 @@
 package com.ahtat204.gitlab.domain.di
 
+import com.ahtat204.gitlab.data.queries.cache.Cache.cache
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig.GRAPHQL_URL
-import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
-import com.apollographql.apollo.cache.normalized.normalizedCache
-import com.apollographql.apollo.interceptor.ApolloInterceptor
+import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
 import com.apollographql.apollo.network.http.DefaultHttpEngine
 import com.apollographql.apollo.network.http.HttpNetworkTransport
+import com.apollographql.cache.normalized.memory.MemoryCacheFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -62,8 +61,8 @@ object ApolloModule {
         val requestComposer = DefaultHttpRequestComposer(GRAPHQL_URL)
         val networkTransport = HttpNetworkTransport.Builder().httpEngine(httpEngine)
             .httpRequestComposer(requestComposer).build()
-        return ApolloClient.Builder().networkTransport(networkTransport).normalizedCache(
-                cacheFactory, writeToCacheAsynchronously = false
-            ).build()
+        return ApolloClient.Builder().networkTransport(networkTransport).cache(
+            cacheFactory, writeToCacheAsynchronously = false
+        ).build()
     }
 }

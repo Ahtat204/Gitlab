@@ -1,12 +1,11 @@
 package com.ahtat204.gitlab.data.remote.repositories.user
 
-import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
 import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.cache.normalized.FetchPolicy
-import com.apollographql.apollo.cache.normalized.fetchPolicy
-import com.apollographql.apollo.cache.normalized.watch
+import com.apollographql.cache.normalized.FetchPolicy
+import com.apollographql.cache.normalized.fetchPolicy
+import com.apollographql.cache.normalized.watch
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -37,11 +36,14 @@ import javax.inject.Singleton
 @Singleton
 class UserRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient
-): UserRepository {
-    override suspend fun getUserProjectsByName(userName: String,policy: FetchPolicy):Flow<GetUserProjectsByNameQuery.Data?>{
+) : UserRepository {
+    override suspend fun getUserProjectsByName(
+        userName: String,
+        policy: FetchPolicy
+    ): Flow<GetUserProjectsByNameQuery.Data?> {
         return apolloClient.query(GetUserProjectsByNameQuery(userName)).fetchPolicy(policy).watch()
             .mapNotNull { it.data }.catch { ex ->
-               logger("ProjectRepository", ex.cause.toString() + "\n" + ex.stackTrace)
+                logger("ProjectRepository", ex.cause.toString() + "\n" + ex.stackTrace)
                 if (ex is CancellationException) throw ex
             }.mapNotNull { it }
     }
