@@ -2,6 +2,7 @@ package com.ahtat204.gitlab.data.remote.repositories.profile
 
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
+import com.ahtat204.gitlab.domain.di.OnlineApolloClient
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.fetchPolicy
@@ -28,7 +29,7 @@ import javax.inject.Singleton
  * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
  */
 @Singleton
-class ProfileRepositoryImpl @Inject constructor(private val apolloClient: ApolloClient) :
+class ProfileRepositoryImpl @Inject constructor(@OnlineApolloClient private val apolloClient: ApolloClient) :
     ProfileRepository {
     override fun getMyProfile(): Flow<GetMyProfileQuery.Data> {
         return apolloClient.query(GetMyProfileQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
