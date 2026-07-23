@@ -3,6 +3,7 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -24,9 +25,11 @@ import kotlinx.coroutines.flow.Flow
  * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
  * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
  * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
+ * - [getProjectMergeRequests]: Retrieves and streams first 20 merge request ina Gitlab Project in descending order by creation Date.
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
+
     /**
      * Streams all projects that the currently authenticated user has contributed to.
      *
@@ -84,5 +87,13 @@ interface ProjectRepository {
     suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
-
+    /**
+     * Retrieves a paginated chunk of available Merged requests  within a project.
+     *
+     * @param id The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the current window slice of matching branch records.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
+    suspend fun getProjectMergeRequests(id: String,cursor:String?=null):Flow<GetProjectMergeRequestsQuery.Data>
 }

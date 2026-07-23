@@ -44,7 +44,7 @@ class ProjectRepositoryImplTest : Responses() {
         mockWebserver.enqueue(
             MockResponse().setResponseCode(200).setBody(mockedProjects)
         )
-        val response = apolloClient.query(GetMyProjectsPaginatedQuery()).execute()
+        val response = apolloClient.query(GetMyPersonalProjectsQuery()).execute()
         assertNotNull(response)
         assertNull(response.errors)
         var data = response.data
