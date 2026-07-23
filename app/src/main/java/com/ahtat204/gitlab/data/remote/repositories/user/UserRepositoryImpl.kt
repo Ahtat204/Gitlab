@@ -33,12 +33,11 @@ import javax.inject.Singleton
 @Singleton
 class UserRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient
-): UserRepository {
+) : UserRepository {
     override suspend fun getUserProjectsByName(
-        userName: String,
-        policy: FetchPolicy
+        userName: String
     ): Flow<GetUserProjectsByNameQuery.Data?> {
-        return apolloClient.query(GetUserProjectsByNameQuery(userName)).fetchPolicy(policy).watch()
-            .mapAndHandleErrors()
+        return apolloClient.query(GetUserProjectsByNameQuery(userName))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
 }

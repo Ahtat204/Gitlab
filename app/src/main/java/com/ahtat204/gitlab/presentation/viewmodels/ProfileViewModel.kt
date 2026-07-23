@@ -41,18 +41,16 @@ class ProfileViewModel @Inject constructor(
      * It attempts a [FetchPolicy.CacheFirst] strategy to minimize latency and data
      * usage. If a [CacheMissException] occurs (meaning no local cache is available),
      * it transparently falls back to [FetchPolicy.NetworkFirst].
-     *
-     * @param userName Optional username to fetch a specific profile. If null,
      * it fetches the currently authenticated user's profile.
      */
   //  @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun loadProfile(userName: String? = null) {
-        if (userName == null) {
+    fun loadProfile() {
+
             viewModelScope.launch {
                 profileRepository
-                    .getMyProfile(FetchPolicy.CacheFirst)
+                    .getMyProfile()
                     .collect { profile.value = it.currentUser }
             }
-        }
+
     }
 }
