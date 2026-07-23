@@ -30,8 +30,8 @@ import javax.inject.Singleton
 @Singleton
 class ProfileRepositoryImpl @Inject constructor(private val apolloClient: ApolloClient) :
     ProfileRepository {
-    override fun getMyProfile(policy: FetchPolicy): Flow<GetMyProfileQuery.Data> {
-        return apolloClient.query(GetMyProfileQuery()).fetchPolicy(policy).watch()
+    override fun getMyProfile(): Flow<GetMyProfileQuery.Data> {
+        return apolloClient.query(GetMyProfileQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapAndHandleErrors()
     }
 }
