@@ -13,7 +13,7 @@ import androidx.navigation.navigation
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
-import com.ahtat204.gitlab.presentation.screens.project.ProjectCommits
+import com.ahtat204.gitlab.presentation.screens.Workspaces
 import com.ahtat204.gitlab.presentation.screens.project.ProjectDetailScreen
 import com.ahtat204.gitlab.presentation.screens.project.RepositoryScreen
 
@@ -56,6 +56,9 @@ fun BottomNavigationGraph(
         }
         composable(route = "personal") {
             PersonalProjects(navController, x)
+        }
+        composable(route = "workspaces") {
+            Workspaces(navController,x)
         }
         composable(route = BottomBarScreen.Activity.route) {
             // Activity screen placeholder

@@ -1,0 +1,19 @@
+query GetMyWorkspaces($cursor:String){
+    currentUser {
+        id
+        workspaces(first: 20,after: $cursor){
+            nodes {
+                id
+                name
+                createdAt
+            }
+
+            pageInfo {
+                hasPreviousPage
+                endCursor
+                hasNextPage
+                startCursor
+            }
+        }
+    }
+}

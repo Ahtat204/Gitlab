@@ -2,13 +2,13 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMyWorkspacesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.Optional
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.fetchPolicy
@@ -99,7 +99,6 @@ class ProjectRepositoryImpl @Inject constructor(
      * }
      * ```
      */
-    @OptIn(ApolloExperimental::class)
     override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
         apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapAndHandleErrors()
@@ -149,6 +148,52 @@ class ProjectRepositoryImpl @Inject constructor(
     override suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?> {
         return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
             .watch().mapAndHandleErrors()
+    }
+
+    /**
+     * Streams the authenticated user's remote development workspaces.
+     *
+     * @param cursor The pagination pointer for sequential page fetches.
+     * @return A [Flow] emitting [GetMyWorkspacesQuery.Data] objects.
+     *
+     * ### Behavior
+     * - Executes [GetMyWorkspacesQuery] with the provided cursor.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow using [watch].
+     * - Handles errors gracefully via [mapAndHandleErrors].
+     * - Throws [kotlinx.coroutines.CancellationException] if the scope is canceled.
+     *
+     * ### Usage Example in ViewModel
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getMyWorkspaces(cursor)
+     *         .collect { workspaces -> updateUI(workspaces) }
+     * }
+     * ```
+     *
+     * ### Query Example
+     * ```graphql
+     * currentUser {
+     *   workspaces(after: $cursor) {
+     *     nodes {
+     *       id
+     *       name
+     *       actualState
+     *       url
+     *     }
+     *     pageInfo {
+     *       endCursor
+     *       hasNextPage
+     *     }
+     *   }
+     * }
+     * ```
+     */
+    override suspend fun getMyWorkspaces(cursor: String?): Flow<GetMyWorkspacesQuery.Data> {
+        return apolloClient.query(GetMyWorkspacesQuery(cursor = Optional.presentIfNotNull(cursor)))
+            .fetchPolicy(
+                FetchPolicy.CacheFirst
+            ).watch().mapAndHandleErrors()
     }
 
     /**
