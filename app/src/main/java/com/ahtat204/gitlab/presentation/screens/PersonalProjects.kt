@@ -82,10 +82,7 @@ fun PersonalProjects(
         projectViewModel.loadAllProjects()
     }
     val currUser by projectViewModel.projects.collectAsState()
-    currUser?.namespace?.projects?.nodes?.sortedByDescending {
-        Instant.parse(it?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
-            .toLocalDate()
-    }?.let { nodes ->
+    currUser?.namespace?.projects?.nodes?.let { nodes ->
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,

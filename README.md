@@ -251,7 +251,7 @@ Gitlab/
 │           │       │       ├── ProfileViewModel.kt
 │           │       │       ├── ProjectViewModel.kt
 │           │       │       ├── RepositoryViewModel.kt
-│           │       │       └── UserViewModel.kt
+│           │       │       └── ExploreViewModel.kt
 │           └── res/
 │               └── drawable/
 │                   ├── commit.png

@@ -30,6 +30,48 @@ import javax.inject.Singleton
 @Singleton
 class ProfileRepositoryImpl @Inject constructor(private val apolloClient: ApolloClient) :
     ProfileRepository {
+    /**
+     * Retrieves the profile of a given user.
+     * @return A [Flow] emitting [GetMyProfileQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetMyProfileQuery].
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Logs errors without terminating the stream.
+     *
+     * ### Examples
+     * usage in ViewModel
+     * ```kotlin
+     * viewModelScope.launch {
+     *     profileRepository.getMyProfile(FetchPolicy.CacheFirst)
+     *         .collect { myProfile=it.CurrentUser }
+     * }
+     * ```
+     * Query Example
+     * ```
+     *     currentUser {
+     *         id
+     *         name
+     *         username
+     *         publicEmail
+     *         avatarUrl
+     *         webUrl
+     *         status {
+     *             availability
+     *             emoji
+     *             message
+     *
+     *         }
+     *         bio
+     *         location
+     *         github
+     *         jobTitle
+     *         projectCount
+     *         linkedin
+     *     }
+     * ```
+     */
     override fun getMyProfile(): Flow<GetMyProfileQuery.Data> {
         return apolloClient.query(GetMyProfileQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapAndHandleErrors()
