@@ -1,15 +1,12 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
-import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
-import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
-import com.apollographql.cache.normalized.FetchPolicy
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -28,7 +25,6 @@ import kotlinx.coroutines.flow.Flow
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
-
     /**
      * Streams all projects that the currently authenticated user has contributed to.
      *
@@ -86,6 +82,7 @@ interface ProjectRepository {
     suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
+
     /**
      * Streams a continuous, sequentially chunked record of repository commit histories.
      *
@@ -98,9 +95,7 @@ interface ProjectRepository {
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
     suspend fun getProjectPipelines(
-        project: String,
-        cursor: String? = null,
-        status: PipelineStatusEnum?=null
+        project: String, cursor: String? = null, status: PipelineStatusEnum? = null
     ): Flow<GetProjectPipelinesQuery.Data>
 
 }
