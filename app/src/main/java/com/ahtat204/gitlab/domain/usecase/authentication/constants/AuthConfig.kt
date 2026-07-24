@@ -24,7 +24,7 @@ import net.openid.appauth.ResponseTypeValues
  *
  * ## Usage
  * These constants are consumed by AppAuth components such as
- * [AuthorizationRequest] and [AuthorizationService] to configure the
+ * [net.openid.appauth.AuthorizationRequest] and [net.openid.appauth.AuthorizationService] to configure the
  * authentication flow.
  *
  * Example:
@@ -40,6 +40,7 @@ import net.openid.appauth.ResponseTypeValues
  *     Uri.parse(AuthConfig.CALLBACK_URL)
  * ).setScope(AuthConfig.SCOPE).build()
  * ```
+ * @author Lahcen AHTAT
  */
 object AuthConfig {
     /** GitLab authorization endpoint for initiating OAuth requests. */
@@ -47,7 +48,10 @@ object AuthConfig {
 
     /** GitLab token endpoint for exchanging authorization codes. */
     const val TOKEN_URI = "https://gitlab.com/oauth/token"
-
+    /** Gitlab REST API URL for usage in Retrofit*/
+    const val REST_URL="https://gitlab.com/api/v4/"
+    /** Gitlab GraphQL API URL for usage with Apollo*/
+    const val GRAPHQL_URL="https://gitlab.com/api/graphql"
     /** GitLab logout endpoint for ending user sessions. */
     const val END_SESSION_URI = "https://gitlab.com/logout"
 

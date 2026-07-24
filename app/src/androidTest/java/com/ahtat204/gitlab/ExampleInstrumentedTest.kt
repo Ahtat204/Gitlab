@@ -17,6 +17,6 @@ package com.ahtat204.gitlab
     fun useAppContext() {
       // Context of the app under test.
       val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-      assertEquals("com.asue24.gitlab", appContext.packageName)
+      assertEquals("com.ahtat204.gitlab", appContext.packageName)
     }
   }

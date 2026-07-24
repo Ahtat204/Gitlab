@@ -9,5 +9,5 @@ import androidx.navigation.NavHostController
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PersonalProjectsScreen(navController: NavHostController, x: PaddingValues){
-    PersonalProjects(x)
+
 }
