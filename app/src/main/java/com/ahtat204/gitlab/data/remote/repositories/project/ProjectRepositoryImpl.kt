@@ -3,7 +3,6 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 import android.util.Log
 import com.ahtat204.gitlab.data.fetchAndMerge
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
-import com.ahtat204.gitlab.data.fetchAndMergePipelines
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
@@ -52,7 +51,7 @@ class ProjectRepositoryImpl @Inject constructor(
      *
      * ### Behavior
      * - Executes [GetMyPersonalProjectsQuery] with the provided fetch policy.
-     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [watch] to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
@@ -131,7 +130,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Executes [GetProjectDetailsQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      * ### Implementation Example
@@ -190,7 +189,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Executes [GetRepositoryCommitsQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      *
@@ -245,8 +244,9 @@ class ProjectRepositoryImpl @Inject constructor(
             GetRepositoryCommitsQuery(
                 id, branch = branch, cursor = Optional.presentIfNotNull(cursor)
             )
-        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-            .fetchAndMergeCommits(client = apolloClient, branch, id, cursor)
+        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors().fetchAndMergeCommits(
+            client = apolloClient, branch = branch, id = id, cursor = cursor
+        )
 
     }
 
@@ -261,7 +261,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Executes [GetProjectPipelinesQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      *
@@ -317,7 +317,12 @@ class ProjectRepositoryImpl @Inject constructor(
             )
         ).fetchPolicy(
             FetchPolicy.CacheFirst
-        ).watch().fetchAndMerge<GetProjectPipelinesQuery.Data>(apolloClient,project, cursor = cursor,status).mapAndHandleErrors()
+        ).watch().fetchAndMerge<GetProjectPipelinesQuery.Data>(
+            apolloClient,
+            project,
+            cursor = cursor,
+            status
+        ).mapAndHandleErrors()
 
     }
 
@@ -332,7 +337,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Executes [GetRepositoryBranchesQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      *
@@ -372,7 +377,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Executes [GetProjectRepositoryQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
+     * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      * ### Implementation Example

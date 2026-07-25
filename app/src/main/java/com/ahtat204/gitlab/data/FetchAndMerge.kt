@@ -11,6 +11,7 @@ import com.apollographql.apollo.api.Query.Data
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.apolloStore
 import com.apollographql.cache.normalized.fetchPolicy
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -146,8 +147,7 @@ suspend fun <D : Data> Flow<ApolloResponse<GetProjectPipelinesQuery.Data>>.fetch
         val query = GetProjectPipelinesQuery(
             id, Optional.presentIfNotNull(cursor), Optional.presentIfNotNull(statusEnum)
         )
-        val cachedList =
-            client.query(query).fetchPolicy(FetchPolicy.CacheOnly).execute().data
+        val cachedList = client.query(query).fetchPolicy(FetchPolicy.CacheOnly).execute().data
         val project = cachedList?.project
         val pipelines = project?.pipelines
         val response = this.first()
@@ -170,17 +170,79 @@ suspend fun <D : Data> Flow<ApolloResponse<GetProjectPipelinesQuery.Data>>.fetch
                     client.apolloStore.publish(keys)
                 }
 
-            return flowOf(ApolloResponse.Builder(
+            return flowOf(
+                ApolloResponse.Builder(
+                    requestUuid = response.requestUuid,
+                    operation = response.operation,
+                ).data(newData).build()
+            )
+        } else return flowOf(
+            ApolloResponse.Builder(
                 requestUuid = response.requestUuid,
                 operation = response.operation,
-            ).data(newData).build())
-        } else return flowOf(ApolloResponse.Builder(
-            requestUuid = response.requestUuid,
-            operation = response.operation,
-        ).data(cachedList).build())
+            ).data(cachedList).build()
+        )
 
     } catch (e: Throwable) {
         throw e
+    }
+
+}
+
+suspend fun <D : Data> Flow<ApolloResponse<GetRepositoryCommitsQuery.Data>>.fetchAndMerge(
+    client: ApolloClient, branch: String, id: String, cursor: String? = null
+): Flow<ApolloResponse<GetRepositoryCommitsQuery.Data>> {
+    if (cursor == null) return this
+    val cache = client.apolloStore.dump().forEach { klass, map ->
+        map.forEach { (key, record) ->
+            Log.d(key.key, record.toString())
+        }
+    }
+    val query = GetRepositoryCommitsQuery(
+        projectPath = id, branch = branch
+    )
+    val cachedList = client.query(
+        query
+    ).fetchPolicy(FetchPolicy.CacheOnly).execute().data
+    val project = cachedList?.project
+    val repository = project?.repository
+    val commits = repository?.commits
+    val result = CompletableDeferred<ApolloResponse<GetRepositoryCommitsQuery.Data>?>(null)
+    this.collect { result.complete(it) }
+    val response=result.await()
+    if (response is ApolloResponse<GetRepositoryCommitsQuery.Data>) {
+        val newCommits = response.data?.project?.repository?.commits
+        val page = newCommits!!.pageInfo
+        val newNodes = newCommits.nodes
+        val cachedCommits = commits?.nodes?.toMutableList()
+        if (newNodes?.isNotEmpty() == true) {
+            val totalCommits = commits?.copy(nodes = cachedCommits, pageInfo = page)
+            val newData = GetRepositoryCommitsQuery.Data(
+                project?.copy(
+                    repository = repository?.copy(commits = totalCommits)
+                )
+            )
+            client.apolloStore.writeOperation(
+                operation = query, publish = true, data = newData
+            ).also { keys ->
+                client.apolloStore.publish(keys)
+            }
+
+            return flowOf(
+                ApolloResponse.Builder(
+                    requestUuid = response.requestUuid,
+                    operation = response.operation,
+                ).data(newData).build()
+            )
+        } else return flowOf(
+            ApolloResponse.Builder(
+                requestUuid = response.requestUuid,
+                operation = response.operation,
+            ).data(cachedList).build()
+        )
+    } else {
+        Log.e("com.ahtat204.gitlab.logger", "data is null")
+        return this
     }
 
 }

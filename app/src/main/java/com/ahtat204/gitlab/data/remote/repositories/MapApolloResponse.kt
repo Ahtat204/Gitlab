@@ -54,6 +54,7 @@ fun <D : Query.Data> Flow<ApolloResponse<D>>.mapAndHandleErrors(): Flow<D> {
         when (ex) {
             is IOException ->logger(message = ex.message)
             is ApolloException->logger(message = ex.message)
+            is NullPointerException->logger(message = ex.cause?.message)
             is CancellationException -> throw ex
             else -> logger(message = null)
         }
