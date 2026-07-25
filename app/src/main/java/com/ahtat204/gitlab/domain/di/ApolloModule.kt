@@ -68,7 +68,7 @@ object ApolloModule {
             .httpRequestComposer(requestComposer).build()
         return ApolloClient.Builder().networkTransport(networkTransport)
             .logCacheMisses({ Log.e("cacheMiss", it) })
-            .cache(normalizedCacheFactory = cacheFactory, writeToCacheAsynchronously = true)
+            .cache(normalizedCacheFactory = cacheFactory)
             .retryOnError { isConnected() }.failFastIfOffline(true).build()
     }
 }

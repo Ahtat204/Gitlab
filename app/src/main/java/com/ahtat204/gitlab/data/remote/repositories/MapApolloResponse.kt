@@ -5,6 +5,7 @@ import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.apollographql.apollo.api.ApolloResponse
 import com.apollographql.apollo.api.Operation
 import com.apollographql.apollo.api.Query
+import com.apollographql.apollo.exception.ApolloException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -52,6 +53,7 @@ fun <D : Query.Data> Flow<ApolloResponse<D>>.mapAndHandleErrors(): Flow<D> {
     }.catch { ex ->
         when (ex) {
             is IOException ->logger(message = ex.message)
+            is ApolloException->logger(message = ex.message)
             is CancellationException -> throw ex
             else -> logger(message = null)
         }

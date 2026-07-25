@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
+import com.ahtat204.gitlab.data.fetchAndMerge
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
 import com.ahtat204.gitlab.data.fetchAndMergePipelines
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
@@ -316,8 +317,7 @@ class ProjectRepositoryImpl @Inject constructor(
             )
         ).fetchPolicy(
             FetchPolicy.CacheFirst
-        ).watch().mapAndHandleErrors()
-            .fetchAndMergePipelines(client = apolloClient, project, cursor = cursor)
+        ).watch().fetchAndMerge<GetProjectPipelinesQuery.Data>(apolloClient,project, cursor = cursor,status).mapAndHandleErrors()
 
     }
 
