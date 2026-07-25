@@ -1,8 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import android.util.Log
-import com.ahtat204.gitlab.data.fetchAndMerge
-import com.ahtat204.gitlab.data.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.*
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
@@ -130,7 +129,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Executes [GetProjectDetailsQuery] with the provided project ID.
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [watch] to continuously observe changes.
+     * - Uses Apollo’s [com.apollographql.cache.normalized.watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      * ### Implementation Example
@@ -317,12 +316,8 @@ class ProjectRepositoryImpl @Inject constructor(
             )
         ).fetchPolicy(
             FetchPolicy.CacheFirst
-        ).watch().fetchAndMerge<GetProjectPipelinesQuery.Data>(
-            apolloClient,
-            project,
-            cursor = cursor,
-            status
-        ).mapAndHandleErrors()
+        ).watch().mapAndHandleErrors()
+            .fetchAndMergePipelines(client = apolloClient, project, cursor = cursor)
 
     }
 

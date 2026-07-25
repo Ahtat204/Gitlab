@@ -1,17 +1,13 @@
 package com.ahtat204.gitlab.data
 
-import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.api.ApolloResponse
 import com.apollographql.apollo.api.Optional
-import com.apollographql.apollo.api.Query.Data
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.apolloStore
 import com.apollographql.cache.normalized.fetchPolicy
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -30,6 +26,7 @@ import kotlinx.coroutines.flow.flowOf
  *
  * @author Lahcen AHTAT
  */
+
 /**
  * Merges a new page of repository commits into the existing cached list and updates the Apollo store.
  *
@@ -48,9 +45,8 @@ import kotlinx.coroutines.flow.flowOf
 suspend fun Flow<GetRepositoryCommitsQuery.Data>.fetchAndMergeCommits(
     client: ApolloClient, branch: String, id: String, cursor: String? = null
 ): Flow<GetRepositoryCommitsQuery.Data> {
+    if (cursor==null) return this
     try {
-        val cache = client.apolloStore.dump().toString()
-        Log.d("com.ahtat204.gitlab.logger", cache ?: "an error occurred")
         val query = GetRepositoryCommitsQuery(
             projectPath = id, branch = branch
         )
@@ -137,112 +133,4 @@ suspend fun Flow<GetProjectPipelinesQuery.Data>.fetchAndMergePipelines(
     } catch (e: Throwable) {
         throw e
     }
-}
-
-suspend fun <D : Data> Flow<ApolloResponse<GetProjectPipelinesQuery.Data>>.fetchAndMerge(
-    client: ApolloClient, id: String, cursor: String? = null, statusEnum: PipelineStatusEnum? = null
-): Flow<ApolloResponse<GetProjectPipelinesQuery.Data>> {
-    if (cursor == null) return this
-    try {
-        val query = GetProjectPipelinesQuery(
-            id, Optional.presentIfNotNull(cursor), Optional.presentIfNotNull(statusEnum)
-        )
-        val cachedList = client.query(query).fetchPolicy(FetchPolicy.CacheOnly).execute().data
-        val project = cachedList?.project
-        val pipelines = project?.pipelines
-        val response = this.first()
-        val cachedPipelines = cachedList?.project?.pipelines?.nodes?.toMutableList()
-        val newPage = response.data?.project?.pipelines
-        val newPipelines = newPage?.nodes
-        newPipelines?.forEach { node ->
-            cachedPipelines?.plusAssign(node)
-        }
-        if (newPipelines?.isNotEmpty() == true) {
-            val totalPipelines =
-                pipelines?.copy(nodes = cachedPipelines, pageInfo = newPage.pageInfo)
-            val newData = GetProjectPipelinesQuery.Data(
-                project = project?.copy(
-                    id = project.id, pipelines = totalPipelines
-                )
-            )
-            client.apolloStore.writeOperation(operation = query, publish = true, data = newData)
-                .also { keys ->
-                    client.apolloStore.publish(keys)
-                }
-
-            return flowOf(
-                ApolloResponse.Builder(
-                    requestUuid = response.requestUuid,
-                    operation = response.operation,
-                ).data(newData).build()
-            )
-        } else return flowOf(
-            ApolloResponse.Builder(
-                requestUuid = response.requestUuid,
-                operation = response.operation,
-            ).data(cachedList).build()
-        )
-
-    } catch (e: Throwable) {
-        throw e
-    }
-
-}
-
-suspend fun <D : Data> Flow<ApolloResponse<GetRepositoryCommitsQuery.Data>>.fetchAndMerge(
-    client: ApolloClient, branch: String, id: String, cursor: String? = null
-): Flow<ApolloResponse<GetRepositoryCommitsQuery.Data>> {
-    if (cursor == null) return this
-    val cache = client.apolloStore.dump().forEach { klass, map ->
-        map.forEach { (key, record) ->
-            Log.d(key.key, record.toString())
-        }
-    }
-    val query = GetRepositoryCommitsQuery(
-        projectPath = id, branch = branch
-    )
-    val cachedList = client.query(
-        query
-    ).fetchPolicy(FetchPolicy.CacheOnly).execute().data
-    val project = cachedList?.project
-    val repository = project?.repository
-    val commits = repository?.commits
-    val result = CompletableDeferred<ApolloResponse<GetRepositoryCommitsQuery.Data>?>(null)
-    this.collect { result.complete(it) }
-    val response=result.await()
-    if (response is ApolloResponse<GetRepositoryCommitsQuery.Data>) {
-        val newCommits = response.data?.project?.repository?.commits
-        val page = newCommits!!.pageInfo
-        val newNodes = newCommits.nodes
-        val cachedCommits = commits?.nodes?.toMutableList()
-        if (newNodes?.isNotEmpty() == true) {
-            val totalCommits = commits?.copy(nodes = cachedCommits, pageInfo = page)
-            val newData = GetRepositoryCommitsQuery.Data(
-                project?.copy(
-                    repository = repository?.copy(commits = totalCommits)
-                )
-            )
-            client.apolloStore.writeOperation(
-                operation = query, publish = true, data = newData
-            ).also { keys ->
-                client.apolloStore.publish(keys)
-            }
-
-            return flowOf(
-                ApolloResponse.Builder(
-                    requestUuid = response.requestUuid,
-                    operation = response.operation,
-                ).data(newData).build()
-            )
-        } else return flowOf(
-            ApolloResponse.Builder(
-                requestUuid = response.requestUuid,
-                operation = response.operation,
-            ).data(cachedList).build()
-        )
-    } else {
-        Log.e("com.ahtat204.gitlab.logger", "data is null")
-        return this
-    }
-
 }
