@@ -29,12 +29,15 @@ import javax.inject.Singleton
  *
  * ## Responsibilities
  * - Fetch all projects contributed by the authenticated user.
- * - Retrieve repository tree data for a specific project by ID.
- * - Handle errors gracefully with logging and structured concurrency.
+ * - Access detailed project metadata including star counts, fork counts, and descriptions.
+ * - Retrieve and monitor repository tree structures (files and directories).
+ * - Fetch paginated commit histories and branch lists for a project repository.
+ * - Stream project merge requests with support for pagination.
+ * - Handle errors gracefully with unified logging and structured concurrency.
  *
  * ## Dependencies
  * - [ApolloClient]: Executes GraphQL queries and manages caching.
- * - [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery],[GetProjectRepositoryQuery],[GetRepositoryCommitsQuery],[GetRepositoryBranchesQuery]: Auto‑generated query classes.
+ * - [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery], [GetProjectMergeRequestsQuery], [GetProjectRepositoryQuery], [GetRepositoryCommitsQuery], [GetRepositoryBranchesQuery]: Auto‑generated query classes.
  * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
  * @author Lahcen AHTAT
  */

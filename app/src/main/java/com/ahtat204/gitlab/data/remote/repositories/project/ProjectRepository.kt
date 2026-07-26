@@ -1,16 +1,11 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
-import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
-import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
-import com.apollographql.cache.normalized.FetchPolicy
-import com.apollographql.cache.normalized.fetchPolicy
-import com.apollographql.cache.normalized.watch
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -29,7 +24,6 @@ import kotlinx.coroutines.flow.Flow
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
-
     /**
      * Streams all projects that the currently authenticated user has contributed to.
      *
@@ -87,6 +81,7 @@ interface ProjectRepository {
     suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
+
     /**
      * Retrieves a paginated chunk of available Merged requests  within a project.
      *
@@ -95,5 +90,7 @@ interface ProjectRepository {
      * @return A reactive stream emitting the current window slice of matching branch records.
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
      */
-    suspend fun getProjectMergeRequests(id: String,cursor:String?=null):Flow<GetProjectMergeRequestsQuery.Data>
+    suspend fun getProjectMergeRequests(
+        id: String, cursor: String? = null
+    ): Flow<GetProjectMergeRequestsQuery.Data>
 }
