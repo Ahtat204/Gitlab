@@ -1,5 +1,7 @@
 package com.ahtat204.gitlab.presentation.screens.project
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,6 +31,7 @@ import com.ahtat204.gitlab.presentation.components.Pipeline
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.project.PipelinesViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Pipelines(
     project: String,
