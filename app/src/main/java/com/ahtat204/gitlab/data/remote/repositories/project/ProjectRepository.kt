@@ -95,7 +95,7 @@ interface ProjectRepository {
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
     suspend fun getProjectPipelines(
-        project: String, cursor: String? = null, status: PipelineStatusEnum? = null
+        project: String, cursor: String? = null, status: PipelineStatusEnum = PipelineStatusEnum.SUCCESS
     ): Flow<GetProjectPipelinesQuery.Data>
 
 }

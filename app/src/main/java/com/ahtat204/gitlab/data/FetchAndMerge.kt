@@ -10,7 +10,6 @@ import com.apollographql.cache.normalized.apolloStore
 import com.apollographql.cache.normalized.fetchPolicy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 
 /**
  * Utility functions for manually merging paginated GraphQL response data into the Apollo Normalized Cache.
@@ -26,7 +25,6 @@ import kotlinx.coroutines.flow.flowOf
  *
  * @author Lahcen AHTAT
  */
-
 /**
  * Merges a new page of repository commits into the existing cached list and updates the Apollo store.
  *
@@ -45,7 +43,7 @@ import kotlinx.coroutines.flow.flowOf
 suspend fun Flow<GetRepositoryCommitsQuery.Data>.fetchAndMergeCommits(
     client: ApolloClient, branch: String, id: String, cursor: String? = null
 ): Flow<GetRepositoryCommitsQuery.Data> {
-    if (cursor==null) return this
+    if (cursor == null) return this
     try {
         val query = GetRepositoryCommitsQuery(
             projectPath = id, branch = branch
@@ -63,20 +61,19 @@ suspend fun Flow<GetRepositoryCommitsQuery.Data>.fetchAndMergeCommits(
         newNodes?.forEach { node ->
             cachedCommits += node
         }
-        if (cachedCommits.isNotEmpty()) {
-            val totalCommits = commits.copy(nodes = cachedCommits, pageInfo = page)
-            val newData = GetRepositoryCommitsQuery.Data(
-                project.copy(
-                    repository = repository.copy(commits = totalCommits)
-                )
+        val totalCommits = commits.copy(nodes = cachedCommits, pageInfo = page)
+        val newData = GetRepositoryCommitsQuery.Data(
+            project.copy(
+                repository = repository.copy(commits = totalCommits)
             )
-            client.apolloStore.writeOperation(
-                operation = query, publish = true, data = newData
-            ).also { keys ->
-                client.apolloStore.publish(keys)
-            }
-            return flowOf(newData)
-        } else return flowOf(cachedList)
+        )
+        client.apolloStore.writeOperation(
+            operation = query, publish = true, data = newData
+        ).also { keys ->
+            client.apolloStore.publish(keys)
+        }
+        return this
+
     } catch (e: Exception) {
         throw e
     }
@@ -98,12 +95,12 @@ suspend fun Flow<GetRepositoryCommitsQuery.Data>.fetchAndMergeCommits(
  * @throws Throwable Propagates any errors encountered during the process.
  */
 suspend fun Flow<GetProjectPipelinesQuery.Data>.fetchAndMergePipelines(
-    client: ApolloClient, id: String, cursor: String? = null, statusEnum: PipelineStatusEnum? = null
+    client: ApolloClient, id: String, cursor: String? = null, statusEnum: PipelineStatusEnum = PipelineStatusEnum.SUCCESS
 ): Flow<GetProjectPipelinesQuery.Data> {
-    if (cursor == null) return this
+    if (cursor == null ) return this
     try {
         val query = GetProjectPipelinesQuery(
-            id, Optional.presentIfNotNull(cursor), Optional.presentIfNotNull(statusEnum)
+            id, status = Optional.presentIfNotNull(statusEnum)
         )
         val cachedList =
             client.query(query).fetchPolicy(FetchPolicy.CacheOnly).execute().dataAssertNoErrors
@@ -115,20 +112,17 @@ suspend fun Flow<GetProjectPipelinesQuery.Data>.fetchAndMergePipelines(
         newPipelines.forEach { node ->
             cachedPipelines += node
         }
-        if (cachedPipelines.isNotEmpty()) {
-            val totalPipelines =
-                pipelines.copy(nodes = cachedPipelines, pageInfo = newPage.pageInfo)
-            val newData = GetProjectPipelinesQuery.Data(
-                project = project.copy(
-                    id = project.id, pipelines = totalPipelines
-                )
+        val totalPipelines = pipelines.copy(nodes = cachedPipelines, pageInfo = newPage.pageInfo)
+        val newData = GetProjectPipelinesQuery.Data(
+            project = project.copy(
+                id = project.id, pipelines = totalPipelines
             )
-            client.apolloStore.writeOperation(operation = query, publish = true, data = newData)
-                .also { keys ->
-                    client.apolloStore.publish(keys)
-                }
-            return flowOf(newData)
-        } else return flowOf(cachedList)
+        )
+        client.apolloStore.writeOperation(operation = query, publish = true, data = newData)
+            .also { keys ->
+                client.apolloStore.publish(keys)
+            }
+        return this
 
     } catch (e: Throwable) {
         throw e

@@ -306,7 +306,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * ```
      */
     override suspend fun getProjectPipelines(
-        project: String, cursor: String?, status: PipelineStatusEnum?
+        project: String, cursor: String?, status: PipelineStatusEnum
     ): Flow<GetProjectPipelinesQuery.Data> {
         return apolloClient.query(
             GetProjectPipelinesQuery(
@@ -317,7 +317,7 @@ class ProjectRepositoryImpl @Inject constructor(
         ).fetchPolicy(
             FetchPolicy.CacheFirst
         ).watch().mapAndHandleErrors()
-            .fetchAndMergePipelines(client = apolloClient, project, cursor = cursor)
+            .fetchAndMergePipelines(client = apolloClient, project, cursor = cursor,statusEnum=status)
 
     }
 

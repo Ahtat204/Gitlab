@@ -37,7 +37,7 @@ fun Pipelines(
     pipelinesViewModel: PipelinesViewModel = hiltViewModel()
 ) {
     val listState = rememberLazyListState()
-    val status by remember { mutableStateOf<PipelineStatusEnum?>(PipelineStatusEnum.SUCCESS) }
+    val status by remember { mutableStateOf<PipelineStatusEnum>(PipelineStatusEnum.SUCCESS) }
     LaunchedEffect(status) {
         pipelinesViewModel.loadProjectPipelines(project, status)
     }
@@ -47,7 +47,7 @@ fun Pipelines(
             val totalItems = listState.layoutInfo.totalItemsCount
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
             // Trigger load when user is 3 items away from the bottom
-            totalItems > 9 && lastVisibleItem >= totalItems - 9
+            totalItems > 1 && lastVisibleItem >= totalItems - 1
         }
     }
     LaunchedEffect(shouldLoadMore.value) {

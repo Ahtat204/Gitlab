@@ -52,13 +52,25 @@ class PipelinesViewModel @Inject constructor(
      *
      * @param project The full path or unique identifier of the GitLab project.
      */
-    fun loadProjectPipelines(project: String, status: PipelineStatusEnum?) {
-        viewModelScope.launch {
-            projectRepository.getProjectPipelines(
-                project = project,
-                cursor = _pipelines.value?.pageInfo?.endCursor,
-                status = status
-            ).collect { _pipelines.value = it.project?.pipelines }
+    fun loadProjectPipelines(project: String, status: PipelineStatusEnum= PipelineStatusEnum.SUCCESS) {
+        val page = _pipelines.value?.pageInfo
+        val cursor = page?.endCursor
+        val hasNextPage = page?.hasNextPage
+        val hasPreviousPage = page?.hasPreviousPage
+        if (_pipelines.value == null) { //first page
+            viewModelScope.launch {
+                projectRepository.getProjectPipelines(
+                    project = project, cursor = null, status = status
+                ).collect { _pipelines.value = it.project?.pipelines }
+            }
+        } else {
+            if (hasNextPage == true) {
+                viewModelScope.launch {
+                    projectRepository.getProjectPipelines(
+                        project = project, cursor = cursor, status = status
+                    ).collect { _pipelines.value = it.project?.pipelines }
+                }
+            }
         }
 
     }
