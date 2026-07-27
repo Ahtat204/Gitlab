@@ -29,7 +29,7 @@ import androidx.navigation.NavController
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.presentation.components.Pipeline
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.viewmodels.project.PipelinesViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.ci.PipelinesViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

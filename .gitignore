@@ -34,3 +34,9 @@ firstcommits.json
 app/src/main/graphql/com/ahtat204/graphql.config.yml
 git.csv
 launch.sh
+bulkpush.sh
+check.sh
+clean.sh
+cleanup.sh
+launch.sh
+reflog.sh

@@ -1,0 +1,11 @@
+query GetPipelineJob($project:ID!,$id:JobID!){
+    project(fullPath: $project){
+        id
+        job(id: $id){
+            id
+            duration
+            createdAt
+            name
+        }
+    }
+}

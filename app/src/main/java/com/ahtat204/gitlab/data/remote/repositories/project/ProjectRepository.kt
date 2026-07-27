@@ -1,7 +1,9 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetPipelineJobQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectPipelineQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -21,7 +23,9 @@ import kotlinx.coroutines.flow.Flow
  * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
  * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
  * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
- * - [getProjectPipelines]: Retrieves and streams first 20 pipeline in a Gitlab Project.
+ * - [getProjectPipelines]: Retrieves and streams the CI/CD pipelines for a given project.
+ * - [getProjectPipeline]: Retrieves and streams details for a specific pipeline, including its jobs.
+ * - [getPipelineJob]: Retrieves and streams details for a specific CI job.
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
@@ -84,18 +88,47 @@ interface ProjectRepository {
     ): Flow<GetRepositoryCommitsQuery.Data?>
 
     /**
-     * Streams a continuous, sequentially chunked record of repository commit histories.
+     * Streams a continuous, sequentially chunked record of project CI/CD pipelines.
      *
      * Implementations are expected to manage incremental page updates and item appending states.
      *
      * @param project The unique identifier or full path of the target GitLab project.
-     * @param status The status [PipelineStatusEnum] of the pipelines to fetch
      * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
-     * @return A reactive stream emitting the combined commit log historical records, or null if missing.
+     * @param status The status [PipelineStatusEnum] filter for the pipelines. Defaults to [PipelineStatusEnum.SUCCESS].
+     * @return A reactive stream emitting the filtered pipeline collection metadata.
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
     suspend fun getProjectPipelines(
-        project: String, cursor: String? = null, status: PipelineStatusEnum = PipelineStatusEnum.SUCCESS
+        project: String,
+        cursor: String? = null,
+        status: PipelineStatusEnum = PipelineStatusEnum.SUCCESS
     ): Flow<GetProjectPipelinesQuery.Data>
+
+    /**
+     * Retrieves and monitors detailed information for a specific CI/CD pipeline.
+     *
+     * This includes pipeline status, duration, and a paginated list of associated jobs.
+     *
+     * @param project The unique identifier or full path of the target GitLab project.
+     * @param pipeline The unique identifier (GID) of the target pipeline.
+     * @param cursor The pagination pointer for the pipeline's jobs list. Pass null for the first page.
+     * @return A reactive stream emitting the pipeline detail dataset.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     */
+    suspend fun getProjectPipeline(
+        project: String, pipeline: String, cursor: String? = null
+    ): Flow<GetProjectPipelineQuery.Data>
+
+    /**
+     * Retrieves and monitors detailed information for a specific CI job.
+     *
+     * Includes job status, duration, and metadata.
+     *
+     * @param project The unique identifier or full path of the target GitLab project.
+     * @param job The unique identifier (GID) of the target job.
+     * @return A reactive stream emitting the job detail dataset.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     */
+    suspend fun getPipelineJob(project: String, job: String): Flow<GetPipelineJobQuery.Data>
 
 }
