@@ -1,6 +1,5 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
-import android.util.Log
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
@@ -82,8 +81,9 @@ interface ProjectRepository {
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
 
-
     suspend fun getUserProjectsByName(
         userName: String
     ): Flow<GetUserProjectsByNameQuery.Data?>
+
+    suspend fun searchProjectsByName(projectName: String): Flow<GetUserProjectsByNameQuery.Data>
 }

@@ -1,0 +1,17 @@
+query SearchByProjectName($name:String!){
+    projects(search: $name){
+        pageInfo {
+            hasNextPage
+            startCursor
+            endCursor
+        }
+        edges {
+            cursor
+            node {
+                name
+                id
+                description
+            }
+        }
+    }
+}

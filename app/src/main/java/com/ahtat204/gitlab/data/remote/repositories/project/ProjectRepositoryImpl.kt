@@ -152,6 +152,11 @@ class ProjectRepositoryImpl @Inject constructor(
             .watch().mapAndHandleErrors()
     }
 
+    override suspend fun searchProjectsByName(projectName: String): Flow<GetUserProjectsByNameQuery.Data> {
+        return apolloClient.query(GetUserProjectsByNameQuery(projectName))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
     /**
      * Retrieves a paginated list of first 20 commits a given project repository .
      *
@@ -315,6 +320,7 @@ class ProjectRepositoryImpl @Inject constructor(
             )
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
+
     override suspend fun getUserProjectsByName(
         userName: String
     ): Flow<GetUserProjectsByNameQuery.Data?> {
