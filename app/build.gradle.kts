@@ -119,6 +119,7 @@ dependencies {
     testImplementation(libs.apollo.testing.support)
     testImplementation(libs.mockwebserver)
     androidTestImplementation(libs.mockwebserver)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 configurations.all {
     resolutionStrategy {

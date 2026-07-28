@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.flowOf
 suspend fun Flow<GetRepositoryCommitsQuery.Data>.fetchAndMergeCommits(
     client: ApolloClient, branch: String, id: String, cursor: String? = null
 ): Flow<GetRepositoryCommitsQuery.Data> {
+    if (cursor == null) return this
     try {
         val query = GetRepositoryCommitsQuery(
             projectPath = id, branch = branch
@@ -44,7 +45,7 @@ suspend fun Flow<GetRepositoryCommitsQuery.Data>.fetchAndMergeCommits(
             return flowOf(newData)
         } else return flowOf(cachedList)
     } catch (e: Exception) {
-    throw e
+        throw e
     }
 
 }
