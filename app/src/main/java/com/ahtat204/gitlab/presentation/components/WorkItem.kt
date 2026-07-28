@@ -29,6 +29,7 @@ import kotlinx.serialization.Serializable
  * @property route The navigation route associated with this item.
  * @property Id The resource ID of the icon representing this item.
  * @property count An optional count value associated with the item (e.g., number of tasks).
+ * @author Lahcen AHTAT
  */
 @Serializable
 data class Item(val name: String, val route: String, val Id: Int,val count:Int?=null)

@@ -53,6 +53,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.titleFont
  * - Navigation routes should be defined in the app’s navigation graph to match
  *   the `item.route` values.
  * - The [WorkItem] composable is responsible for rendering individual items.
+ * @author Lahcen AHTAT
  */
 @Composable
 fun MyWorkItems(navController: NavController) {

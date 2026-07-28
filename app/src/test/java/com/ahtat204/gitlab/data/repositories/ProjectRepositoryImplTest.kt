@@ -1,7 +1,7 @@
 package com.ahtat204.gitlab.data.repositories
 
-import com.ahtat204.gitlab.data.repositories.project.ProjectRepository
-import com.ahtat204.gitlab.data.repositories.project.ProjectRepositoryImpl
+import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepositoryImpl
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.mockserver.MockServer
 import kotlinx.coroutines.runBlocking

@@ -45,6 +45,7 @@ import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
  * - Extend this composable to handle additional statuses (Pending, Running, etc.)
  *   by adding corresponding icons and colors.
  * - The `contentDescription` is set to `null` since icons are purely decorative.
+ * @author Lahcen AHTAT
  */
 @Composable
 fun PipeLineStatusIcon(status: PipelineStatusEnum) {

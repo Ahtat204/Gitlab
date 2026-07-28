@@ -1,13 +1,17 @@
 package com.ahtat204.gitlab.domain.di
 
+import android.util.Log
+import com.ahtat204.gitlab.data.queries.cache.Cache.cache
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig.GRAPHQL_URL
-import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.isConnected
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
-import com.apollographql.apollo.cache.normalized.normalizedCache
+import com.apollographql.apollo.annotations.ApolloExperimental
+import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
 import com.apollographql.apollo.network.http.DefaultHttpEngine
 import com.apollographql.apollo.network.http.HttpNetworkTransport
+import com.apollographql.cache.normalized.logCacheMisses
+import com.apollographql.cache.normalized.memory.MemoryCacheFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,6 +43,7 @@ import javax.inject.Singleton
  *
  * val projects = apolloClient.query(GetMyProjectsQuery()).execute()
  * ```
+ * @author Lahcen AHTAT
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -53,6 +58,7 @@ object ApolloModule {
      * @return A fully configured Apollo client with authentication, logging,
      *         and normalized caching enabled.
      */
+    @OptIn(ApolloExperimental::class)
     @Singleton
     @Provides
     fun getApolloService(okHttpClient: OkHttpClient): ApolloClient {
@@ -60,8 +66,9 @@ object ApolloModule {
         val requestComposer = DefaultHttpRequestComposer(GRAPHQL_URL)
         val networkTransport = HttpNetworkTransport.Builder().httpEngine(httpEngine)
             .httpRequestComposer(requestComposer).build()
-        return ApolloClient.Builder().networkTransport(networkTransport).normalizedCache(
-                cacheFactory, writeToCacheAsynchronously = false
-            ).build()
+        return ApolloClient.Builder().networkTransport(networkTransport)
+            .logCacheMisses({ Log.e("cacheMiss", it) })
+            .cache(normalizedCacheFactory = cacheFactory, writeToCacheAsynchronously = true)
+            .retryOnError { isConnected() }.failFastIfOffline(true).build()
     }
 }

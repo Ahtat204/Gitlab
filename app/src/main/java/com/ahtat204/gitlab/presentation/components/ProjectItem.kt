@@ -37,7 +37,7 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
+import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.presentation.ui.theme.Background
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
@@ -56,9 +56,9 @@ import java.nio.charset.StandardCharsets
  * - Primary language with color indicator
  *
  * ## Parameters
- * @param data The [GetMyProjectsPaginatedQuery.CurrentUser] object containing user metadata
+ * @param data The [com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery.CurrentUser] object containing user metadata
  *             (used to load avatar image if available).
- * @param project The [GetMyProjectsPaginatedQuery.Project] object representing the project
+ * @param project The [com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery.Project] object representing the project
  *                whose details will be displayed.
  * @param imageLoader The [ImageLoader] instance used by Coil to load images asynchronously.
  *
@@ -83,11 +83,12 @@ import java.nio.charset.StandardCharsets
  * - Uses Coil’s [AsyncImage] for image loading with memory and disk caching.
  * - Applies custom font family and colors for consistent styling.
  * - Topics and languages are optional and only shown if available.
+ * @author Lahcen AHTAT
  */
 @Composable
 fun ProjectItem(
-    data: GetMyProjectsPaginatedQuery.CurrentUser?,
-    project: GetMyProjectsPaginatedQuery.Project,
+    data: GetMyPersonalProjectsQuery.CurrentUser?,
+    project: GetMyPersonalProjectsQuery.Node,
     imageLoader: ImageLoader,
     navController: NavHostController
 ) {
@@ -137,7 +138,14 @@ fun ProjectItem(
                     .fillMaxHeight()
                     .background(Background)
             ) {
-                project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+                val pipelines=project.pipelines?.nodes
+                pipelines?.let {pips->
+                    if(pips.isNotEmpty()){
+                        pips[0]?.status?.let { PipeLineStatusIcon(it) }
+                    }
+
+                }
+
 
             //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
 

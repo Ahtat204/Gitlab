@@ -10,12 +10,15 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.isConnected
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
+import okio.IOException
 
 /**
  * LauncherActivity is the entry point of the application.
@@ -48,6 +51,7 @@ import net.openid.appauth.AuthorizationService
  * ## Usage
  * This activity is automatically launched at app startup. It should not be
  * started manually from other parts of the app.
+ * @author Lahcen AHTAT
  */
 @AndroidEntryPoint
 class LauncherActivity : ComponentActivity() {
@@ -60,29 +64,25 @@ class LauncherActivity : ComponentActivity() {
         authenticationService = AuthorizationService(this)
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
-        CoroutineScope(Dispatchers.IO).launch {
-            val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
-            if (storedState.isAuthorized) {
-                storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
-                    if (token != null && ex == null) {
-                        Tokens.accessToken = token
-                        Tokens.CurrentAuthState = storedState
-                        lifecycleScope.launch {
-                            AuthStorage.getAuthState(this@LauncherActivity)
-                                .updateData { storedState }
-                            isReady = true
-                            navigateTo(MainActivity::class.java)
-                        }
-                    }
-                    if (ex != null) {
-                        navigateTo(AuthenticationActivity::class.java)
-                        throw ex
-                    }
-                }
+        lifecycleScope.launch(Dispatchers.IO) {
+        val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
+
+        if (!storedState.isAuthorized) {
+            isReady = true
+            navigateTo(AuthenticationActivity::class.java)
+        } else {
+            // Even if offline, we load the cached state so tokens are ready
+            if (isConnected()) {
+                refresh { isReady = true }
             } else {
-                navigateTo(AuthenticationActivity::class.java)
+                // If offline, just load from cache and proceed
+                Tokens.CurrentAuthState = storedState
+                Tokens.accessToken = storedState.accessToken
+                isReady = true
+                navigateTo(MainActivity::class.java)
             }
         }
+    }
     }
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
@@ -98,4 +98,31 @@ class LauncherActivity : ComponentActivity() {
         authenticationService.dispose()
         super.onDestroy()
     }
+
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    private suspend fun refresh(isReady: () -> Unit) {
+        val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
+        if (storedState.isAuthorized) {
+            storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
+                if (token != null && ex == null) {
+                    Tokens.accessToken = token
+                    Tokens.CurrentAuthState = storedState
+                    lifecycleScope.launch {
+                        AuthStorage.getAuthState(this@LauncherActivity).updateData { storedState }
+                        isReady()
+                        navigateTo(MainActivity::class.java)
+                    }
+                }
+                if (ex != null) {
+                    logger(ex.message)
+                    navigateTo(AuthenticationActivity::class.java)
+                    throw ex
+                }
+            }
+        } else {
+            navigateTo(AuthenticationActivity::class.java)
+
+        }
+    }
+
 }

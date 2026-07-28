@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.StrokeCap
  * The point is drawn with:
  * - A fixed stroke width of 26f to control its size.
  * - A [StrokeCap.Round] to ensure the point appears circular.
+ * @author Lahcen AHTAT
  */
 @Composable
 fun Language(color: Int) {

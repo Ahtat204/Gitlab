@@ -35,6 +35,7 @@ import javax.crypto.spec.IvParameterSpec
  * val decrypted = CryptoUtility.decrypt(encrypted)
  * val original = decrypted.decodeToString()
  * ```
+ * @author Lahcen AHTAT
  */
 object CryptoUtility {
     private const val KEY_ALIAS = "secret"
