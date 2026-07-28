@@ -31,15 +31,23 @@ open class Responses {
         {"data":{
           "currentUser": {
             "__typename": "User",
+            "id": "gid://gitlab/User/1",
             "avatarUrl": "https://gitlab.com/uploads/-/system/user/avatar/123/avatar.png",
-            "projectMemberships": {
-              "__typename": "ProjectMemberships",
-              "nodes": [
-                {
-                  "__typename": "ProjectMember",
-                  "id": "gid://gitlab/ProjectMember/1",
-                  "project": {
+            "namespace": {
+              "__typename": "Namespace",
+              "projects": {
+                "__typename": "ProjectConnection",
+                "pageInfo": {
+                  "__typename": "PageInfo",
+                  "hasNextPage": false,
+                  "endCursor": "eyJpZCI6IjEiLCJfY291bnQiOjF9",
+                  "startCursor": "abc",
+                  "hasPreviousPage": false
+                },
+                "nodes": [
+                  {
                     "__typename": "Project",
+                    "id": "gid://gitlab/Project/1",
                     "topics": ["kotlin", "graphql", "android"],
                     "lastActivityAt": "2026-06-20T10:00:00Z",
                     "languages": [
@@ -64,12 +72,7 @@ open class Responses {
                       ]
                     }
                   }
-                }
-              ],
-              "pageInfo": {
-                "__typename": "PageInfo",
-                "hasNextPage": false,
-                "endCursor": "eyJpZCI6IjEiLCJfY291bnQiOjF9"
+                ]
               }
             }
           }
