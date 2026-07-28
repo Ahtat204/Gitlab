@@ -4,6 +4,7 @@ import com.ahtat204.gitlab.data.fetchAndMergeCommits
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
+import com.ahtat204.gitlab.data.queries.GetRepositoryBlobQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
@@ -20,21 +21,22 @@ import javax.inject.Singleton
 /**
  * Implementation of [ProjectRepository] that integrates with GitLab via Apollo GraphQL.
  *
- * ## Overview
- * - Provides reactive streams of project data using Kotlin [Flow].
- * - Uses Apollo’s normalized caching with configurable [FetchPolicy].
- * - Annotated with `@Inject` for dependency injection, ensuring a singleton lifecycle.
- * - Annotated with [Singleton] to avoid creating a new Repository everytime the ViewModel is created since this Dependency is just for fetching data , doesn't have a state to hold
+ * ## Architecture & Data Strategy
+ * This implementation serves as the **Single Source of Truth (SSOT)** for project-related data.
+ * It sits between the domain layer (Use Cases/ViewModels) and GitLab's GraphQL API, providing 
+ * reactive, cache-backed data streams that automatically update the UI when underlying data changes.
  *
- * ## Responsibilities
- * - Fetch all projects contributed by the authenticated user.
- * - Retrieve repository tree data for a specific project by ID.
- * - Handle errors gracefully with logging and structured concurrency.
+ * ### Key Technologies
+ * - **Apollo GraphQL**: Leveraged for structured data fetching and normalized caching.
+ * - **Kotlin Coroutines Flow**: Provides asynchronous, cold streams for reactive data observation.
+ * - **Normalized Cache**: Enables "Single Source of Truth" behavior across the entire application.
  *
- * ## Dependencies
- * - [ApolloClient]: Executes GraphQL queries and manages caching.
- * - [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery],[GetProjectRepositoryQuery],[GetRepositoryCommitsQuery],[GetRepositoryBranchesQuery]: Auto‑generated query classes.
- * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
+ * ### Caching Policy
+ * Most methods utilize [FetchPolicy.CacheFirst]. This ensures the UI remains responsive by 
+ * emitting cached data immediately, while Apollo handles the network request in the background 
+ * to refresh the cache and trigger subsequent emissions if data has changed.
+ *
+ * @param apolloClient The configured Apollo client used for executing GraphQL operations.
  * @author Lahcen AHTAT
  */
 @Singleton
@@ -42,33 +44,30 @@ class ProjectRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient
 ) : ProjectRepository {
     /**
-     * Streams all projects the authenticated user has contributed to.
-     * @return A [Flow] emitting [GetMyPersonalProjectsQuery.Data] objects.
+     * **Project Landscape Discovery**: Streams all projects where the authenticated user is a member.
+     *
+     * This is the primary entry point for the dashboard. It retrieves a comprehensive view of the 
+     * user's project landscape, including topics, visibility levels, and recent activity timestamps.
      *
      * ### Behavior
-     * - Executes [GetMyPersonalProjectsQuery] with the provided fetch policy.
-     * - Uses Apollo’s [watch] to continuously observe changes.
-     * - Filters out null results with `mapNotNull`.
-     * - Logs exceptions with [android.util.Log.e] while keeping the stream alive.
-     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Usage example in ViewModel
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getAllProjects(FetchPolicy.CacheFirst)
-     *         .collect { projects -> renderProjects(projects) }
-     * }
-     * ```
-     * Query Example:
-     * ```
+     * - Uses [FetchPolicy.CacheFirst] to show cached data immediately while fetching updates.
+     * - Continuously [watch]es the cache for updates (e.g., from other queries or manual cache writes).
+     * - Filters out null results and handles exceptions via `mapAndHandleErrors`.
+     * ``` Graphql
+     * query GetMyPersonalProjects($cursor: String){
      *     currentUser {
+     *         id
      *         avatarUrl
-     *         projectMemberships(first: 10) {
-     *             __typename
-     *             nodes {
-     *                 __typename
-     *                 id
-     *                 project {
+     *         namespace {
+     *             projects(first: 20,after: $cursor,sort: ACTIVITY_DESC){
      *
+     *                pageInfo {
+     *                    startCursor
+     *                    hasNextPage
+     *                    hasPreviousPage
+     *                }
+     *                 nodes {
+     *                     id
      *                     topics
      *                     lastActivityAt
      *                     __typename
@@ -89,11 +88,6 @@ class ProjectRepositoryImpl @Inject constructor(
      *                     }
      *                 }
      *             }
-     *             pageInfo {
-     *                 __typename
-     *                 hasNextPage
-     *                 endCursor
-     *             }
      *         }
      *     }
      * }
@@ -105,29 +99,16 @@ class ProjectRepositoryImpl @Inject constructor(
             .mapAndHandleErrors()
 
     /**
-     * Retrieves a project overview  for a given project.(full description , star count, fork count )
+     * **Project Intelligence**: Provides deep-dive metadata and analytics for a specific GitLab project.
      *
-     * @param id The unique identifier of the project.
-     * @return A [Flow] emitting [GetProjectDetailsQuery.Data] objects, or null if unavailable.
+     * Beyond basic naming, this retrieves quantitative data like star counts, fork counts, 
+     * and detailed issue metrics, enabling rich project overview screens.
      *
-     * ### Behavior
-     * - Executes [GetProjectDetailsQuery] with the provided project ID.
-     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
-     * - Emits results reactively via Flow.
-     * - Uses Apollo’s [watch] to continuously observe changes.
-     * - Logs errors without terminating the stream.
-     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Usage Example in ViewModel
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectById("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
-     * Query Example
-     * ``` GraphQL
-     *  project(fullPath: $projectPath) {
-     *
+     * @param id The unique identifier (GID) or full path of the GitLab project.
+     * @return A reactive stream of project metadata, or null if inaccessible.
+     * ``` Graphql
+     * query GetProjectDetails($projectPath: ID!) {
+     *     project(fullPath: $projectPath) {
      *         __typename
      *         pipelineCounts{
      *             pending
@@ -144,7 +125,9 @@ class ProjectRepositoryImpl @Inject constructor(
      *         id
      *         name
      *         description
-     *         }
+     *     }
+     * }
+     * ```
      */
     override suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?> {
         return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
@@ -152,42 +135,70 @@ class ProjectRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Retrieves a paginated list of first 20 commits a given project repository .
+     * **Source Code Access**: Fetches the raw content and metadata of individual repository files.
      *
-     * @param id The unique identifier of the project.
-     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
-     * @return A [Flow] emitting [GetRepositoryCommitsQuery.Data] objects, or null if unavailable.
+     * Designed for source code inspection, this method retrieves the actual content of "blobs" 
+     * (Binary Large Objects) along with metadata like web URLs and repository paths.
      *
-     * ### Behavior
-     * - Executes [GetRepositoryCommitsQuery] with the provided project ID.
-     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
-     * - Emits results reactively via Flow.
-     * - Uses Apollo’s [watch] to continuously observe changes.
-     * - Logs errors without terminating the stream.
-     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectCommits("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * @param project The project full path or GID.
+     * @param branch The target git branch (e.g., "main").
+     * @param path The relative path to the file within the repository.
+     * @return A [Flow] emitting the file metadata and raw content.
+     * ```
+     * query GetRepositoryBlob($project:ID!,$branch:String,$path:[String!]!){
+     *     project(fullPath:$project ){
+     *         repository {
+     *             blobs(first: 20,ref: $branch,paths:$path  ){
+     *                 edges {
+     *                     cursor
+     *                     node {
+     *                         rawBlob
+     *                         rawTextBlob
+     *                     }
+     *                 }
+     *             }
+     *         }
+     *     }
      * }
      * ```
-     * query example
-     * ``` GraphQL
-     *    project(fullPath: $projectPath){
+     */
+    override suspend fun getRepositoryBlob(
+        project: String, branch: String, path: String
+    ): Flow<GetRepositoryBlobQuery.Data> {
+        return apolloClient.query(
+            GetRepositoryBlobQuery(
+                project, Optional.presentIfNotNull(branch), listOf(path)
+            )
+        ).fetchPolicy(
+            FetchPolicy.CacheFirst
+        ).watch().mapAndHandleErrors()
+    }
+
+    /**
+     * **Audit Trail & Evolution**: Streams a sequentially merged log of repository commit activity.
+     *
+     * Utilizes specialized [fetchAndMergeCommits] logic to manually manage pagination. 
+     * New pages are appended to the existing cached list rather than replacing it, 
+     * ensuring smooth infinite scrolling and data persistence in the UI.
+     *
+     * @param id The project identifier or full path.
+     * @param branch The targeted branch name.
+     * @param cursor Optional pagination pointer (GitLab's `endCursor`).
+     * @return A [Flow] emitting the combined, deduplicated commit history.
+     * ``````
+     * query GetRepositoryCommits($projectPath: ID!,$cursor:String,$branch:String!){
+     *     project(fullPath: $projectPath){
      *         __typename
      *         repository {
      *             __typename
      *             branchNames(searchPattern: "*", offset: 0, limit: 100)
-     *             commits(ref:"main",first: 20,after: $cursor) {
+     *             commits(ref:$branch,first: 20,after: $cursor) {
      *                 __typename
      *                 nodes {
      *                     __typename
      *                     id
      *                     sha
      *                     name
-     *                     message
      *                     authorName
      *                     committedDate
      *                     signature {
@@ -208,7 +219,9 @@ class ProjectRepositoryImpl @Inject constructor(
      *         }
      *
      *     }
-     * ```
+     *
+     * }
+     * ```````
      */
     override suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
@@ -222,36 +235,24 @@ class ProjectRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Retrieves the repository tree for a given project.
+     * **Reference Explorer**: Lists the available development branches for repository navigation.
      *
-     * @param project The unique identifier of the project.
-     * @param skip: a pseudo-pagination key to determine how many branches you want to skip before fetching
-     * @return A [Flow] emitting [GetRepositoryBranchesQuery.Data] objects, or null if unavailable.
+     * Provides a paginated list of git branches. This is the backend provider for branch 
+     * switchers and repository browsers, allowing users to toggle between different versions of code.
      *
-     * ### Behavior
-     * - Executes [GetRepositoryBranchesQuery] with the provided project ID.
-     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
-     * - Emits results reactively via Flow.
-     * - Uses Apollo’s [watch] to continuously observe changes.
-     * - Logs errors without terminating the stream.
-     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getRepositoryBranches("12345",20)
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
-     * query example
-     * ``` GraphQL
-     *    project(fullPath: $projectPath){
+     * @param project The project identifier or full path.
+     * @param skip Pseudo-pagination offset for branch navigation.
+     * @return A [Flow] emitting the branch registry for the repository.
+     *````
+     * query GetRepositoryBranches($projectPath:ID!,$skip:Int!){
+     *     project(fullPath: $projectPath){
      *         id
      *         repository{
      *             branchNames(searchPattern: "*",limit: 20,offset:$skip)
      *         }
      *     }
-     * ```
+     * }
+     * ````
      */
     override suspend fun getRepositoryBranches(
         project: String, skip: Int
@@ -261,46 +262,67 @@ class ProjectRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Retrieves the repository tree for a given project.
+     * **FileSystem Navigator**: Streams the structural tree of files and directories.
      *
-     * @param id The unique identifier of the project.
-     * @return A [Flow] emitting [GetProjectDetailsQuery.Data] objects, or null if unavailable.
+     * Provides the backbone for the repository file explorer. It reactively streams 
+     * directory content for any given path, enabling seamless navigation through 
+     * the project's source hierarchy.
      *
-     * ### Behavior
-     * - Executes [GetProjectRepositoryQuery] with the provided project ID.
-     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
-     * - Emits results reactively via Flow.
-     * - Uses Apollo’s [watch] to continuously observe changes.
-     * - Logs errors without terminating the stream.
-     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectRepository("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
+     * @param id The project identifier or full path.
+     * @param branch Optional branch name (defaults to repository root).
+     * @param path Optional relative path to a sub-directory.
+     * @return A [Flow] emitting the current directory's children (blobs/trees).
      * ```
-     * query example
-     * ``` GraphQL
+     * query GetProjectRepository($projectPath:ID!,$branch:String,$path:String){
      *     project(fullPath: $projectPath){
      *         id
+     *         name
      *         repository {
-     *             branchNames(searchPattern: "*",limit: 20,offset: $skip)
      *             rootRef
-     *         tree(ref: $branch){
-     *             blobs{
-     *                 nodes {
+     *
+     *             tree(ref: $branch,path:$path){
+     *                 __typename
+     *                 lastCommit(ref: $branch){
+     *                     message
      *                     id
-     *                     name
-     *                     webUrl
-     *                     path
+     *                     committedDate
+     *                     author {
+     *                         name
+     *                     }
      *                 }
+     *                 trees{
+     *                     __typename
      *
+     *                     nodes {
+     *                         id
+     *                         name
+     *                         path
+     *
+     *                     }
+     *                     pageInfo {
+     *                         startCursor
+     *                     }
+     *                     edges {
+     *                         cursor
+     *                     }
+     *                 }
+     *                 blobs{
+     *                     nodes {
+     *                         id
+     *                         name
+     *                         path
+     *                     }
+     *                     pageInfo {
+     *                         startCursor
+     *                     }
+     *                     edges {
+     *                         cursor
+     *                     }
+     *                 }
      *             }
-     *
-     *         }
      *         }
      *     }
+     * }
      * ```
      */
     override suspend fun getProjectRepository(

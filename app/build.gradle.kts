@@ -58,7 +58,6 @@ android {
         buildConfig = true
         compose = true
     }
-
 }
 
 apollo {
@@ -108,6 +107,8 @@ dependencies {
     implementation(libs.androidx.material.icons.core)
     implementation(libs.apollo.normalized.cache)
     implementation(libs.apollo.http.cache)
+    implementation(libs.multiplatform.markdown.renderer)
+    implementation(libs.multiplatform.markdown.renderer.m3)
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

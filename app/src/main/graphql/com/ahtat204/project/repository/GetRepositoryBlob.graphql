@@ -1,10 +1,13 @@
-query GetRepositoryBlob{
-    project(fullPath: ""){
+query GetRepositoryBlob($project:ID!,$branch:String,$path:[String!]!){
+    project(fullPath:$project ){
         repository {
-            blobs(ref: "",paths: ".gitignore"){
-                nodes {
-                    rawTextBlob
-                    rawBlob
+            blobs(first: 20,ref: $branch,paths:$path  ){
+                edges {
+                    cursor
+                    node {
+                        rawBlob
+                        rawTextBlob
+                    }
                 }
             }
         }
