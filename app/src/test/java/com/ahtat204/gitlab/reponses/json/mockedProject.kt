@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.reponses
+package com.ahtat204.gitlab.reponses.json
 
 val mockedProject = """
           {"data":

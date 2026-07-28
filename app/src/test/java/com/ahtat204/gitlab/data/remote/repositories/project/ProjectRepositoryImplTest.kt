@@ -1,12 +1,12 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import com.ahtat204.gitlab.data.queries.cache.Cache.cache
-import com.ahtat204.gitlab.reponses.assertNotNullAndEquals
-import com.ahtat204.gitlab.reponses.mockedBranches
-import com.ahtat204.gitlab.reponses.mockedCommits
-import com.ahtat204.gitlab.reponses.mockedProject
-import com.ahtat204.gitlab.reponses.mockedProjects
-import com.ahtat204.gitlab.reponses.mockedRepository
+import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
+import com.ahtat204.gitlab.reponses.json.mockedBranches
+import com.ahtat204.gitlab.reponses.json.mockedCommits
+import com.ahtat204.gitlab.reponses.json.mockedProject
+import com.ahtat204.gitlab.reponses.json.mockedProjects
+import com.ahtat204.gitlab.reponses.json.mockedRepository
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.cache.normalized.memory.MemoryCacheFactory
 import kotlinx.coroutines.flow.first
