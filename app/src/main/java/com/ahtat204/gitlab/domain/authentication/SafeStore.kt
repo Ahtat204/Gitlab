@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.domain.usecase.authentication
+package com.ahtat204.gitlab.domain.authentication
 
 import android.content.Context
 import androidx.datastore.core.DataStore

@@ -1,9 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories
 
-import android.media.VolumeShaper
-import com.ahtat204.gitlab.domain.usecase.logging.logger
+import com.ahtat204.gitlab.domain.logging.logger
 import com.apollographql.apollo.api.ApolloResponse
-import com.apollographql.apollo.api.Operation
 import com.apollographql.apollo.api.Query
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -42,7 +40,6 @@ import okio.IOException
  *                   excluding [CancellationException] which is re-thrown to honor coroutine lifecycle.
  * @author Lahcen AHTAT
  */
-
 fun <D : Query.Data> Flow<ApolloResponse<D>>.mapAndHandleErrors(): Flow<D> {
     return this.map { response ->
         response.exception?.cause?.let {
@@ -51,7 +48,7 @@ fun <D : Query.Data> Flow<ApolloResponse<D>>.mapAndHandleErrors(): Flow<D> {
         response.data
     }.catch { ex ->
         when (ex) {
-            is IOException ->logger(message = ex.message)
+            is IOException -> logger(message = ex.message)
             is CancellationException -> throw ex
             else -> logger(message = null)
         }

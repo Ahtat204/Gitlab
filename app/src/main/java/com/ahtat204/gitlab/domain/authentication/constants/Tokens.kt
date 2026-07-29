@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.domain.usecase.authentication.constants
+package com.ahtat204.gitlab.domain.authentication.constants
 
 import androidx.datastore.core.DataStore
 import android.content.Context

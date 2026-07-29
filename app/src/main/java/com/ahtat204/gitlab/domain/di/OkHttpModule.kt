@@ -5,7 +5,7 @@ import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.ahtat204.gitlab.BuildConfig
 import com.ahtat204.gitlab.data.security.AuthenticationInterceptor
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens.context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

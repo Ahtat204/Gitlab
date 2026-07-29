@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.fetchAndMergeProjects
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -41,8 +42,19 @@ class ProjectRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient
 ) : ProjectRepository {
     /**
-     * Streams all projects the authenticated user has contributed to.
-     * @return A [Flow] emitting [GetMyPersonalProjectsQuery.Data] objects.
+     * Streams a paginated list of projects the authenticated user has contributed to.
+     *
+     * @param cursor An optional opaque string used for cursor-based pagination. 
+     *               Pass the `endCursor` from a previous response's `pageInfo` to fetch the next set of projects.
+     *               Pass `null` to fetch the initial page.
+     * @return A [Flow] emitting the combined list of projects (existing + new page).
+     *
+     * ### Pagination Behavior
+     * This method implements **infinite scrolling** support. It doesn't just return the next page;
+     * it uses [fetchAndMergeProjects] to:
+     * 1. Retrieve the currently cached projects from the [apolloClient] store.
+     * 2. Append the newly fetched projects from the remote server.
+     * 3. Update the normalized cache with the merged list, triggering an emission to all active [watch]ers.
      *
      * ### Behavior
      * - Executes [GetMyPersonalProjectsQuery] with the provided fetch policy.
@@ -94,6 +106,7 @@ class ProjectRepositoryImpl @Inject constructor(
     override suspend fun getAllProjects(cursor: String?): Flow<GetMyPersonalProjectsQuery.Data> =
         apolloClient.query(GetMyPersonalProjectsQuery(cursor = Optional.presentIfNotNull(cursor)))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+            .fetchAndMergeProjects(apolloClient, cursor)
 
     /**
      * Retrieves a project overview  for a given project.(full description , star count, fork count )
@@ -139,8 +152,16 @@ class ProjectRepositoryImpl @Inject constructor(
      * Retrieves a paginated list of first 20 commits a given project repository .
      *
      * @param id The unique identifier of the project.
+     * @param branch The targeted git branch line from which to trace commit milestones.
      * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
      * @return A [Flow] emitting [GetRepositoryCommitsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Pagination Behavior
+     * This method implements **infinite scrolling** support. It doesn't just return the next page;
+     * it uses [fetchAndMergeCommits] to:
+     * 1. Retrieve the currently cached commits from the [apolloClient] store.
+     * 2. Append the newly fetched commits from the remote server.
+     * 3. Update the normalized cache with the merged list, triggering an emission to all active [watch]ers.
      *
      * ### Behavior
      * - Executes [GetRepositoryCommitsQuery] with the provided project ID.

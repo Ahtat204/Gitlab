@@ -1,10 +1,9 @@
-package com.ahtat204.gitlab.domain.usecase.authentication.utility
+package com.ahtat204.gitlab.domain.authentication.utility
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
-import com.ahtat204.gitlab.domain.usecase.logging.logger
+import com.ahtat204.gitlab.domain.logging.logger
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationResponse
