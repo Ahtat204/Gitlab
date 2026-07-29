@@ -6,7 +6,7 @@ query GetMyPersonalProjects($cursor: String){
             projects(first: 20,after: $cursor,sort: ACTIVITY_DESC){
 
                pageInfo {
-                   startCursor
+                   endCursor
                    hasNextPage
                    hasPreviousPage
                }

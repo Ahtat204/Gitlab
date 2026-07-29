@@ -8,7 +8,6 @@ import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.Optional
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.fetchPolicy
@@ -23,7 +22,7 @@ import javax.inject.Singleton
  * ## Overview
  * - Provides reactive streams of project data using Kotlin [Flow].
  * - Uses Apollo’s normalized caching with configurable [FetchPolicy].
- * - Annotated with `@Inject` for dependency injection, ensuring a singleton lifecycle.
+ * - Annotated with `@Inject` for dependency injection, and Testability.
  * - Annotated with [Singleton] to avoid creating a new Repository everytime the ViewModel is created since this Dependency is just for fetching data , doesn't have a state to hold
  *
  * ## Responsibilities
@@ -51,14 +50,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [android.util.Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Usage example in ViewModel
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getAllProjects(FetchPolicy.CacheFirst)
-     *         .collect { projects -> renderProjects(projects) }
-     * }
-     * ```
-     * Query Example:
+     * ### query example
      * ```
      *     currentUser {
      *         avatarUrl
@@ -99,10 +91,9 @@ class ProjectRepositoryImpl @Inject constructor(
      * }
      * ```
      */
-    @OptIn(ApolloExperimental::class)
-    override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
-        apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
-            .mapAndHandleErrors()
+    override suspend fun getAllProjects(cursor: String?): Flow<GetMyPersonalProjectsQuery.Data> =
+        apolloClient.query(GetMyPersonalProjectsQuery(cursor = Optional.presentIfNotNull(cursor)))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
 
     /**
      * Retrieves a project overview  for a given project.(full description , star count, fork count )
@@ -117,14 +108,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Usage Example in ViewModel
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectById("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
-     * Query Example
+     * ### query example
      * ``` GraphQL
      *  project(fullPath: $projectPath) {
      *
@@ -165,15 +149,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectCommits("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
-     * query example
+     * ### query example
      * ``` GraphQL
      *    project(fullPath: $projectPath){
      *         __typename
@@ -235,15 +211,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getRepositoryBranches("12345",20)
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
-     * query example
+     *### query example
      * ``` GraphQL
      *    project(fullPath: $projectPath){
      *         id
@@ -273,14 +241,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectRepository("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
-     * query example
+     * ### query example
      * ``` GraphQL
      *     project(fullPath: $projectPath){
      *         id

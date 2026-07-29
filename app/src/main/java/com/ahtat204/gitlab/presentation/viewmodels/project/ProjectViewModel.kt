@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
-import com.ahtat204.gitlab.presentation.components.withCacheFallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -64,8 +63,28 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      * - First attempts with [com.apollographql.apollo.cache.normalized.FetchPolicy.CacheFirst].
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
-    fun loadAllProjects() = viewModelScope.launch {
-        projectRepository.getAllProjects().collect { _projects.value = it.currentUser }
+    fun loadAllProjects() {
+        val value = _projects.value
+        if (value == null) viewModelScope.launch {
+            projectRepository.getAllProjects().collect { _projects.value = it.currentUser }
+        }
+        else {
+            val nodes = value.namespace?.projects?.nodes
+            if (nodes?.isEmpty() == true) viewModelScope.launch {
+                projectRepository.getAllProjects().collect { _projects.value = it.currentUser }
+            }
+            val page = value.namespace?.projects?.pageInfo
+            val hasNextPage = page?.hasNextPage
+            val cursor = page?.endCursor
+            if (hasNextPage == true && cursor != null) {
+                viewModelScope.launch {
+                    projectRepository.getAllProjects(cursor)
+                        .collect { _projects.value = it.currentUser }
+                }
+
+            }
+        }
+
     }
 
     /**
