@@ -4,8 +4,13 @@ query GetProjectMembers($project:ID!,$cursor:String){
             nodes {
                 id
                 user {
+                    namespace {
+                        name
+                    }
                     name
+
                 }
+
                 createdAt
             }
             pageInfo {

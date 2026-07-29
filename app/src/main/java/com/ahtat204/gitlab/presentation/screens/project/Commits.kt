@@ -5,13 +5,10 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -21,13 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.components.CommitCard
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
 /**
  * Displays a paginated list of commits for a given GitLab project.
@@ -40,9 +35,8 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
  *
  * ## Parameters
  * @param navController Navigation controller used for handling navigation actions.
- * @param x Padding values applied to the layout.
  * @param id The unique project identifier. If empty, the composable returns immediately.
- * @param projectViewModel ViewModel responsible for loading and exposing commit data.
+ * @param repositoryViewModel ViewModel responsible for loading and exposing commit data.
  * Defaults to [hiltViewModel] injection.
  *
  * ## Behavior
@@ -77,15 +71,14 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
 @Composable
 fun ProjectCommits(
     navController: NavController,
-    x: PaddingValues,
     branch:String,
     id: String,
-    projectViewModel: RepositoryViewModel = hiltViewModel()
+    repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
     if (id == "") return
-    val commits by projectViewModel.commits.collectAsStateWithLifecycle()
+    val commits by repositoryViewModel.commits.collectAsStateWithLifecycle()
     LaunchedEffect(id) {
-        projectViewModel.loadProjectCommits(id,branch)
+        repositoryViewModel.loadProjectCommits(id,branch)
     }
     if (commits?.nodes?.isEmpty() == true) return
     val listState = rememberLazyListState()
@@ -94,33 +87,25 @@ fun ProjectCommits(
             val totalItems = listState.layoutInfo.totalItemsCount
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
             // Trigger load when user is 3 items away from the bottom
-            totalItems > 0 && lastVisibleItem >= totalItems - 5
+            totalItems > 9 && lastVisibleItem >= totalItems - 9
         }
     }
     LaunchedEffect(shouldLoadMore.value) {
         if (shouldLoadMore.value) {
-            projectViewModel.loadProjectCommits(id,branch)
+            repositoryViewModel.loadProjectCommits(id,branch)
         }
     }
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .padding(x)
             .background(Color.Black)
     ) {
         commits?.nodes?.let { nodes ->
             if (nodes.isNotEmpty()) {
-                Text(
-                    text = "Commits",
-                    fontFamily = titleFont,
-                    fontSize = 20.sp,
-                    modifier = Modifier
-                )
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = x,
                     verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
