@@ -3,6 +3,7 @@ package com.ahtat204.gitlab.data.remote.repositories.project
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMilestonesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
@@ -313,5 +314,17 @@ class ProjectRepositoryImpl @Inject constructor(
                 path = Optional.presentIfNotNull(path)
             )
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
+    override suspend fun getProjectMilestones(
+        project: String, cursor: String?
+    ): Flow<GetProjectMilestonesQuery.Data> {
+        return apolloClient.query(
+            GetProjectMilestonesQuery(
+                project, cursor = Optional.presentIfNotNull(cursor)
+            )
+        ).fetchPolicy(
+            FetchPolicy.CacheFirst
+        ).watch().mapAndHandleErrors()
     }
 }
