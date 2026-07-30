@@ -27,7 +27,7 @@ import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.presentation.components.CoilCache.loader
 import com.ahtat204.gitlab.presentation.components.ProjectItem
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectViewModel
 import java.time.Instant
 import java.time.ZoneId

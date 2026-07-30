@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -100,7 +101,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * ```
      */
     @OptIn(ApolloExperimental::class)
-    override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
+    override suspend fun getAllPersonalProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
         apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapAndHandleErrors()
 
@@ -313,5 +314,12 @@ class ProjectRepositoryImpl @Inject constructor(
                 path = Optional.presentIfNotNull(path)
             )
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
+    override suspend fun getAllProjects(cursor: String?): Flow<GetAllProjectsQuery.Data> {
+        return apolloClient.query(GetAllProjectsQuery(cursor = Optional.presentIfNotNull(cursor)))
+            .fetchPolicy(
+                FetchPolicy.CacheFirst
+            ).watch().mapAndHandleErrors()
     }
 }

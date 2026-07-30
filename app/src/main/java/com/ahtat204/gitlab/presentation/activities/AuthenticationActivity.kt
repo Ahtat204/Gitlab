@@ -33,7 +33,7 @@ import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.ahtat204.gitlab.domain.usecase.authentication.utility.buildResponse
 import com.ahtat204.gitlab.domain.usecase.logging.logger
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthState
