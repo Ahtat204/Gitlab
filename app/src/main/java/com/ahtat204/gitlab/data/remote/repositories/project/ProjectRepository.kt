@@ -89,6 +89,14 @@ interface ProjectRepository {
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
 
+    /**
+     * Streams a paginated list of members for a specific GitLab project.
+     *
+     * @param project The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the current window slice of project member records.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
     suspend fun getProjectMembers(
         project: String,
         cursor: String? = null

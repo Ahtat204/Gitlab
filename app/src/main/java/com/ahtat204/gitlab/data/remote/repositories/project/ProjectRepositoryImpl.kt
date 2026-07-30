@@ -28,13 +28,13 @@ import javax.inject.Singleton
  * - Annotated with [Singleton] to avoid creating a new Repository everytime the ViewModel is created since this Dependency is just for fetching data , doesn't have a state to hold
  *
  * ## Responsibilities
- * - Fetch all projects contributed by the authenticated user.
+ * - Fetch all projects contributed by the authenticated user , along with its data (pipelines, issues, MRs,jobs.
  * - Retrieve repository tree data for a specific project by ID.
  * - Handle errors gracefully with logging and structured concurrency.
  *
  * ## Dependencies
  * - [ApolloClient]: Executes GraphQL queries and manages caching.
- * - [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery],[GetProjectRepositoryQuery],[GetRepositoryCommitsQuery],[GetRepositoryBranchesQuery]: Auto‑generated query classes.
+ * - [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery],[GetProjectRepositoryQuery],[GetRepositoryCommitsQuery],[GetRepositoryBranchesQuery],[GetProjectMembersQuery]: Auto‑generated query classes.
  * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
  * @author Lahcen AHTAT
  */
@@ -280,6 +280,43 @@ class ProjectRepositoryImpl @Inject constructor(
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
 
+    /**
+     * Streams a paginated list of members for a specific GitLab project.
+     *
+     * @param project The unique identifier or full path of the GitLab project.
+     * @param cursor The pagination pointer for sequential page fetches.
+     * @return A [Flow] emitting [GetProjectMembersQuery.Data] objects.
+     *
+     * ### Behavior
+     * - Executes [GetProjectMembersQuery] with the provided project and cursor.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow using [watch].
+     * - Handles errors via [mapAndHandleErrors].
+     * - Throws [kotlinx.coroutines.CancellationException] if the collection coroutine scope is cancelled.
+     * ### query example
+     * ``` GraphQL
+     *  project(fullPath: $projectPath) {
+     *         projectMembers(first: 20, after: $cursor) {
+     *             nodes {
+     *                 id
+     *                 accessLevel {
+     *                     stringLevel
+     *                 }
+     *                 user {
+     *                     id
+     *                     name
+     *                     username
+     *                     avatarUrl
+     *                 }
+     *             }
+     *             pageInfo {
+     *                 endCursor
+     *                 hasNextPage
+     *             }
+     *         }
+     *     }
+     * ```
+     */
     override suspend fun getProjectMembers(
         project: String, cursor: String?
     ): Flow<GetProjectMembersQuery.Data> {
