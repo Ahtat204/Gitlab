@@ -45,7 +45,6 @@ import javax.inject.Singleton
 class ProjectRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient
 ) : ProjectRepository {
-
     /**
      * **Project Landscape Discovery**: Streams all projects where the authenticated user is a member.
      *
@@ -97,6 +96,11 @@ class ProjectRepositoryImpl @Inject constructor(
                 apolloClient.apolloStore.removeOperation(
                     operation = query, data = data, publish = true
                 )
+            }
+
+            is GetProjectDetailsQuery.Data -> {
+                val query = GetProjectDetailsQuery(data.project?.id!!)
+                apolloClient.apolloStore.removeOperation(operation = query, data, publish = true)
             }
 
             else -> Unit

@@ -90,9 +90,19 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
         scope.launch {
             projectRepository.refresh(GetMyPersonalProjectsQuery.Data(_projects.value))
             _projects.value = null
+            loadAllProjects()
         }
-        loadAllProjects()
 
+    }
+
+    fun refetchProject(id: String) {
+        val scope = viewModelScope
+        val value = currentProject.value
+        scope.launch {
+            projectRepository.refresh(GetProjectDetailsQuery.Data(value))
+            currentProject.value = null
+            loadProject(id)
+        }
     }
 
 }
