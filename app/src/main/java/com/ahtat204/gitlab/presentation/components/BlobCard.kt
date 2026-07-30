@@ -149,7 +149,7 @@ fun TreeItemCard(
     Card(
         onClick = {
             repositoryViewModel.loadProjectRepository(
-                branch = branch, folderName = path, projectPath = project, folderPath = name
+                branch = branch, folderName = name, projectPath = project, folderPath = path
             )
             addPath()
         }, modifier = Modifier

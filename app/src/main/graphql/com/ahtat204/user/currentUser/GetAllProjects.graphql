@@ -1,0 +1,31 @@
+query GetAllProjects($cursor:String){
+    currentUser {
+        projectMemberships(first: 20,after: $cursor){
+            pageInfo {
+                hasPreviousPage
+                hasNextPage
+                endCursor
+            }
+            nodes{
+                id
+                createdAt
+              project {
+                  id
+                  name
+                  description
+                  pipelines(first: 1){
+                      edges {
+                        cursor
+                          node {
+                              id
+                              status
+                              name
+
+                          }
+                      }
+                  }
+              }
+            }
+        }
+    }
+}
