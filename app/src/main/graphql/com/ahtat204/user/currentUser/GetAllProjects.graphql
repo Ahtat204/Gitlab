@@ -11,8 +11,17 @@ query GetAllProjects($cursor:String){
                 createdAt
               project {
                   id
+                  fullPath
                   name
                   description
+                  avatarUrl
+                  visibility
+                  topics
+                  languages {
+                      name
+                      color
+
+                  }
                   pipelines(first: 1){
                       edges {
                         cursor
