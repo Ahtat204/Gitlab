@@ -30,11 +30,13 @@ import coil.ImageLoader
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
 import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.components.Contact
 import com.ahtat204.gitlab.presentation.components.Header
 import com.ahtat204.gitlab.presentation.components.Info
-import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
-import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
+import com.ahtat204.gitlab.presentation.components.Item
+import com.ahtat204.gitlab.presentation.components.WorkItem
 import com.ahtat204.gitlab.presentation.viewmodels.ProfileViewModel
 import kotlinx.coroutines.Dispatchers
 
@@ -112,10 +114,18 @@ fun Profile(
                 if (profile.linkedin == null) Pair(null, null) else Pair(
                     profile.linkedin, R.drawable.linkedin
                 )
-            val email:Pair<String?,Int?> =if(profile.publicEmail==null)Pair(null, null) else Pair(
-                profile.publicEmail, R.drawable.mail
-            )
-            Contact(linked, github,email)
+            val email: Pair<String?, Int?> =
+                if (profile.publicEmail == null) Pair(null, null) else Pair(
+                    profile.publicEmail, R.drawable.mail
+                )
+            Contact(linked, github, email)
+            WorkItem(
+                Item(
+                    "Projects",
+                    route = "projects",
+                    R.drawable.project
+                )
+            ) { navController.navigate("projects") }
         }
     }
 

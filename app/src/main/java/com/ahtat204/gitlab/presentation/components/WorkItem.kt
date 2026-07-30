@@ -9,15 +9,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.ahtat204.gitlab.presentation.activities.ui.theme.ElementBackground
 import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
 import kotlinx.serialization.Serializable
@@ -32,7 +33,7 @@ import kotlinx.serialization.Serializable
  * @author Lahcen AHTAT
  */
 @Serializable
-data class Item(val name: String, val route: String, val Id: Int,val count:Int?=null)
+data class Item(val name: String, val route: String, val Id: Int, val count: Int? = null)
 
 /**
  * Displays a clickable card representing a [Item].
@@ -63,16 +64,17 @@ data class Item(val name: String, val route: String, val Id: Int,val count:Int?=
 @Composable
 fun WorkItem(item: Item, openScreen: () -> Unit) {
     Card(
-        openScreen,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(20.dp, 10.dp)
-            .background(Color.Black)
+            .background(ElementBackground)
+            .padding(20.dp, 10.dp),
+        shape = RoundedCornerShape(20.dp),
+        onClick = openScreen
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Black)
+                .background(ElementBackground)
                 .height(50.dp),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
@@ -80,14 +82,14 @@ fun WorkItem(item: Item, openScreen: () -> Unit) {
             Icon(
                 painter = painterResource(item.Id),
                 contentDescription = item.name,
-                Modifier.size(30.dp).padding(3.dp),
+                Modifier
+                    .size(30.dp)
+                    .padding(3.dp),
                 tint = Orange
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = item.name,
-                fontFamily = customFontFamily,
-                modifier = Modifier.weight(0.9f)
+                text = item.name, fontFamily = customFontFamily, modifier = Modifier.weight(0.9f)
             )
         }
     }
