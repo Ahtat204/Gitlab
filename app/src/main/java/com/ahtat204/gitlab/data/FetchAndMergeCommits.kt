@@ -51,6 +51,7 @@ suspend fun Flow<GetRepositoryCommitsQuery.Data>.fetchAndMergeCommits(
         val project = cachedList.project
         val repository = project?.repository
         val commits = repository?.commits
+        val cachedNodes = commits?.nodes.orEmpty()
         val newCommits = this.first().project?.repository?.commits
         val page = newCommits!!.pageInfo
         val newNodes = newCommits.nodes

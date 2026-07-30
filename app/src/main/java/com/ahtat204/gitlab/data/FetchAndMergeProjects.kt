@@ -34,16 +34,13 @@ suspend fun Flow<GetMyPersonalProjectsQuery.Data>.fetchAndMergeProjects(
         val namespace = currentUser.namespace ?: return this
         var projects = namespace.projects
             ?: return this //edge case , like the cache is got evacuated by the OS
-        val nodes = projects.nodes?.toMutableList()
+        var nodes = projects.nodes.orEmpty()
         val newProjects = this.first().currentUser?.namespace?.projects
         val newNodes = newProjects?.nodes
         val newPage = newProjects!!.pageInfo
         if (newNodes.isNullOrEmpty()) return this
-
-        newNodes.forEach { node ->
-            nodes?.plusAssign(node)
-        }
-        projects = projects.copy(nodes = nodes, pageInfo = newPage)
+        val totalProjects = nodes + newNodes
+        projects = projects.copy(nodes = totalProjects, pageInfo = newPage)
         cachedData = GetMyPersonalProjectsQuery.Data(
             currentUser.copy(
                 avatarUrl = currentUser.avatarUrl,
