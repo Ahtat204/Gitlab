@@ -103,6 +103,11 @@ class ProjectRepositoryImpl @Inject constructor(
                 apolloClient.apolloStore.removeOperation(operation = query, data, publish = true)
             }
 
+            is GetProjectRepositoryQuery.Data -> {
+                val query = GetProjectRepositoryQuery(projectPath = data.project?.id!!)
+                apolloClient.apolloStore.removeOperation(operation = query, data, publish = true)
+            }
+
             else -> Unit
         }
 

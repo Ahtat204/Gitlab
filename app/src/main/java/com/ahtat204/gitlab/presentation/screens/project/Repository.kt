@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -29,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.ahtat204.gitlab.presentation.components.BranchesList
 import com.ahtat204.gitlab.presentation.components.FileBrowser
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
@@ -89,7 +91,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
  * - The timeline string combines author name and relative commit time.
  *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/repository.jpg"  width="300" height="700"/>
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RepositoryScreen(
@@ -98,6 +100,7 @@ fun RepositoryScreen(
     navController: NavController,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
+    var isRefreshing by remember { mutableStateOf(false) }
     val history = remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
@@ -105,7 +108,18 @@ fun RepositoryScreen(
     LaunchedEffect(Unit) {
         repositoryViewModel.loadProjectRepository(projectPath, currentBranch.value)
     }
+    val state = rememberPullRefreshState(
+        refreshing = isRefreshing, onRefresh = {
+            repositoryViewModel.refreshRepository(
+                projectPath, branch = currentBranch.value
+            )
+            isRefreshing = false
+        })
     val repository by repositoryViewModel.repository.collectAsStateWithLifecycle()
+
+    PullRefreshIndicator(
+        refreshing = isRefreshing, state = state
+    )
     Column(
         modifier = Modifier
             .padding(x)
@@ -115,9 +129,9 @@ fun RepositoryScreen(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        repository?.tree?.lastCommit?.message?.let { message ->
-            repository?.rootRef?.let { rootRef ->
-                repository?.tree?.lastCommit?.committedDate.let { date ->
+        repository?.repository?.tree?.lastCommit?.message?.let { message ->
+            repository?.repository?.rootRef?.let { rootRef ->
+                repository?.repository?.tree?.lastCommit?.committedDate.let { date ->
                     val parsedDateTime = iso8601ToRelative(date as String)
 
                     if (currentBranch.value == null) currentBranch.value = rootRef
@@ -125,24 +139,24 @@ fun RepositoryScreen(
                         { showSheet = !showSheet },
                         currentBranch,
                         message,
-                        repository?.tree?.lastCommit?.author?.name,
+                        repository?.repository?.tree?.lastCommit?.author?.name,
                         parsedDateTime,
                         navController,
                         projectPath,
-                        history)
+                        history
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(30.dp))
 
-            if(!history.value){
+            if (!history.value) {
                 FileBrowser(repositoryViewModel, currentBranch, projectPath, repository)
             }
-            if(history.value==true){
-             currentBranch.value?.let{
-                 ProjectCommits(navController = navController, branch = it, id = projectPath)
-             }
+            if (history.value) {
+                currentBranch.value?.let {
+                    ProjectCommits(navController = navController, branch = it, id = projectPath)
+                }
             }
-
         }
 
         if (showSheet) {
@@ -159,4 +173,5 @@ fun RepositoryScreen(
             }
         }
     }
+
 }
