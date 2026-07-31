@@ -236,9 +236,10 @@ class RepositoryViewModel @Inject constructor(
 
     fun refreshRepository(project: String, branch: String? = null) {
         val scope = viewModelScope
-        _repository.value
+
         scope.launch {
             projectRepository.refresh(GetProjectRepositoryQuery.Data(_repository.value))
+            _repository.value = null
             loadProjectRepository(project, branch = branch)
         }
     }

@@ -14,16 +14,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -100,7 +101,7 @@ fun RepositoryScreen(
     navController: NavController,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
-    var isRefreshing by remember { mutableStateOf(false) }
+    rememberCoroutineScope()
     val history = remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
@@ -108,68 +109,65 @@ fun RepositoryScreen(
     LaunchedEffect(Unit) {
         repositoryViewModel.loadProjectRepository(projectPath, currentBranch.value)
     }
-    val state = rememberPullRefreshState(
-        refreshing = isRefreshing, onRefresh = {
-            repositoryViewModel.refreshRepository(
-                projectPath, branch = currentBranch.value
-            )
-            isRefreshing = false
-        })
+    var bIsRefreshing by remember { mutableStateOf(false) }
+    val state = rememberPullToRefreshState()
     val repository by repositoryViewModel.repository.collectAsStateWithLifecycle()
+    PullToRefreshBox(state = state, onRefresh = {
+        bIsRefreshing = true
+        repositoryViewModel.refreshRepository(projectPath)
+        bIsRefreshing = false
+    }, isRefreshing = bIsRefreshing) {
+        Column(
+            modifier = Modifier
+                .padding(x)
+                .fillMaxHeight()
+                .clickable(onClick = { })
+                .background(Color.Black),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
+        ) {
+            repository?.repository?.tree?.lastCommit?.message?.let { message ->
+                repository?.repository?.rootRef?.let { rootRef ->
+                    repository?.repository?.tree?.lastCommit?.committedDate.let { date ->
+                        val parsedDateTime = iso8601ToRelative(date as String)
 
-    PullRefreshIndicator(
-        refreshing = isRefreshing, state = state
-    )
-    Column(
-        modifier = Modifier
-            .padding(x)
-            .fillMaxHeight()
-            .clickable(onClick = { })
-            .background(Color.Black),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
-    ) {
-        repository?.repository?.tree?.lastCommit?.message?.let { message ->
-            repository?.repository?.rootRef?.let { rootRef ->
-                repository?.repository?.tree?.lastCommit?.committedDate.let { date ->
-                    val parsedDateTime = iso8601ToRelative(date as String)
+                        if (currentBranch.value == null) currentBranch.value = rootRef
+                        RepositoryHead(
+                            { showSheet = !showSheet },
+                            currentBranch,
+                            message,
+                            repository?.repository?.tree?.lastCommit?.author?.name,
+                            parsedDateTime,
+                            navController,
+                            projectPath,
+                            history
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(30.dp))
 
-                    if (currentBranch.value == null) currentBranch.value = rootRef
-                    RepositoryHead(
-                        { showSheet = !showSheet },
-                        currentBranch,
-                        message,
-                        repository?.repository?.tree?.lastCommit?.author?.name,
-                        parsedDateTime,
-                        navController,
-                        projectPath,
-                        history
-                    )
+                if (!history.value) {
+                    FileBrowser(repositoryViewModel, currentBranch, projectPath, repository)
+                }
+                if (history.value) {
+                    currentBranch.value?.let {
+                        ProjectCommits(navController = navController, branch = it, id = projectPath)
+                    }
                 }
             }
-            Spacer(modifier = Modifier.height(30.dp))
 
-            if (!history.value) {
-                FileBrowser(repositoryViewModel, currentBranch, projectPath, repository)
-            }
-            if (history.value) {
-                currentBranch.value?.let {
-                    ProjectCommits(navController = navController, branch = it, id = projectPath)
+            if (showSheet) {
+                ModalBottomSheet(
+                    modifier = Modifier.fillMaxHeight(),
+                    onDismissRequest = { showSheet = false },
+                    sheetState = sheetState
+                ) {
+                    LaunchedEffect(currentBranch.value) {
+                        repositoryViewModel.loadRepositoryBranches(projectPath)
+                    }
+                    val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
+                    BranchesList(branches, repositoryViewModel, projectPath, currentBranch, x)
                 }
-            }
-        }
-
-        if (showSheet) {
-            ModalBottomSheet(
-                modifier = Modifier.fillMaxHeight(),
-                onDismissRequest = { showSheet = false },
-                sheetState = sheetState
-            ) {
-                LaunchedEffect(currentBranch.value) {
-                    repositoryViewModel.loadRepositoryBranches(projectPath)
-                }
-                val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
-                BranchesList(branches, repositoryViewModel, projectPath, currentBranch, x)
             }
         }
     }
