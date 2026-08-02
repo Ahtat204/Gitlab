@@ -10,10 +10,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.ahtat204.gitlab.presentation.navigation.BottomBarScreen.Routes.MRS
+import com.ahtat204.gitlab.presentation.navigation.BottomBarScreen.Routes.PERSONAL
+import com.ahtat204.gitlab.presentation.navigation.BottomBarScreen.Routes.PROJECT
+import com.ahtat204.gitlab.presentation.navigation.BottomBarScreen.Routes.REPOSITORY
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
-import com.ahtat204.gitlab.presentation.screens.project.ProjectCommits
 import com.ahtat204.gitlab.presentation.screens.project.ProjectDetailScreen
 import com.ahtat204.gitlab.presentation.screens.project.RepositoryScreen
 
@@ -28,8 +31,7 @@ import com.ahtat204.gitlab.presentation.screens.project.RepositoryScreen
  * - Placeholder routes for Profile and Activity
  *
  * @param navController The [NavHostController] used to handle navigation actions.
- * @param x The [PaddingValues] applied to the content area, typically provided
- * by the [androidx.compose.material.Scaffold] in the parent activity.
+ * @param x The [PaddingValues] representing the inner padding provided by a Scaffold.
  *
  * Example usage:
  * ```
@@ -54,12 +56,13 @@ fun BottomNavigationGraph(
         composable(route = BottomBarScreen.Profile.route) {
             Profile(navController,x)
         }
-        composable(route = "personal") {
+        composable(route = PERSONAL) {
             PersonalProjects(navController, x)
         }
         composable(route = BottomBarScreen.Activity.route) {
             // Activity screen placeholder
         }
+        composable (route=MRS){  }
         composable(route = "commits/{projectId}/{branch}",
             arguments = listOf(
                 navArgument("projectId") { type = NavType.StringType },
@@ -80,7 +83,7 @@ fun BottomNavigationGraph(
         }
 
         navigation(startDestination ="Project", route = "project" ){
-            composable(route = "repository?projectId={projectId}",
+            composable(route =REPOSITORY,
                 arguments = listOf(navArgument("projectId") { defaultValue = "" })
             )
             {backStackEntry ->
@@ -88,7 +91,7 @@ fun BottomNavigationGraph(
                 projectId?.let { RepositoryScreen(it,x,navController) }
             }
             composable(
-                route = "project?projectId={projectId}",
+                route = PROJECT,
                 arguments = listOf(navArgument("projectId") { defaultValue = "" })
             ) { backStackEntry ->
                 val projectId = backStackEntry.arguments?.getString("projectId")

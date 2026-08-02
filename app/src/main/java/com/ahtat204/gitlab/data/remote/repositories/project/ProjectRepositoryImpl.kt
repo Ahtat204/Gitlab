@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.queries.GetMyMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -33,7 +34,7 @@ import javax.inject.Singleton
  *
  * ## Dependencies
  * - [ApolloClient]: Executes GraphQL queries and manages caching.
- * - [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery],[GetProjectRepositoryQuery],[GetRepositoryCommitsQuery],[GetRepositoryBranchesQuery]: Auto‑generated query classes.
+ * - [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery], [GetMyMergeRequestsQuery], [GetProjectRepositoryQuery], [GetRepositoryCommitsQuery], [GetRepositoryBranchesQuery]: Auto‑generated query classes.
  * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
  * @author Lahcen AHTAT
  */
@@ -150,6 +151,31 @@ class ProjectRepositoryImpl @Inject constructor(
         return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
             .watch().mapAndHandleErrors()
     }
+
+    /**
+     * Streams the Merge Requests associated with the authenticated user's projects.
+     *
+     * @param projectCursor The pagination pointer for the projects collection.
+     * @param mrCursor The pagination pointer for the merge requests collection.
+     * @return A [Flow] emitting [GetMyMergeRequestsQuery.Data] objects.
+     *
+     * ### Behavior
+     * - Executes [GetMyMergeRequestsQuery] with the provided cursors.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow using [watch].
+     * - Handles errors gracefully via [mapAndHandleErrors].
+     */
+    override suspend fun getMyMergeRequests(
+        projectCursor: String?, mrCursor: String?
+    ): Flow<GetMyMergeRequestsQuery.Data> = apolloClient.query(
+        GetMyMergeRequestsQuery(
+            projectCursor = Optional.presentIfNotNull(
+                projectCursor
+            ), cursor = Optional.presentIfNotNull(mrCursor)
+        )
+    ).fetchPolicy(
+        FetchPolicy.CacheFirst
+    ).watch().mapAndHandleErrors()
 
     /**
      * Retrieves a paginated list of first 20 commits a given project repository .

@@ -1,15 +1,11 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
-import android.util.Log
+import com.ahtat204.gitlab.data.queries.GetMyMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
-import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
-import com.apollographql.cache.normalized.FetchPolicy
-import com.apollographql.cache.normalized.fetchPolicy
-import com.apollographql.cache.normalized.watch
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -24,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
  * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
  * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
  * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
+ * - [getMyMergeRequests]: Retrieves and streams the authenticated user's merge requests.
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
@@ -85,4 +82,16 @@ interface ProjectRepository {
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
 
+    /**
+     * Retrieves a paginated chunk of available Merge Requests for the authenticated user.
+     *
+     * @param projectCursor The pagination pointer for the projects collection. Pass null for the initial page.
+     * @param mrCursor The pagination pointer for the merge requests collection within a project. Pass null for the initial page.
+     * @return A reactive stream emitting the user's merge requests metadata.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
+    suspend fun getMyMergeRequests(
+        projectCursor: String? = null,
+        mrCursor: String? = null
+    ): Flow<GetMyMergeRequestsQuery.Data>
 }

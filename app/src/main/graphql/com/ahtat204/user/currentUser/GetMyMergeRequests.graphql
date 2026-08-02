@@ -1,0 +1,22 @@
+query GetMyMergeRequests($projectCursor:String,$cursor:String){
+    projects(membership: true,after: $projectCursor,first:20){
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+        nodes {
+            id
+            mergeRequests(first: 20,after:$cursor ){
+                nodes {
+                    id
+                    description
+                    closedAt
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+            }
+        }
+    }
+}
