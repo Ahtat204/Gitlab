@@ -14,7 +14,7 @@ import javax.inject.Inject
 typealias Groups = GetCurrentUserGroupsQuery.Data?
 
 @HiltViewModel
-class GroupsViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
+class GroupsViewModel @Inject internal constructor(private val projectRepository: ProjectRepository) :
     ViewModel() {
     private val _groups = MutableStateFlow<Groups>(null)
     val groups: StateFlow<Groups> = _groups.asStateFlow()
