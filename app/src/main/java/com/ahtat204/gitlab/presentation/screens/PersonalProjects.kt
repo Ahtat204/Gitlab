@@ -69,7 +69,7 @@ import java.time.ZoneId
  * - Uses [Instant] and [ZoneId] to sort projects by activity date.
  * - Relies on [ProjectItem] composable to render individual project details.
  * - Displays up to all available projects; topics and languages are shown if present.
- *   @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/repository/personalprojects.jpg"  width="300" height="700"/>
+ *   @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/personalprojects.jpg"  width="300" height="700"/>
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -82,8 +82,8 @@ fun PersonalProjects(
         projectViewModel.loadAllProjects()
     }
     val currUser by projectViewModel.projects.collectAsState()
-    currUser?.projectMemberships?.nodes?.sortedByDescending {
-        Instant.parse(it?.project?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
+    currUser?.namespace?.projects?.nodes?.sortedByDescending {
+        Instant.parse(it?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
             .toLocalDate()
     }?.let { nodes ->
         Column(
@@ -93,7 +93,7 @@ fun PersonalProjects(
                 .padding(x)
                 .background(Color.Black)
         ) {
-            if (currUser?.projectMemberships?.nodes?.isEmpty() == true || currUser?.avatarUrl == null) {
+            if (currUser?.namespace?.projects?.nodes?.isEmpty() == true || currUser?.avatarUrl == null) {
                 CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
 
             } else {
@@ -110,7 +110,7 @@ fun PersonalProjects(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(nodes, key = { item -> item?.id ?: Any() }) { item ->
-                        item?.project?.let { ProjectItem(currUser, it, loader, navController) }
+                        item?.let { ProjectItem(currUser, it, loader, navController) }
                     }
                 }
             }
