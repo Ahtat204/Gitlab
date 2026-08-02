@@ -19,9 +19,22 @@ class IssuesViewModel @Inject constructor(private val projectRepository: Project
     private val _issues = MutableStateFlow<Issues>(null)
     val issues: StateFlow<Issues> get() = _issues.asStateFlow()
     fun loadProjectIssues(id: String) {
-        viewModelScope.launch {
-            projectRepository.getProjectIssues(id).collect { _issues.value = it }
+        val value = _issues.value
+        if (value == null) {
+            viewModelScope.launch {
+                projectRepository.getProjectIssues(id).collect { _issues.value = it }
+            }
+        } else {
+            val page = value.project?.issues?.pageInfo
+            val hasNextPage = page?.hasNextPage
+            val endCursor = page?.endCursor
+            if (hasNextPage == true && endCursor != null) {
+                viewModelScope.launch {
+                    projectRepository.getProjectIssues(id, endCursor).collect { _issues.value = it }
+                }
+            }
         }
+
     }
 
 }

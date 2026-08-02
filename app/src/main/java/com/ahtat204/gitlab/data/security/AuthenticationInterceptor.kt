@@ -1,12 +1,5 @@
 package com.ahtat204.gitlab.data.security
 
-import android.Manifest
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.util.Log
-import androidx.annotation.RequiresPermission
-import androidx.compose.ui.unit.IntOffset
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
@@ -19,10 +12,10 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationService
 import okhttp3.Interceptor
 import okhttp3.Response
-import net.openid.appauth.AuthState
 import okio.IOException
 
 /**
@@ -68,7 +61,6 @@ class AuthenticationInterceptor : Interceptor {
 
     @OptIn(InternalCoroutinesApi::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-
         try {
             if (!isConnected()) {
                 throw IOException("no internet connection")
@@ -117,7 +109,6 @@ class AuthenticationInterceptor : Interceptor {
             }
             return response
         } catch (e: Exception) {
-
             throw e
 
         }
