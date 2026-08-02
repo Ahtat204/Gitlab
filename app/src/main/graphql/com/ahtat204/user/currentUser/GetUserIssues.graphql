@@ -1,0 +1,27 @@
+query GetUserIssues($projectCursor:String,$issuesCursor:String){
+    projects(membership: true,first: 20,after: $projectCursor){
+        pageInfo {
+            endCursor
+            startCursor
+            hasNextPage
+        }
+        nodes{
+            id
+            issues(sort: CREATED_ASC,first: 20,after: $issuesCursor,){
+                pageInfo {
+                    hasNextPage
+                    endCursor
+                    startCursor
+                }
+                nodes {
+                    id
+                    name
+                    description
+                    createdAt
+                    closedAt
+                }
+            }
+        }
+
+    }
+}
