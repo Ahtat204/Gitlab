@@ -1,15 +1,11 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
-import android.util.Log
+import com.ahtat204.gitlab.data.queries.GetCurrentUserGroupsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
-import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
-import com.apollographql.cache.normalized.FetchPolicy
-import com.apollographql.cache.normalized.fetchPolicy
-import com.apollographql.cache.normalized.watch
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -24,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
  * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
  * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
  * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
+ * - [getCurrentUserGroups]: Retrieves and streams first 20 Groups for th currently Authenticated User.
  * @author Lahcen AHTAT
  */
 interface ProjectRepository {
@@ -84,5 +81,13 @@ interface ProjectRepository {
     suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
+
+    /**
+     * Streams all Groups for  that the currently authenticated user has.
+     *
+     * @return A reactive stream emitting the user's groups.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
+    suspend fun getCurrentUserGroups(cursor: String? = null): Flow<GetCurrentUserGroupsQuery.Data>
 
 }

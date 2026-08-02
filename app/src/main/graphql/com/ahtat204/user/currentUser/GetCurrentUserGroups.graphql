@@ -1,0 +1,17 @@
+query GetCurrentUserGroups($cursor:String){
+currentUser {
+    groups(first: 30,after:$cursor,sort: CREATED_AT_ASC ){
+        pageInfo {
+            hasPreviousPage
+            hasNextPage
+            startCursor
+        }
+        nodes {
+            id
+            name
+            fullPath
+        }
+        count
+    }
+}
+}

@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.queries.GetCurrentUserGroupsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
@@ -149,6 +150,55 @@ class ProjectRepositoryImpl @Inject constructor(
     override suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?> {
         return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
             .watch().mapAndHandleErrors()
+    }
+
+    /**
+     * Retrieves first 30 group of a user
+     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
+     * @return A [Flow] emitting [GetCurrentUserGroupsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetCurrentUserGroupsQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getCurrentUserGroups("12345")
+     *         .collect {  }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL
+     * currentUser {
+     *     groups(first: 30,after:$cursor,sort: CREATED_AT_ASC ){
+     *         pageInfo {
+     *             hasPreviousPage
+     *             hasNextPage
+     *             startCursor
+     *         }
+     *         nodes {
+     *             id
+     *             name
+     *             fullPath
+     *         }
+     *         count
+     *     }
+     * }
+     */
+    override suspend fun getCurrentUserGroups(cursor: String?): Flow<GetCurrentUserGroupsQuery.Data> {
+        val result = apolloClient.query(
+            GetCurrentUserGroupsQuery(
+                cursor = Optional.presentIfNotNull(
+                    cursor
+                )
+            )
+        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+        return result
     }
 
     /**
