@@ -10,6 +10,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.ahtat204.gitlab.presentation.navigation.BottomBarScreen.Routes.BRANCHES
+import com.ahtat204.gitlab.presentation.navigation.BottomBarScreen.Routes.ISSUES
+import com.ahtat204.gitlab.presentation.navigation.BottomBarScreen.Routes.PERSONAL
+import com.ahtat204.gitlab.presentation.navigation.BottomBarScreen.Routes.REPOSITORY
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.Issues
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
@@ -54,16 +58,16 @@ fun BottomNavigationGraph(
         composable(route = BottomBarScreen.Profile.route) {
             Profile(navController,x)
         }
-        composable(route = "personal") {
+        composable(route = PERSONAL) {
             PersonalProjects(navController, x)
         }
         composable(route = BottomBarScreen.Activity.route) {
             // Activity screen placeholder
         }
-        composable(route="issues"){
+        composable(route=ISSUES){
             Issues(navController,x)
         }
-        composable(route = "commits/{projectId}/{branch}",
+        composable(route = BRANCHES,
             arguments = listOf(
                 navArgument("projectId") { type = NavType.StringType },
                 navArgument("branch") {
@@ -83,7 +87,7 @@ fun BottomNavigationGraph(
         }
 
         navigation(startDestination ="Project", route = "project" ){
-            composable(route = "repository?projectId={projectId}",
+            composable(route = REPOSITORY,
                 arguments = listOf(navArgument("projectId") { defaultValue = "" })
             )
             {backStackEntry ->

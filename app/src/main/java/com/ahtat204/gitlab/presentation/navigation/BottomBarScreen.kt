@@ -20,8 +20,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 sealed class BottomBarScreen(
     val route: String, val title: String, val icon: ImageVector
 ) {
-    data object Home : BottomBarScreen("home", "Home", Icons.Default.Home)
-    data object Explore : BottomBarScreen("explore", "Explore", Icons.Filled.Explore)
-    data object Profile : BottomBarScreen("profile", "Profile", Icons.TwoTone.Person)
-    data object Activity : BottomBarScreen("activity", "Activity", Icons.Filled.AvTimer)
+    companion object Routes {
+        const val HOME = "home"
+        const val EXPLORE = "explore"
+        const val PROFILE = "profile"
+        const val ACTIVITY = "activity"
+        const val ISSUES = "issues"
+        const val PERSONAL = "personal"
+        const val BRANCHES = "commits/{projectId}/{branch}"
+        const val REPOSITORY = "repository?projectId={projectId}"
+    }
+
+    data object Home : BottomBarScreen(HOME, "Home", Icons.Default.Home)
+    data object Explore : BottomBarScreen(EXPLORE, "Explore", Icons.Filled.Explore)
+    data object Profile : BottomBarScreen(PROFILE, "Profile", Icons.TwoTone.Person)
+    data object Activity : BottomBarScreen(ACTIVITY, "Activity", Icons.Filled.AvTimer)
 }
