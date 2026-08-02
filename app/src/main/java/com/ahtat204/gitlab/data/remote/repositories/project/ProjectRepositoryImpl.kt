@@ -6,6 +6,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
+import com.ahtat204.gitlab.data.queries.GetUserIssuesQuery
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
@@ -149,6 +150,17 @@ class ProjectRepositoryImpl @Inject constructor(
     override suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?> {
         return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
             .watch().mapAndHandleErrors()
+    }
+
+    override suspend fun getUserIssues(
+        projectCursor: String?, issuesCursor: String?
+    ): Flow<GetUserIssuesQuery.Data> {
+        return apolloClient.query(
+            GetUserIssuesQuery(
+                projectCursor = Optional.presentIfNotNull(projectCursor),
+                issuesCursor = Optional.presentIfNotNull(issuesCursor)
+            )
+        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
 
     /**
