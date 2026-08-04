@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import coil.ImageLoader
 import com.ahtat204.gitlab.R
@@ -91,7 +92,8 @@ fun ProjectDetailScreen(
     navController: NavController,
     x: PaddingValues,
     path: String,
-    projectViewModel: ProjectViewModel = hiltViewModel()
+    sharedBackStackEntry: NavBackStackEntry,
+    projectViewModel: ProjectViewModel = hiltViewModel(sharedBackStackEntry)
 ) {
     val project by projectViewModel.currentProject.collectAsStateWithLifecycle()
     LaunchedEffect(true) {

@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.presentation.components.CoilCache.loader
@@ -76,15 +77,15 @@ import java.time.ZoneId
 fun PersonalProjects(
     navController: NavHostController,
     x: PaddingValues,
-    projectViewModel: ProjectViewModel = hiltViewModel()
+    sharedBackStackEntry: NavBackStackEntry,
+    projectViewModel: ProjectViewModel = hiltViewModel(viewModelStoreOwner = sharedBackStackEntry)
 ) {
     LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
     }
     val currUser by projectViewModel.projects.collectAsState()
     currUser?.namespace?.projects?.nodes?.sortedByDescending {
-        Instant.parse(it?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
-            .toLocalDate()
+        Instant.parse(it?.lastActivityAt.toString()).atZone(ZoneId.systemDefault()).toLocalDate()
     }?.let { nodes ->
         Column(
             verticalArrangement = Arrangement.Center,
