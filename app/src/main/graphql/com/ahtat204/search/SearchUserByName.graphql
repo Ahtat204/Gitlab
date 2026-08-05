@@ -1,0 +1,10 @@
+query SearchUserByName($name:String!){
+    user(username: $name){
+        id
+        name
+        avatarUrl
+        commitEmail
+
+
+    }
+}

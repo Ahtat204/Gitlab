@@ -6,6 +6,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
+import com.ahtat204.gitlab.data.queries.SearchUserByNameQuery
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -86,4 +87,5 @@ interface ProjectRepository {
     ): Flow<GetUserProjectsByNameQuery.Data?>
 
     suspend fun searchProjectsByName(projectName: String): Flow<GetUserProjectsByNameQuery.Data>
+    suspend fun searchUserByName(username: String): Flow<SearchUserByNameQuery.Data>
 }

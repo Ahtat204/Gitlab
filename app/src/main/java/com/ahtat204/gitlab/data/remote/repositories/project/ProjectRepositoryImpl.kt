@@ -7,6 +7,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
+import com.ahtat204.gitlab.data.queries.SearchUserByNameQuery
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
@@ -52,13 +53,6 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [android.util.Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Usage example in ViewModel
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getAllProjects(FetchPolicy.CacheFirst)
-     *         .collect { projects -> renderProjects(projects) }
-     * }
-     * ```
      * Query Example:
      * ```
      *     currentUser {
@@ -118,13 +112,6 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Usage Example in ViewModel
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectById("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
      * Query Example
      * ``` GraphQL
      *  project(fullPath: $projectPath) {
@@ -152,6 +139,11 @@ class ProjectRepositoryImpl @Inject constructor(
             .watch().mapAndHandleErrors()
     }
 
+    override suspend fun searchUserByName(username: String): Flow<SearchUserByNameQuery.Data> {
+        return apolloClient.query(SearchUserByNameQuery(username))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
     override suspend fun searchProjectsByName(projectName: String): Flow<GetUserProjectsByNameQuery.Data> {
         return apolloClient.query(GetUserProjectsByNameQuery(projectName))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
@@ -171,14 +163,6 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectCommits("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
      * query example
      * ``` GraphQL
      *    project(fullPath: $projectPath){
@@ -241,14 +225,6 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getRepositoryBranches("12345",20)
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
      * query example
      * ``` GraphQL
      *    project(fullPath: $projectPath){
@@ -279,13 +255,6 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectRepository("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
      * query example
      * ``` GraphQL
      *     project(fullPath: $projectPath){
