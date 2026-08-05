@@ -51,7 +51,13 @@ interface ProjectRepository {
      * @return A reactive stream emitting the repository tree layer layout, or null if invalid or inaccessible.
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
      */
-    suspend fun getProjectRepository(id: String, branch: String?, path: String? = null): Flow<Data?>
+    suspend fun getProjectRepository(
+        id: String,
+        branch: String?,
+        path: String? = null,
+        blobCursor: String? = null,
+        treesCursor: String? = null
+    ): Flow<Data?>
 
     /**
      * Retrieves a paginated chunk of available reference branches within a repository.

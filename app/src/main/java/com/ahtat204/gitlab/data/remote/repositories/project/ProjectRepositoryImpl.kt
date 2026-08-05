@@ -267,13 +267,15 @@ class ProjectRepositoryImpl @Inject constructor(
      * ```
      */
     override suspend fun getProjectRepository(
-        id: String, branch: String?, path: String?
+        id: String, branch: String?, path: String?, blobCursor: String?, treesCursor: String?
     ): Flow<GetProjectRepositoryQuery.Data?> {
         return apolloClient.query(
             GetProjectRepositoryQuery(
                 id,
                 branch = Optional.presentIfNotNull(branch),
-                path = Optional.presentIfNotNull(path)
+                path = Optional.presentIfNotNull(path),
+                blobsCursor = Optional.presentIfNotNull(blobCursor),
+                treeCursor = Optional.presentIfNotNull(treesCursor)
             )
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
