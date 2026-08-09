@@ -31,6 +31,19 @@ import com.ahtat204.gitlab.presentation.components.Pipeline
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.project.PipelinesViewModel
 
+/**
+ * Composable representing the Pipelines screen for a specific project.
+ *
+ * This screen displays a list of CI/CD pipelines filtered by status. It supports
+ * infinite scrolling by automatically fetching more pipelines when the user
+ * reaches the bottom of the list.
+ *
+ * @param project The unique identifier or full path of the GitLab project.
+ * @param navController Controller used for navigating between screens.
+ * @param x Padding values representing the inner padding provided by a Scaffold.
+ * @param pipelinesViewModel The ViewModel responsible for managing pipeline data,
+ *                           injected via Hilt.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Pipelines(
@@ -90,10 +103,7 @@ fun Pipelines(
                     }
                 }
             }
-            /**
-             *
-             *
-             */
+
         }
     }
 }
