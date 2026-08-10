@@ -9,6 +9,9 @@ query GetProjectPipelines($project:ID!,$cursor:String,$status:PipelineStatusEnum
                 finishedAt
                 id
                 name
+                user {
+                    avatarUrl
+                }
             }
             pageInfo {
                 hasNextPage
