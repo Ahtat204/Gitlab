@@ -91,6 +91,13 @@ interface GraphQlRepository {
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
     fun getMyProfile(): Flow<GetMyProfileQuery.Data>
+    /**
+     * Streams all projects belonging to a specific user identified by their username.
+     *
+     * @param userName The unique username of the GitLab user.
+     * @return A reactive stream emitting the user's project collection metadata, or null if not found.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
     suspend fun getUserProjectsByName(
         userName: String
     ): Flow<GetUserProjectsByNameQuery.Data?>

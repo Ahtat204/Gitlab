@@ -317,6 +317,19 @@ class ApolloGraphQLRepository @Inject constructor(
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
 
+    /**
+     * Streams all projects belonging to a specific user identified by their username.
+     *
+     * @param userName The unique username of the GitLab user.
+     * @return A reactive stream emitting the user's project collection metadata, or null if not found.
+     *
+     * ### Behavior
+     * - Executes [GetUserProjectsByNameQuery] with the provided username.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow using [watch] to observe changes.
+     * - Handles errors gracefully via [mapAndHandleErrors].
+     * - Throws [kotlinx.coroutines.CancellationException] if the collection coroutine scope is cancelled.
+     */
     override suspend fun getUserProjectsByName(
         userName: String
     ): Flow<GetUserProjectsByNameQuery.Data?> {
