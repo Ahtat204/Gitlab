@@ -52,6 +52,7 @@ fun CollaborationDetails(
     mergeRequestCount: Int?,
     pipelinesCount: Int?,
     navController: NavController,
+    encodedId:String
 ) {
     Column(
         modifier = Modifier
@@ -60,13 +61,13 @@ fun CollaborationDetails(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        issuesCount.let { ProjectWorkItems(Item("issues", "issues", R.drawable.issues, it)) {} }
+        ProjectWorkItems(Item("issues", "issues", R.drawable.issues, issuesCount)) {}
         mergeRequestCount?.let {
             ProjectWorkItems(
                 Item(
                     "Merge Requests", "merge_requests", R.drawable.mergerequest, it
                 )
-            ) {}
+            ) {navController.navigate("mergerequests?projectId=$encodedId")}
         }
             ProjectWorkItems(
                 Item(

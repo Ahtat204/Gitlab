@@ -3,6 +3,7 @@ package com.ahtat204.gitlab.data.remote.repositories.graphql
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
@@ -18,6 +19,13 @@ import kotlinx.coroutines.flow.Flow
  * 2. **Centralize Data Logic**: Provides a single entry point for all queries, ensuring consistent caching policies.
  * 3. **Optimize Apollo Usage**: Facilitates cross-domain data consistency through Apollo's normalized cache.
  *
+ * ### Contracts:
+ * - [getAllProjects]: retrieves and Streams all projects the authenticated user has contributed to.
+ * - [getProjectById]: Retrieves and streams a project overview for a given project (full description, star count, fork count, ...).
+ * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
+ * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
+ * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
+ * - [getProjectMergeRequests]: Retrieves and streams first 20 merge request ina Gitlab Project in descending order by creation Date.
  * ### Key Responsibilities:
  * - **User Dashboard**: [getAllProjects] and [getMyProfile].
  * - **Project Intelligence**: [getProjectById] and [getUserProjectsByName].
@@ -85,6 +93,17 @@ interface GraphQlRepository {
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
 
+    /**
+     * Retrieves a paginated chunk of available Merged requests  within a project.
+     *
+     * @param id The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the current window slice of matching branch records.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
+    suspend fun getProjectMergeRequests(
+        id: String, cursor: String? = null
+    ): Flow<GetProjectMergeRequestsQuery.Data>
     /**
      * Streams a continuous FLow containing the CurrentUser Profile data.
      * @return A reactive stream emitting the Authenticated User's profile details
