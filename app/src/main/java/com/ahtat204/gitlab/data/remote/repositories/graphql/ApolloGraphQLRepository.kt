@@ -1,12 +1,14 @@
-package com.ahtat204.gitlab.data.remote.repositories.project
+package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
+import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
@@ -19,14 +21,19 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Implementation of [ProjectRepository] that integrates with GitLab via Apollo GraphQL.
+ * Implementation of [GraphQlRepository] that serves as the central hub for all GitLab GraphQL interactions.
  *
- * ## Overview
- * - Provides reactive streams of project data using Kotlin [Flow].
- * - Uses Apollo’s normalized caching with configurable [FetchPolicy].
- * - Annotated with `@Inject` for dependency injection, ensuring a singleton lifecycle.
- * - Annotated with [Singleton] to avoid creating a new Repository everytime the ViewModel is created since this Dependency is just for fetching data , doesn't have a state to hold
+ * ## Architecture: Unified Repository (SSOT)
+ * This class is designed as a single, consolidated repository for all domain data (Projects, Profiles, Commits, etc.).
+ * By avoiding a split into multiple domain-specific repositories, we:
+ * - **Reduce Allocation**: Single singleton instance injected across all ViewModels.
+ * - **Ensure Consistency**: All queries share the same [ApolloClient] instance and its normalized cache.
+ * - **Streamline DI**: Simplifies Dagger/Hilt configuration by providing a one-stop-shop for GraphQL data.
  *
+ * ## Data Strategy
+ * - **Reactive Streams**: Returns Kotlin [Flow] to provide real-time updates when the cache changes.
+ * - **Normalized Caching**: Leverages Apollo's cache to minimize network requests and ensure data integrity.
+ * - **Performance**: Annotated with [Singleton] to persist across the app's lifecycle without redundant object creation.
  * ## Responsibilities
  * - Fetch all projects contributed by the authenticated user.
  * - Access detailed project metadata including star counts, fork counts, and descriptions.
@@ -35,6 +42,7 @@ import javax.inject.Singleton
  * - Stream project merge requests with support for pagination.
  * - Handle errors gracefully with unified logging and structured concurrency.
  *
+ * @param apolloClient The primary GraphQL engine used for network transport and cache management.
  * ## Dependencies
  * - [ApolloClient]: Executes GraphQL queries and manages caching.
  * - [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery], [GetProjectMergeRequestsQuery], [GetProjectRepositoryQuery], [GetRepositoryCommitsQuery], [GetRepositoryBranchesQuery]: Auto‑generated query classes.
@@ -42,9 +50,9 @@ import javax.inject.Singleton
  * @author Lahcen AHTAT
  */
 @Singleton
-class ProjectRepositoryImpl @Inject constructor(
+class ApolloGraphQLRepository @Inject constructor(
     private val apolloClient: ApolloClient
-) : ProjectRepository {
+) : GraphQlRepository {
     /**
      * Streams all projects the authenticated user has contributed to.
      * @return A [Flow] emitting [GetMyPersonalProjectsQuery.Data] objects.
@@ -55,13 +63,6 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [android.util.Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Usage example in ViewModel
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getAllProjects(FetchPolicy.CacheFirst)
-     *         .collect { projects -> renderProjects(projects) }
-     * }
-     * ```
      * Query Example:
      * ```
      *     currentUser {
@@ -177,13 +178,6 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Usage Example in ViewModel
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectById("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
      * Query Example
      * ``` GraphQL
      *  project(fullPath: $projectPath) {
@@ -212,6 +206,44 @@ class ProjectRepositoryImpl @Inject constructor(
     }
 
     /**
+     * Retrieves profile data of the currentUser
+     * @return A [Flow] emitting [GetMyProfileQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetMyProfileQuery].
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Logs errors without terminating the stream.
+     * Query Example
+     * ```
+     *     currentUser {
+     *         id
+     *         name
+     *         username
+     *         publicEmail
+     *         avatarUrl
+     *         webUrl
+     *         status {
+     *             availability
+     *             emoji
+     *             message
+     *
+     *         }
+     *         bio
+     *         location
+     *         github
+     *         jobTitle
+     *         projectCount
+     *         linkedin
+     *     }
+     * ```
+     */
+    override fun getMyProfile(): Flow<GetMyProfileQuery.Data> {
+        return apolloClient.query(GetMyProfileQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
+            .mapAndHandleErrors()
+    }
+
+    /**
      * Retrieves a paginated list of first 20 commits a given project repository .
      *
      * @param id The unique identifier of the project.
@@ -225,14 +257,6 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectCommits("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
      * query example
      * ``` GraphQL
      *    project(fullPath: $projectPath){
@@ -295,14 +319,6 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getRepositoryBranches("12345",20)
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
      * query example
      * ``` GraphQL
      *    project(fullPath: $projectPath){
@@ -333,13 +349,7 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectRepository("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
+
      * query example
      * ``` GraphQL
      *     project(fullPath: $projectPath){
@@ -373,5 +383,25 @@ class ProjectRepositoryImpl @Inject constructor(
                 path = Optional.presentIfNotNull(path)
             )
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
+    /**
+     * Streams all projects belonging to a specific user identified by their username.
+     *
+     * @param userName The unique username of the GitLab user.
+     * @return A reactive stream emitting the user's project collection metadata, or null if not found.
+     *
+     * ### Behavior
+     * - Executes [GetUserProjectsByNameQuery] with the provided username.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow using [watch] to observe changes.
+     * - Handles errors gracefully via [mapAndHandleErrors].
+     * - Throws [kotlinx.coroutines.CancellationException] if the collection coroutine scope is cancelled.
+     */
+    override suspend fun getUserProjectsByName(
+        userName: String
+    ): Flow<GetUserProjectsByNameQuery.Data?> {
+        return apolloClient.query(GetUserProjectsByNameQuery(userName))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
 }

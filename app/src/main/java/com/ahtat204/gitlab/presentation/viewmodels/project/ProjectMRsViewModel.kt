@@ -3,7 +3,7 @@ package com.ahtat204.gitlab.presentation.viewmodels.project
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
-import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ typealias MergeRequests = GetProjectMergeRequestsQuery.MergeRequests?
  * ViewModel responsible for managing and providing Merge Request data for a specific GitLab project.
  *
  * ## Responsibilities
- * - Fetches Merge Requests from the [ProjectRepository].
+ * - Fetches Merge Requests from the [GraphQlRepository].
  * - Exposes a reactive stream of [MergeRequests] to the UI.
  * - Handles the lifecycle of the data fetching operation using [viewModelScope].
  *
@@ -30,9 +30,8 @@ typealias MergeRequests = GetProjectMergeRequestsQuery.MergeRequests?
  */
 @HiltViewModel
 class ProjectMRsViewModel @Inject constructor(
-    private val repository: ProjectRepository
+    private val repository: GraphQlRepository
 ) : ViewModel() {
-
     private val _mrs = MutableStateFlow<MergeRequests>(null)
 
     /**

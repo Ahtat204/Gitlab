@@ -21,6 +21,18 @@ import androidx.navigation.NavHostController
 import com.ahtat204.gitlab.presentation.components.MergeRequest
 import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectMRsViewModel
 
+/**
+ * Composable representing the Merge Requests screen for a specific project.
+ *
+ * This screen displays a list of merge requests associated with the given project.
+ * It uses the [ProjectMRsViewModel] to fetch and manage the data.
+ *
+ * @param project The unique identifier or full path of the GitLab project.
+ * @param navController Controller used for navigating between screens.
+ * @param x Padding values representing the inner padding provided by a Scaffold.
+ * @param mRsViewModel The ViewModel responsible for managing project merge requests,
+ *                     injected via Hilt.
+ */
 @Composable
 fun MergeRequests(
     project: String,
