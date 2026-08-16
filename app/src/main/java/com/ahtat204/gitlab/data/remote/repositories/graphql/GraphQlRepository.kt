@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
+import com.ahtat204.gitlab.data.queries.GetCommitDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
@@ -22,7 +23,7 @@ import kotlinx.coroutines.flow.Flow
  * - **User Dashboard**: [getAllProjects] and [getMyProfile].
  * - **Project Intelligence**: [getProjectById] and [getUserProjectsByName].
  * - **Repository Browsing**: [getProjectRepository] and [getProjectCommits].
- * - **Git Metadata**: [getRepositoryBranches].
+ * - **Git Metadata**: [getRepositoryBranches].[getCommitDetails]
  *
  * @author Lahcen AHTAT
  */
@@ -91,6 +92,7 @@ interface GraphQlRepository {
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
     fun getMyProfile(): Flow<GetMyProfileQuery.Data>
+
     /**
      * Streams all projects belonging to a specific user identified by their username.
      *
@@ -101,4 +103,16 @@ interface GraphQlRepository {
     suspend fun getUserProjectsByName(
         userName: String
     ): Flow<GetUserProjectsByNameQuery.Data?>
+
+    /**
+     * Streams a continuous, sequentially chunked record of repository commit histories.
+     *
+     * Implementations are expected to manage incremental page updates and item appending states.
+     *
+     * @param project The unique identifier or full path of the target GitLab project.
+     * @param sha The unique identifier of the commit.
+     * @return A reactive stream emitting specific information about the commit(ex:description,author.name,parentSha,authorName,pipelines,...)
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     */
+    suspend fun getCommitDetails(sha: String, project: String): Flow<GetCommitDetailsQuery.Data>
 }

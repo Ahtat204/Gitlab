@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.queries.GetCommitDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
@@ -335,5 +336,57 @@ class ApolloGraphQLRepository @Inject constructor(
     ): Flow<GetUserProjectsByNameQuery.Data?> {
         return apolloClient.query(GetUserProjectsByNameQuery(userName))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
+    /**
+     * Streams details about the commit with the [sha] identifier.
+     * @param project The unique identifier or full path of the target GitLab project.
+     * @param sha The unique identifier of the commit.
+     * @return A [Flow] emitting [GetCommitDetailsQuery.Data] objects.
+     *
+     * ### Behavior
+     * - Executes [GetCommitDetailsQuery] with the provided fetch policy.
+     * - Uses Apollo’s [watch] to continuously observe changes.
+     * - Filters out null results with `mapNotNull`.
+     * - Logs exceptions with [Log.e] while keeping the stream alive.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     * Query Example:
+     * ```
+     *    project(fullPath: $project){
+     *         repository {
+     *             commit(ref:$sha ){
+     *                 id
+     *                 authorName
+     *                 description
+     *                 author {
+     *                     name
+     *                 }
+     *                 parentSha
+     *                 diffs{
+     *                     diff
+     *                     aMode
+     *                     deletedFile
+     *                     newFile
+     *                     renamedFile
+     *                 }
+     *                 pipelines(first: 20,after: $cursor){
+     *                     edges {
+     *                         node {
+     *                             id
+     *                             finishedAt
+     *                         }
+     *                     }
+     *                 }
+     *
+     *             }
+     *         }
+     *     }
+     * ```
+     */
+    override suspend fun getCommitDetails(
+        sha: String, project: String
+    ): Flow<GetCommitDetailsQuery.Data> {
+        return apolloClient.query(GetCommitDetailsQuery(project = project, sha = sha))
+            .fetchPolicy((FetchPolicy.CacheFirst)).watch().mapAndHandleErrors()
     }
 }

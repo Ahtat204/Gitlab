@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
@@ -59,9 +60,9 @@ import com.ahtat204.gitlab.presentation.ui.theme.titleFont
  * @author Lahcen AHTAT
  */
 @Composable
-fun CommitCard(sha: String?, message: String?, author: String, date: String) {
+fun CommitCard(project:String,sha: String?, message: String?, author: String, date: String,navController: NavController) {
     Card(
-        {}, modifier = Modifier
+        {navController.navigate("commit/$project/$sha")}, modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp, 10.dp)
             .background(Color.Black)

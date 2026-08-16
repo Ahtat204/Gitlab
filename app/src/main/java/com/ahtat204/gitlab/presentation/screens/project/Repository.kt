@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.ahtat204.gitlab.presentation.components.BranchesList
 import com.ahtat204.gitlab.presentation.components.FileBrowser
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
@@ -129,20 +128,24 @@ fun RepositoryScreen(
                         parsedDateTime,
                         navController,
                         projectPath,
-                        history)
+                        history
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(30.dp))
 
-            if(!history.value){
-                FileBrowser(repositoryViewModel, currentBranch, projectPath, repository)
+            if (!history.value) {
+                FileBrowser(
+                    repositoryViewModel, currentBranch, projectPath, repository
+                )
             }
-            if(history.value==true){
-             currentBranch.value?.let{
-                 ProjectCommits(navController = navController, branch = it, id = projectPath)
-             }
+            if (history.value) {
+                currentBranch.value?.let {
+                    ProjectCommits(
+                        navController = navController, branch = it, id = projectPath
+                    )
+                }
             }
-
         }
 
         if (showSheet) {
