@@ -7,6 +7,7 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
+
 /**
  * Utility object for encrypting and decrypting sensitive data using
  * the Android Keystore system.
@@ -38,13 +39,25 @@ import javax.crypto.spec.IvParameterSpec
  * @author Lahcen AHTAT
  */
 object CryptoUtility {
+    /** The alias used to store the secret key in the Android Keystore. */
     private const val KEY_ALIAS = "secret"
+
+    /** The encryption algorithm used (AES). */
     private const val ALGORITHM = KeyProperties.KEY_ALGORITHM_AES
+
+    /** The block mode used for encryption (CBC). */
     private const val BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
+
+    /** The padding scheme used for encryption (PKCS7). */
     private const val PADDING = KeyProperties.ENCRYPTION_PADDING_PKCS7
+
+    /** The full transformation string for the [Cipher] instance. */
     private const val TRANSFORMATION = "$ALGORITHM/$BLOCK_MODE/$PADDING"
 
+    /** The [Cipher] instance used for performing encryption and decryption. */
     private val cipher = Cipher.getInstance(TRANSFORMATION)
+
+    /** The [KeyStore] instance used to manage cryptographic keys. */
     private val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
 
     /**
