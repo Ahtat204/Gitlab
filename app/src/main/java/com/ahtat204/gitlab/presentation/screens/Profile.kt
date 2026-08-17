@@ -36,7 +36,7 @@ import com.ahtat204.gitlab.presentation.components.Info
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.viewmodels.ProfileViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.user.ProfileViewModel
 import kotlinx.coroutines.Dispatchers
 
 /**

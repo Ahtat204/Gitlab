@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
+import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
@@ -91,6 +92,7 @@ interface GraphQlRepository {
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
     fun getMyProfile(): Flow<GetMyProfileQuery.Data>
+
     /**
      * Streams all projects belonging to a specific user identified by their username.
      *
@@ -101,4 +103,13 @@ interface GraphQlRepository {
     suspend fun getUserProjectsByName(
         userName: String
     ): Flow<GetUserProjectsByNameQuery.Data?>
+
+    /**
+     * Streams a continuous, sequentially chunked record of the [com.ahtat204.gitlab.data.queries.type.CurrentUser]  contributed  Projects.
+     *
+     * Implementations are expected to manage incremental page updates and item appending states.
+     * @return A reactive stream emitting the first 20 Contributed Projects then more with cursor pagination.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     */
+    suspend fun getAllMyContributedProjects(): Flow<GetMyContributedProjectsQuery.Data>
 }

@@ -140,23 +140,23 @@ fun RepositoryScreen(
             if(history.value==true){
              currentBranch.value?.let{
                  ProjectCommits(navController = navController, branch = it, id = projectPath)
-             }
+                                            }
+                                            }
+
             }
 
-        }
-
-        if (showSheet) {
-            ModalBottomSheet(
-                modifier = Modifier.fillMaxHeight(),
-                onDismissRequest = { showSheet = false },
-                sheetState = sheetState
-            ) {
-                LaunchedEffect(currentBranch.value) {
-                    repositoryViewModel.loadRepositoryBranches(projectPath)
+            if (showSheet) {
+                ModalBottomSheet(
+                    modifier = Modifier.fillMaxHeight(),
+                    onDismissRequest = { showSheet = false },
+                    sheetState = sheetState
+                ) {
+                    LaunchedEffect(currentBranch.value) {
+                        repositoryViewModel.loadRepositoryBranches(projectPath)
+                    }
+                    val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
+                    BranchesList(branches, repositoryViewModel, projectPath, currentBranch, x)
                 }
-                val branches by repositoryViewModel.branches.collectAsStateWithLifecycle()
-                BranchesList(branches, repositoryViewModel, projectPath, currentBranch, x)
             }
         }
     }
-}

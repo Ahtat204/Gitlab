@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
@@ -334,6 +335,57 @@ class ApolloGraphQLRepository @Inject constructor(
         userName: String
     ): Flow<GetUserProjectsByNameQuery.Data?> {
         return apolloClient.query(GetUserProjectsByNameQuery(userName))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
+    /**
+     * Streams all Personal projects the authenticated user has contributed to.
+     * @return A [Flow] emitting [com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery.Data] objects.
+     *
+     * ### Behavior
+     * - Executes [com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery] with the provided fetch policy.
+     * - Uses Apollo’s [watch] to continuously observe changes.
+     * - Filters out null results with `mapNotNull`.
+     * - Logs exceptions with [Log.e] while keeping the stream alive.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     * ### Implementation Example
+     * Query Example:
+     * ```
+     *    currentUser {
+     *             contributedProjects(first: 20,includePersonal: true,after: $cursor){
+     *                 pageInfo {
+     *                     startCursor
+     *                     hasNextPage
+     *                     hasPreviousPage
+     *                 }
+     *                 nodes {
+     *                     id
+     *                     topics
+     *                     lastActivityAt
+     *                     __typename
+     *                     languages {
+     *                         color
+     *                         name
+     *                     }
+     *                     name
+     *                     fullPath
+     *                     description
+     *                     visibility
+     *                     pipelines(first: 1){
+     *                         nodes {
+     *                             __typename
+     *                             id
+     *                             status
+     *                         }
+     *                     }
+     *                 }
+     *             }
+     *
+     *     }
+     * ```
+     */
+    override suspend fun getAllMyContributedProjects(): Flow<GetMyContributedProjectsQuery.Data> {
+        return apolloClient.query(GetMyContributedProjectsQuery())
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
 }
