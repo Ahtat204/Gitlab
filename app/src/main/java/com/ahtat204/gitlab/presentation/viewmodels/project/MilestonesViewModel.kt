@@ -3,7 +3,7 @@ package com.ahtat204.gitlab.presentation.viewmodels.project
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectMilestonesQuery
-import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,7 @@ import javax.inject.Inject
 typealias Milestones = GetProjectMilestonesQuery.Milestones?
 
 @HiltViewModel
-class MilestonesViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
+class MilestonesViewModel @Inject constructor(private val repository: GraphQlRepository) :
     ViewModel() {
     private val _milestones = MutableStateFlow<Milestones>(null)
     val milestones: StateFlow<Milestones> = _milestones.asStateFlow()
@@ -22,7 +22,7 @@ class MilestonesViewModel @Inject constructor(private val projectRepository: Pro
         val value = _milestones.value
         if (value == null) {
             viewModelScope.launch {
-                projectRepository.getProjectMilestones(project)
+                repository.getProjectMilestones(project)
                     .collect { _milestones.value = it.project?.milestones }
             }
         } else {
@@ -31,7 +31,7 @@ class MilestonesViewModel @Inject constructor(private val projectRepository: Pro
             val cursor = page.endCursor
             if (hasNextPage && cursor != null) {
                 viewModelScope.launch {
-                    projectRepository.getProjectMilestones(project, cursor)
+                    repository.getProjectMilestones(project, cursor)
                         .collect { _milestones.value = it.project?.milestones }
                 }
             }
