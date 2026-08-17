@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
-import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import com.ahtat204.gitlab.presentation.components.withCacheFallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,8 +14,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ContributedProjectsViewModel @Inject constructor(private val projectRepository: ProjectRepository) : ViewModel() {
-
+class ContributedProjectsViewModel @Inject constructor(private val graphqlRepository: GraphQlRepository) :
+    ViewModel() {
     /** Currently selected project’s overview/details */
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
 
@@ -32,8 +32,7 @@ class ContributedProjectsViewModel @Inject constructor(private val projectReposi
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
     fun loadAllProjects() = viewModelScope.launch {
-        projectRepository.getAllMyContributedProjects().withCacheFallback { projectRepository.getAllMyContributedProjects() }
-            .collect { _projects.value = it.currentUser }
+        graphqlRepository.getAllMyContributedProjects().collect { _projects.value = it.currentUser }
     }
 
     /**
@@ -42,8 +41,8 @@ class ContributedProjectsViewModel @Inject constructor(private val projectReposi
      * @param id The unique project identifier.
      */
     fun loadProject(id: String) = viewModelScope.launch {
-        projectRepository.getProjectById(id).withCacheFallback {
-            projectRepository.getProjectById(
+        graphqlRepository.getProjectById(id).withCacheFallback {
+            graphqlRepository.getProjectById(
                 id
             )
         }.collect { currentProject.value = it?.project }

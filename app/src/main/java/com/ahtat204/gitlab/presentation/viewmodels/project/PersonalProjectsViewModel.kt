@@ -4,8 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
-import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
-import com.ahtat204.gitlab.presentation.components.withCacheFallback
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -47,7 +46,7 @@ import javax.inject.Inject
  * @author Lahcen AHTAT
  */
 @HiltViewModel
-class PersonalProjectsViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
+class PersonalProjectsViewModel @Inject constructor(private val graphqlRepository: GraphQlRepository) :
     ViewModel() {
     /** Currently selected project’s overview/details */
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
@@ -65,7 +64,7 @@ class PersonalProjectsViewModel @Inject constructor(private val projectRepositor
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
     fun loadAllProjects() = viewModelScope.launch {
-        projectRepository.getAllProjects().collect { _projects.value = it.currentUser }
+        graphqlRepository.getAllProjects().collect { _projects.value = it.currentUser }
     }
 
     /**
@@ -74,7 +73,7 @@ class PersonalProjectsViewModel @Inject constructor(private val projectRepositor
      * @param id The unique project identifier.
      */
     fun loadProject(id: String) = viewModelScope.launch {
-        projectRepository.getProjectById(id).collect { currentProject.value = it?.project }
+        graphqlRepository.getProjectById(id).collect { currentProject.value = it?.project }
     }
 
 }

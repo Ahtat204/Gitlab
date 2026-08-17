@@ -1,30 +1,33 @@
-package com.ahtat204.gitlab.data.remote.repositories.project
+package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
-import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
+import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Repository interface for accessing GitLab project data via GraphQL.
+ * Unified Repository interface for all GitLab GraphQL operations.
  *
- * Provides reactive streams of project lists, details, and repository trees.
- * Implementations are expected to use Apollo GraphQL client with caching policies.
+ * This repository serves as the **Single Source of Truth (SSOT)** for all data retrieved via GraphQL.
+ * Unlike traditional domain-driven repositories, this unified approach is used to:
+ * 1. **Minimize Memory Overhead**: Prevents the creation of multiple repository instances for different domains.
+ * 2. **Centralize Data Logic**: Provides a single entry point for all queries, ensuring consistent caching policies.
+ * 3. **Optimize Apollo Usage**: Facilitates cross-domain data consistency through Apollo's normalized cache.
  *
- * ### Contracts:
- * - [getAllProjects]: retrieves and Streams all projects the authenticated user has contributed to.
- * - [getProjectById]: Retrieves and streams a project overview for a given project (full description, star count, fork count, ...).
- * - [getProjectRepository]: Retrieves and streams  the repository tree (blobs, trees,...) for a given project.
- * - [getProjectCommits]: Retrieves and streams the repository commits for a given project.
- * - [getRepositoryBranches]: Retrieves and streams first 20 branches in a repository.
- * - [getAllMyContributedProjects]: Retrieves and streams first 20 pipeline in a Gitlab Project.
+ * ### Key Responsibilities:
+ * - **User Dashboard**: [getAllProjects] and [getMyProfile].
+ * - **Project Intelligence**: [getProjectById] and [getUserProjectsByName].
+ * - **Repository Browsing**: [getProjectRepository] and [getProjectCommits].
+ * - **Git Metadata**: [getRepositoryBranches].
+ *
  * @author Lahcen AHTAT
  */
-interface ProjectRepository {
+interface GraphQlRepository {
     /**
      * Streams all projects that the currently authenticated user has contributed to.
      *
@@ -84,6 +87,24 @@ interface ProjectRepository {
     ): Flow<GetRepositoryCommitsQuery.Data?>
 
     /**
+     * Streams a continuous FLow containing the CurrentUser Profile data.
+     * @return A reactive stream emitting the Authenticated User's profile details
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     */
+    fun getMyProfile(): Flow<GetMyProfileQuery.Data>
+
+    /**
+     * Streams all projects belonging to a specific user identified by their username.
+     *
+     * @param userName The unique username of the GitLab user.
+     * @return A reactive stream emitting the user's project collection metadata, or null if not found.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
+    suspend fun getUserProjectsByName(
+        userName: String
+    ): Flow<GetUserProjectsByNameQuery.Data?>
+
+    /**
      * Streams a continuous, sequentially chunked record of the [com.ahtat204.gitlab.data.queries.type.CurrentUser]  contributed  Projects.
      *
      * Implementations are expected to manage incremental page updates and item appending states.
@@ -91,5 +112,4 @@ interface ProjectRepository {
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
     suspend fun getAllMyContributedProjects(): Flow<GetMyContributedProjectsQuery.Data>
-
 }

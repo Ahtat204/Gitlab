@@ -1,13 +1,14 @@
-package com.ahtat204.gitlab.data.remote.repositories.project
+package com.ahtat204.gitlab.data.remote.repositories.graphql
 
-import android.util.Log
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
 import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
+import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
@@ -20,29 +21,27 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Implementation of [ProjectRepository] that integrates with GitLab via Apollo GraphQL.
+ * Implementation of [GraphQlRepository] that serves as the central hub for all GitLab GraphQL interactions.
  *
- * ## Overview
- * - Provides reactive streams of project data using Kotlin [Flow].
- * - Uses Apollo’s normalized caching with configurable [FetchPolicy].
- * - Annotated with `@Inject` for dependency injection, ensuring a singleton lifecycle.
- * - Annotated with [Singleton] to avoid creating a new Repository everytime the ViewModel is created since this Dependency is just for fetching data , doesn't have a state to hold
+ * ## Architecture: Unified Repository (SSOT)
+ * This class is designed as a single, consolidated repository for all domain data (Projects, Profiles, Commits, etc.).
+ * By avoiding a split into multiple domain-specific repositories, we:
+ * - **Reduce Allocation**: Single singleton instance injected across all ViewModels.
+ * - **Ensure Consistency**: All queries share the same [ApolloClient] instance and its normalized cache.
+ * - **Streamline DI**: Simplifies Dagger/Hilt configuration by providing a one-stop-shop for GraphQL data.
  *
- * ## Responsibilities
- * - Fetch all projects contributed by the authenticated user.
- * - Retrieve repository tree data for a specific project by ID.
- * - Handle errors gracefully with logging and structured concurrency.
+ * ## Data Strategy
+ * - **Reactive Streams**: Returns Kotlin [Flow] to provide real-time updates when the cache changes.
+ * - **Normalized Caching**: Leverages Apollo's cache to minimize network requests and ensure data integrity.
+ * - **Performance**: Annotated with [Singleton] to persist across the app's lifecycle without redundant object creation.
  *
- * ## Dependencies
- * - [ApolloClient]: Executes GraphQL queries and manages caching.
- * - [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery],[GetProjectRepositoryQuery],[GetRepositoryCommitsQuery],[GetRepositoryBranchesQuery]: Auto‑generated query classes.
- * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
+ * @param apolloClient The primary GraphQL engine used for network transport and cache management.
  * @author Lahcen AHTAT
  */
 @Singleton
-class ProjectRepositoryImpl @Inject constructor(
+class ApolloGraphQLRepository @Inject constructor(
     private val apolloClient: ApolloClient
-) : ProjectRepository {
+) : GraphQlRepository {
     /**
      * Streams all projects the authenticated user has contributed to.
      * @return A [Flow] emitting [GetMyPersonalProjectsQuery.Data] objects.
@@ -51,27 +50,8 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Executes [GetMyPersonalProjectsQuery] with the provided fetch policy.
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
-     * - Logs exceptions with [Log.e] while keeping the stream alive.
+     * - Logs exceptions with [android.util.Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Implementation Example
-     * ```
-     * override suspend fun getAllProjects(): Flow<GetMyProjectsPaginatedQuery.Data> =
-     *         apolloClient.query(GetMyProjectsPaginatedQuery()).fetchPolicy(FetchPolicy.CacheFirst)
-     *             .watch().mapNotNull { it.data }.catch { ex ->
-     *                 if (ex is CancellationException) throw ex
-     *                 else Log.d(ex.cause,ex.message)
-     *             }.mapNotNull { it }
-     *
-     * ```
-     *
-     *
-     * ### Usage example in ViewModel
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getAllProjects(FetchPolicy.CacheFirst)
-     *         .collect { projects -> renderProjects(projects) }
-     * }
-     * ```
      * Query Example:
      * ```
      *     currentUser {
@@ -131,24 +111,6 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Implementation Example
-     * ```kotlin
-     *  override suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?> {
-     *         return apolloClient.query(GetProjectDetailsQuery(id)).fetchPolicy(FetchPolicy.CacheFirst)
-     *             .watch().mapNotNull { it.data }.catch { ex ->
-     *                 if (ex is CancellationException) throw ex
-     *             }.mapNotNull { it }
-     *     }
-     * ```
-     *
-     *
-     * ### Usage Example in ViewModel
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectById("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
      * Query Example
      * ``` GraphQL
      *  project(fullPath: $projectPath) {
@@ -177,84 +139,45 @@ class ProjectRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Retrieves the repository tree for a given project.
-     *
-     * @param id The unique identifier of the project.
-     * @param path the path of the folder you want to open
-     * @param branch the branch of the repository
-     * @return A [Flow] emitting [GetProjectRepositoryQuery.Data] objects, or null if unavailable.
+     * Retrieves profile data of the currentUser
+     * @return A [Flow] emitting [GetMyProfileQuery.Data] objects, or null if unavailable.
      *
      * ### Behavior
-     * - Executes [GetProjectRepositoryQuery] with the provided project ID.
+     * - Executes [GetMyProfileQuery].
      * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
      * - Emits results reactively via Flow.
-     * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
-     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     * ### Implementation Example
-     * ```kotlin
-     *     override suspend fun getProjectRepository(id: String,skip:Int,branch:String?): Flow<GetProjectRepositoryQuery.Data?> {
-     *       return  if(branch==null) {
-     *             apolloClient.query(GetProjectRepositoryQuery(id,skip = skip))
-     *                 .fetchPolicy(FetchPolicy.CacheFirst)
-     *                 .watch().mapNotNull { it.data }
-     *                 .catch { ex ->
-     *                 if (ex is CancellationException) throw ex
-     *             }.mapNotNull { it }
-     *         }
-     *         else{
-     *           apolloClient.query(GetProjectRepositoryQuery(id,skip = skip, branch = Optional.present(branch)))
-     *               .fetchPolicy(FetchPolicy.CacheFirst).watch()
-     *               .mapNotNull { it.data }.catch { ex ->
-     *               if (ex is CancellationException) throw ex
-     *           }.mapNotNull { it }
-     *         }
-     *     }
+     * Query Example
      * ```
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectRepository("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
-     * query example
-     * ``` GraphQL
-     *     project(fullPath: $projectPath){
+     *     currentUser {
      *         id
-     *         repository {
-     *             branchNames(searchPattern: "*",limit: 20,offset: $skip)
-     *             rootRef
-     *         tree(ref: $branch){
-     *             blobs{
-     *                 nodes {
-     *                     id
-     *                     name
-     *                     webUrl
-     *                     path
-     *                 }
-     *
-     *             }
+     *         name
+     *         username
+     *         publicEmail
+     *         avatarUrl
+     *         webUrl
+     *         status {
+     *             availability
+     *             emoji
+     *             message
      *
      *         }
-     *         }
+     *         bio
+     *         location
+     *         github
+     *         jobTitle
+     *         projectCount
+     *         linkedin
      *     }
      * ```
      */
-    override suspend fun getProjectRepository(
-        id: String, branch: String?, path: String?
-    ): Flow<GetProjectRepositoryQuery.Data?> {
-        return apolloClient.query(
-            GetProjectRepositoryQuery(
-                id,
-                branch = Optional.presentIfNotNull(branch),
-                path = Optional.presentIfNotNull(path)
-            )
-        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    override fun getMyProfile(): Flow<GetMyProfileQuery.Data> {
+        return apolloClient.query(GetMyProfileQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
+            .mapAndHandleErrors()
     }
 
     /**
-     * Retrieves the repository tree for a given project.
+     * Retrieves a paginated list of first 20 commits a given project repository .
      *
      * @param id The unique identifier of the project.
      * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
@@ -267,14 +190,6 @@ class ProjectRepositoryImpl @Inject constructor(
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Logs errors without terminating the stream.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectCommits("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
      * query example
      * ``` GraphQL
      *    project(fullPath: $projectPath){
@@ -321,35 +236,119 @@ class ProjectRepositoryImpl @Inject constructor(
             )
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
             .fetchAndMergeCommits(client = apolloClient, branch, id, cursor)
-
     }
+
     /**
-     * Streams all Personal projects the authenticated user has contributed to.
-     * @return A [Flow] emitting [GetMyContributedProjectsQuery.Data] objects.
+     * Retrieves the repository tree for a given project.
+     *
+     * @param project The unique identifier of the project.
+     * @param skip: a pseudo-pagination key to determine how many branches you want to skip before fetching
+     * @return A [Flow] emitting [GetRepositoryBranchesQuery.Data] objects, or null if unavailable.
      *
      * ### Behavior
-     * - Executes [GetMyContributedProjectsQuery] with the provided fetch policy.
-     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Executes [GetRepositoryBranchesQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     * query example
+     * ``` GraphQL
+     *    project(fullPath: $projectPath){
+     *         id
+     *         repository{
+     *             branchNames(searchPattern: "*",limit: 20,offset:$skip)
+     *         }
+     *     }
+     * ```
+     */
+    override suspend fun getRepositoryBranches(
+        project: String, skip: Int
+    ): Flow<GetRepositoryBranchesQuery.Data> {
+        return apolloClient.query(GetRepositoryBranchesQuery(project, skip))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
+    /**
+     * Retrieves the repository tree for a given project.
+     *
+     * @param id The unique identifier of the project.
+     * @return A [Flow] emitting [GetProjectDetailsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetProjectRepositoryQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+
+     * query example
+     * ``` GraphQL
+     *     project(fullPath: $projectPath){
+     *         id
+     *         repository {
+     *             branchNames(searchPattern: "*",limit: 20,offset: $skip)
+     *             rootRef
+     *         tree(ref: $branch){
+     *             blobs{
+     *                 nodes {
+     *                     id
+     *                     name
+     *                     webUrl
+     *                     path
+     *                 }
+     *
+     *             }
+     *
+     *         }
+     *         }
+     *     }
+     * ```
+     */
+    override suspend fun getProjectRepository(
+        id: String, branch: String?, path: String?
+    ): Flow<GetProjectRepositoryQuery.Data?> {
+        return apolloClient.query(
+            GetProjectRepositoryQuery(
+                id,
+                branch = Optional.presentIfNotNull(branch),
+                path = Optional.presentIfNotNull(path)
+            )
+        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
+    /**
+     * Streams all projects belonging to a specific user identified by their username.
+     *
+     * @param userName The unique username of the GitLab user.
+     * @return A reactive stream emitting the user's project collection metadata, or null if not found.
+     *
+     * ### Behavior
+     * - Executes [GetUserProjectsByNameQuery] with the provided username.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow using [watch] to observe changes.
+     * - Handles errors gracefully via [mapAndHandleErrors].
+     * - Throws [kotlinx.coroutines.CancellationException] if the collection coroutine scope is cancelled.
+     */
+    override suspend fun getUserProjectsByName(
+        userName: String
+    ): Flow<GetUserProjectsByNameQuery.Data?> {
+        return apolloClient.query(GetUserProjectsByNameQuery(userName))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
+    /**
+     * Streams all Personal projects the authenticated user has contributed to.
+     * @return A [Flow] emitting [com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery.Data] objects.
+     *
+     * ### Behavior
+     * - Executes [com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery] with the provided fetch policy.
+     * - Uses Apollo’s [watch] to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [Log.e] while keeping the stream alive.
      * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
      * ### Implementation Example
-     * ```
-     * override suspend fun getAllMyContributedProjects(): Flow<GetMyContributedProjectsQuery.Data> =
-     *         apolloClient.query(GetMyContributedProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst)
-     *             .watch().mapNotNull { it.data }.catch { ex ->
-     *                 if (ex is CancellationException) throw ex
-     *                 else Log.d(ex.cause,ex.message)
-     *             }.mapNotNull { it }
-     *
-     * ```
-     * ### Usage example in ViewModel
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getAllMyContributedProjects()
-     *         .collect { projects -> renderProjects(projects) }
-     * }
-     * ```
      * Query Example:
      * ```
      *    currentUser {
@@ -389,45 +388,4 @@ class ProjectRepositoryImpl @Inject constructor(
         return apolloClient.query(GetMyContributedProjectsQuery())
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
-
-    /**
-     * Retrieves the repository tree for a given project.
-     *
-     * @param project The unique identifier of the project.
-     * @param skip: a pseudo-pagination key to determine how many branches you want to skip before fetching
-     * @return A [Flow] emitting [GetRepositoryBranchesQuery.Data] objects, or null if unavailable.
-     *
-     * ### Behavior
-     * - Executes [GetRepositoryBranchesQuery] with the provided project ID.
-     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
-     * - Emits results reactively via Flow.
-     * - Uses Apollo’s [watch] to continuously observe changes.
-     * - Logs errors without terminating the stream.
-     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getRepositoryBranches("12345",20)
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
-     * query example
-     * ``` GraphQL
-     *    project(fullPath: $projectPath){
-     *         id
-     *         repository{
-     *             branchNames(searchPattern: "*",limit: 20,offset:$skip)
-     *         }
-     *     }
-     * ```
-     */
-    override suspend fun getRepositoryBranches(
-        project: String, skip: Int
-    ): Flow<GetRepositoryBranchesQuery.Data> {
-        return apolloClient.query(GetRepositoryBranchesQuery(project, skip))
-            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-    }
-
 }
-
