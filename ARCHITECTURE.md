@@ -4,9 +4,18 @@
 
 ## Overview
 
-GitLab Client is a native Android application built with Kotlin and Jetpack Compose that provides a mobile-first interface for interacting with GitLab repositories. The application follows a Clean Architecture pattern with three distinct layers: presentation using Jetpack Compose, domain logic with use cases and repositories, and data access through Apollo Kotlin GraphQL client and secure OAuth2 authentication.
+GitLab Client is a native Android application built with Kotlin and Jetpack Compose that provides a
+mobile-first interface for interacting with GitLab repositories. The application follows a Clean
+Architecture pattern with three distinct layers: presentation using Jetpack Compose, domain logic
+with use cases and repositories, and data access through Apollo Kotlin GraphQL client and secure
+OAuth2 authentication.
 
-The runtime boundary is layered around three main concerns: presentation in Jetpack Compose, business logic through use cases and domain models, and data access via GraphQL queries with encrypted token storage. Authentication workflows leverage GitLab's OAuth2 flow, while project data is fetched through Apollo Kotlin with OkHttp interceptors that manage secure token injection. The application bootstraps from `GitlabApp` through `LauncherActivity`, which determines navigation state based on authentication status.
+The runtime boundary is layered around three main concerns: presentation in Jetpack Compose,
+business logic through use cases and domain models, and data access via GraphQL queries with
+encrypted token storage. Authentication workflows leverage GitLab's OAuth2 flow, while project data
+is fetched through Apollo Kotlin with OkHttp interceptors that manage secure token injection. The
+application bootstraps from `GitlabApp` through `LauncherActivity`, which determines navigation
+state based on authentication status.
 
 ## Architecture Overview
 
@@ -83,61 +92,66 @@ flowchart TB
 
 *com/ahtat204/gitlab/GitlabApp.kt*
 
-`GitlabApp` is the Android Application class that initializes Hilt dependency injection and sets up the application lifecycle.
+`GitlabApp` is the Android Application class that initializes Hilt dependency injection and sets up
+the application lifecycle.
 
-| Property | Type | Description |
-| --- | --- | --- |
+| Property            | Type    | Description                                       |
+|---------------------|---------|---------------------------------------------------|
 | Application context | Context | Android application context for DI initialization |
 
-| Method | Description |
-| --- | --- |
+| Method       | Description                                                               |
+|--------------|---------------------------------------------------------------------------|
 | `onCreate()` | Called when the application process starts; initializes Hilt DI container |
 
 ### Launcher Activity
 
 *com/ahtat204/gitlab/presentation/activities/LauncherActivity.kt*
 
-`LauncherActivity` is the entry point that determines navigation state based on authentication. If a valid OAuth token exists in secure storage, the app navigates to `MainActivity`; otherwise, it routes to `AuthenticationActivity`.
+`LauncherActivity` is the entry point that determines navigation state based on authentication. If a
+valid OAuth token exists in secure storage, the app navigates to `MainActivity`; otherwise, it
+routes to `AuthenticationActivity`.
 
-| Dependency | Type | Description |
-| --- | --- | --- |
+| Dependency       | Type             | Description                                     |
+|------------------|------------------|-------------------------------------------------|
 | `authRepository` | `AuthRepository` | Checks for existing valid authentication tokens |
 
-| Method | Description |
-| --- | --- |
+| Method       | Description                                           |
+|--------------|-------------------------------------------------------|
 | `onCreate()` | Checks authentication state and navigates accordingly |
 
 ### Authentication Activity
 
 *com/ahtat204/gitlab/presentation/activities/AuthenticationActivity.kt*
 
-`AuthenticationActivity` handles the OAuth2 authorization flow. It launches the GitLab OAuth login screen, intercepts the callback with the authorization code, and exchanges it for an access token.
+`AuthenticationActivity` handles the OAuth2 authorization flow. It launches the GitLab OAuth login
+screen, intercepts the callback with the authorization code, and exchanges it for an access token.
 
-| Dependency | Type | Description |
-| --- | --- | --- |
+| Dependency       | Type             | Description                   |
+|------------------|------------------|-------------------------------|
 | `authRepository` | `AuthRepository` | Executes OAuth token exchange |
 
-| Property | Type | Description |
-| --- | --- | --- |
+| Property        | Type            | Description                              |
+|-----------------|-----------------|------------------------------------------|
 | `authViewModel` | `AuthViewModel` | State management for authentication flow |
 
-| Method | Description |
-| --- | --- |
-| `onCreate()` | Initializes OAuth flow and callback handler |
+| Method                          | Description                                          |
+|---------------------------------|------------------------------------------------------|
+| `onCreate()`                    | Initializes OAuth flow and callback handler          |
 | `handleOAuthCallback(uri: Uri)` | Processes the OAuth redirect with authorization code |
 
 ### Main Activity
 
 *com/ahtat204/gitlab/presentation/activities/MainActivity.kt*
 
-`MainActivity` is the main container activity that hosts the navigation graph and bottom navigation bar for switching between screens (Home, Projects, Merge Requests, Issues, Profile).
+`MainActivity` is the main container activity that hosts the navigation graph and bottom navigation
+bar for switching between screens (Home, Projects, Merge Requests, Issues, Profile).
 
-| Dependency | Type | Description |
-| --- | --- | --- |
+| Dependency         | Type               | Description                            |
+|--------------------|--------------------|----------------------------------------|
 | `projectViewModel` | `ProjectViewModel` | Provides project data to child screens |
 
-| Method | Description |
-| --- | --- |
+| Method       | Description                             |
+|--------------|-----------------------------------------|
 | `onCreate()` | Sets up navigation graph and bottom bar |
 
 ### Screens and Navigation
@@ -148,14 +162,14 @@ flowchart TB
 
 This composable function defines all screen routes and navigation destinations.
 
-| Screen | Route | Purpose |
-| --- | --- | --- |
-| `Home` | `home` | Dashboard showing overview and quick actions |
-| `Projects` | `projects` | List of all GitLab projects |
-| `MergeRequests` | `merge_requests` | List of merge requests across projects |
-| `Issues` | `issues` | List of issues across projects |
-| `Profile` | `profile` | User profile and account information |
-| `PersonalProjects` | `personal_projects` | User's personal projects |
+| Screen             | Route               | Purpose                                      |
+|--------------------|---------------------|----------------------------------------------|
+| `Home`             | `home`              | Dashboard showing overview and quick actions |
+| `Projects`         | `projects`          | List of all GitLab projects                  |
+| `MergeRequests`    | `merge_requests`    | List of merge requests across projects       |
+| `Issues`           | `issues`            | List of issues across projects               |
+| `Profile`          | `profile`           | User profile and account information         |
+| `PersonalProjects` | `personal_projects` | User's personal projects                     |
 
 #### Home Screen
 
@@ -163,11 +177,11 @@ This composable function defines all screen routes and navigation destinations.
 
 Dashboard screen that displays project statistics, recent activity, and quick navigation.
 
-| State | Type | Description |
-| --- | --- | --- |
-| `userInfo` | `User` | Current authenticated user information |
-| `projectCount` | `Int` | Total number of projects |
-| `recentActivity` | `List<Activity>` | Recent user activities |
+| State            | Type             | Description                            |
+|------------------|------------------|----------------------------------------|
+| `userInfo`       | `User`           | Current authenticated user information |
+| `projectCount`   | `Int`            | Total number of projects               |
+| `recentActivity` | `List<Activity>` | Recent user activities                 |
 
 #### Projects Screen
 
@@ -175,16 +189,16 @@ Dashboard screen that displays project statistics, recent activity, and quick na
 
 Displays a paginated list of GitLab projects with search and filter capabilities.
 
-| State | Type | Description |
-| --- | --- | --- |
-| `projects` | `List<Project>` | List of projects fetched from GraphQL |
-| `isLoading` | `Boolean` | Loading state for pagination |
-| `searchQuery` | `String` | Search term for filtering projects |
+| State         | Type            | Description                           |
+|---------------|-----------------|---------------------------------------|
+| `projects`    | `List<Project>` | List of projects fetched from GraphQL |
+| `isLoading`   | `Boolean`       | Loading state for pagination          |
+| `searchQuery` | `String`        | Search term for filtering projects    |
 
-| Method | Description |
-| --- | --- |
+| Method                              | Description                  |
+|-------------------------------------|------------------------------|
 | `onProjectSelected(projectId: Int)` | Navigates to project details |
-| `loadMore()` | Loads next page of projects |
+| `loadMore()`                        | Loads next page of projects  |
 
 #### Merge Requests Screen
 
@@ -192,10 +206,10 @@ Displays a paginated list of GitLab projects with search and filter capabilities
 
 Shows merge requests across all projects with filtering options.
 
-| State | Type | Description |
-| --- | --- | --- |
-| `mergeRequests` | `List<MergeRequest>` | List of MRs from all projects |
-| `filterState` | `MRFilter` | Current filter (open, merged, closed) |
+| State           | Type                 | Description                           |
+|-----------------|----------------------|---------------------------------------|
+| `mergeRequests` | `List<MergeRequest>` | List of MRs from all projects         |
+| `filterState`   | `MRFilter`           | Current filter (open, merged, closed) |
 
 #### Issues Screen
 
@@ -203,10 +217,10 @@ Shows merge requests across all projects with filtering options.
 
 Displays issues across all projects with assignment and status tracking.
 
-| State | Type | Description |
-| --- | --- | --- |
-| `issues` | `List<Issue>` | List of issues from all projects |
-| `selectedFilter` | `IssueFilter` | Current filter state |
+| State            | Type          | Description                      |
+|------------------|---------------|----------------------------------|
+| `issues`         | `List<Issue>` | List of issues from all projects |
+| `selectedFilter` | `IssueFilter` | Current filter state             |
 
 #### Profile Screen
 
@@ -214,10 +228,10 @@ Displays issues across all projects with assignment and status tracking.
 
 User profile screen showing account details and account management options.
 
-| State | Type | Description |
-| --- | --- | --- |
+| State         | Type          | Description                        |
+|---------------|---------------|------------------------------------|
 | `userProfile` | `UserProfile` | Current user's profile information |
-| `statistics` | `UserStats` | User contribution statistics |
+| `statistics`  | `UserStats`   | User contribution statistics       |
 
 #### Personal Projects Screen
 
@@ -225,8 +239,8 @@ User profile screen showing account details and account management options.
 
 Displays projects owned by or directly assigned to the current user.
 
-| State | Type | Description |
-| --- | --- | --- |
+| State              | Type            | Description              |
+|--------------------|-----------------|--------------------------|
 | `personalProjects` | `List<Project>` | User's personal projects |
 
 ### UI Components
@@ -237,9 +251,9 @@ Displays projects owned by or directly assigned to the current user.
 
 Reusable bottom navigation component for screen switching.
 
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `currentScreen` | `BottomBarScreen` | Currently selected screen |
+| Parameter          | Type                        | Description                      |
+|--------------------|-----------------------------|----------------------------------|
+| `currentScreen`    | `BottomBarScreen`           | Currently selected screen        |
 | `onScreenSelected` | `(BottomBarScreen) -> Unit` | Callback when user selects a tab |
 
 #### Top App Bar
@@ -248,9 +262,9 @@ Reusable bottom navigation component for screen switching.
 
 Header component with screen title and action buttons.
 
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `title` | `String` | Screen title |
+| Parameter | Type                              | Description             |
+|-----------|-----------------------------------|-------------------------|
+| `title`   | `String`                          | Screen title            |
 | `actions` | `@Composable RowScope.() -> Unit` | Trailing action buttons |
 
 #### Project Item
@@ -259,9 +273,9 @@ Header component with screen title and action buttons.
 
 Reusable card component for displaying a single project in lists.
 
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `project` | `Project` | Project data to display |
+| Parameter | Type         | Description                   |
+|-----------|--------------|-------------------------------|
+| `project` | `Project`    | Project data to display       |
 | `onClick` | `() -> Unit` | Callback when item is clicked |
 
 ### Theme and Styling
@@ -270,11 +284,11 @@ Reusable card component for displaying a single project in lists.
 
 Material Design 3 theme configuration with color palette, typography, and shape definitions.
 
-| File | Purpose |
-| --- | --- |
+| File       | Purpose                                     |
+|------------|---------------------------------------------|
 | `Color.kt` | Color definitions for light and dark themes |
-| `Theme.kt` | Material Theme composition |
-| `Type.kt` | Typography and text styles |
+| `Theme.kt` | Material Theme composition                  |
+| `Type.kt`  | Typography and text styles                  |
 
 ### View Models
 
@@ -284,17 +298,17 @@ Material Design 3 theme configuration with color palette, typography, and shape 
 
 Manages project-related state and coordinates with domain layer use cases.
 
-| Property | Type | Description |
-| --- | --- | --- |
-| `projects` | `StateFlow<List<Project>>` | Reactive projects list |
-| `isLoading` | `StateFlow<Boolean>` | Loading indicator state |
-| `error` | `StateFlow<String?>` | Error message state |
+| Property    | Type                       | Description             |
+|-------------|----------------------------|-------------------------|
+| `projects`  | `StateFlow<List<Project>>` | Reactive projects list  |
+| `isLoading` | `StateFlow<Boolean>`       | Loading indicator state |
+| `error`     | `StateFlow<String?>`       | Error message state     |
 
-| Method | Description |
-| --- | --- |
-| `fetchProjects()` | Initiates GraphQL query for projects |
+| Method                          | Description                           |
+|---------------------------------|---------------------------------------|
+| `fetchProjects()`               | Initiates GraphQL query for projects  |
 | `searchProjects(query: String)` | Searches projects by name/description |
-| `fetchProjectDetails(id: Int)` | Loads detailed project information |
+| `fetchProjectDetails(id: Int)`  | Loads detailed project information    |
 
 #### AuthViewModel
 
@@ -302,16 +316,16 @@ Manages project-related state and coordinates with domain layer use cases.
 
 Manages authentication state and OAuth flow.
 
-| Property | Type | Description |
-| --- | --- | --- |
-| `isAuthenticated` | `StateFlow<Boolean>` | Authentication status |
-| `user` | `StateFlow<User?>` | Current authenticated user |
+| Property          | Type                 | Description                |
+|-------------------|----------------------|----------------------------|
+| `isAuthenticated` | `StateFlow<Boolean>` | Authentication status      |
+| `user`            | `StateFlow<User?>`   | Current authenticated user |
 
-| Method | Description |
-| --- | --- |
-| `initiateOAuthFlow()` | Starts OAuth2 authorization |
-| `handleOAuthCallback(code: String)` | Exchanges auth code for token |
-| `logout()` | Clears tokens and logs out user |
+| Method                              | Description                     |
+|-------------------------------------|---------------------------------|
+| `initiateOAuthFlow()`               | Starts OAuth2 authorization     |
+| `handleOAuthCallback(code: String)` | Exchanges auth code for token   |
+| `logout()`                          | Clears tokens and logs out user |
 
 ## Domain Layer
 
@@ -319,17 +333,17 @@ Manages authentication state and OAuth flow.
 
 #### ProjectRepository
 
-*com/ahtat204/gitlab/domain/repositories/ProjectRepository.kt*
+*com/ahtat204/gitlab/domain/repositories/GraphQlRepository.kt*
 
 Abstract repository interface for project data operations.
 
-| Method | Description |
-| --- | --- |
-| `getProjects(page: Int, perPage: Int)` | Fetches paginated project list |
-| `searchProjects(query: String)` | Searches projects |
-| `getProjectDetails(id: Int)` | Retrieves single project details |
-| `getMergeRequests(projectId: Int)` | Gets MRs for a project |
-| `getIssues(projectId: Int)` | Gets issues for a project |
+| Method                                 | Description                      |
+|----------------------------------------|----------------------------------|
+| `getProjects(page: Int, perPage: Int)` | Fetches paginated project list   |
+| `searchProjects(query: String)`        | Searches projects                |
+| `getProjectDetails(id: Int)`           | Retrieves single project details |
+| `getMergeRequests(projectId: Int)`     | Gets MRs for a project           |
+| `getIssues(projectId: Int)`            | Gets issues for a project        |
 
 #### AuthRepository
 
@@ -337,14 +351,14 @@ Abstract repository interface for project data operations.
 
 Abstract repository for authentication and token management.
 
-| Method | Description |
-| --- | --- |
-| `getOAuthAuthorizationUrl()` | Generates GitLab OAuth URL |
-| `exchangeCodeForToken(code: String)` | Exchanges auth code for access token |
-| `refreshToken()` | Refreshes expired access token |
-| `isTokenValid()` | Checks if stored token is still valid |
-| `logout()` | Clears all authentication data |
-| `getCurrentUser()` | Returns authenticated user information |
+| Method                               | Description                            |
+|--------------------------------------|----------------------------------------|
+| `getOAuthAuthorizationUrl()`         | Generates GitLab OAuth URL             |
+| `exchangeCodeForToken(code: String)` | Exchanges auth code for access token   |
+| `refreshToken()`                     | Refreshes expired access token         |
+| `isTokenValid()`                     | Checks if stored token is still valid  |
+| `logout()`                           | Clears all authentication data         |
+| `getCurrentUser()`                   | Returns authenticated user information |
 
 ### Use Cases
 
@@ -393,17 +407,17 @@ class AuthenticateUseCase(
 
 Domain model representing a GitLab project.
 
-| Property | Type | Description |
-| --- | --- | --- |
-| `id` | `Int` | Project identifier |
-| `name` | `String` | Project name |
-| `description` | `String?` | Project description |
-| `url` | `String` | Project web URL |
-| `visibility` | `Visibility` | Public, internal, or private |
-| `starCount` | `Int` | Number of stars |
-| `forkCount` | `Int` | Number of forks |
-| `lastActivityAt` | `LocalDateTime?` | Last activity timestamp |
-| `owner` | `User` | Project owner information |
+| Property         | Type             | Description                  |
+|------------------|------------------|------------------------------|
+| `id`             | `Int`            | Project identifier           |
+| `name`           | `String`         | Project name                 |
+| `description`    | `String?`        | Project description          |
+| `url`            | `String`         | Project web URL              |
+| `visibility`     | `Visibility`     | Public, internal, or private |
+| `starCount`      | `Int`            | Number of stars              |
+| `forkCount`      | `Int`            | Number of forks              |
+| `lastActivityAt` | `LocalDateTime?` | Last activity timestamp      |
+| `owner`          | `User`           | Project owner information    |
 
 #### MergeRequest
 
@@ -411,19 +425,19 @@ Domain model representing a GitLab project.
 
 Domain model for GitLab merge requests.
 
-| Property | Type | Description |
-| --- | --- | --- |
-| `id` | `Int` | MR identifier |
-| `iid` | `Int` | Internal project ID |
-| `title` | `String` | MR title |
-| `description` | `String?` | MR description |
-| `state` | `MRState` | Opened, merged, closed |
-| `author` | `User` | MR author |
-| `createdAt` | `LocalDateTime` | Creation timestamp |
-| `updatedAt` | `LocalDateTime` | Last update timestamp |
-| `mergedAt` | `LocalDateTime?` | Merge timestamp |
-| `targetBranch` | `String` | Target branch name |
-| `sourceBranch` | `String` | Source branch name |
+| Property       | Type             | Description            |
+|----------------|------------------|------------------------|
+| `id`           | `Int`            | MR identifier          |
+| `iid`          | `Int`            | Internal project ID    |
+| `title`        | `String`         | MR title               |
+| `description`  | `String?`        | MR description         |
+| `state`        | `MRState`        | Opened, merged, closed |
+| `author`       | `User`           | MR author              |
+| `createdAt`    | `LocalDateTime`  | Creation timestamp     |
+| `updatedAt`    | `LocalDateTime`  | Last update timestamp  |
+| `mergedAt`     | `LocalDateTime?` | Merge timestamp        |
+| `targetBranch` | `String`         | Target branch name     |
+| `sourceBranch` | `String`         | Source branch name     |
 
 #### Issue
 
@@ -431,18 +445,18 @@ Domain model for GitLab merge requests.
 
 Domain model for GitLab issues.
 
-| Property | Type | Description |
-| --- | --- | --- |
-| `id` | `Int` | Issue identifier |
-| `iid` | `Int` | Internal project ID |
-| `title` | `String` | Issue title |
-| `description` | `String?` | Issue description |
-| `state` | `IssueState` | Open or closed |
-| `author` | `User` | Issue author |
-| `assignee` | `User?` | Assigned user |
-| `createdAt` | `LocalDateTime` | Creation timestamp |
-| `updatedAt` | `LocalDateTime` | Last update timestamp |
-| `labels` | `List<String>` | Associated labels |
+| Property      | Type            | Description           |
+|---------------|-----------------|-----------------------|
+| `id`          | `Int`           | Issue identifier      |
+| `iid`         | `Int`           | Internal project ID   |
+| `title`       | `String`        | Issue title           |
+| `description` | `String?`       | Issue description     |
+| `state`       | `IssueState`    | Open or closed        |
+| `author`      | `User`          | Issue author          |
+| `assignee`    | `User?`         | Assigned user         |
+| `createdAt`   | `LocalDateTime` | Creation timestamp    |
+| `updatedAt`   | `LocalDateTime` | Last update timestamp |
+| `labels`      | `List<String>`  | Associated labels     |
 
 #### User
 
@@ -450,16 +464,16 @@ Domain model for GitLab issues.
 
 Domain model for GitLab users.
 
-| Property | Type | Description |
-| --- | --- | --- |
-| `id` | `Int` | User identifier |
-| `username` | `String` | GitLab username |
-| `name` | `String` | User display name |
-| `email` | `String?` | User email address |
-| `avatarUrl` | `String?` | Avatar image URL |
-| `bio` | `String?` | User biography |
-| `publicEmail` | `String?` | Public email address |
-| `createdAt` | `LocalDateTime` | Account creation timestamp |
+| Property      | Type            | Description                |
+|---------------|-----------------|----------------------------|
+| `id`          | `Int`           | User identifier            |
+| `username`    | `String`        | GitLab username            |
+| `name`        | `String`        | User display name          |
+| `email`       | `String?`       | User email address         |
+| `avatarUrl`   | `String?`       | Avatar image URL           |
+| `bio`         | `String?`       | User biography             |
+| `publicEmail` | `String?`       | Public email address       |
+| `createdAt`   | `LocalDateTime` | Account creation timestamp |
 
 ## Data Layer
 
@@ -495,12 +509,12 @@ object ApolloModule {
 
 OkHttp interceptor that injects OAuth access token into every GraphQL request.
 
-| Dependency | Type | Description |
-| --- | --- | --- |
+| Dependency      | Type                 | Description                   |
+|-----------------|----------------------|-------------------------------|
 | `secureStorage` | `SecureTokenStorage` | Retrieves stored access token |
 
-| Method | Description |
-| --- | --- |
+| Method                                | Description                                                        |
+|---------------------------------------|--------------------------------------------------------------------|
 | `intercept(chain: Interceptor.Chain)` | Intercepts request and adds `Authorization: Bearer <token>` header |
 
 ```kotlin
@@ -532,31 +546,31 @@ class AuthenticationInterceptor(
 
 Encrypts and stores OAuth tokens using Android's Crypto API.
 
-| Method | Description |
-| --- | --- |
-| `saveAccessToken(token: String)` | Encrypts and persists access token |
-| `getAccessToken(): String?` | Retrieves and decrypts access token |
-| `saveRefreshToken(token: String)` | Encrypts and persists refresh token |
-| `getRefreshToken(): String?` | Retrieves and decrypts refresh token |
-| `clearTokens()` | Removes all stored tokens |
+| Method                            | Description                          |
+|-----------------------------------|--------------------------------------|
+| `saveAccessToken(token: String)`  | Encrypts and persists access token   |
+| `getAccessToken(): String?`       | Retrieves and decrypts access token  |
+| `saveRefreshToken(token: String)` | Encrypts and persists refresh token  |
+| `getRefreshToken(): String?`      | Retrieves and decrypts refresh token |
+| `clearTokens()`                   | Removes all stored tokens            |
 
 ### Repository Implementations
 
 #### ProjectRepositoryImpl
 
-*com/ahtat204/gitlab/data/repositories/project/ProjectRepositoryImpl.kt*
+*com/ahtat204/gitlab/data/repositories/project/ApolloGraphQLRepository.kt*
 
 Concrete implementation of ProjectRepository using Apollo GraphQL client.
 
-| Dependency | Type | Description |
-| --- | --- | --- |
+| Dependency     | Type           | Description                |
+|----------------|----------------|----------------------------|
 | `apolloClient` | `ApolloClient` | GraphQL client for queries |
 
-| Method | Description |
-| --- | --- |
-| `getProjects(page, perPage)` | Executes `ProjectsList` GraphQL query |
-| `getProjectDetails(id)` | Executes `GetProjectDetails` GraphQL query |
-| `searchProjects(query)` | Queries with search filter |
+| Method                       | Description                                |
+|------------------------------|--------------------------------------------|
+| `getProjects(page, perPage)` | Executes `ProjectsList` GraphQL query      |
+| `getProjectDetails(id)`      | Executes `GetProjectDetails` GraphQL query |
+| `searchProjects(query)`      | Queries with search filter                 |
 
 ### GraphQL Queries
 
@@ -789,12 +803,12 @@ plugins {
 
 Configures Android app compilation, dependencies, and Compose settings.
 
-| Configuration | Value |
-| --- | --- |
-| `compileSdk` | 33 |
-| `minSdk` | 24 |
-| `targetSdk` | 33 |
-| `buildFeatures.compose` | true |
+| Configuration                                   | Value |
+|-------------------------------------------------|-------|
+| `compileSdk`                                    | 33    |
+| `minSdk`                                        | 24    |
+| `targetSdk`                                     | 33    |
+| `buildFeatures.compose`                         | true  |
 | `composeOptions.kotlinCompilerExtensionVersion` | 1.5.0 |
 
 ### Dependency Versions
@@ -900,16 +914,16 @@ Rules to preserve API compatibility while obfuscating implementation details:
 
 ### Key Libraries
 
-| Library | Purpose | Version |
-| --- | --- | --- |
-| Jetpack Compose | Modern declarative UI framework | 1.5.0 |
-| Apollo Kotlin | GraphQL client | 3.8.0 |
-| Hilt | Dependency injection | 2.46 |
-| Material Design 3 | Design components | 1.0.0 |
-| Coil | Image loading | 2.3.0 |
-| OkHttp | HTTP client | 4.10.0 |
-| Kotlin Coroutines | Async programming | 1.7.0 |
-| Android Lifecycle | Lifecycle management | 2.6.0 |
+| Library           | Purpose                         | Version |
+|-------------------|---------------------------------|---------|
+| Jetpack Compose   | Modern declarative UI framework | 1.5.0   |
+| Apollo Kotlin     | GraphQL client                  | 3.8.0   |
+| Hilt              | Dependency injection            | 2.46    |
+| Material Design 3 | Design components               | 1.0.0   |
+| Coil              | Image loading                   | 2.3.0   |
+| OkHttp            | HTTP client                     | 4.10.0  |
+| Kotlin Coroutines | Async programming               | 1.7.0   |
+| Android Lifecycle | Lifecycle management            | 2.6.0   |
 
 ## Deployment
 
@@ -941,31 +955,31 @@ keyPassword=password
 
 ## Key Classes Reference
 
-| Class | Location | Responsibility |
-| --- | --- | --- |
-| `GitlabApp` | `com/ahtat204/gitlab/` | Application entry point and DI setup |
-| `LauncherActivity` | `presentation/activities/` | Initial navigation routing |
-| `AuthenticationActivity` | `presentation/activities/` | OAuth2 flow handling |
-| `MainActivity` | `presentation/activities/` | Main app container |
-| `ProjectViewModel` | `presentation/viewmodels/` | Project state management |
-| `AuthViewModel` | `presentation/viewmodels/` | Authentication state |
-| `ProjectRepository` | `domain/repositories/` | Project data abstraction |
-| `AuthRepository` | `domain/repositories/` | Authentication abstraction |
-| `ProjectRepositoryImpl` | `data/repositories/` | GraphQL project queries |
-| `AuthenticationInterceptor` | `data/remote/` | Token injection middleware |
-| `SecureTokenStorage` | `data/security/` | Encrypted token persistence |
-| `ApolloModule` | `domain/di/` | Apollo client DI |
+| Class                       | Location                   | Responsibility                       |
+|-----------------------------|----------------------------|--------------------------------------|
+| `GitlabApp`                 | `com/ahtat204/gitlab/`     | Application entry point and DI setup |
+| `LauncherActivity`          | `presentation/activities/` | Initial navigation routing           |
+| `AuthenticationActivity`    | `presentation/activities/` | OAuth2 flow handling                 |
+| `MainActivity`              | `presentation/activities/` | Main app container                   |
+| `ProjectViewModel`          | `presentation/viewmodels/` | Project state management             |
+| `AuthViewModel`             | `presentation/viewmodels/` | Authentication state                 |
+| `ProjectRepository`         | `domain/repositories/`     | Project data abstraction             |
+| `AuthRepository`            | `domain/repositories/`     | Authentication abstraction           |
+| `ProjectRepositoryImpl`     | `data/repositories/`       | GraphQL project queries              |
+| `AuthenticationInterceptor` | `data/remote/`             | Token injection middleware           |
+| `SecureTokenStorage`        | `data/security/`           | Encrypted token persistence          |
+| `ApolloModule`              | `domain/di/`               | Apollo client DI                     |
 
 ## Glossary
 
-| Term | Definition |
-| --- | --- |
-| **OAuth2** | Open authorization standard for secure user authentication |
-| **GraphQL** | Query language for APIs with client-specified data requirements |
-| **Apollo Client** | GraphQL client library for consuming GraphQL APIs |
-| **Jetpack Compose** | Modern Android UI toolkit with declarative API |
-| **StateFlow** | Coroutine-based reactive state holder |
-| **ViewModel** | Architecture component for managing UI state across reconfigurations |
-| **Hilt** | Dependency injection library built on Dagger |
-| **Interceptor** | OkHttp middleware for modifying requests/responses |
-| **Keystore** | Android system for securely storing cryptographic keys |
+| Term                | Definition                                                           |
+|---------------------|----------------------------------------------------------------------|
+| **OAuth2**          | Open authorization standard for secure user authentication           |
+| **GraphQL**         | Query language for APIs with client-specified data requirements      |
+| **Apollo Client**   | GraphQL client library for consuming GraphQL APIs                    |
+| **Jetpack Compose** | Modern Android UI toolkit with declarative API                       |
+| **StateFlow**       | Coroutine-based reactive state holder                                |
+| **ViewModel**       | Architecture component for managing UI state across reconfigurations |
+| **Hilt**            | Dependency injection library built on Dagger                         |
+| **Interceptor**     | OkHttp middleware for modifying requests/responses                   |
+| **Keystore**        | Android system for securely storing cryptographic keys               |

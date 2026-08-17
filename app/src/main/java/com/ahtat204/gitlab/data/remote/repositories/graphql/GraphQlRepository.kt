@@ -1,30 +1,33 @@
-package com.ahtat204.gitlab.data.remote.repositories.project
+package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
+import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
 import com.apollographql.apollo.api.Operation
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Repository interface for accessing GitLab project data via GraphQL.
+ * Unified Repository interface for all GitLab GraphQL operations.
  *
- * Provides reactive streams of project lists, details, and repository trees.
- * Implementations are expected to use Apollo GraphQL client with caching policies.
+ * This repository serves as the **Single Source of Truth (SSOT)** for all data retrieved via GraphQL.
+ * Unlike traditional domain-driven repositories, this unified approach is used to:
+ * 1. **Minimize Memory Overhead**: Prevents the creation of multiple repository instances for different domains.
+ * 2. **Centralize Data Logic**: Provides a single entry point for all queries, ensuring consistent caching policies.
+ * 3. **Optimize Apollo Usage**: Facilitates cross-domain data consistency through Apollo's normalized cache.
  *
- * ### Core Capabilities:
- * - **Discovery**: [getAllProjects] retrieves and streams all projects the authenticated user contributes to.
- * - **Intelligence**: [getProjectById] provides detailed metrics and metadata for a specific project.
- * - **Browsing**: [getProjectRepository] streams the file and directory hierarchy.
- * - **History**: [getProjectCommits] exposes the audit trail of repository changes.
- * - **Registry**: [getRepositoryBranches] lists available git references.
- * - **Maintenance**: [refresh] allows manual cache invalidation for updated data.
+ * ### Key Responsibilities:
+ * - **User Dashboard**: [getAllProjects] and [getMyProfile].
+ * - **Project Intelligence**: [getProjectById] and [getUserProjectsByName].
+ * - **Repository Browsing**: [getProjectRepository] and [getProjectCommits].
+ * - **Git Metadata**: [getRepositoryBranches].
  *
  * @author Lahcen AHTAT
  */
-interface ProjectRepository {
+interface GraphQlRepository {
     /**
      * Streams all projects that the currently authenticated user has contributed to.
      *
@@ -36,11 +39,11 @@ interface ProjectRepository {
     /**
      * Retrieves and monitors a comprehensive overview of a single project.
      *
-     * Includes detailed statistics such as descriptions, star counts, fork counts,
+     * This includes detailed statistics such as descriptions, star counts, fork counts,
      * and issue metrics.
      *
      * @param id The unique identifier or full path of the target GitLab project.
-     * @return A reactive stream emitting the project overview dataset, or null if unavailable.
+     * @return A reactive stream emitting the project overview dataset, or null if the project is unavailable.
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
      */
     suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?>
@@ -49,8 +52,8 @@ interface ProjectRepository {
      * Streams the structural file hierarchy (directories and files) for a specific path and branch.
      *
      * @param id The unique identifier or full path of the target GitLab project.
-     * @param branch The target git reference branch. Pass null for the repository's root reference.
-     * @param path The relative sub-directory path. Pass null to open the root folder.
+     * @param branch The target git reference branch. Pass null to default to the repository's root reference.
+     * @param path The relative sub-directory path to query inside the repository. Pass null to open the root folder.
      * @return A reactive stream emitting the repository tree layer layout, or null if invalid or inaccessible.
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
      */
@@ -69,19 +72,37 @@ interface ProjectRepository {
     ): Flow<GetRepositoryBranchesQuery.Data>
 
     /**
-     * Streams a continuous record of repository commit history.
+     * Streams a continuous, sequentially chunked record of repository commit histories.
      *
      * Implementations are expected to manage incremental page updates and item appending states.
      *
      * @param id The unique identifier or full path of the target GitLab project.
      * @param branch The targeted git branch line from which to trace commit milestones.
-     * @param cursor The pagination pointer. Pass null for the initial page.
+     * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
      * @return A reactive stream emitting the combined commit log historical records, or null if missing.
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
     suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
+
+    /**
+     * Streams a continuous FLow containing the CurrentUser Profile data.
+     * @return A reactive stream emitting the Authenticated User's profile details
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     */
+    fun getMyProfile(): Flow<GetMyProfileQuery.Data>
+
+    /**
+     * Streams all projects belonging to a specific user identified by their username.
+     *
+     * @param userName The unique username of the GitLab user.
+     * @return A reactive stream emitting the user's project collection metadata, or null if not found.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
+    suspend fun getUserProjectsByName(
+        userName: String
+    ): Flow<GetUserProjectsByNameQuery.Data?>
 
     /**
      * Manually invalidates and refreshes specific data in the normalized cache.
