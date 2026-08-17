@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
-import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
-import com.ahtat204.gitlab.presentation.components.withCacheFallback
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +16,7 @@ import javax.inject.Inject
  * ViewModel responsible for exposing GitLab project data to the UI layer.
  *
  * ## Overview
- * - Integrates with [com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository] to fetch project lists and repository trees.
+ * - Integrates with [com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository] to fetch project lists and repository trees.
  * - Uses Kotlin [kotlinx.coroutines.flow.StateFlow] to provide reactive, lifecycle‑aware state to the UI.
  * - Scoped with [dagger.hilt.android.lifecycle.HiltViewModel] for dependency injection and lifecycle management.
  *
@@ -48,7 +46,7 @@ import javax.inject.Inject
  * @author Lahcen AHTAT
  */
 @HiltViewModel
-class ProjectViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
+class ProjectViewModel @Inject constructor(private val graphQlRepository: GraphQlRepository) :
     ViewModel() {
     /** Currently selected project’s overview/details */
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
@@ -66,7 +64,7 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
     fun loadAllProjects() = viewModelScope.launch {
-        projectRepository.getAllProjects().collect { _projects.value = it.currentUser }
+        graphQlRepository.getAllProjects().collect { _projects.value = it.currentUser }
     }
 
     /**
@@ -75,7 +73,7 @@ class ProjectViewModel @Inject constructor(private val projectRepository: Projec
      * @param id The unique project identifier.
      */
     fun loadProject(id: String) = viewModelScope.launch {
-        projectRepository.getProjectById(id).collect { currentProject.value = it?.project }
+        graphQlRepository.getProjectById(id).collect { currentProject.value = it?.project }
     }
 
 }
