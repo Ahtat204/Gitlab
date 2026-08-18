@@ -1,6 +1,8 @@
 package com.ahtat204.gitlab.data.remote.repositories.project
 
 import com.ahtat204.gitlab.data.queries.cache.Cache.cache
+import com.ahtat204.gitlab.data.remote.repositories.graphql.ApolloGraphQLRepository
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.json.mockedBranches
 import com.ahtat204.gitlab.reponses.json.mockedCommits
@@ -28,7 +30,7 @@ import org.junit.Test
 class ProjectRepositoryImplTest {
     private lateinit var mockWebserver: MockWebServer
     private lateinit var apolloClient: ApolloClient
-    private lateinit var repository: ProjectRepository
+    private lateinit var repository: GraphQlRepository
 
     @Before
     fun setUp() {
@@ -42,7 +44,7 @@ class ProjectRepositoryImplTest {
             .cache(MemoryCacheFactory())
             .build()
             
-        repository = ProjectRepositoryImpl(apolloClient)
+        repository = ApolloGraphQLRepository(apolloClient)
     }
 
     @After
