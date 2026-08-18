@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.presentation.viewmodels.project
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
@@ -58,15 +59,20 @@ class PipelinesViewModel @Inject constructor(
         val page = _pipelines.value?.pageInfo
         val cursor = page?.endCursor
         val hasNextPage = page?.hasNextPage
+        val isFirstPage = page?.startCursor
+        Log.i(
+            "com.ahtat204.gitlab.presentation.viewmodels.project",
+            "the cursor is $cursor and does it has next page? $hasNextPage "
+        )
         val hasPreviousPage = page?.hasPreviousPage
-        if (_pipelines.value == null) { //first page
+        if (isFirstPage == null) { //first page
             viewModelScope.launch {
                 repository.getProjectPipelines(
                     project = project, cursor = null, status = status
                 ).collect { _pipelines.value = it.project?.pipelines }
             }
         } else {
-            if (hasNextPage == true) {
+            if (hasNextPage == true && cursor != null) {
                 viewModelScope.launch {
                     repository.getProjectPipelines(
                         project = project, cursor = cursor, status = status

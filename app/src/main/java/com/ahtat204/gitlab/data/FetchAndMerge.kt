@@ -95,9 +95,12 @@ suspend fun Flow<GetRepositoryCommitsQuery.Data>.fetchAndMergeCommits(
  * @throws Throwable Propagates any errors encountered during the process.
  */
 suspend fun Flow<GetProjectPipelinesQuery.Data>.fetchAndMergePipelines(
-    client: ApolloClient, id: String, cursor: String? = null, statusEnum: PipelineStatusEnum = PipelineStatusEnum.SUCCESS
+    client: ApolloClient,
+    id: String,
+    cursor: String? = null,
+    statusEnum: PipelineStatusEnum = PipelineStatusEnum.SUCCESS
 ): Flow<GetProjectPipelinesQuery.Data> {
-    if (cursor == null ) return this
+    if (cursor == null) return this
     try {
         val query = GetProjectPipelinesQuery(
             id, status = Optional.presentIfNotNull(statusEnum)
@@ -107,12 +110,13 @@ suspend fun Flow<GetProjectPipelinesQuery.Data>.fetchAndMergePipelines(
         val project = cachedList.project
         val pipelines = project?.pipelines
         val cachedPipelines = cachedList.project?.pipelines?.nodes!!.toMutableList()
-        val newPage = this.first().project?.pipelines!!
-        val newPipelines = newPage.nodes!!
-        newPipelines.forEach { node ->
+        val newPipelines = this.first().project?.pipelines!!
+        val newNodes = newPipelines.nodes!!
+        val newPage = newPipelines.pageInfo
+        newNodes.forEach { node ->
             cachedPipelines += node
         }
-        val totalPipelines = pipelines.copy(nodes = cachedPipelines, pageInfo = newPage.pageInfo)
+        val totalPipelines = pipelines.copy(nodes = cachedPipelines, pageInfo = newPage)
         val newData = GetProjectPipelinesQuery.Data(
             project = project.copy(
                 id = project.id, pipelines = totalPipelines
