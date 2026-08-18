@@ -3,7 +3,7 @@ package com.ahtat204.gitlab.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetUserIssuesQuery
-import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,7 @@ import javax.inject.Inject
 typealias Issues = GetUserIssuesQuery.Data?
 
 @HiltViewModel
-class UserIssuesVM @Inject internal constructor(private val repository: ProjectRepository) :
+class UserIssuesVM @Inject internal constructor(private val repository: GraphQlRepository) :
     ViewModel() {
     private val _issues = MutableStateFlow<Issues>(null)
     val issues: StateFlow<Issues> = _issues.asStateFlow()

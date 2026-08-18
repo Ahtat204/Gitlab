@@ -179,8 +179,8 @@ Gitlab/
 │           │       │   │   │   ├── ProfileRepository.kt
 │           │       │   │   │   └── ProfileRepositoryImpl.kt
 │           │       │   │   ├── project/
-│           │       │   │   │   ├── ProjectRepository.kt
-│           │       │   │   │   └── ProjectRepositoryImpl.kt
+│           │       │   │   │   ├── GraphQlRepository.kt
+│           │       │   │   │   └── ApolloGraphQLRepository.kt
 │           │       │   │   └── user/
 │           │       │   │       ├── UserRepository.kt
 │           │       │   │       └── UserRepositoryImpl.kt
