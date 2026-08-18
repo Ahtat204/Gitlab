@@ -3,7 +3,7 @@ package com.ahtat204.gitlab.presentation.viewmodels.project
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
-import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,15 +20,15 @@ typealias Members = GetProjectMembersQuery.ProjectMembers?
  * ViewModel responsible for managing and exposing the list of members for a specific GitLab project.
  *
  * ## Responsibilities
- * - Fetches project members from [ProjectRepository].
+ * - Fetches project members from [GraphQlRepository].
  * - Manages pagination by tracking the [GetProjectMembersQuery.PageInfo].
  * - Exposes a reactive [members] stream to the UI.
  *
- * @param projectRepository The repository used to fetch project-related data.
+ * @param repository The repository used to fetch project-related data.
  * @author Lahcen AHTAT
  */
 @HiltViewModel
-class MembersViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
+class MembersViewModel @Inject constructor(private val repository: GraphQlRepository) :
     ViewModel() {
     private val _members = MutableStateFlow<Members>(null)
 
@@ -52,7 +52,7 @@ class MembersViewModel @Inject constructor(private val projectRepository: Projec
         val value = _members.value
         if (value == null) {
             scope.launch {
-                projectRepository.getProjectMembers(project)
+                repository.getProjectMembers(project)
                     .collect { _members.value = it.project?.projectMembers }
             }
         } else {
@@ -61,7 +61,7 @@ class MembersViewModel @Inject constructor(private val projectRepository: Projec
             val cursor = page.endCursor
             if (hasNextPage && cursor != null) {
                 scope.launch {
-                    projectRepository.getProjectMembers(project, cursor)
+                    repository.getProjectMembers(project, cursor)
                         .collect { _members.value = it.project?.projectMembers }
                 }
             }
