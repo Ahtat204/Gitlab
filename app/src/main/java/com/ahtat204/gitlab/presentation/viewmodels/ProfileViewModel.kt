@@ -33,7 +33,7 @@ class ProfileViewModel @Inject constructor(
     /**
      * Exposes the current user's profile as an immutable [kotlinx.coroutines.flow.StateFlow].
      */
-    val currentUser = profile.asStateFlow()
+    val currentUser get() = profile.asStateFlow()
 
     /**
      * Loads the profile information.

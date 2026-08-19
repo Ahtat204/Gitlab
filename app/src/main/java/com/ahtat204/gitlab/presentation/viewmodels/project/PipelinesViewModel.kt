@@ -1,6 +1,5 @@
 package com.ahtat204.gitlab.presentation.viewmodels.project
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
@@ -48,7 +47,7 @@ class PipelinesViewModel @Inject constructor(
      * Loads project pipelines if they are not already cached in the UI state.
      *
      * ### Logic
-     * - Checks the [pageInfo.hasPreviousPage] flag to avoid unnecessary re-fetching.
+     * - Checks the [GetProjectPipelinesQuery.PageInfo.hasNextPage] flag to avoid unnecessary re-fetching.
      * - Launches a coroutine in [viewModelScope] to collect the flow from the repository.
      *
      * @param project The full path or unique identifier of the GitLab project.
@@ -60,10 +59,6 @@ class PipelinesViewModel @Inject constructor(
         val cursor = page?.endCursor
         val hasNextPage = page?.hasNextPage
         val isFirstPage = page?.startCursor
-        Log.i(
-            "com.ahtat204.gitlab.presentation.viewmodels.project",
-            "the cursor is $cursor and does it has next page? $hasNextPage "
-        )
         val hasPreviousPage = page?.hasPreviousPage
         if (isFirstPage == null) { //first page
             viewModelScope.launch {

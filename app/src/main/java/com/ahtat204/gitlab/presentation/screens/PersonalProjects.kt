@@ -15,7 +15,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.presentation.components.CoilCache.loader
@@ -81,7 +81,7 @@ fun PersonalProjects(
     LaunchedEffect(1) {
         projectViewModel.loadAllProjects()
     }
-    val currUser by projectViewModel.projects.collectAsState()
+    val currUser by projectViewModel.projects.collectAsStateWithLifecycle()
     currUser?.namespace?.projects?.nodes?.let { nodes ->
         Column(
             verticalArrangement = Arrangement.Center,
