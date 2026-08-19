@@ -1,31 +1,20 @@
-package com.ahtat204.gitlab.data.remote.repositories.project
+package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.Responses
-import com.ahtat204.gitlab.data.queries.GetMyProjectsPaginatedQuery
-import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.apollographql.apollo.ApolloClient
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNotNull
-import junit.framework.TestCase.assertNull
-import kotlinx.coroutines.runBlocking
-import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
 
 class ProjectRepositoryImplTest : Responses() {
     private lateinit var mockWebserver: MockWebServer
     private lateinit var apolloClient: ApolloClient
-    private lateinit var repository: ProjectRepository
-/*
+    private lateinit var repository: GraphQlRepository/*
     @Before
     fun setUp() = runBlocking {
         mockWebserver = MockWebServer()
         mockWebserver.start()
         apolloClient =
             ApolloClient.Builder().serverUrl(mockWebserver.url("/graphql").toString()).build()
-        repository = ProjectRepositoryImpl(apolloClient)
+        repository = ApolloGraphQLRepository(apolloClient)
     }
 
     @After

@@ -3,15 +3,15 @@ package com.ahtat204.gitlab.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
-import com.ahtat204.gitlab.data.remote.repositories.profile.ProfileRepository
-import com.ahtat204.gitlab.presentation.components.withCacheFallback
-import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import com.apollographql.apollo.exception.CacheMissException
+import com.apollographql.cache.normalized.FetchPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 /**
  * ViewModel responsible for managing the user's profile state and data retrieval.
  *
@@ -19,16 +19,15 @@ import javax.inject.Inject
  * handling data fetching, caching strategies, and state exposure. It utilizes [StateFlow]
  * to provide a thread-safe, observable stream of the current user's profile information.
  *
- * @property profileRepository The repository instance responsible for data access,
+ * @property graphqlRepository The repository instance responsible for data access,
  * injected via Hilt.
  *
  * @see GetMyProfileQuery
  */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val profileRepository: ProfileRepository
+    private val graphqlRepository: GraphQlRepository
 ) : ViewModel() {
-
     private val profile = MutableStateFlow<GetMyProfileQuery.CurrentUser?>(null)
 
     /**
@@ -42,19 +41,12 @@ class ProfileViewModel @Inject constructor(
      * It attempts a [FetchPolicy.CacheFirst] strategy to minimize latency and data
      * usage. If a [CacheMissException] occurs (meaning no local cache is available),
      * it transparently falls back to [FetchPolicy.NetworkFirst].
-     *
-     * @param userName Optional username to fetch a specific profile. If null,
      * it fetches the currently authenticated user's profile.
      */
-  //  @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun loadProfile(userName: String? = null) {
-        if (userName == null) {
-            viewModelScope.launch {
-                profileRepository
-                    .getMyProfile(FetchPolicy.CacheFirst)
-                    .withCacheFallback { profileRepository.getMyProfile(FetchPolicy.NetworkFirst) }
-                    .collect { profile.value = it.currentUser }
-            }
+    fun loadProfile() {
+        viewModelScope.launch {
+            graphqlRepository.getMyProfile().collect { profile.value = it.currentUser }
         }
+
     }
 }

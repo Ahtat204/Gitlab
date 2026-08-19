@@ -5,13 +5,14 @@
 [![Platform](https://img.shields.io/badge/platform-Android-3DDC84?style=for-the-badge)](https://www.android.com)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
-> A native Android client for GitLab that brings your repositories to your fingertips. Browse projects, view merge requests, and manage issues without opening a web browser.
+> A native Android client for GitLab that brings your repositories to your fingertips. Browse
+> projects, view merge requests, and manage issues without opening a web browser.
 
 ## 📸 Screenshots
 
-|          Home Screen           |             Project List              |            Project Overview            |              Profile               | 
-|:------------------------------:|:-------------------------------------:|:--------------------------------------:|:----------------------------------:| 
-| ![Home Screen](homescreen.jpg) | ![Project List](personalprojects.jpg) | ![Project Details](projectdetails.jpg) | ![Developper Profile](profile.jpg) | 
+|       Home Screen        |             Project List              |            Project Overview            |              Profile               |              Repository               |              Commits               |  
+|:------------------------:|:-------------------------------------:|:--------------------------------------:|:----------------------------------:|:-------------------------------------:|:----------------------------------:|  
+| ![Home Screen](home.jpg) | ![Project List](personalprojects.jpg) | ![Project Details](projectdetails.jpg) | ![Developper Profile](profile.jpg) | ![Project Repository](repository.jpg) | ![Repository Commits](history.jpg) |  
 
 ---
 
@@ -32,37 +33,45 @@
 
 ## Overview
 
-**GitLab Client** is a modern Android application built with **Kotlin** and **Jetpack Compose** that provides a native, efficient way to interact with GitLab. Whether you're a developer on the go or prefer a dedicated mobile experience, this app eliminates the need to open a web browser while maintaining full access to your GitLab workspace.
+**GitLab Client** is a modern Android application built with **Kotlin** and **Jetpack Compose** that
+provides a native, efficient way to interact with GitLab. Whether you're a developer on the go or
+prefer a dedicated mobile experience, this app eliminates the need to open a web browser while
+maintaining full access to your GitLab workspace.
 
-The application leverages **Apollo Kotlin** for GraphQL queries and **OAuth2** for secure authentication, ensuring a seamless and secure user experience.
+The application leverages **Apollo Kotlin** for GraphQL queries and **OAuth2** for secure
+authentication, ensuring a seamless and secure user experience.
 
 ---
 
 ## ✨ Key Features
 
-- 📱 **Modern Jetpack Compose UI** — Clean, responsive, and fully native Android interface built with Jetpack Compose for an intuitive user experience.
-- 🔐 **GitLab OAuth2 Authentication** — Secure login using GitLab's official OAuth2 authorization flow.
+- 📱 **Modern Jetpack Compose UI** — Clean, responsive, and fully native Android interface built with
+  Jetpack Compose for an intuitive user experience.
+- 🔐 **GitLab OAuth2 Authentication** — Secure login using GitLab's official OAuth2 authorization
+  flow.
 - ⚡ **GraphQL Integration** — Efficient data fetching using Apollo Kotlin for optimized performance.
 - 📂 **Repository Browsing** — Quickly view and navigate your GitLab projects on mobile.
-- 🔍 **Project Details** — Access comprehensive project information including merge requests, issues, and statistics.
-- 💾 **Secure Token Storage** — Encrypted storage of authentication tokens for safe credential management.
+- 🔍 **Project Details** — Access comprehensive project information including merge requests, issues,
+  and statistics.
+- 💾 **Secure Token Storage** — Encrypted storage of authentication tokens for safe credential
+  management.
 - 🎨 **Dark & Light Themes** — Adaptive UI themes for comfortable viewing in any lighting condition.
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer | Technologies |
-|:---:|:---|
-| **UI Framework** | Jetpack Compose, Material Design 3 |
-| **Language** | Kotlin |
-| **Data Layer** | Apollo Kotlin (GraphQL), OkHttp |
-| **Authentication** | OAuth2 |
-| **Security** | Crypto/Encryption utilities |
-| **Dependency Injection** | Hilt (inferred from structure) |
-| **Image Loading** | Coil |
-| **Platform** | Android (Native) |
-| **Build System** | Gradle (Kotlin DSL) |
+|          Layer           | Technologies                       |
+|:------------------------:|:-----------------------------------|
+|     **UI Framework**     | Jetpack Compose, Material Design 3 |
+|       **Language**       | Kotlin                             |
+|      **Data Layer**      | Apollo Kotlin (GraphQL), OkHttp    |
+|    **Authentication**    | OAuth2                             |
+|       **Security**       | Crypto/Encryption utilities        |
+| **Dependency Injection** | Hilt                               |
+|    **Image Loading**     | Coil                               |
+|       **Platform**       | Android (Native)                   |
+|     **Build System**     | Gradle (Kotlin DSL)                |
 
 ---
 
@@ -96,9 +105,9 @@ cd Gitlab
 ### Configuration
 
 1. **Register a GitLab Application**:
-   - Go to GitLab → Preferences → Applications
-   - Create a new application with redirect URI: `gitlab://oauth-callback`
-   - Note your Application ID and Secret
+    - Go to GitLab → Preferences → Applications
+    - Create a new application with redirect URI: `gitlab://oauth-callback`
+    - Note your Application ID and Secret
 
 2. **Update AuthConfig.kt**:
    ```kotlin
@@ -170,8 +179,8 @@ Gitlab/
 │           │       │   │   │   ├── ProfileRepository.kt
 │           │       │   │   │   └── ProfileRepositoryImpl.kt
 │           │       │   │   ├── project/
-│           │       │   │   │   ├── ProjectRepository.kt
-│           │       │   │   │   └── ProjectRepositoryImpl.kt
+│           │       │   │   │   ├── GraphQlRepository.kt
+│           │       │   │   │   └── ApolloGraphQLRepository.kt
 │           │       │   │   └── user/
 │           │       │   │       ├── UserRepository.kt
 │           │       │   │       └── UserRepositoryImpl.kt
@@ -328,20 +337,20 @@ This project follows **Clean Architecture** principles with a layered approach:
 ### Layers
 
 1. **Presentation Layer** (UI)
-   - Composable screens using Jetpack Compose
-   - ViewModels for state management
-   - Navigation graph for screen transitions
+    - Composable screens using Jetpack Compose
+    - ViewModels for state management
+    - Navigation graph for screen transitions
 
 2. **Domain Layer** (Business Logic)
-   - Use cases for business operations
-   - Domain models
-   - Repository interfaces
+    - Use cases for business operations
+    - Domain models
+    - Repository interfaces
 
 3. **Data Layer** (Data Sources)
-   - Repository implementations
-   - Remote data sources (API)
-   - Local caching (if applicable)
-   - Interceptors for request/response handling
+    - Repository implementations
+    - Remote data sources (API)
+    - Local caching (if applicable)
+    - Interceptors for request/response handling
 
 ### Design Patterns
 
@@ -354,7 +363,8 @@ This project follows **Clean Architecture** principles with a layered approach:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Whether it's bug fixes, feature requests, or improvements, please follow these guidelines:
+Contributions are welcome! Whether it's bug fixes, feature requests, or improvements, please follow
+these guidelines:
 
 ### Development Workflow
 
@@ -369,9 +379,9 @@ Contributions are welcome! Whether it's bug fixes, feature requests, or improvem
    ```
 
 3. **Make your changes**
-   - Follow Kotlin coding conventions
-   - Add comments for complex logic
-   - Test your changes locally
+    - Follow Kotlin coding conventions
+    - Add comments for complex logic
+    - Test your changes locally
 
 4. **Commit with clear messages**
    ```bash
@@ -386,9 +396,9 @@ Contributions are welcome! Whether it's bug fixes, feature requests, or improvem
    ```
 
 6. **Open a Pull Request**
-   - Provide a clear description of your changes
-   - Link to any related issues
-   - Include screenshots for UI changes
+    - Provide a clear description of your changes
+    - Link to any related issues
+    - Include screenshots for UI changes
 
 ### Commit Convention
 
@@ -420,7 +430,7 @@ Contributions are welcome! Whether it's bug fixes, feature requests, or improvem
 
 ## 📞 Support
 
-Have questions or found a bug? 
+Have questions or found a bug?
 
 - Open an [Issue](https://github.com/Ahtat204/Gitlab/issues)
 - Check existing issues for similar problems

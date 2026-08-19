@@ -1,0 +1,37 @@
+query GetMyPersonalProjects($cursor: String){
+    currentUser {
+        id
+        avatarUrl
+        namespace {
+            projects(first: 20,after: $cursor,sort: ACTIVITY_DESC){
+
+               pageInfo {
+                   startCursor
+                   hasNextPage
+                   hasPreviousPage
+               }
+                nodes {
+                    id
+                    topics
+                    lastActivityAt
+                    __typename
+                    languages {
+                        color
+                        name
+                    }
+                    name
+                    fullPath
+                    description
+                    visibility
+                    pipelines(first: 1){
+                        nodes {
+                            __typename
+                            id
+                            status
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
