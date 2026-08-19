@@ -53,6 +53,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
     buildFeatures {
         buildConfig = true
@@ -114,6 +115,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
     testImplementation(libs.apollo.mockserver)
+    implementation(libs.apoolo.cache)
     testImplementation(libs.apollo.testing.support)
     testImplementation(libs.mockwebserver)
 }

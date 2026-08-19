@@ -28,6 +28,7 @@ import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Branches
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
+
 /**
  * Displays a scrollable list of repository branches.
  *
@@ -85,7 +86,6 @@ fun BranchesList(
     x: PaddingValues
 ) {
     branches?.branchNames?.let {
-        branches
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -97,7 +97,7 @@ fun BranchesList(
             items(it) { branch ->
                 Card(
                     {
-                        if(branch == currentBranch.value) return@Card
+                        if (branch == currentBranch.value) return@Card
                         repositoryViewModel.loadProjectRepository(
                             projectPath, branch
                         )

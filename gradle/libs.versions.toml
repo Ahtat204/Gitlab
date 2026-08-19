@@ -43,6 +43,7 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 apollo-http-cache = { module = "com.apollographql.apollo:apollo-http-cache", version.ref = "apolloVersion" }
 apollo-mockserver = { module = "com.apollographql.mockserver:apollo-mockserver", version.ref = "apolloMockserver" }
 apollo-normalized-cache = { module = "com.apollographql.cache:normalized-cache", version.ref = "apolloCacheVersion" }
+apoolo-cache={module="com.apollographql.cache:normalized-cache-sqlite",version.ref ="apolloCacheVersion"}
 apollo-testing-support = { module = "com.apollographql.apollo:apollo-testing-support", version.ref = "apolloVersion" }
 appauth = { module = "net.openid:appauth", version.ref = "appauth" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
@@ -70,7 +71,7 @@ hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltA
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
-androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
+androidx-material3-android = {group = "androidx.compose.material3",name = "material3-android",version.ref = "material3Android" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
@@ -81,7 +82,7 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kapt = { id = "kotlin-kapt" }
-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroidCompiler" }
-secrets-gradle = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin" }
-apollo = { id = "com.apollographql.apollo", version.ref = "apolloVersion" }
+kapt={id="kotlin-kapt"}
+hilt={id="com.google.dagger.hilt.android",version.ref="hiltAndroidCompiler"}
+secrets-gradle={id="com.google.android.libraries.mapsplatform.secrets-gradle-plugin"}
+apollo={id="com.apollographql.apollo",version.ref="apolloVersion"}
