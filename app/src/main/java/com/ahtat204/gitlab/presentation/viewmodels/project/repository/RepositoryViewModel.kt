@@ -5,27 +5,26 @@ import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
-import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
-import com.ahtat204.gitlab.domain.usecase.logging.logger
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import com.ahtat204.gitlab.presentation.components.removeAfterKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 typealias Commits = GetRepositoryCommitsQuery.Commits?
 typealias Repository = GetProjectRepositoryQuery.Repository?
 typealias Branches = GetRepositoryBranchesQuery.Repository?
-typealias Path=String?
-typealias Name=String
+typealias Path = String?
+typealias Name = String
+
 /**
  * ViewModel responsible for exposing GitLab project repository data to the UI layer.
  *
  * ## Overview
- * - Integrates with [ProjectRepository] to fetch repository trees, commits, and branches.
+ * - Integrates with [GraphQlRepository] to fetch repository trees, commits, and branches.
  * - Uses Kotlin [StateFlow] to provide reactive, lifecycle‑aware state to composables.
  * - Annotated with [HiltViewModel] for dependency injection and lifecycle management.
  *
@@ -80,9 +79,8 @@ typealias Name=String
  */
 @HiltViewModel
 class RepositoryViewModel @Inject constructor(
-    private val projectRepository: ProjectRepository
+    private val graphQlRepository: GraphQlRepository
 ) : ViewModel() {
-
     /**
      * A [StateFlow] representing the folder hierarchy of the repository.
      *
@@ -145,10 +143,10 @@ class RepositoryViewModel @Inject constructor(
         folderName: String? = null,
         folderPath: String? = null
     ) {
-        val path=if(folderPath.equals("."))null  else folderPath
-       val newBranch= if(branch?.equals(_repository.value?.rootRef)==true) null else branch
+        val path = if (folderPath.equals(".")) null else folderPath
+        val newBranch = if (branch?.equals(_repository.value?.rootRef) == true) null else branch
         viewModelScope.launch {
-            projectRepository.getProjectRepository(projectPath, branch = newBranch, path = path)
+            graphQlRepository.getProjectRepository(projectPath, branch = newBranch, path = path)
                 .collect {
                     _repository.value = it?.project?.repository
                     if (folders.value.isEmpty()) {
@@ -185,12 +183,12 @@ class RepositoryViewModel @Inject constructor(
     fun loadRepositoryBranches(id: String, skip: Int? = null) {
         if (_branches.value != null && _branches.value?.branchNames?.isNotEmpty() == true && skip != null) {
             viewModelScope.launch {
-                projectRepository.getRepositoryBranches(id, skip)
+                graphQlRepository.getRepositoryBranches(id, skip)
                     .collect { _branches.value = it.project?.repository }
             }
         } else {
             viewModelScope.launch {
-                projectRepository.getRepositoryBranches(id, 0)
+                graphQlRepository.getRepositoryBranches(id, 0)
                     .collect { _branches.value = it.project?.repository }
             }
         }
@@ -212,23 +210,24 @@ class RepositoryViewModel @Inject constructor(
      * - Supports infinite scrolling by appending new commits.
      */
     fun loadProjectCommits(id: String, branch: String) {
-        val pageInfo= commits.value?.pageInfo
+        val pageInfo = commits.value?.pageInfo
         val pager = pageInfo?.endCursor
-        val isFirstPage=pageInfo?.startCursor
-        val hasNextPage=pageInfo?.hasNextPage
-        if (isFirstPage==null) {
+        val isFirstPage = pageInfo?.startCursor
+        val hasNextPage = pageInfo?.hasNextPage
+        if (isFirstPage == null) {
             viewModelScope.launch {
-                projectRepository.getProjectCommits(id, cursor = null, branch = branch).collect {
+                graphQlRepository.getProjectCommits(id, cursor = null, branch = branch).collect {
                     _commits.value = it?.project?.repository?.commits
                 }
             }
         }
-        if(hasNextPage==true && pager!=null){
+        if (hasNextPage == true && pager != null) {
             viewModelScope.launch {
                 _commits.value?.nodes?.size?.let {
-                    projectRepository.getProjectCommits(id, cursor=pager,branch= branch).collect { newCommits ->
-                        _commits.value=newCommits?.project?.repository?.commits
-                    }
+                    graphQlRepository.getProjectCommits(id, cursor = pager, branch = branch)
+                        .collect { newCommits ->
+                            _commits.value = newCommits?.project?.repository?.commits
+                        }
                 }
             }
         }

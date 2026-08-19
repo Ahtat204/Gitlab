@@ -16,13 +16,21 @@ import com.apollographql.cache.normalized.logCacheMisses
 import com.apollographql.cache.normalized.memory.MemoryCacheFactory
 import com.apollographql.cache.normalized.sql.SqlNormalizedCacheFactory
 import dagger.Module
-import kotlin.time.Duration
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class OnlineApolloClient
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class OfflineApolloClient
 
 /**
  * Dagger Hilt module providing a configured [ApolloClient] instance.
@@ -37,7 +45,7 @@ import javax.inject.Singleton
  * - **Authorization header**: Injects a bearer token from [Tokens.accessToken].
  * - **Logging**: Uses [HttpLoggingInterceptor] to log HTTP headers for debugging.
  * - **AuthenticationInterceptor**: Custom interceptor for handling GitLab auth.
- * - **Normalized cache**: Backed by [MemoryCacheFactory] with a 10 MB limit and
+ * - **Normalized cache**: Backed by [MemoryCacheFactory] with a 20 MB limit and
  *   60‑second expiration.
  *
  * ## Usage
