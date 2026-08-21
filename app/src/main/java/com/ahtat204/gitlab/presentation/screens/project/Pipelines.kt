@@ -58,7 +58,7 @@ fun Pipelines(
         pipelinesViewModel.loadProjectPipelines(project, status)
     }
     val pipelines by pipelinesViewModel.pipelines.collectAsStateWithLifecycle()
-      val shouldLoadMore = remember {
+    val shouldLoadMore = remember {
         derivedStateOf {
             val totalItems = listState.layoutInfo.totalItemsCount
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
@@ -95,10 +95,7 @@ fun Pipelines(
                 items(items = nodes, key = { item -> item?.id ?: Any() }) { item ->
                     item?.let { pipeline ->
                         Pipeline(
-                            pipeline.name,
-                            pipeline.status,
-                            pipeline.duration,
-                            pipeline.finishedAt
+                            pipeline
                         )
                     }
                 }
