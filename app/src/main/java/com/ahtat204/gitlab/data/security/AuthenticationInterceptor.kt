@@ -1,6 +1,5 @@
 package com.ahtat204.gitlab.data.security
 
-import android.util.Log
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
@@ -10,13 +9,14 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.internal.synchronized
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationService
 import okhttp3.Interceptor
 import okhttp3.Response
-import net.openid.appauth.AuthState
 import okio.IOException
 
 /**
@@ -69,6 +69,14 @@ class AuthenticationInterceptor : Interceptor {
             } else {
                 var request = chain.request()
                 val builder = request.newBuilder()
+
+                if (Tokens.accessToken == null) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val result = AuthStorage.getAuthState(context).data.first()
+                        Tokens.CurrentAuthState = result
+                        Tokens.accessToken = result.accessToken
+                    }
+                }
                 val token = Tokens.accessToken
                 if (token != null) {
                     builder.header("Authorization", "Bearer $token")

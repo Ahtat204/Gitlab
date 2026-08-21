@@ -120,6 +120,7 @@ fun ProjectItem(
                         contentDescription = "Sample Image",
                         modifier = Modifier
                             .padding(10.dp)
+                            .offset(y = 13.dp)
                             .size(40.dp)
                             .clip(RoundedCornerShape(20.dp)),
                         onState = { state ->
@@ -138,16 +139,16 @@ fun ProjectItem(
                     .fillMaxHeight()
                     .background(Background)
             ) {
-                val pipelines=project.pipelines?.nodes
-                pipelines?.let {pips->
-                    if(pips.isNotEmpty()){
+                val pipelines = project.pipelines?.nodes
+                pipelines?.let { pips ->
+                    if (pips.isNotEmpty()) {
                         pips[0]?.status?.let { PipeLineStatusIcon(it) }
                     }
 
                 }
 
 
-            //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+                //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
 
                 project.let { project ->
                     Row(
