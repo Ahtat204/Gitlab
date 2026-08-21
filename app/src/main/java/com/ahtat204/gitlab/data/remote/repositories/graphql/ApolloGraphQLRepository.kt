@@ -13,7 +13,6 @@ import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.Optional
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.fetchPolicy
@@ -95,7 +94,6 @@ class ApolloGraphQLRepository @Inject constructor(
      * }
      * ```
      */
-    @OptIn(ApolloExperimental::class)
     override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
         apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapAndHandleErrors()
