@@ -39,7 +39,7 @@ class ProjectViewModelTest {
     }
 
     @Test
-    fun `loadProject updates currentProject state correctly`() = runTest {
+    fun `loadProject updates currentProject state correctly`() = runTest(testDispatcher) {
         val projectId = "gid://gitlab/Project/123"
         whenever(repository.getProjectById(projectId)).thenReturn(flowOf(mockProjectDetails))
         viewModel.loadProject(projectId)
@@ -57,7 +57,7 @@ class ProjectViewModelTest {
     }
 
     @Test
-    fun `load a List of projects updates _projects state `() = runTest {
+    fun `load a List of projects updates _projects state `() = runTest(testDispatcher) {
         whenever(repository.getAllProjects()).thenReturn(flowOf(mockDataList))
         viewModel.loadAllProjects()
         assertNotNull(viewModel.projects.value)
