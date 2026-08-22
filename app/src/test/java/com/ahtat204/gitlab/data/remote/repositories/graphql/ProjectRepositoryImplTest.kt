@@ -1,8 +1,6 @@
-package com.ahtat204.gitlab.data.remote.repositories.project
+package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.queries.cache.Cache.cache
-import com.ahtat204.gitlab.data.remote.repositories.graphql.ApolloGraphQLRepository
-import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.json.mockedBranches
 import com.ahtat204.gitlab.reponses.json.mockedCommits
@@ -22,12 +20,12 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * Integration tests for [ProjectRepositoryImpl] using [MockWebServer].
+ * Integration tests for [ApolloGraphQLRepository] using [MockWebServer].
  * 
  * These tests verify the integration between the repository, the Apollo GraphQL client, 
  * and the network layer by simulating real API responses.
  */
-class ProjectRepositoryImplTest {
+class ApolloGraphQLRepositoryTest {
     private lateinit var mockWebserver: MockWebServer
     private lateinit var apolloClient: ApolloClient
     private lateinit var repository: GraphQlRepository
@@ -36,14 +34,14 @@ class ProjectRepositoryImplTest {
     fun setUp() {
         mockWebserver = MockWebServer()
         mockWebserver.start()
-        
+
         // Build ApolloClient pointing to the mock server with an in-memory normalized cache
         // This is necessary because the repository uses .watch()
         apolloClient = ApolloClient.Builder()
             .serverUrl(mockWebserver.url("/graphql").toString())
             .cache(MemoryCacheFactory())
             .build()
-            
+
         repository = ApolloGraphQLRepository(apolloClient)
     }
 
@@ -73,7 +71,7 @@ class ProjectRepositoryImplTest {
         assertEquals(projectId, result?.project?.id)
         assertEquals("gitlab", result?.project?.name)
         assertEquals("gitlab-org", result?.project?.namespace?.path)
-        
+
         // Verify the request made to the mock server
         val recordedRequest = mockWebserver.takeRequest()
         assertEquals("/graphql", recordedRequest.path)
@@ -98,21 +96,21 @@ class ProjectRepositoryImplTest {
         val firstProject = result.currentUser?.namespace?.projects?.nodes?.first()
         assertEquals("GitLab-Client", firstProject?.name)
         assertEquals("username/gitlab-client", firstProject?.fullPath)
-        
+
         // Verify request
         val recordedRequest = mockWebserver.takeRequest()
         assertEquals("/graphql", recordedRequest.path)
     }
 
     @Test
-    fun `getProjectRepository returns expected data when successful`()= runTest {
-        val projectId="gid://gitlab/Project/12345"
+    fun `getProjectRepository returns expected data when successful`() = runTest {
+        val projectId = "gid://gitlab/Project/12345"
         mockWebserver.enqueue(
             MockResponse()
                 .setResponseCode(200)
                 .setBody(mockedRepository)
         )
-        val result = repository.getProjectRepository(projectId,null).first()
+        val result = repository.getProjectRepository(projectId, null).first()
         ///null checks
         assertNotNull(result)
         assertNotNull(result?.project)
@@ -127,45 +125,65 @@ class ProjectRepositoryImplTest {
         assertNotNull(result?.project?.repository?.tree?.trees)
         assertNotNull(result?.project?.repository?.tree?.blobs)
         ///equality checks
-        assertEquals(result?.project?.id,projectId)
-        assertEquals(result?.project?.name,"awesome-android-app")
-        assertEquals(result?.project?.repository?.rootRef,"main")
-        assertEquals(result?.project?.repository?.tree?.blobs?.nodes?.first()?.name,"README.md")
-        assertEquals(result?.project?.repository?.tree?.blobs?.nodes?.first()?.id,"gid://gitlab/Blob/456")
-        assertEquals(result?.project?.repository?.tree?.trees?.nodes?.first()?.id,"gid://gitlab/Tree/789")
-        assertEquals(result?.project?.repository?.tree?.trees?.nodes?.first()?.name,"src")
-        assertEquals(result?.project?.repository?.tree?.lastCommit?.id,"gid://gitlab/Commit/abc123def456")
+        assertEquals(result?.project?.id, projectId)
+        assertEquals(result?.project?.name, "awesome-android-app")
+        assertEquals(result?.project?.repository?.rootRef, "main")
+        assertEquals(result?.project?.repository?.tree?.blobs?.nodes?.first()?.name, "README.md")
+        assertEquals(
+            result?.project?.repository?.tree?.blobs?.nodes?.first()?.id,
+            "gid://gitlab/Blob/456"
+        )
+        assertEquals(
+            result?.project?.repository?.tree?.trees?.nodes?.first()?.id,
+            "gid://gitlab/Tree/789"
+        )
+        assertEquals(result?.project?.repository?.tree?.trees?.nodes?.first()?.name, "src")
+        assertEquals(
+            result?.project?.repository?.tree?.lastCommit?.id,
+            "gid://gitlab/Commit/abc123def456"
+        )
         val recordedRequest = mockWebserver.takeRequest()
         assertEquals("/graphql", recordedRequest.path)
     }
 
     @Test
-    fun `getRepositoryBranches returns expected data when successful`()= runTest{
-        val projectId="gid://gitlab/Project/1"
+    fun `getRepositoryBranches returns expected data when successful`() = runTest {
+        val projectId = "gid://gitlab/Project/1"
         mockWebserver.enqueue(
             MockResponse()
                 .setResponseCode(200)
-                .setBody(mockedBranches))
-        val result = repository.getRepositoryBranches(project = projectId,skip=0).first()
+                .setBody(mockedBranches)
+        )
+        val result = repository.getRepositoryBranches(project = projectId, skip = 0).first()
         assertNotNull(result.project)
-        assertNotNullAndEquals(result.project?.id,projectId)
-        assertNotNullAndEquals(result.project?.repository?.branchNames?.first(),"main")
+        assertNotNullAndEquals(result.project?.id, projectId)
+        assertNotNullAndEquals(result.project?.repository?.branchNames?.first(), "main")
     }
 
     @Test
-    fun `getRepositoryCommits returns expected data when successful`()=runTest{
-    val projectId="gid://gitlab/Project/1"
+    fun `getRepositoryCommits returns expected data when successful`() = runTest {
+        val projectId = "gid://gitlab/Project/1"
         mockWebserver.enqueue(
             MockResponse()
                 .setResponseCode(200)
-                .setBody(mockedCommits))
+                .setBody(mockedCommits)
+        )
 
-        val result = repository.getProjectCommits(projectId, branch = "main",null).first()
-        assertNotNullAndEquals(result?.project?.id,projectId)
-        assertNotNullAndEquals(result?.project?.repository?.branchNames?.first(),"main")
-        assertNotNullAndEquals(result?.project?.repository?.commits?.nodes?.first()?.id,"gid://gitlab/Commit/a1b2c3d4")
-        assertNotNullAndEquals(result?.project?.repository?.commits?.nodes?.first()?.committedDate,"2023-10-27T14:30:00Z")
-        assertNotNullAndEquals(result?.project?.repository?.commits?.nodes?.first()?.name,"feat: implement repository history view")
+        val result = repository.getProjectCommits(projectId, branch = "main", null).first()
+        assertNotNullAndEquals(result?.project?.id, projectId)
+        assertNotNullAndEquals(result?.project?.repository?.branchNames?.first(), "main")
+        assertNotNullAndEquals(
+            result?.project?.repository?.commits?.nodes?.first()?.id,
+            "gid://gitlab/Commit/a1b2c3d4"
+        )
+        assertNotNullAndEquals(
+            result?.project?.repository?.commits?.nodes?.first()?.committedDate,
+            "2023-10-27T14:30:00Z"
+        )
+        assertNotNullAndEquals(
+            result?.project?.repository?.commits?.nodes?.first()?.name,
+            "feat: implement repository history view"
+        )
 
     }
 }
