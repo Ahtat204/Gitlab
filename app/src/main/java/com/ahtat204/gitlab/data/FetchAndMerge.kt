@@ -59,16 +59,16 @@ suspend fun Flow<GetRepositoryCommitsQuery.Data>.fetchAndMergeCommits(
             cachedCommits += node
         }
         val totalCommits = commits.copy(nodes = cachedCommits, pageInfo = page)
-        val newData = GetRepositoryCommitsQuery.Data(
-            project.copy(
-                repository = repository.copy(commits = totalCommits)
+            val newData = GetRepositoryCommitsQuery.Data(
+                project.copy(
+                    repository = repository.copy(commits = totalCommits)
+                )
             )
-        )
-        client.apolloStore.writeOperation(
-            operation = query, publish = true, data = newData
-        ).also { keys ->
-            client.apolloStore.publish(keys)
-        }
+            client.apolloStore.writeOperation(
+                operation = query, publish = true, data = newData
+            ).also { keys ->
+                client.apolloStore.publish(keys)
+            }
         return this
 
     } catch (e: Exception) {
