@@ -34,14 +34,10 @@ class ApolloGraphQLRepositoryTest {
     fun setUp() {
         mockWebserver = MockWebServer()
         mockWebserver.start()
-
-        // Build ApolloClient pointing to the mock server with an in-memory normalized cache
-        // This is necessary because the repository uses .watch()
         apolloClient = ApolloClient.Builder()
             .serverUrl(mockWebserver.url("/graphql").toString())
             .cache(MemoryCacheFactory())
             .build()
-
         repository = ApolloGraphQLRepository(apolloClient)
     }
 
@@ -59,20 +55,12 @@ class ApolloGraphQLRepositoryTest {
                 .setResponseCode(200)
                 .setBody(mockedProject)
         )
-
-        // Act
-        // We use .first() because getProjectById returns a Flow that watches for changes.
-        // The first emission will be the one triggered by the network request.
         val result = repository.getProjectById(projectId).first()
-
-        // Assert
         assertNotNull(result)
         assertNotNull(result?.project)
         assertEquals(projectId, result?.project?.id)
         assertEquals("gitlab", result?.project?.name)
         assertEquals("gitlab-org", result?.project?.namespace?.path)
-
-        // Verify the request made to the mock server
         val recordedRequest = mockWebserver.takeRequest()
         assertEquals("/graphql", recordedRequest.path)
     }
@@ -85,19 +73,13 @@ class ApolloGraphQLRepositoryTest {
                 .setResponseCode(200)
                 .setBody(mockedProjects)
         )
-
-        // Act
         val result = repository.getAllProjects().first()
-
-        // Assert
         assertNotNull(result)
         assertNotNull(result.currentUser?.namespace?.projects?.nodes)
         assertEquals(1, result.currentUser?.namespace?.projects?.nodes?.size)
         val firstProject = result.currentUser?.namespace?.projects?.nodes?.first()
         assertEquals("GitLab-Client", firstProject?.name)
         assertEquals("username/gitlab-client", firstProject?.fullPath)
-
-        // Verify request
         val recordedRequest = mockWebserver.takeRequest()
         assertEquals("/graphql", recordedRequest.path)
     }
@@ -111,7 +93,6 @@ class ApolloGraphQLRepositoryTest {
                 .setBody(mockedRepository)
         )
         val result = repository.getProjectRepository(projectId, null).first()
-        ///null checks
         assertNotNull(result)
         assertNotNull(result?.project)
         assertNotNull(result?.project?.repository)
@@ -124,7 +105,6 @@ class ApolloGraphQLRepositoryTest {
         assertNotNull(result?.project?.repository?.tree)
         assertNotNull(result?.project?.repository?.tree?.trees)
         assertNotNull(result?.project?.repository?.tree?.blobs)
-        ///equality checks
         assertEquals(result?.project?.id, projectId)
         assertEquals(result?.project?.name, "awesome-android-app")
         assertEquals(result?.project?.repository?.rootRef, "main")

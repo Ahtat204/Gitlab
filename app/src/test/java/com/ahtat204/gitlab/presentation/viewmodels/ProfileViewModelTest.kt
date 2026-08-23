@@ -1,12 +1,10 @@
 package com.ahtat204.gitlab.presentation.viewmodels
 
-import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.objects.mockedProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -14,14 +12,11 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ProfileViewModelTest {
-    private val repository: GraphQlRepository = mock()
+class ProfileViewModelTest : TestBase() {
     private lateinit var viewModel: ProfileViewModel
-    private val testDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setup() {
@@ -52,7 +47,6 @@ class ProfileViewModelTest {
         assertNotNullAndEquals(profile?.location, expected.location!!)
         assertNotNullAndEquals(profile?.projectCount, expected.projectCount!!)
         assertNotNullAndEquals(profile?.webUrl, expected.webUrl)
-
     }
 
 }

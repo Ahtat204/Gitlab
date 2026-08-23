@@ -78,6 +78,7 @@ typealias Name = String
  * @author Lahcen AHTAT
  */
 @HiltViewModel
+@Suppress("DEPRECATION")
 class RepositoryViewModel @Inject constructor(
     private val graphQlRepository: GraphQlRepository
 ) : ViewModel() {

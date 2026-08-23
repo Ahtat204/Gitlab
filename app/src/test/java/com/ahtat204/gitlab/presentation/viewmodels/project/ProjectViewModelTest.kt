@@ -1,13 +1,12 @@
 package com.ahtat204.gitlab.presentation.viewmodels.project
 
-import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
+import com.ahtat204.gitlab.presentation.viewmodels.TestBase
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.objects.mockDataList
 import com.ahtat204.gitlab.reponses.objects.mockProjectDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -17,15 +16,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ProjectViewModelTest {
-
-    private val repository: GraphQlRepository = mock()
+class ProjectViewModelTest : TestBase() {
     private lateinit var viewModel: ProjectViewModel
-    private val testDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setup() {
