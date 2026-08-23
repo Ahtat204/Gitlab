@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.presentation.viewmodels
+package com.ahtat204.gitlab.presentation.viewmodels.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -44,9 +44,9 @@ class ProfileViewModel @Inject constructor(
      * it fetches the currently authenticated user's profile.
      */
     fun loadProfile() {
-        viewModelScope.launch {
+            viewModelScope.launch {
             graphqlRepository.getMyProfile().collect { profile.value = it.currentUser }
-        }
+            }
 
     }
 }
