@@ -9,6 +9,7 @@ import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
 import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
+import com.ahtat204.gitlab.domain.di.OnlineApolloClient
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.Optional
@@ -39,7 +40,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class ApolloGraphQLRepository @Inject constructor(
-    private val apolloClient: ApolloClient
+    @OnlineApolloClient private val apolloClient: ApolloClient
 ) : GraphQlRepository {
     /**
      * Streams all projects the authenticated user has contributed to.
