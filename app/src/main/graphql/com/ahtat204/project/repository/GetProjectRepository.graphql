@@ -4,7 +4,6 @@ query GetProjectRepository($projectPath:ID!,$branch:String,$path:String,$blobsCu
         name
         repository {
             rootRef
-
             tree(ref: $branch,path:$path){
                 __typename
                 lastCommit(ref: $branch){
@@ -25,7 +24,7 @@ query GetProjectRepository($projectPath:ID!,$branch:String,$path:String,$blobsCu
 
                     }
                     pageInfo {
-                        startCursor
+                        endCursor
                         hasNextPage
                     }
                 }
@@ -36,7 +35,7 @@ query GetProjectRepository($projectPath:ID!,$branch:String,$path:String,$blobsCu
                         path
                     }
                     pageInfo {
-                        startCursor
+                        endCursor
                         hasNextPage
                     }
                 }
