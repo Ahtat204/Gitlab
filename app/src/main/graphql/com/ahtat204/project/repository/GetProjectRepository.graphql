@@ -1,10 +1,9 @@
-query GetProjectRepository($projectPath:ID!,$branch:String,$path:String){
+query GetProjectRepository($projectPath:ID!,$branch:String,$path:String,$blobsCursor:String,$treeCursor:String){
     project(fullPath: $projectPath){
         id
         name
         repository {
             rootRef
-
             tree(ref: $branch,path:$path){
                 __typename
                 lastCommit(ref: $branch){
@@ -15,7 +14,7 @@ query GetProjectRepository($projectPath:ID!,$branch:String,$path:String){
                         name
                     }
                 }
-                trees{
+                trees(first: 20,after:$treeCursor){
                     __typename
 
                     nodes {
@@ -25,23 +24,19 @@ query GetProjectRepository($projectPath:ID!,$branch:String,$path:String){
 
                     }
                     pageInfo {
-                        startCursor
-                    }
-                    edges {
-                        cursor
+                        endCursor
+                        hasNextPage
                     }
                 }
-                blobs{
+                blobs(first: 20,after:$blobsCursor){
                     nodes {
                         id
                         name
                         path
                     }
                     pageInfo {
-                        startCursor
-                    }
-                    edges {
-                        cursor
+                        endCursor
+                        hasNextPage
                     }
                 }
             }
