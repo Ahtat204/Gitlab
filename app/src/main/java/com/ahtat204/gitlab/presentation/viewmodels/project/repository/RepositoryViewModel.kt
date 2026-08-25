@@ -79,6 +79,7 @@ typealias BreadCrumb = LinkedHashMap<Path, Name>
  * @author Lahcen AHTAT
  */
 @HiltViewModel
+@Suppress("DEPRECATION")
 class RepositoryViewModel @Inject constructor(
     private val graphQlRepository: GraphQlRepository
 ) : ViewModel() {
