@@ -59,7 +59,6 @@ class PipelinesViewModel @Inject constructor(
         val cursor = page?.endCursor
         val hasNextPage = page?.hasNextPage
         val isFirstPage = page?.startCursor
-        val hasPreviousPage = page?.hasPreviousPage
         if (isFirstPage == null) { //first page
             viewModelScope.launch {
                 repository.getProjectPipelines(
