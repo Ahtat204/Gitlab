@@ -4,7 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.ahtat204.gitlab.domain.usecase.logging.logger
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationResponse
@@ -64,3 +68,13 @@ fun buildResponse(
     }
     return null
 }
+
+//
+//suspend fun getToken():String{
+//    if(Tokens.accessToken==null || Tokens.CurrentAuthState==null){
+//        val storedState = AuthStorage.getAuthState(Tokens.context).data.first()
+//        Tokens.CurrentAuthState=storedState
+//        Tokens.accessToken=storedState.accessToken
+//
+//    }
+//}

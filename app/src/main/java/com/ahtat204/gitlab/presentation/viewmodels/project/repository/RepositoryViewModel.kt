@@ -19,6 +19,7 @@ typealias Repository = GetProjectRepositoryQuery.Repository?
 typealias Branches = GetRepositoryBranchesQuery.Repository?
 typealias Path = String?
 typealias Name = String
+typealias BreadCrumb = LinkedHashMap<Path, Name>
 
 /**
  * ViewModel responsible for exposing GitLab project repository data to the UI layer.
@@ -82,6 +83,9 @@ typealias Name = String
 class RepositoryViewModel @Inject constructor(
     private val graphQlRepository: GraphQlRepository
 ) : ViewModel() {
+
+    private val _folders: MutableStateFlow<BreadCrumb> = MutableStateFlow(LinkedHashMap())
+
     /**
      * A [StateFlow] representing the folder hierarchy of the repository.
      *
@@ -91,8 +95,7 @@ class RepositoryViewModel @Inject constructor(
      * The root directory is represented by `"."` and mapped to the project name.
      * Updated when navigating into subfolders.
      */
-    val folders: StateFlow<LinkedHashMap<Path, Name>> =
-        MutableStateFlow(LinkedHashMap<Path, Name>()).asStateFlow()
+    val folders: StateFlow<BreadCrumb> = _folders.asStateFlow()
 
     /** Backing state for commits. */
     private val _commits = MutableStateFlow<Commits>(null)

@@ -46,7 +46,7 @@ import javax.inject.Inject
  * @author Lahcen AHTAT
  */
 @HiltViewModel
-class ProjectViewModel @Inject constructor(private val graphQlRepository: GraphQlRepository) :
+class ProjectViewModel @Inject constructor(private val repository: GraphQlRepository) :
     ViewModel() {
     /** Currently selected project’s overview/details */
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
@@ -64,7 +64,7 @@ class ProjectViewModel @Inject constructor(private val graphQlRepository: GraphQ
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
     fun loadAllProjects() = viewModelScope.launch {
-        graphQlRepository.getAllProjects().collect { _projects.value = it.currentUser }
+        repository.getAllProjects().collect { _projects.value = it.currentUser }
     }
 
     /**
@@ -73,7 +73,7 @@ class ProjectViewModel @Inject constructor(private val graphQlRepository: GraphQ
      * @param id The unique project identifier.
      */
     fun loadProject(id: String) = viewModelScope.launch {
-        graphQlRepository.getProjectById(id).collect { currentProject.value = it?.project }
+        repository.getProjectById(id).collect { currentProject.value = it?.project }
     }
 
 }
