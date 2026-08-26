@@ -2,6 +2,7 @@ package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
 import com.ahtat204.gitlab.data.fetchAndMergePipelines
+import com.ahtat204.gitlab.data.mapAndHandleErrors
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
@@ -11,11 +12,13 @@ import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
-import com.ahtat204.gitlab.data.remote.repositories.mapAndHandleErrors
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.Operation
 import com.apollographql.apollo.api.Optional
 import com.apollographql.cache.normalized.FetchPolicy
+import com.apollographql.cache.normalized.apolloStore
 import com.apollographql.cache.normalized.fetchPolicy
+import com.apollographql.cache.normalized.removeOperation
 import com.apollographql.cache.normalized.watch
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -336,6 +339,47 @@ class ApolloGraphQLRepository @Inject constructor(
     ): Flow<GetUserProjectsByNameQuery.Data?> {
         return apolloClient.query(GetUserProjectsByNameQuery(userName))
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
+    /**
+     * Manually invalidates and refreshes data in the normalized cache for specific queries.
+     *
+     * Currently supports:
+     * - [GetMyPersonalProjectsQuery.Data]: Removes the cached project list.
+     * - [GetProjectDetailsQuery.Data]
+     * - [GetProjectRepositoryQuery.Data]
+     *
+     * ### Behavior
+     * 1. Identifies the query type from the provided [data].
+     * 2. Uses [com.apollographql.cache.normalized.removeOperation] to purge the data from the store.
+     * 3. Publishes changes to trigger [watch] updates across the app.
+     *
+     * @param data The data object used to identify the cache entries to remove.
+     */
+    override suspend fun <D : Operation.Data> refresh(
+        data: D?
+    ) {
+        when (data) {
+            is GetMyPersonalProjectsQuery.Data -> {
+                val query = GetMyPersonalProjectsQuery()
+                apolloClient.apolloStore.removeOperation(
+                    operation = query, data = data, publish = true
+                )
+            }
+
+            is GetProjectDetailsQuery.Data -> {
+                val query = GetProjectDetailsQuery(data.project?.id!!)
+                apolloClient.apolloStore.removeOperation(operation = query, data, publish = true)
+            }
+
+            is GetProjectRepositoryQuery.Data -> {
+                val query = GetProjectRepositoryQuery(projectPath = data.project?.id!!)
+                apolloClient.apolloStore.removeOperation(operation = query, data, publish = true)
+            }
+
+            else -> Unit
+        }
+
     }
 
     /**

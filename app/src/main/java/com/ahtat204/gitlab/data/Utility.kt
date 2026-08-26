@@ -2,29 +2,23 @@ package com.ahtat204.gitlab.data
 
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
+import com.ahtat204.gitlab.domain.usecase.logging.logger
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.ApolloResponse
+import com.apollographql.apollo.api.Query
 import com.apollographql.apollo.api.Optional
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.apolloStore
 import com.apollographql.cache.normalized.fetchPolicy
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import okio.IOException
 
-/**
- * Utility functions for manually merging paginated GraphQL response data into the Apollo Normalized Cache.
- *
- * ## Overview
- * Apollo’s default caching mechanism for paginated fields often replaces the existing list with the new page.
- * These extension functions provide a way to:
- * 1. Retrieve the currently cached list of items (e.g., Commits or Pipelines).
- * 2. Collect the new page of data from a [Flow].
- * 3. Merge the new items into the cached collection.
- * 4. Manually write the merged dataset back to the [com.apollographql.cache.normalized.ApolloStore].
- * 5. Publish the changes to update active watchers (via [com.apollographql.cache.normalized.watch]).
- *
- * @author Lahcen AHTAT
- */
 /**
  * Merges a new page of repository commits into the existing cached list and updates the Apollo store.
  *
@@ -132,3 +126,49 @@ suspend fun Flow<GetProjectPipelinesQuery.Data>.fetchAndMergePipelines(
         throw e
     }
 }
+
+/**
+ * Processes an Apollo GraphQL [Flow] response, providing unified error handling,
+ * data extraction, and automatic filtering of null values.
+ *
+ * ## Features
+ * - **Exception Unwrapping**: Automatically detects and throws [ApolloResponse.exception]
+ *   to propagate network or transport-level failures to the [catch] block.
+ * - **GraphQL Error Handling**: Inspects [ApolloResponse.hasErrors] and throws an [Exception]
+ *   if the server returns business-logic errors, ensuring they are not ignored.
+ * - **Unified Error Logging**: Centralizes error handling via a [catch] block, distinguishing
+ *   between recoverable network issues ([IOException]), coroutine lifecycle events
+ *   ([CancellationException]), and unexpected system failures.
+ * - **Safe Data Emission**: Sanitizes the stream by returning only valid [D] (data)
+ *   and filtering out nulls via [mapNotNull].
+ *
+ * ## Usage
+ * ```kotlin
+ * override suspend fun getProjects(): Flow<ProjectQuery.Data> =
+ *     apolloClient.query(ProjectQuery())
+ *         .watch()
+ *         .mapAndHandleErrors()
+ * ```
+ *
+ * @param D The type of the GraphQL operation data (e.g., `Query.Data` or `Mutation.Data`).
+ * @return A [Flow] emitting the raw data [D], with all errors intercepted and logged.
+ *
+ * @throws Exception Propagates exceptions caught during stream collection,
+ *                   excluding [CancellationException] which is re-thrown to honor coroutine lifecycle.
+ * @author Lahcen AHTAT
+ */
+fun <D : Query.Data> Flow<ApolloResponse<D>>.mapAndHandleErrors(): Flow<D> {
+    return this.map { response ->
+        response.exception?.cause?.let {
+            throw it
+        }
+        response.data
+    }.catch { ex ->
+        when (ex) {
+            is IOException -> logger(message = ex.message)
+            is CancellationException -> throw ex
+            else -> logger(message = null)
+        }
+    }.mapNotNull { it }
+}
+

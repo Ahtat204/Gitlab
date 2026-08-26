@@ -9,6 +9,7 @@ import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
+import com.apollographql.apollo.api.Operation
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -94,6 +95,7 @@ interface GraphQlRepository {
      */
     fun getMyProfile(): Flow<GetMyProfileQuery.Data>
 
+
     /**
      * Streams all projects belonging to a specific user identified by their username.
      *
@@ -104,6 +106,17 @@ interface GraphQlRepository {
     suspend fun getUserProjectsByName(
         userName: String
     ): Flow<GetUserProjectsByNameQuery.Data?>
+
+    /**
+     * Manually invalidates and refreshes specific data in the normalized cache.
+     *
+     * Removes the existing operation data from the cache and triggers a re-fetch
+     * to ensure active observers receive fresh data.
+     *
+     * @param D The data type of the GraphQL operation.
+     * @param data The specific data object used to identify what needs removal.
+     */
+    suspend fun <D : Operation.Data> refresh(data: D?)
 
     /**
      * Streams a continuous, sequentially chunked record of repository commit histories.

@@ -42,7 +42,7 @@ class RepositoryViewModelTest : TestBase() {
             )
         )
         viewModel.loadProjectRepository(projectId)
-        val repository = viewModel.repository.value
+        val repository = viewModel.repository.value!!.repository
         Assert.assertNotNull(repository)
         val rootRef = repository?.rootRef
         assertNotNullAndEquals(rootRef, mockRepository.project.repository?.rootRef!!)
