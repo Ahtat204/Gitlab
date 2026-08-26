@@ -2,6 +2,8 @@ package com.ahtat204.gitlab.domain.usecase.authentication.security
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import com.ahtat204.gitlab.domain.usecase.authentication.security.CryptoUtility.decrypt
+import com.ahtat204.gitlab.domain.usecase.authentication.security.CryptoUtility.encrypt
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -80,13 +82,9 @@ object CryptoUtility {
         return KeyGenerator.getInstance(ALGORITHM).apply {
             init(
                 KeyGenParameterSpec.Builder(
-                    KEY_ALIAS,
-                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-                )
-                    .setBlockModes(BLOCK_MODE)
-                    .setEncryptionPaddings(PADDING)
-                    .setRandomizedEncryptionRequired(true)
-                    .setUserAuthenticationRequired(false)
+                    KEY_ALIAS, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+                ).setBlockModes(BLOCK_MODE).setEncryptionPaddings(PADDING)
+                    .setRandomizedEncryptionRequired(true).setUserAuthenticationRequired(false)
                     .build()
             )
         }.generateKey()

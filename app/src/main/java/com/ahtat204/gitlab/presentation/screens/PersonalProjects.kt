@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.presentation.components.CoilCache.loader
@@ -92,48 +93,51 @@ fun PersonalProjects(
     currUser?.namespace?.projects?.nodes?.sortedByDescending {
         Instant.parse(it?.lastActivityAt.toString()).atZone(ZoneId.systemDefault()).toLocalDate()
     }?.let { nodes ->
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(x)
-                .background(Color.Black)
-        ) {
-            if (currUser?.namespace?.projects?.nodes?.isEmpty() == true || currUser?.avatarUrl == null) {
-                CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
+        val currUser by projectViewModel.projects.collectAsStateWithLifecycle()
+        currUser?.namespace?.projects?.nodes?.let { nodes ->
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(x)
+                    .background(Color.Black)
+            ) {
+                if (currUser?.namespace?.projects?.nodes?.isEmpty() == true || currUser?.avatarUrl == null) {
+                    CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
 
-            } else {
-                Row(
-                    modifier = Modifier
-                        .background(Color.Black)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Your Projects",
-                        fontFamily = titleFont,
-                        fontSize = 20.sp,
+                } else {
+                    Row(
                         modifier = Modifier
-                            .weight(1.0f)
-                            .offset(20.dp, 0.dp),
-                        textAlign = TextAlign.Center
-                    )
-                    IconButton(
-                        onClick = { projectViewModel.refreshProjects() },
-                        modifier = Modifier.weight(0.1f)
+                            .background(Color.Black)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        Icon(Icons.Default.Refresh, contentDescription = null)
+                        Text(
+                            text = "Your Projects",
+                            fontFamily = titleFont,
+                            fontSize = 20.sp,
+                            modifier = Modifier
+                                .weight(1.0f)
+                                .offset(20.dp, 0.dp),
+                            textAlign = TextAlign.Center
+                        )
+                        IconButton(
+                            onClick = { projectViewModel.refreshProjects() },
+                            modifier = Modifier.weight(0.1f)
+                        ) {
+                            Icon(Icons.Default.Refresh, contentDescription = null)
+                        }
                     }
-                }
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = x,
-                    verticalArrangement = Arrangement.spacedBy(0.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    items(nodes, key = { item -> item?.id ?: Any() }) { item ->
-                        item?.let { ProjectItem(currUser, it, loader, navController) }
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = x,
+                        verticalArrangement = Arrangement.spacedBy(0.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        items(nodes, key = { item -> item?.id ?: Any() }) { item ->
+                            item?.let { ProjectItem(currUser, it, loader, navController) }
+                        }
                     }
                 }
             }

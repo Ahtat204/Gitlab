@@ -145,7 +145,7 @@ fun ProjectDetailScreen(
                 pro.openIssuesCount ?: 0,
                 pro.openMergeRequestsCount ?: 0,
                 pro.pipelineCounts?.running,
-                navController,
+                navController,encodedId
             )
 
             Card(

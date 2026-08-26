@@ -3,10 +3,12 @@ package com.ahtat204.gitlab.data.remote.repositories.graphql
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
+import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.apollographql.apollo.api.Operation
 import kotlinx.coroutines.flow.Flow
 
@@ -93,6 +95,7 @@ interface GraphQlRepository {
      */
     fun getMyProfile(): Flow<GetMyProfileQuery.Data>
 
+
     /**
      * Streams all projects belonging to a specific user identified by their username.
      *
@@ -114,4 +117,21 @@ interface GraphQlRepository {
      * @param data The specific data object used to identify what needs removal.
      */
     suspend fun <D : Operation.Data> refresh(data: D?)
+
+    /**
+     * Streams a continuous, sequentially chunked record of repository commit histories.
+     *
+     * Implementations are expected to manage incremental page updates and item appending states.
+     *
+     * @param project The unique identifier or full path of the target GitLab project.
+     * @param status The status [PipelineStatusEnum] of the pipelines to fetch
+     * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the combined commit log historical records, or null if missing.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     */
+    suspend fun getProjectPipelines(
+        project: String,
+        cursor: String? = null,
+        status: PipelineStatusEnum = PipelineStatusEnum.SUCCESS
+    ): Flow<GetProjectPipelinesQuery.Data>
 }
