@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -16,9 +17,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -108,13 +112,32 @@ fun ProjectDetailScreen(
     ) {
         project?.let { pro ->
             val encodedId = URLEncoder.encode(pro.fullPath, StandardCharsets.UTF_8.toString())
-            Text(
-                text = pro.namespace?.path ?: "",
-                fontFamily = titleFont,
-                textAlign = TextAlign.Center,
-                fontSize = 20.sp,
-                modifier = Modifier.fillMaxWidth()
-            )
+
+            Row(
+                modifier = Modifier
+                    .background(Color.Black)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = pro.namespace?.path ?: "",
+                    fontFamily = titleFont,
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1.0f)
+                        .offset(20.dp, 0.dp)
+                )
+                IconButton(
+                    onClick = { projectViewModel.refetchProject(path) },
+                    modifier = Modifier.weight(0.1f)
+                ) {
+                    Icon(Icons.Default.Refresh, contentDescription = null)
+                }
+            }
+
             GeneralDetails(
                 pro.forksCount, pro.starCount, pro.name, pro.description ?: ""
             )

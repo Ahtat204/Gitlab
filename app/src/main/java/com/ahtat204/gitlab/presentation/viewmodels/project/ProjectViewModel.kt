@@ -28,6 +28,7 @@ import javax.inject.Inject
  * - **loadAllProjects()**: Fetches all projects using Apollo caching. Falls back
  *   to `NetworkFirst` policy if cache retrieval fails.
  * - **loadProject(id)**: Retrieves a specific project’s repository details by ID.
+ * - **refreshProjects()**: Manually invalidates the project cache and triggers a re-fetch.
  *
  * ## Error Handling
  * - Exceptions during data collection are caught. The ViewModel retries with
@@ -74,6 +75,34 @@ class ProjectViewModel @Inject constructor(private val graphQlRepository: GraphQ
      */
     fun loadProject(id: String) = viewModelScope.launch {
         graphQlRepository.getProjectById(id).collect { currentProject.value = it?.project }
+    }
+
+    /**
+     * Performs a manual refresh of the contributed projects list.
+     *
+     * This logic:
+     * 1. Invalides the current projects in the [projectRepository]'s local cache.
+     * 2. Clears the local [_projects] state to ensure UI reflects a "loading" or "empty" state.
+     * 3. Re-triggers [loadAllProjects] to fetch a fresh set of data from the network.
+     */
+    fun refreshProjects() {
+        val scope = viewModelScope
+        scope.launch {
+            graphQlRepository.refresh(GetMyPersonalProjectsQuery.Data(_projects.value))
+            _projects.value = null
+            loadAllProjects()
+        }
+
+    }
+
+    fun refetchProject(id: String) {
+        val scope = viewModelScope
+        val value = currentProject.value
+        scope.launch {
+            graphQlRepository.refresh(GetProjectDetailsQuery.Data(value))
+            currentProject.value = null
+            loadProject(id)
+        }
     }
 
 }

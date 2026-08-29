@@ -14,13 +14,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
+import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
+import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
 import com.ahtat204.gitlab.presentation.components.CoilCache
 import com.ahtat204.gitlab.presentation.navigation.BottomBar
 import com.ahtat204.gitlab.presentation.navigation.BottomNavigationGraph
 import com.ahtat204.gitlab.presentation.ui.theme.GitlabTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 /**
@@ -77,5 +83,17 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(Tokens.CurrentAuthState==null || Tokens.accessToken==null){
+            lifecycleScope.launch {
+                val storedState = AuthStorage.getAuthState(this@MainActivity).data.first()
+                Tokens.CurrentAuthState=storedState
+                Tokens.accessToken=storedState.accessToken
+            }
+        }
+
     }
 }

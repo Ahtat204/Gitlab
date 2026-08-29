@@ -53,7 +53,6 @@ fun CollaborationDetails(
     pipelinesCount: Int?,
     navController: NavController,
     encodedId: String
-
 ) {
     Column(
         modifier = Modifier
@@ -70,15 +69,14 @@ fun CollaborationDetails(
                 )
             ) {}
         }
-            ProjectWorkItems(
-                Item(
-                    "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, null
-                )
-            ) {}
+        ProjectWorkItems(
+            Item(
+                "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, null
+            ), openScreen = { navController.navigate("pipelines?projectId=$encodedId") })
         pipelinesCount?.let {
             ProjectWorkItems(
                 Item(
-                    "WorkItems", "project/{id]/workitems", R.drawable.workitems, null
+                    "WorkItems", "proshaject/{id]/workitems", R.drawable.workitems, null
                 )
             ) {}
         }
