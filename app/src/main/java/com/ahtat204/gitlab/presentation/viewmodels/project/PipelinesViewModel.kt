@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-typealias Pipelines = GetProjectPipelinesQuery.Pipelines?
+typealias Pipelines = GetProjectPipelinesQuery.Project?
 
 /**
  * ViewModel responsible for managing and exposing the CI/CD pipeline state for a specific GitLab project.
@@ -55,7 +55,7 @@ class PipelinesViewModel @Inject constructor(
     fun loadProjectPipelines(
         project: String, status: PipelineStatusEnum = PipelineStatusEnum.SUCCESS
     ) {
-        val page = _pipelines.value?.pageInfo
+        val page = _pipelines.value?.pipelines?.pageInfo
         val cursor = page?.endCursor
         val hasNextPage = page?.hasNextPage
         val isFirstPage = page?.startCursor
@@ -63,17 +63,27 @@ class PipelinesViewModel @Inject constructor(
             viewModelScope.launch {
                 repository.getProjectPipelines(
                     project = project, cursor = null, status = status
-                ).collect { _pipelines.value = it.project?.pipelines }
+                ).collect { _pipelines.value = it.project }
             }
         } else {
             if (hasNextPage == true && cursor != null) {
                 viewModelScope.launch {
                     repository.getProjectPipelines(
                         project = project, cursor = cursor, status = status
-                    ).collect { _pipelines.value = it.project?.pipelines }
+                    ).collect { _pipelines.value = it.project }
                 }
             }
         }
 
+    }
+
+    fun refresh(id: String) {
+        val scope = viewModelScope
+        val value = _pipelines.value
+        scope.launch {
+            repository.refresh(GetProjectPipelinesQuery.Data(value))
+            _pipelines.value = null
+            loadProjectPipelines(value!!.id)
+        }
     }
 }

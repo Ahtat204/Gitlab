@@ -40,7 +40,7 @@ class PipelinesViewModelTest : TestBase() {
             )
         )
         viewModel.loadProjectPipelines(projectId)
-        val pipelines = viewModel.pipelines.value
+        val pipelines = viewModel.pipelines.value?.pipelines
         assertNotNull(pipelines)
         val nodes = pipelines!!.nodes
         assertNotNull(nodes)
@@ -49,8 +49,7 @@ class PipelinesViewModelTest : TestBase() {
         val mockedNodes = mockProjectPipelinesData.project!!.pipelines!!.nodes
         for (i in 0 until nodes.size) {
             assertNotNullAndEquals(
-                nodes[i]!!.id,
-                mockedNodes!![i]!!.id
+                nodes[i]!!.id, mockedNodes!![i]!!.id
             )
             assertNotNullAndEquals(nodes[i]!!.type, mockedNodes[i]!!.type)
             assertNotNullAndEquals(nodes[i]!!.status, mockedNodes[i]!!.status)
@@ -58,8 +57,7 @@ class PipelinesViewModelTest : TestBase() {
             assertNotNullAndEquals(nodes[i]!!.commit!!.name, mockedNodes[i]!!.commit!!.name!!)
             assertNotNull(nodes[i]!!.mergeRequest)
             assertNotNullAndEquals(
-                nodes[i]!!.mergeRequest!!.name,
-                mockedNodes[i]!!.mergeRequest!!.name!!
+                nodes[i]!!.mergeRequest!!.name, mockedNodes[i]!!.mergeRequest!!.name!!
             )
             assertNotNullAndEquals(nodes[i]!!.duration, mockedNodes[i]!!.duration!!)
             assertNotNull(nodes[i]!!.user)

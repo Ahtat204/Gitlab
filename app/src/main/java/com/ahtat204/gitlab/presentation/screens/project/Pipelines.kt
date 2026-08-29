@@ -78,7 +78,7 @@ fun Pipelines(
             .padding(x)
             .background(Color.Black)
     ) {
-        val nodes = pipelines?.nodes
+        val nodes = pipelines?.pipelines?.nodes
         if (nodes?.isEmpty() == false) {
             Text(
                 text = "Your Projects",
