@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetProjectPipelineQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
-import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,13 +32,13 @@ typealias Pipeline = GetProjectPipelineQuery.Pipeline?
  * - Handles data fetching and pagination for both lists of pipelines and jobs within a pipeline.
  * - Manages status filtering for pipeline lists.
  *
- * @param projectRepository The data layer dependency used to fetch pipeline information.
- * @see [ProjectRepository]
+ * @param repository The data layer dependency used to fetch pipeline information.
+ * @see [GraphQlRepository]
  * @author Lahcen AHTAT
  */
 @HiltViewModel
 class PipelinesViewModel @Inject constructor(
-    private val projectRepository: ProjectRepository
+    private val repository: GraphQlRepository
 ) : ViewModel() {
     private val _pipeline = MutableStateFlow<Pipeline>(null)
 
@@ -73,14 +73,14 @@ class PipelinesViewModel @Inject constructor(
         val hasNextPage = page?.hasNextPage
         if (_pipelines.value == null) { // first page
             viewModelScope.launch {
-                projectRepository.getProjectPipelines(
+                repository.getProjectPipelines(
                     project = project, cursor = null, status = status
                 ).collect { _pipelines.value = it.project?.pipelines }
             }
         } else {
             if (hasNextPage == true) {
                 viewModelScope.launch {
-                    projectRepository.getProjectPipelines(
+                    repository.getProjectPipelines(
                         project = project, cursor = cursor, status = status
                     ).collect { _pipelines.value = it.project?.pipelines }
                 }
@@ -101,14 +101,14 @@ class PipelinesViewModel @Inject constructor(
         val hasNextPage = page?.hasNextPage
         if (_pipeline.value == null) {
             viewModelScope.launch {
-                projectRepository.getProjectPipeline(project, pipeline).collect {
+                repository.getProjectPipeline(project, pipeline).collect {
                     _pipeline.value = it.project?.pipeline
                 }
             }
         } else {
             if (hasNextPage == true && cursor != null) {
                 viewModelScope.launch {
-                    projectRepository.getProjectPipeline(project, pipeline, cursor)
+                    repository.getProjectPipeline(project, pipeline, cursor)
                         .collect { _pipeline.value = it.project?.pipeline }
                 }
             }

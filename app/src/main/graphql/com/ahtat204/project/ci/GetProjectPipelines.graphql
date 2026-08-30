@@ -4,11 +4,21 @@ query GetProjectPipelines($project:ID!,$cursor:String,$status:PipelineStatusEnum
         pipelines(first: 20,status: $status ,after: $cursor ){
             __typename
             nodes {
+                id
                 status
+                type
                 duration
                 finishedAt
-                id
-                name
+                ref
+                mergeRequest {
+                    name
+                }
+                commit {
+                    name
+                }
+                user {
+                    name
+                }
             }
             pageInfo {
                 hasNextPage

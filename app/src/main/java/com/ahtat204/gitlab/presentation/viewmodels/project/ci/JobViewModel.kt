@@ -3,7 +3,7 @@ package com.ahtat204.gitlab.presentation.viewmodels.project.ci
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetPipelineJobQuery
-import com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,13 +21,13 @@ typealias Job = GetPipelineJobQuery.Job?
  *
  * ### Responsibilities
  * - Exposes a reactive [job] stream for UI observation.
- * - Fetches detailed job information from [ProjectRepository].
+ * - Fetches detailed job information from [GraphQlRepository].
  *
- * @param projectRepository The data layer dependency used to fetch job information.
+ * @param repository The data layer dependency used to fetch job information.
  * @author Lahcen AHTAT
  */
 @HiltViewModel
-class JobViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
+class JobViewModel @Inject constructor(private val repository: GraphQlRepository) :
     ViewModel() {
     private val _job = MutableStateFlow<Job>(null)
 
@@ -44,7 +44,7 @@ class JobViewModel @Inject constructor(private val projectRepository: ProjectRep
      */
     fun loadPipelineJob(project: String, job: String) {
         viewModelScope.launch {
-            projectRepository.getPipelineJob(project = project, job).collect {
+            repository.getPipelineJob(project = project, job).collect {
                 _job.value = it.project?.job
             }
         }
