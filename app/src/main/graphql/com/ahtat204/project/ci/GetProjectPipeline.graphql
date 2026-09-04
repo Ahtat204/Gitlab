@@ -1,0 +1,24 @@
+query GetProjectPipeline($project:ID!,$pipline:CiPipelineID!,$cursor:String){
+    project(fullPath:$project ){
+        pipeline(id: $pipline){
+            id
+            name
+            type
+            computeMinutes
+            jobs(first: 20,after: $cursor){
+                nodes {
+                    id
+                    createdAt
+                    status
+                    duration
+                }
+                pageInfo {
+                    endCursor
+                    startCursor
+                    hasNextPage
+                }
+            }
+        }
+    }
+
+}
