@@ -29,16 +29,16 @@ import javax.inject.Singleton
  * Implementation of [GraphQlRepository] that serves as the central hub for all GitLab GraphQL interactions.
  *
  * ## Architecture: Unified Repository (SSOT)
- * This class is designed as a single, consolidated repository for all domain data (Projects, Profiles, Commits, etc.).
+ * This class is designed as a single, consolidated repository for all domain data (Projects, Profiles, Commits, Pipelines, etc.).
  * By avoiding a split into multiple domain-specific repositories, we:
- * - **Reduce Allocation**: Single singleton instance injected across all ViewModels.
- * - **Ensure Consistency**: All queries share the same [ApolloClient] instance and its normalized cache.
- * - **Streamline DI**: Simplifies Dagger/Hilt configuration by providing a one-stop-shop for GraphQL data.
+ * - **Reduce Allocation**: Single singleton instance injected across all ViewModels via Hilt.
+ * - **Ensure Consistency**: All queries share the same [ApolloClient] instance and its normalized cache, facilitating real-time UI updates across the app.
+ * - **Streamline DI**: Simplifies dependency injection configuration.
  *
  * ## Data Strategy
- * - **Reactive Streams**: Returns Kotlin [Flow] to provide real-time updates when the cache changes.
- * - **Normalized Caching**: Leverages Apollo's cache to minimize network requests and ensure data integrity.
- * - **Performance**: Annotated with [Singleton] to persist across the app's lifecycle without redundant object creation.
+ * - **Reactive Streams**: Returns Kotlin [Flow] to provide real-time updates when the cache changes using Apollo's [watch] mechanism.
+ * - **Normalized Caching**: Leverages Apollo's cache to minimize network requests, support offline viewing, and ensure data integrity.
+ * - **Performance**: Annotated with [Singleton] to persist across the app's lifecycle.
  *
  * @param apolloClient The primary GraphQL engine used for network transport and cache management.
  * @author Lahcen AHTAT
@@ -49,10 +49,11 @@ class ApolloGraphQLRepository @Inject constructor(
 ) : GraphQlRepository {
     /**
      * Streams all projects the authenticated user has contributed to.
+     *
      * @return A [Flow] emitting [GetMyPersonalProjectsQuery.Data] objects.
      *
      * ### Behavior
-     * - Executes [GetMyPersonalProjectsQuery] with the provided fetch policy.
+     * - Executes [GetMyPersonalProjectsQuery] with [FetchPolicy.CacheFirst].
      * - Uses Apollo’s [watch] to continuously observe changes.
      * - Filters out null results with `mapNotNull`.
      * - Logs exceptions with [android.util.Log.e] while keeping the stream alive.
@@ -98,14 +99,14 @@ class ApolloGraphQLRepository @Inject constructor(
      * }
      * ```
      */
-    override suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
+    override suspend fun getAllPersonalProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
         apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapAndHandleErrors()
 
     /**
-     * Retrieves a project overview  for a given project.(full description , star count, fork count )
+     * Retrieves a comprehensive overview for a given project, including statistics like star and fork counts.
      *
-     * @param id The unique identifier of the project.
+     * @param id The unique identifier (GID) or full path of the project.
      * @return A [Flow] emitting [GetProjectDetailsQuery.Data] objects, or null if unavailable.
      *
      * ### Behavior
@@ -143,8 +144,7 @@ class ApolloGraphQLRepository @Inject constructor(
     }
 
     /**
-     * Retrieves profile data of the currentUser
-     * @return A [Flow] emitting [GetMyProfileQuery.Data] objects, or null if unavailable.
+     * Retrieves the profile data of the currently authenticated user.
      *
      * ### Behavior
      * - Executes [GetMyProfileQuery].
@@ -181,11 +181,12 @@ class ApolloGraphQLRepository @Inject constructor(
     }
 
     /**
-     * Retrieves a paginated list of first 20 commits a given project repository .
+     * Retrieves a paginated list of commits for a given project repository and branch.
      *
-     * @param id The unique identifier of the project.
-     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
-     * @return A [Flow] emitting [GetRepositoryCommitsQuery.Data] objects, or null if unavailable.
+     * @param id The unique identifier or full path of the project.
+     * @param branch The target git reference branch.
+     * @param cursor Optional pagination pointer for fetching sequential pages.
+     * @return A [Flow] emitting the combined commit history.
      *
      * ### Behavior
      * - Executes [GetRepositoryCommitsQuery] with the provided project ID.
@@ -276,8 +277,10 @@ class ApolloGraphQLRepository @Inject constructor(
     /**
      * Retrieves the repository tree for a given project.
      *
-     * @param id The unique identifier of the project.
-     * @return A [Flow] emitting [GetProjectDetailsQuery.Data] objects, or null if unavailable.
+     * @param id The unique identifier or full path of the project.
+     * @param branch The target git branch. Pass null for root reference.
+     * @param path The relative sub-directory path. Pass null for the root folder.
+     * @return A [Flow] emitting the repository tree layer layout.
      *
      * ### Behavior
      * - Executes [GetProjectRepositoryQuery] with the provided project ID.
@@ -305,10 +308,7 @@ class ApolloGraphQLRepository @Inject constructor(
      *
      *             }
      *
-     *         }
-     *         }
-     *     }
-     * ```
+
      */
     override suspend fun getProjectRepository(
         id: String, branch: String?, path: String?
@@ -326,14 +326,7 @@ class ApolloGraphQLRepository @Inject constructor(
      * Streams all projects belonging to a specific user identified by their username.
      *
      * @param userName The unique username of the GitLab user.
-     * @return A reactive stream emitting the user's project collection metadata, or null if not found.
-     *
-     * ### Behavior
-     * - Executes [GetUserProjectsByNameQuery] with the provided username.
-     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
-     * - Emits results reactively via Flow using [watch] to observe changes.
-     * - Handles errors gracefully via [mapAndHandleErrors].
-     * - Throws [kotlinx.coroutines.CancellationException] if the collection coroutine scope is cancelled.
+     * @return A reactive stream emitting the user's project collection metadata.
      */
     override suspend fun getUserProjectsByName(
         userName: String
@@ -343,19 +336,16 @@ class ApolloGraphQLRepository @Inject constructor(
     }
 
     /**
-     * Manually invalidates and refreshes data in the normalized cache for specific queries.
+     * Manually invalidates and refreshes data in the normalized cache for specific operations.
      *
-     * Currently supports:
-     * - [GetMyPersonalProjectsQuery.Data]: Removes the cached project list.
-     * - [GetProjectDetailsQuery.Data]
-     * - [GetProjectRepositoryQuery.Data]
+     * Supported operations: [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery], [GetProjectRepositoryQuery].
      *
      * ### Behavior
      * 1. Identifies the query type from the provided [data].
-     * 2. Uses [com.apollographql.cache.normalized.removeOperation] to purge the data from the store.
-     * 3. Publishes changes to trigger [watch] updates across the app.
+     * 2. Removes the cached entry from [com.apollographql.cache.normalized.apolloStore].
+     * 3. Publishes the change to trigger active observers ([watch]).
      *
-     * @param data The data object used to identify the cache entries to remove.
+     * @param data The data object used to identify which cache entries to purge.
      */
     override suspend fun <D : Operation.Data> refresh(
         data: D?
@@ -384,11 +374,12 @@ class ApolloGraphQLRepository @Inject constructor(
     }
 
     /**
-     * Retrieves first 20 pipelines (currently fetch the running pipelines , later will add more method arguments).
+     * Retrieves a paginated record of project CI/CD pipelines, filtered by status.
      *
-     * @param project The unique identifier of the project or the project path.
-     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
-     * @return A [Flow] emitting [GetProjectPipelinesQuery.Data] objects, or null if unavailable.
+     * @param project The unique identifier or full path of the project.
+     * @param cursor Optional pagination pointer anchor.
+     * @param status Filter for pipeline status (e.g., SUCCESS, RUNNING).
+     * @return A reactive stream emitting filtered pipeline metadata.
      *
      * ### Behavior
      * - Executes [GetProjectPipelinesQuery] with the provided project ID.
@@ -448,6 +439,53 @@ class ApolloGraphQLRepository @Inject constructor(
 
     }
 
+    /**
+     * Streams all projects that the currently authenticated user has access to, with pagination.
+     *
+     * @param cursor The pagination pointer for sequential page fetches.
+     * @return A reactive stream emitting the user's project memberships.
+     * query example:
+     * ``` GraphQM
+     * currentUser {
+     *         projectMemberships(first: 20,after: $cursor){
+     *             pageInfo {
+     *                 hasPreviousPage
+     *                 hasNextPage
+     *                 endCursor
+     *             }
+     *             nodes{
+     *                 id
+     *                 createdAt
+     *               project {
+     *                   id
+     *                   fullPath
+     *                   name
+     *                   description
+     *                   avatarUrl
+     *                   visibility
+     *                   topics
+     *                   languages {
+     *                       name
+     *                       color
+     *
+     *                   }
+     *                   pipelines(first: 1){
+     *                       edges {
+     *                         cursor
+     *                           node {
+     *                               id
+     *                               status
+     *                               name
+     *
+     *                           }
+     *                       }
+     *                   }
+     *               }
+     *             }
+     *         }
+     *     }
+     * ```
+     */
     override suspend fun getAllProjects(cursor: String?): Flow<GetAllProjectsQuery.Data> {
         return apolloClient.query(GetAllProjectsQuery(cursor = Optional.presentIfNotNull(cursor)))
             .fetchPolicy(

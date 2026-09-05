@@ -29,6 +29,17 @@ import com.ahtat204.gitlab.presentation.components.CoilCache.loader
 import com.ahtat204.gitlab.presentation.components.ProjectItem
 import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectsViewModel
 
+/**
+ * Composable screen that displays a list of projects for the current user.
+ *
+ * This screen uses [ProjectsViewModel] to fetch and display projects in a [LazyColumn].
+ * It includes a loading indicator while the initial data is being fetched and
+ * renders each project using the [ProjectItem] component.
+ *
+ * @param navController The controller used for navigating between screens.
+ * @param x Padding values typically provided by a [androidx.compose.material3.Scaffold].
+ * @param viewModel The ViewModel providing project data and business logic.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Projects(
