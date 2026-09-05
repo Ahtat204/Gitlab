@@ -5,7 +5,8 @@
 [![Platform](https://img.shields.io/badge/platform-Android-3DDC84?style=for-the-badge)](https://www.android.com)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
-> A native Android client for GitLab that brings your repositories to your fingertips. Browse projects, view merge requests, and manage issues without opening a web browser.
+> A native Android client for GitLab that brings your repositories to your fingertips. Browse
+> projects, view merge requests, and manage issues without opening a web browser.
 
 ## 📸 Screenshots
 
@@ -32,20 +33,28 @@
 
 ## Overview
 
-**GitLab Client** is a modern Android application built with **Kotlin** and **Jetpack Compose** that provides a native, efficient way to interact with GitLab. Whether you're a developer on the go or prefer a dedicated mobile experience, this app eliminates the need to open a web browser while maintaining full access to your GitLab workspace.
+**GitLab Client** is a modern Android application built with **Kotlin** and **Jetpack Compose** that
+provides a native, efficient way to interact with GitLab. Whether you're a developer on the go or
+prefer a dedicated mobile experience, this app eliminates the need to open a web browser while
+maintaining full access to your GitLab workspace.
 
-The application leverages **Apollo Kotlin** for GraphQL queries and **OAuth2** for secure authentication, ensuring a seamless and secure user experience.
+The application leverages **Apollo Kotlin** for GraphQL queries and **OAuth2** for secure
+authentication, ensuring a seamless and secure user experience.
 
 ---
 
 ## ✨ Key Features
 
-- 📱 **Modern Jetpack Compose UI** — Clean, responsive, and fully native Android interface built with Jetpack Compose for an intuitive user experience.
-- 🔐 **GitLab OAuth2 Authentication** — Secure login using GitLab's official OAuth2 authorization flow.
+- 📱 **Modern Jetpack Compose UI** — Clean, responsive, and fully native Android interface built with
+  Jetpack Compose for an intuitive user experience.
+- 🔐 **GitLab OAuth2 Authentication** — Secure login using GitLab's official OAuth2 authorization
+  flow.
 - ⚡ **GraphQL Integration** — Efficient data fetching using Apollo Kotlin for optimized performance.
 - 📂 **Repository Browsing** — Quickly view and navigate your GitLab projects on mobile.
-- 🔍 **Project Details** — Access comprehensive project information including merge requests, issues, and statistics.
-- 💾 **Secure Token Storage** — Encrypted storage of authentication tokens for safe credential management.
+- 🔍 **Project Details** — Access comprehensive project information including merge requests, issues,
+  and statistics.
+- 💾 **Secure Token Storage** — Encrypted storage of authentication tokens for safe credential
+  management.
 - 🎨 **Dark & Light Themes** — Adaptive UI themes for comfortable viewing in any lighting condition.
 
 ---
@@ -53,7 +62,7 @@ The application leverages **Apollo Kotlin** for GraphQL queries and **OAuth2** f
 ## 🛠️ Tech Stack
 
 | Layer | Technologies |
-|:---:|:---|
+|:------------------------:|:-----------------------------------|
 | **UI Framework** | Jetpack Compose, Material Design 3 |
 | **Language** | Kotlin |
 | **Data Layer** | Apollo Kotlin (GraphQL), OkHttp |
@@ -170,8 +179,8 @@ Gitlab/
 │           │       │   │   │   ├── ProfileRepository.kt
 │           │       │   │   │   └── ProfileRepositoryImpl.kt
 │           │       │   │   ├── project/
-│           │       │   │   │   ├── ProjectRepository.kt
-│           │       │   │   │   └── ProjectRepositoryImpl.kt
+│           │       │   │   │   ├── GraphQlRepository.kt
+│           │       │   │   │   └── ApolloGraphQLRepository.kt
 │           │       │   │   └── user/
 │           │       │   │       ├── UserRepository.kt
 │           │       │   │       └── UserRepositoryImpl.kt
@@ -354,7 +363,8 @@ This project follows **Clean Architecture** principles with a layered approach:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Whether it's bug fixes, feature requests, or improvements, please follow these guidelines:
+Contributions are welcome! Whether it's bug fixes, feature requests, or improvements, please follow
+these guidelines:
 
 ### Development Workflow
 

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.R
@@ -32,13 +33,13 @@ import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.contex
 import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
+import com.ahtat204.gitlab.presentation.components.CoilCache.loader
 import com.ahtat204.gitlab.presentation.components.Contact
 import com.ahtat204.gitlab.presentation.components.Header
 import com.ahtat204.gitlab.presentation.components.Info
 import com.ahtat204.gitlab.presentation.components.Item
 import com.ahtat204.gitlab.presentation.components.WorkItem
 import com.ahtat204.gitlab.presentation.viewmodels.ProfileViewModel
-import kotlinx.coroutines.Dispatchers
 
 /**
  * A profile screen composable responsible for orchestrating the user's account information display.
@@ -62,7 +63,7 @@ import kotlinx.coroutines.Dispatchers
  * @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/profile.jpg" width="300" height="700"/>
  */
 @Composable
-fun Profile(
+internal fun Profile(
     navController: NavHostController,
     x: PaddingValues,
     profileViewModel: ProfileViewModel = hiltViewModel()
