@@ -38,7 +38,6 @@ import javax.crypto.spec.IvParameterSpec
  * val decrypted = CryptoUtility.decrypt(encrypted)
  * val original = decrypted.decodeToString()
  * ```
- * @author Lahcen AHTAT
  */
 object CryptoUtility {
     /** The alias used to store the secret key in the Android Keystore. */

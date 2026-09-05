@@ -37,10 +37,11 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
-import com.ahtat204.gitlab.presentation.ui.theme.Background
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Background
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -228,15 +229,147 @@ fun ProjectItem(
         }
     }
 
-}/*
+}
+
+ @Composable
+fun ProjectItem(
+     project: GetAllProjectsQuery.Project,
+     imageLoader: ImageLoader,
+     navController: NavHostController
+) {
+    val encodedId = URLEncoder.encode(project.fullPath, StandardCharsets.UTF_8.toString())
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = { navController.navigate("project?projectId=$encodedId") })
+            .fillMaxHeight()
+            .height(120.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .background(Color.Black)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            project.let {
+                it.avatarUrl?.let { url ->
+                    val avatar = "https://gitlab.com/$url"
+
+                    AsyncImage(
+                        imageLoader = imageLoader,
+                        model = ImageRequest.Builder(LocalContext.current).data(avatar) // Image URL
+                            .crossfade(true).memoryCachePolicy(CachePolicy.ENABLED)
+                            .diskCachePolicy(CachePolicy.ENABLED) // Smooth fade-in
+                            .build(),
+                        contentDescription = "Sample Image",
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .size(40.dp)
+                            .clip(RoundedCornerShape(20.dp)),
+                        onState = { state ->
+                            when (state) {
+                                is AsyncImagePainter.State.Loading -> {}
+                                is AsyncImagePainter.State.Success -> {}
+                                else -> {}
+                            }
+                        })
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .background(Background)
+            ) {
+                val pipelines=project?.pipelines?.edges
+                pipelines?.let {pips->
+                    if(pips.isNotEmpty()){
+                        pips[0]?.node?.status?.let { PipeLineStatusIcon(it) }
+                    }
+
+                }
 
 
-fun hexColorToLong(hex: String): Long {
-    val cleanHex = hex.removePrefix("#").trim()
-    require(cleanHex.matches(Regex("^[0-9A-Fa-f]{6}$"))) {
-        "Invalid hex color format. Expected #RRGGBB."
+            //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+
+                project.let { project ->
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = project.name,
+                            fontSize = 17.sp,
+                            color = Color.White,
+                            modifier = Modifier.offset(10.dp, 0.dp),
+                            fontFamily = customFontFamily
+                        )
+                        Spacer(modifier = Modifier.width(15.dp))
+                        val visibilityIcon: ImageVector = when (project.visibility) {
+                            "public" -> Icons.Default.Public
+                            else -> Icons.Default.Lock
+                        }
+                        project.visibility?.let {
+                            Icon(
+                                visibilityIcon,
+                                contentDescription = null,
+                                modifier = Modifier.size(15.dp)
+                            )
+                        }
+                    }
+
+                    project.description?.let {
+                        Text(
+                            text = it,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            fontSize = 10.sp,
+                            color = Color.White,
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .offset(10.dp, 0.dp),
+                            fontFamily = customFontFamily,
+                        )
+                    }
+                    project.topics?.let { topics ->
+                        Row(horizontalArrangement = Arrangement.Start) {
+                            topics.onEachIndexed { index, topic ->
+                                if (index < 3) {
+                                    Text(
+                                        text = topic,
+                                        fontSize = 11.sp,
+                                        color = Orange,
+                                        modifier = Modifier
+                                            .offset(0.dp, 0.dp)
+                                            .padding(10.dp, 0.dp),
+                                        fontFamily = customFontFamily
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    val languages = project.languages
+                    if (languages?.isNotEmpty() == true) {
+                        val language = languages[0]
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(14.dp, 0.dp)
+                        ) {
+                            Language(language.color.toString().toColorInt())
+                            Text(
+                                text = language.name,
+                                fontSize = 11.sp,
+                                color = Color.White,
+                                modifier = Modifier.offset(10.dp, 0.dp),
+                                fontFamily = customFontFamily
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    // Parse as unsigned long from hex
-    return cleanHex.toLong(16)
-}*/
+}

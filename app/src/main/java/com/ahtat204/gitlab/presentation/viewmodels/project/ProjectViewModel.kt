@@ -65,7 +65,7 @@ class ProjectViewModel @Inject constructor(private val graphQlRepository: GraphQ
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
     fun loadAllProjects() = viewModelScope.launch {
-        graphQlRepository.getAllProjects().collect { _projects.value = it.currentUser }
+        graphQlRepository.getAllPersonalProjects().collect { _projects.value = it.currentUser }
     }
 
     /**

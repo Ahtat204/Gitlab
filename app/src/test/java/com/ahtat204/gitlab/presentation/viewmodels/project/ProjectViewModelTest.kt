@@ -53,7 +53,7 @@ class ProjectViewModelTest : TestBase() {
 
     @Test
     fun `load a List of projects updates _projects state `() = runTest(testDispatcher) {
-        whenever(repository.getAllProjects()).thenReturn(flowOf(mockDataList))
+        whenever(repository.getAllPersonalProjects()).thenReturn(flowOf(mockDataList))
         viewModel.loadAllProjects()
         assertNotNull(viewModel.projects.value)
         val projects = viewModel.projects.value

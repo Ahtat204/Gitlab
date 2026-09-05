@@ -27,8 +27,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.components.Pipeline
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.project.PipelinesViewModel
 
 /**

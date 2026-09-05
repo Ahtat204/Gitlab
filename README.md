@@ -61,17 +61,17 @@ authentication, ensuring a seamless and secure user experience.
 
 ## 🛠️ Tech Stack
 
-|          Layer           | Technologies                       |
+| Layer | Technologies |
 |:------------------------:|:-----------------------------------|
-|     **UI Framework**     | Jetpack Compose, Material Design 3 |
-|       **Language**       | Kotlin                             |
-|      **Data Layer**      | Apollo Kotlin (GraphQL), OkHttp    |
-|    **Authentication**    | OAuth2                             |
-|       **Security**       | Crypto/Encryption utilities        |
-| **Dependency Injection** | Hilt                               |
-|    **Image Loading**     | Coil                               |
-|       **Platform**       | Android (Native)                   |
-|     **Build System**     | Gradle (Kotlin DSL)                |
+| **UI Framework** | Jetpack Compose, Material Design 3 |
+| **Language** | Kotlin |
+| **Data Layer** | Apollo Kotlin (GraphQL), OkHttp |
+| **Authentication** | OAuth2 |
+| **Security** | Crypto/Encryption utilities |
+| **Dependency Injection** | Hilt  |
+| **Image Loading** | Coil |
+| **Platform** | Android (Native) |
+| **Build System** | Gradle (Kotlin DSL) |
 
 ---
 
@@ -105,9 +105,9 @@ cd Gitlab
 ### Configuration
 
 1. **Register a GitLab Application**:
-    - Go to GitLab → Preferences → Applications
-    - Create a new application with redirect URI: `gitlab://oauth-callback`
-    - Note your Application ID and Secret
+   - Go to GitLab → Preferences → Applications
+   - Create a new application with redirect URI: `gitlab://oauth-callback`
+   - Note your Application ID and Secret
 
 2. **Update AuthConfig.kt**:
    ```kotlin
@@ -337,20 +337,20 @@ This project follows **Clean Architecture** principles with a layered approach:
 ### Layers
 
 1. **Presentation Layer** (UI)
-    - Composable screens using Jetpack Compose
-    - ViewModels for state management
-    - Navigation graph for screen transitions
+   - Composable screens using Jetpack Compose
+   - ViewModels for state management
+   - Navigation graph for screen transitions
 
 2. **Domain Layer** (Business Logic)
-    - Use cases for business operations
-    - Domain models
-    - Repository interfaces
+   - Use cases for business operations
+   - Domain models
+   - Repository interfaces
 
 3. **Data Layer** (Data Sources)
-    - Repository implementations
-    - Remote data sources (API)
-    - Local caching (if applicable)
-    - Interceptors for request/response handling
+   - Repository implementations
+   - Remote data sources (API)
+   - Local caching (if applicable)
+   - Interceptors for request/response handling
 
 ### Design Patterns
 
@@ -379,9 +379,9 @@ these guidelines:
    ```
 
 3. **Make your changes**
-    - Follow Kotlin coding conventions
-    - Add comments for complex logic
-    - Test your changes locally
+   - Follow Kotlin coding conventions
+   - Add comments for complex logic
+   - Test your changes locally
 
 4. **Commit with clear messages**
    ```bash
@@ -396,9 +396,9 @@ these guidelines:
    ```
 
 6. **Open a Pull Request**
-    - Provide a clear description of your changes
-    - Link to any related issues
-    - Include screenshots for UI changes
+   - Provide a clear description of your changes
+   - Link to any related issues
+   - Include screenshots for UI changes
 
 ### Commit Convention
 
@@ -430,7 +430,7 @@ these guidelines:
 
 ## 📞 Support
 
-Have questions or found a bug?
+Have questions or found a bug? 
 
 - Open an [Issue](https://github.com/Ahtat204/Gitlab/issues)
 - Check existing issues for similar problems

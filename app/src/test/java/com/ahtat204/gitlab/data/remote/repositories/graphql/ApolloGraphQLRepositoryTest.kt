@@ -70,7 +70,7 @@ class ApolloGraphQLRepositoryTest {
         mockWebserver.enqueue(
             MockResponse().setResponseCode(200).setBody(mockedProjects)
         )
-        val result = repository.getAllProjects().first()
+        val result = repository.getAllPersonalProjects().first()
         assertNotNull(result)
         assertNotNull(result.currentUser?.namespace?.projects?.nodes)
         assertEquals(1, result.currentUser?.namespace?.projects?.nodes?.size)

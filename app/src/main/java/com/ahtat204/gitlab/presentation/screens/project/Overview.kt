@@ -43,9 +43,9 @@ import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.presentation.components.CollaborationDetails
 import com.ahtat204.gitlab.presentation.components.GeneralDetails
 import com.ahtat204.gitlab.presentation.components.ProjectItem
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
+import com.ahtat204.gitlab.presentation.activities.ui.theme.topBarFont
 import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectViewModel
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -120,16 +120,16 @@ fun ProjectDetailScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = pro.namespace?.path ?: "",
-                    fontFamily = titleFont,
-                    textAlign = TextAlign.Center,
-                    fontSize = 20.sp,
+            Text(
+                text = pro.namespace?.path ?: "",
+                fontFamily = titleFont,
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp,
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1.0f)
                         .offset(20.dp, 0.dp)
-                )
+            )
                 IconButton(
                     onClick = { projectViewModel.refetchProject(path) },
                     modifier = Modifier.weight(0.1f)

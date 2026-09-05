@@ -19,14 +19,13 @@ import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
 import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.presentation.activities.ui.theme.GitlabTheme
 import com.ahtat204.gitlab.presentation.components.CoilCache
 import com.ahtat204.gitlab.presentation.navigation.BottomBar
 import com.ahtat204.gitlab.presentation.navigation.BottomNavigationGraph
-import com.ahtat204.gitlab.presentation.ui.theme.GitlabTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 /**
@@ -50,7 +49,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
-     lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     /**
      * Called when the activity is starting.
@@ -75,7 +74,9 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             GitlabTheme(darkTheme = true) {
                 Scaffold(
-                    modifier = Modifier.fillMaxSize().background(Color.Black),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black),
                     bottomBar = { BottomBar(navController) },
                     floatingActionButtonPosition = FabPosition.End
                 ) { paddingValues ->
@@ -87,11 +88,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        if(Tokens.CurrentAuthState==null || Tokens.accessToken==null){
+        if (Tokens.CurrentAuthState == null || Tokens.accessToken == null) {
             lifecycleScope.launch {
                 val storedState = AuthStorage.getAuthState(this@MainActivity).data.first()
-                Tokens.CurrentAuthState=storedState
-                Tokens.accessToken=storedState.accessToken
+                Tokens.CurrentAuthState = storedState
+                Tokens.accessToken = storedState.accessToken
             }
         }
 

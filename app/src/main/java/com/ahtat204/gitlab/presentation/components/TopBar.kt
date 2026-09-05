@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
+import com.ahtat204.gitlab.presentation.activities.ui.theme.topBarFont
 
 /**
  * the name represent the name of the screen ,as this Bar will contain useful buttons (like search and refresh )
