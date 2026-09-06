@@ -19,13 +19,13 @@ import org.junit.Test
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ProjectViewModelTest : TestBase() {
-    private lateinit var viewModel: ProjectViewModel
+class PersonalProjectsViewModelTest : TestBase() {
+    private lateinit var viewModel: PersonalProjectsViewModel
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = ProjectViewModel(repository)
+        viewModel = PersonalProjectsViewModel(repository)
     }
 
     @After
@@ -53,7 +53,7 @@ class ProjectViewModelTest : TestBase() {
 
     @Test
     fun `load a List of projects updates _projects state `() = runTest(testDispatcher) {
-        whenever(repository.getAllProjects()).thenReturn(flowOf(mockDataList))
+        whenever(repository.getAllPersonalProjects()).thenReturn(flowOf(mockDataList))
         viewModel.loadAllProjects()
         assertNotNull(viewModel.projects.value)
         val projects = viewModel.projects.value

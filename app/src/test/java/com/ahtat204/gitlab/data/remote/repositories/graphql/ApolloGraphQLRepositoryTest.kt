@@ -3,6 +3,7 @@ package com.ahtat204.gitlab.data.remote.repositories.graphql
 import com.ahtat204.gitlab.data.queries.cache.Cache.cache
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
+import com.ahtat204.gitlab.reponses.json.mockedAllProjects
 import com.ahtat204.gitlab.reponses.json.mockedBranches
 import com.ahtat204.gitlab.reponses.json.mockedCommits
 import com.ahtat204.gitlab.reponses.json.mockedPipelines
@@ -16,8 +17,8 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
-import org.junit.Assert
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
@@ -28,6 +29,7 @@ import org.junit.Test
  * These tests verify the integration between the repository, the Apollo GraphQL client, 
  * and the network layer by simulating real API responses.
  */
+@Suppress("DEPRECATION")
 class ApolloGraphQLRepositoryTest {
     private lateinit var mockWebserver: MockWebServer
     private lateinit var apolloClient: ApolloClient
@@ -70,7 +72,7 @@ class ApolloGraphQLRepositoryTest {
         mockWebserver.enqueue(
             MockResponse().setResponseCode(200).setBody(mockedProjects)
         )
-        val result = repository.getAllProjects().first()
+        val result = repository.getAllPersonalProjects().first()
         assertNotNull(result)
         assertNotNull(result.currentUser?.namespace?.projects?.nodes)
         assertEquals(1, result.currentUser?.namespace?.projects?.nodes?.size)
@@ -167,7 +169,7 @@ class ApolloGraphQLRepositoryTest {
         assertNotNull(pipelines)
         val nodes = pipelines?.nodes
         assertNotNull(nodes)
-        Assert.assertFalse(nodes!!.isEmpty())
+        assertFalse(nodes!!.isEmpty())
         val first = nodes[0]!!
         assertNotNullAndEquals(first.id, "pipeline-id-001")
         assertNotNullAndEquals(first.type, "CI_BRANCH")
@@ -200,5 +202,51 @@ class ApolloGraphQLRepositoryTest {
         assertNotNullAndEquals(page.endCursor, "cursor-end-xyz")
         assertNotNullAndEquals(page.hasPreviousPage, false)
 
+    }
+
+    @Test
+    fun getAllProjectsTest() = runTest {
+        mockWebserver.enqueue(
+            MockResponse().setResponseCode(200).setBody(mockedAllProjects)
+        )
+        val result = repository.getAllProjects().first()
+        val page = result.currentUser!!.projectMemberships!!.pageInfo
+        assertNotNullAndEquals("eyJpZCI6IjEwMSJ9", page.endCursor!!)
+        assertNotNullAndEquals(true, page.hasNextPage)
+        assertNotNullAndEquals(false, page.hasPreviousPage)
+        assertNotNull(result)
+        assertNotNull(result.currentUser.projectMemberships.nodes)
+        assertFalse(result.currentUser.projectMemberships.nodes!!.isEmpty())
+        assertEquals(1, result.currentUser.projectMemberships.nodes.size)
+        val firstProject = result.currentUser.projectMemberships.nodes.first()
+        assertEquals("gid://gitlab/ProjectMember/1", firstProject?.id)
+        assertEquals("2023-10-27T10:00:00Z", firstProject?.createdAt)
+        assertEquals("gid://gitlab/Project/101", firstProject?.project?.id)
+        assertEquals("android-dev/gitlab-client", firstProject?.project?.fullPath)
+        assertEquals(
+            "A native Android client for GitLab built with Compose.",
+            firstProject?.project?.description
+        )
+        assertEquals(
+            "https://gitlab.com/uploads/project/avatar/101/logo.png",
+            firstProject?.project?.avatarUrl
+        )
+        assertEquals("GitLab Client", firstProject?.project?.name)
+        assertEquals("public", firstProject?.project?.visibility)
+        val recentPipeline = firstProject!!.project!!.pipelines!!.nodes!![0]
+        assertEquals("gid://gitlab/Ci::Pipeline/5001", recentPipeline!!.id)
+        assertEquals(PipelineStatusEnum.SUCCESS, recentPipeline.status)
+        val firstTopic = firstProject.project.topics!![0]
+        assertEquals("android", firstTopic)
+        val secondTopic = firstProject.project.topics[1]
+        assertEquals("kotlin", secondTopic)
+        val thirdTopic = firstProject.project.topics[2]
+        assertEquals("graphql", thirdTopic)
+        val firstLanguage = firstProject.project.languages!![0].name
+        assertEquals("Kotlin", firstLanguage)
+        val secondLanguage = firstProject.project.languages[1]
+        assertEquals("Java", secondLanguage.name)
+        // val recordedRequest = mockWebserver.takeRequest()
+        //assertEquals("/graphql", recordedRequest.path)
     }
 }

@@ -18,8 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
 import kotlinx.serialization.Serializable
 
 /**
@@ -32,7 +32,7 @@ import kotlinx.serialization.Serializable
  * @author Lahcen AHTAT
  */
 @Serializable
-data class Item(val name: String, val route: String, val Id: Int,val count:Int?=null)
+data class Item(val name: String, val route: String, val Id: Int, val count: Int? = null)
 
 /**
  * Displays a clickable card representing a [Item].
@@ -63,8 +63,7 @@ data class Item(val name: String, val route: String, val Id: Int,val count:Int?=
 @Composable
 fun WorkItem(item: Item, openScreen: () -> Unit) {
     Card(
-        openScreen,
-        modifier = Modifier
+        openScreen, modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp, 10.dp)
             .background(Color.Black)
@@ -80,14 +79,14 @@ fun WorkItem(item: Item, openScreen: () -> Unit) {
             Icon(
                 painter = painterResource(item.Id),
                 contentDescription = item.name,
-                Modifier.size(30.dp).padding(3.dp),
+                Modifier
+                    .size(30.dp)
+                    .padding(3.dp),
                 tint = Orange
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = item.name,
-                fontFamily = customFontFamily,
-                modifier = Modifier.weight(0.9f)
+                text = item.name, fontFamily = customFontFamily, modifier = Modifier.weight(0.9f)
             )
         }
     }

@@ -38,7 +38,7 @@ import javax.inject.Inject
  * Inject into a UI controller (e.g., Activity/Fragment) and collect flows:
  * ```kotlin
  * @Composable
- * fun screen(projectVM:ProjectViewModel=hiltViewModel) {
+ * fun screen(projectVM:PersonalProjectsViewModel=hiltViewModel) {
  *  LaunchedEffect(1) {
  *         projectViewModel.loadAllProjects()
  *     }
@@ -47,7 +47,7 @@ import javax.inject.Inject
  * @author Lahcen AHTAT
  */
 @HiltViewModel
-class ProjectViewModel @Inject constructor(private val graphQlRepository: GraphQlRepository) :
+class PersonalProjectsViewModel @Inject constructor(private val graphQlRepository: GraphQlRepository) :
     ViewModel() {
     /** Currently selected project’s overview/details */
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
@@ -65,7 +65,7 @@ class ProjectViewModel @Inject constructor(private val graphQlRepository: GraphQ
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
     fun loadAllProjects() = viewModelScope.launch {
-        graphQlRepository.getAllProjects().collect { _projects.value = it.currentUser }
+        graphQlRepository.getAllPersonalProjects().collect { _projects.value = it.currentUser }
     }
 
     /**
