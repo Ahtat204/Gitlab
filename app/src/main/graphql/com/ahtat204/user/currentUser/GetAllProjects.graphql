@@ -23,14 +23,10 @@ query GetAllProjects($cursor:String){
 
                   }
                   pipelines(first: 1){
-                      edges {
-                        cursor
-                          node {
-                              id
-                              status
-                              name
-
-                          }
+                      nodes {
+                          __typename
+                          id
+                          status
                       }
                   }
               }

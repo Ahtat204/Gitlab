@@ -136,5 +136,5 @@ interface GraphQlRepository {
      * @param cursor The pagination pointer for sequential page fetches. Pass null for the initial page.
      * @return A reactive stream emitting the user's project memberships metadata.
      */
-    suspend fun getAllProjects(cursor: String?): Flow<GetAllProjectsQuery.Data>
+    suspend fun getAllProjects(cursor: String? = null): Flow<GetAllProjectsQuery.Data>
 }

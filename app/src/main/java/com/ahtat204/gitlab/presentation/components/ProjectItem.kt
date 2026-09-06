@@ -231,11 +231,11 @@ fun ProjectItem(
 
 }
 
- @Composable
+@Composable
 fun ProjectItem(
-     project: GetAllProjectsQuery.Project,
-     imageLoader: ImageLoader,
-     navController: NavHostController
+    project: GetAllProjectsQuery.Project,
+    imageLoader: ImageLoader,
+    navController: NavHostController
 ) {
     val encodedId = URLEncoder.encode(project.fullPath, StandardCharsets.UTF_8.toString())
     Card(
@@ -283,16 +283,16 @@ fun ProjectItem(
                     .fillMaxHeight()
                     .background(Background)
             ) {
-                val pipelines=project?.pipelines?.edges
-                pipelines?.let {pips->
-                    if(pips.isNotEmpty()){
-                        pips[0]?.node?.status?.let { PipeLineStatusIcon(it) }
+                val pipelines = project?.pipelines?.nodes
+                pipelines?.let { pips ->
+                    if (pips.isNotEmpty()) {
+                        pips[0]?.status?.let { PipeLineStatusIcon(it) }
                     }
 
                 }
 
 
-            //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+                //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
 
                 project.let { project ->
                     Row(
