@@ -33,10 +33,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.ImageLoader
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.components.CoilCache.loader
 import com.ahtat204.gitlab.presentation.components.ProjectItem
-import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.PersonalProjectsViewModel
 import java.time.Instant
 import java.time.ZoneId
 
@@ -44,20 +44,20 @@ import java.time.ZoneId
  * Composable that displays the authenticated user's personal GitLab projects.
  *
  * ## Overview
- * - Fetches and observes project data via [ProjectViewModel].
+ * - Fetches and observes project data via [PersonalProjectsViewModel].
  * - Shows a loading indicator until projects and avatar are available.
  * - Displays a list of projects sorted by last activity date.
  * - Delegates rendering of each project to [ProjectItem].
  *
  * ## Parameters
  * @param x The [PaddingValues] applied to the container for spacing.
- * @param projectViewModel The [ProjectViewModel] instance used to load and observe
+ * @param personalProjectsViewModel The [PersonalProjectsViewModel] instance used to load and observe
  *                         project data. Defaults to Hilt‑provided instance via [hiltViewModel].
  *
  * ## UI Behavior
  * - Initializes a Coil [ImageLoader] with caching and crossfade enabled.
- * - Calls [ProjectViewModel.loadAllProjects] inside [LaunchedEffect] to trigger data fetch.
- * - Collects current user data from [ProjectViewModel.projects] as state.
+ * - Calls [PersonalProjectsViewModel.loadAllProjects] inside [LaunchedEffect] to trigger data fetch.
+ * - Collects current user data from [PersonalProjectsViewModel.projects] as state.
  * - If no projects or avatar are available:
  *   - Displays a [CircularProgressIndicator].
  * - Otherwise:
@@ -69,7 +69,7 @@ import java.time.ZoneId
  * ```kotlin
  * PersonalProjects(
  *     x = PaddingValues(16.dp),
- *     projectViewModel = hiltViewModel()
+ *     personalProjectsViewModel = hiltViewModel()
  * )
  * ```
  *
@@ -84,16 +84,16 @@ import java.time.ZoneId
 fun PersonalProjects(
     navController: NavHostController,
     x: PaddingValues,
-    projectViewModel: ProjectViewModel = hiltViewModel()
+    personalProjectsViewModel: PersonalProjectsViewModel = hiltViewModel()
 ) {
     LaunchedEffect(1) {
-        projectViewModel.loadAllProjects()
+        personalProjectsViewModel.loadAllProjects()
     }
-    val currUser by projectViewModel.projects.collectAsState()
+    val currUser by personalProjectsViewModel.projects.collectAsState()
     currUser?.namespace?.projects?.nodes?.sortedByDescending {
         Instant.parse(it?.lastActivityAt.toString()).atZone(ZoneId.systemDefault()).toLocalDate()
     }?.let { nodes ->
-        val currUser by projectViewModel.projects.collectAsStateWithLifecycle()
+        val currUser by personalProjectsViewModel.projects.collectAsStateWithLifecycle()
         currUser?.namespace?.projects?.nodes?.let { nodes ->
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -123,7 +123,7 @@ fun PersonalProjects(
                             textAlign = TextAlign.Center
                         )
                         IconButton(
-                            onClick = { projectViewModel.refreshProjects() },
+                            onClick = { personalProjectsViewModel.refreshProjects() },
                             modifier = Modifier.weight(0.1f)
                         ) {
                             Icon(Icons.Default.Refresh, contentDescription = null)

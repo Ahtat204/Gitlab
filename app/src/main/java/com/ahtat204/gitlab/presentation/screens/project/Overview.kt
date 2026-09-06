@@ -40,13 +40,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.ImageLoader
 import com.ahtat204.gitlab.R
-import com.ahtat204.gitlab.presentation.components.CollaborationDetails
-import com.ahtat204.gitlab.presentation.components.GeneralDetails
-import com.ahtat204.gitlab.presentation.components.ProjectItem
 import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.activities.ui.theme.topBarFont
-import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectViewModel
+import com.ahtat204.gitlab.presentation.components.CollaborationDetails
+import com.ahtat204.gitlab.presentation.components.GeneralDetails
+import com.ahtat204.gitlab.presentation.components.ProjectItem
+import com.ahtat204.gitlab.presentation.viewmodels.project.PersonalProjectsViewModel
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.Instant
@@ -56,19 +56,19 @@ import java.time.ZoneId
  * Composable that displays the details of a given project.
  *
  * ## Overview
- * - Fetches and observes project data via [ProjectViewModel].
+ * - Fetches and observes project data via [PersonalProjectsViewModel].
  * - Shows a loading indicator until projects data is available.
  * - Delegates rendering the project details to a set of Components.
  *
  * ## Parameters
  * @param x The [PaddingValues] applied to the container for spacing.
  * @param path the path of the project to show.
- * @param projectViewModel The [ProjectViewModel] instance used to load and observe project data. Defaults to Hilt‑provided instance via [hiltViewModel].
+ * @param personalProjectsViewModel The [PersonalProjectsViewModel] instance used to load and observe project data. Defaults to Hilt‑provided instance via [hiltViewModel].
  *
  * ## UI Behavior
  * - Initializes a Coil [ImageLoader] with caching and crossfade enabled.
- * - Calls [ProjectViewModel.loadAllProjects] inside [LaunchedEffect] to trigger data fetch.
- * - Collects current user data from [ProjectViewModel.projects] as state.
+ * - Calls [PersonalProjectsViewModel.loadAllProjects] inside [LaunchedEffect] to trigger data fetch.
+ * - Collects current user data from [PersonalProjectsViewModel.projects] as state.
  * - If no projects or avatar are available:
  *   - Displays a [CircularProgressIndicator].
  * - Otherwise:
@@ -80,7 +80,7 @@ import java.time.ZoneId
  * ```kotlin
  * PersonalProjects(
  *     x = PaddingValues(16.dp),
- *     projectViewModel = hiltViewModel()
+ *     personalProjectsViewModel = hiltViewModel()
  * )
  * ```
  *
@@ -95,11 +95,11 @@ fun ProjectDetailScreen(
     navController: NavController,
     x: PaddingValues,
     path: String,
-    projectViewModel: ProjectViewModel = hiltViewModel()
+    personalProjectsViewModel: PersonalProjectsViewModel = hiltViewModel()
 ) {
-    val project by projectViewModel.currentProject.collectAsStateWithLifecycle()
+    val project by personalProjectsViewModel.currentProject.collectAsStateWithLifecycle()
     LaunchedEffect(true) {
-        projectViewModel.loadProject(path)
+        personalProjectsViewModel.loadProject(path)
     }
     Column(
         modifier = Modifier
@@ -120,18 +120,18 @@ fun ProjectDetailScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-            Text(
-                text = pro.namespace?.path ?: "",
-                fontFamily = titleFont,
-                textAlign = TextAlign.Center,
-                fontSize = 20.sp,
+                Text(
+                    text = pro.namespace?.path ?: "",
+                    fontFamily = titleFont,
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp,
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1.0f)
                         .offset(20.dp, 0.dp)
-            )
+                )
                 IconButton(
-                    onClick = { projectViewModel.refetchProject(path) },
+                    onClick = { personalProjectsViewModel.refetchProject(path) },
                     modifier = Modifier.weight(0.1f)
                 ) {
                     Icon(Icons.Default.Refresh, contentDescription = null)
@@ -145,7 +145,7 @@ fun ProjectDetailScreen(
                 pro.openIssuesCount ?: 0,
                 pro.openMergeRequestsCount ?: 0,
                 pro.pipelineCounts?.running,
-                navController,encodedId
+                navController, encodedId
             )
 
             Card(

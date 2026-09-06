@@ -108,14 +108,14 @@ bar for switching between top-level screens (Home, Profile, Activity).
 
 This defines all screen routes and navigation destinations using Jetpack Compose Navigation.
 
-| Screen | Route | Purpose |
-| :--- | :--- | :--- |
-| `Home` | `home` | Dashboard showing overview |
-| `PersonalProjects` | `personal` | User's personal projects list |
-| `Profile` | `profile` | User profile information |
-| `ProjectDetail` | `project` | Overview of a specific project |
-| `Repository` | `repository` | File browser for a project repository |
-| `Pipelines` | `pipelines` | CI/CD pipeline history for a project |
+| Screen             | Route        | Purpose                               |
+|:-------------------|:-------------|:--------------------------------------|
+| `Home`             | `home`       | Dashboard showing overview            |
+| `PersonalProjects` | `personal`   | User's personal projects list         |
+| `Profile`          | `profile`    | User profile information              |
+| `ProjectDetail`    | `project`    | Overview of a specific project        |
+| `Repository`       | `repository` | File browser for a project repository |
+| `Pipelines`        | `pipelines`  | CI/CD pipeline history for a project  |
 
 #### Home Screen
 
@@ -140,15 +140,15 @@ repository and pipelines.
 
 #### ProjectViewModel
 
-*com/ahtat204/gitlab/presentation/viewmodels/project/ProjectViewModel.kt*
+*com/ahtat204/gitlab/presentation/viewmodels/project/PersonalProjectsViewModel.kt*
 
 Manages project-related state, such as fetching all personal projects or details for a specific
 project.
 
-| Method | Description |
-| :--- | :--- |
-| `loadAllProjects()` | Fetches user's personal projects |
-| `loadProject(id)` | Loads detailed project info by ID |
+| Method              | Description                                   |
+|:--------------------|:----------------------------------------------|
+| `loadAllProjects()` | Fetches user's personal projects              |
+| `loadProject(id)`   | Loads detailed project info by ID             |
 | `refreshProjects()` | Invalidates cache and re-fetches project list |
 
 #### RepositoryViewModel
@@ -187,9 +187,10 @@ logging, and error retry logic.
 *com/ahtat204/gitlab/data/security/AuthenticationInterceptor.kt*
 
 OkHttp interceptor that:
-1.  Injects the OAuth bearer token from `Tokens.accessToken` into every request.
-2.  Intercepts `401 Unauthorized` responses to perform an automatic token refresh using AppAuth.
-3.  Persists updated tokens back to `AuthStorage`.
+
+1. Injects the OAuth bearer token from `Tokens.accessToken` into every request.
+2. Intercepts `401 Unauthorized` responses to perform an automatic token refresh using AppAuth.
+3. Persists updated tokens back to `AuthStorage`.
 
 ### Auth Storage
 
@@ -209,15 +210,15 @@ Uses a custom `AuthStateSerializer` for protobuf-like persistence of the AppAuth
 
 A unified interface acting as the Single Source of Truth for all GraphQL data operations.
 
-| Method | Description |
-| :--- | :--- |
-| `getAllProjects()` | Streams user's personal projects |
-| `getProjectById(id)` | Streams comprehensive project overview |
-| `getProjectRepository(...)` | Streams file hierarchy for a branch/path |
-| `getProjectCommits(...)` | Streams paginated commit history |
-| `getProjectPipelines(...)` | Streams CI/CD pipelines |
-| `getMyProfile()` | Streams authenticated user profile |
-| `refresh(data)` | Manually invalidates specific cache entries |
+| Method                      | Description                                 |
+|:----------------------------|:--------------------------------------------|
+| `getAllProjects()`          | Streams user's personal projects            |
+| `getProjectById(id)`        | Streams comprehensive project overview      |
+| `getProjectRepository(...)` | Streams file hierarchy for a branch/path    |
+| `getProjectCommits(...)`    | Streams paginated commit history            |
+| `getProjectPipelines(...)`  | Streams CI/CD pipelines                     |
+| `getMyProfile()`            | Streams authenticated user profile          |
+| `refresh(data)`             | Manually invalidates specific cache entries |
 
 ## GraphQL Queries
 
@@ -263,29 +264,29 @@ sequenceDiagram
 
 ### Token Management
 
-1.  **Encrypted Storage**: Authentication state is persisted via DataStore using `SafeStore`.
-2.  **Automatic Refresh**: `AuthenticationInterceptor` handles transparent token refresh using the
-    refresh token when an access token expires (401 response).
-3.  **AppAuth SDK**: Uses industry-standard OpenID Connect/OAuth2 library for secure login flows via
-    Custom Tabs.
+1. **Encrypted Storage**: Authentication state is persisted via DataStore using `SafeStore`.
+2. **Automatic Refresh**: `AuthenticationInterceptor` handles transparent token refresh using the
+   refresh token when an access token expires (401 response).
+3. **AppAuth SDK**: Uses industry-standard OpenID Connect/OAuth2 library for secure login flows via
+   Custom Tabs.
 
 ### Network Security
 
-1.  **TLS**: All communications with `gitlab.com` use HTTPS.
-2.  **Interceptor-based Auth**: Tokens are injected at the network level, ensuring consistent
-    security across all API calls.
+1. **TLS**: All communications with `gitlab.com` use HTTPS.
+2. **Interceptor-based Auth**: Tokens are injected at the network level, ensuring consistent
+   security across all API calls.
 
 ## Key Classes Reference
 
-| Class | Responsibility |
-| :--- | :--- |
-| `GitlabApp` | Application entry point and Hilt setup |
-| `LauncherActivity` | App startup and auth state routing |
-| `AuthenticationActivity` | AppAuth OAuth2 login flow |
-| `MainActivity` | Main UI container and navigation host |
-| `GraphQlRepository` | Centralized data access for GraphQL operations |
-| `ProjectViewModel` | Project-related UI state |
+| Class                       | Responsibility                                   |
+|:----------------------------|:-------------------------------------------------|
+| `GitlabApp`                 | Application entry point and Hilt setup           |
+| `LauncherActivity`          | App startup and auth state routing               |
+| `AuthenticationActivity`    | AppAuth OAuth2 login flow                        |
+| `MainActivity`              | Main UI container and navigation host            |
+| `GraphQlRepository`         | Centralized data access for GraphQL operations   |
+| `ProjectViewModel`          | Project-related UI state                         |
 | `AuthenticationInterceptor` | Token injection and automatic refresh middleware |
-| `AuthStorage` | DataStore-based persistence for auth state |
-| `Tokens` | Singleton holding active session token and state |
-| `ApolloModule` | Configuration for Apollo Client and caching |
+| `AuthStorage`               | DataStore-based persistence for auth state       |
+| `Tokens`                    | Singleton holding active session token and state |
+| `ApolloModule`              | Configuration for Apollo Client and caching      |

@@ -46,7 +46,7 @@ class ProjectsViewModel @Inject constructor(private val projectRepository: Graph
      * - If no projects are loaded, fetches the initial page.
      * - If projects exist, attempts to fetch the next page based on `hasNextPage` and `endCursor` from the current page info.
      */
-    fun loadCurrentUserProjects() {
+    fun loadAllProjects() {
         val scope = viewModelScope
         val value = _projects.value
         if (value == null) {

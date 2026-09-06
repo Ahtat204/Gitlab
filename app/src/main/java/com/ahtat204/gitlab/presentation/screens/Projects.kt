@@ -48,7 +48,7 @@ fun Projects(
     viewModel: ProjectsViewModel = hiltViewModel()
 ) {
     LaunchedEffect(1) {
-        viewModel.loadCurrentUserProjects()
+        viewModel.loadAllProjects()
     }
     val currUser by viewModel.projects.collectAsState()
     currUser?.nodes?.let { nodes ->

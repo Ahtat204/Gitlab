@@ -19,13 +19,13 @@ import org.junit.Test
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ProjectViewModelTest : TestBase() {
-    private lateinit var viewModel: ProjectViewModel
+class PersonalProjectsViewModelTest : TestBase() {
+    private lateinit var viewModel: PersonalProjectsViewModel
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = ProjectViewModel(repository)
+        viewModel = PersonalProjectsViewModel(repository)
     }
 
     @After
