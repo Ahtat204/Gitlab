@@ -1,5 +1,6 @@
 query GetProjectPipeline($project:ID!,$pipline:CiPipelineID!,$cursor:String){
     project(fullPath:$project ){
+        id
         pipeline(id: $pipline){
             id
             name

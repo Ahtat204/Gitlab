@@ -210,75 +210,6 @@ class ApolloGraphQLRepository @Inject constructor(
     }
 
     /**
-     * Retrieves a paginated list of first 20 commits a given project repository .
-     * Retrieves detailed information for a specific CI job.
-     *
-     * @param project The unique identifier or full path of the GitLab project.
-     * @param job The unique identifier (GID) of the target job.
-     * @return A [Flow] emitting [GetPipelineJobQuery.Data] objects.
-     *
-     * ### Query Example:
-     * ``` Graphql
-    project(fullPath: $project){
-    id
-    job(id: $id){
-    id
-    duration
-    createdAt
-    name
-    }
-    }
-     * ```
-     */
-    override suspend fun getPipelineJob(
-        project: String, job: String
-    ): Flow<GetPipelineJobQuery.Data> {
-        return apolloClient.query(GetPipelineJobQuery(project = project, id = job))
-            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-    }
-
-    /**
-     * Retrieves detailed information for a specific CI/CD pipeline.
-     *
-     * @param project The unique identifier or full path of the GitLab project.
-     * @param pipeline The unique identifier (GID) of the target pipeline.
-     * @param cursor Pagination pointer for the associated jobs list.
-     * @return A [Flow] emitting [com.ahtat204.gitlab.data.queries.GetProjectPipelineQuery.Data] objects.
-     * ``` GraphQL
-    project(fullPath:$project ){
-    pipeline(id: $pipline){
-    id
-    name
-    type
-    computeMinutes
-    jobs(first: 20,after: $cursor){
-    nodes {
-    id
-    createdAt
-    status
-    duration
-    }
-    pageInfo {
-    endCursor
-    startCursor
-    hasNextPage
-    }
-    }
-    }
-    }
-     * ```
-     */
-    override suspend fun getProjectPipeline(
-        project: String, pipeline: String, cursor: String?
-    ): Flow<GetProjectPipelineQuery.Data> {
-        return apolloClient.query(
-            GetProjectPipelineQuery(
-                project = project, pipline = pipeline, cursor = Optional.presentIfNotNull(cursor)
-            )
-        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-    }
-
-    /**
      * Retrieves a paginated list of repository commits.
      *
      * @param id The unique identifier of the project.
@@ -547,5 +478,72 @@ class ApolloGraphQLRepository @Inject constructor(
 
     }
 
+    /**
+     * Retrieves a paginated list of first 20 commits a given project repository .
+     * Retrieves detailed information for a specific CI job.
+     *
+     * @param project The unique identifier or full path of the GitLab project.
+     * @param job The unique identifier (GID) of the target job.
+     * @return A [Flow] emitting [GetPipelineJobQuery.Data] objects.
+     *
+     * ### Query Example:
+     * ``` Graphql
+     *   project(fullPath: $project){
+     *         id
+     *         job(id: $id){
+     *             id
+     *             duration
+     *             createdAt
+     *             name
+     *         }
+     *     }
+     * ```
+     */
+    override suspend fun getPipelineJob(
+        project: String, job: String
+    ): Flow<GetPipelineJobQuery.Data> {
+        return apolloClient.query(GetPipelineJobQuery(project = project, id = job))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
 
+    /**
+     * Retrieves detailed information for a specific CI/CD pipeline.
+     *
+     * @param project The unique identifier or full path of the GitLab project.
+     * @param pipeline The unique identifier (GID) of the target pipeline.
+     * @param cursor Pagination pointer for the associated jobs list.
+     * @return A [Flow] emitting [com.ahtat204.gitlab.data.queries.GetProjectPipelineQuery.Data] objects.
+     * ``` GraphQL
+     *     project(fullPath:$project ){
+     *         pipeline(id: $pipline){
+     *             id
+     *             name
+     *             type
+     *             computeMinutes
+     *             jobs(first: 20,after: $cursor){
+     *                 nodes {
+     *                     id
+     *                     createdAt
+     *                     status
+     *                     duration
+     *                 }
+     *                 pageInfo {
+     *                     endCursor
+     *                     startCursor
+     *                     hasNextPage
+     *                 }
+     *             }
+     *         }
+     *     }
+     * ```
+     */
+    override suspend fun getProjectPipeline(
+        project: String, pipeline: String, cursor: String?
+    ): Flow<GetProjectPipelineQuery.Data> {
+        return apolloClient.query(
+            GetProjectPipelineQuery(
+                project = project, pipline = pipeline, cursor = Optional.presentIfNotNull(cursor)
+            )
+        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
 }

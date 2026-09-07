@@ -1,10 +1,12 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.queries.cache.Cache.cache
+import com.ahtat204.gitlab.data.queries.type.CiJobStatus
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.json.mockedBranches
 import com.ahtat204.gitlab.reponses.json.mockedCommits
+import com.ahtat204.gitlab.reponses.json.mockedPipeline
 import com.ahtat204.gitlab.reponses.json.mockedPipelines
 import com.ahtat204.gitlab.reponses.json.mockedProject
 import com.ahtat204.gitlab.reponses.json.mockedProjects
@@ -199,6 +201,37 @@ class ApolloGraphQLRepositoryTest {
         assertNotNullAndEquals(page.hasNextPage, true)
         assertNotNullAndEquals(page.endCursor, "cursor-end-xyz")
         assertNotNullAndEquals(page.hasPreviousPage, false)
+    }
+
+    @Test
+    fun getProjectPipelineTest() = runTest {
+        val projectId = "gid://gitlab/Project/1"
+        val pipelineId = "gid://gitlab/Ci::Pipeline/8812345"
+        mockWebserver.enqueue(
+            MockResponse().setResponseCode(200).setBody(mockedPipeline)
+        )
+        val result = repository.getProjectPipeline(projectId, pipelineId).first()
+        val project = result.project
+        assertNotNull(project)
+        val pipeline = project!!.pipeline!!
+        assertNotNull(pipeline)
+        assertNotNullAndEquals(pipeline.id, "gid://gitlab/Ci::Pipeline/8812345")
+        assertNotNullAndEquals(pipeline.name, "Production Deploy")
+        assertNotNullAndEquals(pipeline.type, "CI_PIPE")
+        assertNotNullAndEquals(pipeline.computeMinutes, 12.5)
+        val jobs = pipeline.jobs!!
+        val page = jobs.pageInfo
+        assertNotNullAndEquals(page.hasNextPage, false)
+        assertNotNullAndEquals(page.endCursor, "eyJpZCI6IjEyMzQ1NyJ9")
+        assertNotNullAndEquals(page.startCursor, "eyJpZCI6IjEyMzQ1NiJ9")
+        val firstJob = jobs.nodes!![0]
+        assertNotNullAndEquals(firstJob!!.id, "gid://gitlab/Ci::Build/123456")
+        assertNotNullAndEquals(firstJob.status, CiJobStatus.SUCCESS)
+        assertNotNullAndEquals(firstJob.duration, 180)
+        assertNotNullAndEquals(firstJob.createdAt, "2023-11-01T14:30:00Z")
 
     }
+
+    @Test
+    fun getPipelineJobTest() = runTest {}
 }

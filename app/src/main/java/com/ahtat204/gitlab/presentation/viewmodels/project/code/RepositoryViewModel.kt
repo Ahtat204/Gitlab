@@ -25,7 +25,7 @@ typealias BreadCrumb = LinkedHashMap<Path, Name>
  * ViewModel responsible for exposing GitLab project repository data to the UI layer.
  *
  * ## Overview
- * - Integrates with [ProjectRepository] to fetch repository trees, commits, and branches.
+ * - Integrates with [GraphQlRepository] to fetch repository trees, commits, and branches.
  * - Uses Kotlin [StateFlow] to provide reactive, lifecycle‑aware state to composables.
  * - Annotated with [HiltViewModel] for dependency injection and lifecycle management.
  *

@@ -34,6 +34,7 @@ material3Android = "1.4.0"
 secretsGradlePlugin = "2.0.1"
 material3 = "1.4.0"
 hiltAndroidTesting = "2.56.2"
+junitJunit = "4.12"
 
 
 
@@ -84,6 +85,7 @@ androidx-material3-android = { group = "androidx.compose.material3", name = "mat
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
 
 
 [plugins]

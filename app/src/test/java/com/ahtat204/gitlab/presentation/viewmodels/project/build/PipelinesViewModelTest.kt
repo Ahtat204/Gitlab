@@ -1,7 +1,6 @@
-package com.ahtat204.gitlab.presentation.viewmodels.project
+package com.ahtat204.gitlab.presentation.viewmodels.project.build
 
 import com.ahtat204.gitlab.presentation.viewmodels.TestBase
-import com.ahtat204.gitlab.presentation.viewmodels.project.build.PipelinesViewModel
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.objects.mockProjectPipelinesData
 import kotlinx.coroutines.Dispatchers
@@ -11,8 +10,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.whenever
@@ -42,10 +40,10 @@ class PipelinesViewModelTest : TestBase() {
         )
         viewModel.loadProjectPipelines(projectId)
         val pipelines = viewModel.pipelines.value
-        assertNotNull(pipelines)
+        Assert.assertNotNull(pipelines)
         val nodes = pipelines!!.nodes
-        assertNotNull(nodes)
-        assertFalse(nodes!!.isEmpty())
+        Assert.assertNotNull(nodes)
+        Assert.assertFalse(nodes!!.isEmpty())
         val mockedPage = mockProjectPipelinesData.project!!.pipelines!!.pageInfo
         val mockedNodes = mockProjectPipelinesData.project!!.pipelines!!.nodes
         for (i in 0 until nodes.size) {
@@ -55,15 +53,15 @@ class PipelinesViewModelTest : TestBase() {
             )
             assertNotNullAndEquals(nodes[i]!!.type, mockedNodes[i]!!.type)
             assertNotNullAndEquals(nodes[i]!!.status, mockedNodes[i]!!.status)
-            assertNotNull(nodes[i]!!.commit)
+            Assert.assertNotNull(nodes[i]!!.commit)
             assertNotNullAndEquals(nodes[i]!!.commit!!.name, mockedNodes[i]!!.commit!!.name!!)
-            assertNotNull(nodes[i]!!.mergeRequest)
+            Assert.assertNotNull(nodes[i]!!.mergeRequest)
             assertNotNullAndEquals(
                 nodes[i]!!.mergeRequest!!.name,
                 mockedNodes[i]!!.mergeRequest!!.name!!
             )
             assertNotNullAndEquals(nodes[i]!!.duration, mockedNodes[i]!!.duration!!)
-            assertNotNull(nodes[i]!!.user)
+            Assert.assertNotNull(nodes[i]!!.user)
             assertNotNullAndEquals(nodes[i]!!.user!!.name, mockedNodes[i]!!.user!!.name)
             assertNotNullAndEquals(nodes[i]!!.finishedAt, mockedNodes[i]!!.finishedAt!!)
             assertNotNullAndEquals(nodes[i]!!.ref, mockedNodes[i]!!.ref!!)

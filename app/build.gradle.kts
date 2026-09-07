@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material)
     testImplementation(libs.junit)
+    testImplementation(libs.junit.junit)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockito.core)
     testImplementation(libs.hilt.android.testing)
