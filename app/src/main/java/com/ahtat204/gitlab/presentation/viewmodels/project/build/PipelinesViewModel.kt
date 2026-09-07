@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.presentation.viewmodels.project
+package com.ahtat204.gitlab.presentation.viewmodels.project.build
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

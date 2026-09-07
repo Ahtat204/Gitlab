@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.presentation.viewmodels.project
 
 import com.ahtat204.gitlab.presentation.viewmodels.TestBase
+import com.ahtat204.gitlab.presentation.viewmodels.project.build.PipelinesViewModel
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.objects.mockProjectPipelinesData
 import kotlinx.coroutines.Dispatchers

@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.presentation.viewmodels.project.repository
+package com.ahtat204.gitlab.presentation.viewmodels.project.code
 
 import com.ahtat204.gitlab.presentation.viewmodels.TestBase
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals

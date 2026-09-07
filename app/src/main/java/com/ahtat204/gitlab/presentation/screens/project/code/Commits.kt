@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.presentation.screens.project
+package com.ahtat204.gitlab.presentation.screens.project.code
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -23,7 +23,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.components.CommitCard
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
-import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.code.RepositoryViewModel
+
 /**
  * Displays a paginated list of commits for a given GitLab project.
  *
@@ -72,18 +73,18 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
 @Composable
 fun ProjectCommits(
     navController: NavController,
-    branch:String,
+    branch: String,
     id: String,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
     if (id.isEmpty()) return
     val commits by repositoryViewModel.commits.collectAsStateWithLifecycle()
     LaunchedEffect(id) {
-        repositoryViewModel.loadProjectCommits(id,branch)
+        repositoryViewModel.loadProjectCommits(id, branch)
     }
     if (commits?.nodes?.isEmpty() == true) return
     val listState = rememberLazyListState()
-  val shouldLoadMore = remember {
+    val shouldLoadMore = remember {
         derivedStateOf {
             val totalItems = listState.layoutInfo.totalItemsCount
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
@@ -93,7 +94,7 @@ fun ProjectCommits(
     }
     LaunchedEffect(shouldLoadMore.value) {
         if (shouldLoadMore.value) {
-            repositoryViewModel.loadProjectCommits(id,branch)
+            repositoryViewModel.loadProjectCommits(id, branch)
         }
     }
     Column(
@@ -110,8 +111,15 @@ fun ProjectCommits(
                     verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(items = nodes, key =  { item -> item?.id ?: item?.sha?: null.hashCode() }) { commit ->
-                        CommitCard(commit?.sha?.substring(0,8), commit?.name,commit?.authorName?:"", iso8601ToRelative(commit?.committedDate as String))
+                    items(
+                        items = nodes,
+                        key = { item -> item?.id ?: item?.sha ?: null.hashCode() }) { commit ->
+                        CommitCard(
+                            commit?.sha?.substring(0, 8),
+                            commit?.name,
+                            commit?.authorName ?: "",
+                            iso8601ToRelative(commit?.committedDate as String)
+                        )
                     }
                 }
             }

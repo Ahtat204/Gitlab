@@ -19,8 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
-import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.code.Repository
+import com.ahtat204.gitlab.presentation.viewmodels.project.code.RepositoryViewModel
 
 /**
  * Displays a file browser UI for navigating a GitLab project repository.

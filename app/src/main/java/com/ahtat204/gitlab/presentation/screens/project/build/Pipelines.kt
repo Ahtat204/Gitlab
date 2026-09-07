@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.presentation.screens.project
+package com.ahtat204.gitlab.presentation.screens.project.build
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -29,7 +29,7 @@ import androidx.navigation.NavController
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.presentation.components.Pipeline
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.viewmodels.project.ci.PipelinesViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.build.PipelinesViewModel
 
 /**
  * Composable representing the Pipelines screen for a specific project.
@@ -53,12 +53,12 @@ fun Pipelines(
     pipelinesViewModel: PipelinesViewModel = hiltViewModel()
 ) {
     val listState = rememberLazyListState()
-    val status by remember { mutableStateOf<PipelineStatusEnum>(PipelineStatusEnum.SUCCESS) }
+    val status by remember { mutableStateOf(PipelineStatusEnum.SUCCESS) }
     LaunchedEffect(status) {
         pipelinesViewModel.loadProjectPipelines(project, status)
     }
     val pipelines by pipelinesViewModel.pipelines.collectAsStateWithLifecycle()
-      val shouldLoadMore = remember {
+    val shouldLoadMore = remember {
         derivedStateOf {
             val totalItems = listState.layoutInfo.totalItemsCount
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0

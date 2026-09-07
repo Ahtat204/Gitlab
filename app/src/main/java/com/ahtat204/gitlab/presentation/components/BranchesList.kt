@@ -26,8 +26,9 @@ import androidx.compose.ui.unit.dp
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
-import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Branches
-import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.code.Branches
+import com.ahtat204.gitlab.presentation.viewmodels.project.code.RepositoryViewModel
+
 /**
  * Displays a scrollable list of repository branches.
  *
@@ -97,7 +98,7 @@ fun BranchesList(
             items(it) { branch ->
                 Card(
                     {
-                        if(branch == currentBranch.value) return@Card
+                        if (branch == currentBranch.value) return@Card
                         repositoryViewModel.loadProjectRepository(
                             projectPath, branch
                         )

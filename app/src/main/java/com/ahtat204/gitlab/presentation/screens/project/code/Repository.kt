@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.presentation.screens.project
+package com.ahtat204.gitlab.presentation.screens.project.code
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -38,7 +38,7 @@ import com.ahtat204.gitlab.presentation.components.FileBrowser
 import com.ahtat204.gitlab.presentation.components.RepositoryHead
 import com.ahtat204.gitlab.presentation.components.TreeItemCard
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
-import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.code.RepositoryViewModel
 
 /**
  * Displays the repository screen for a given project, including branch selection,
