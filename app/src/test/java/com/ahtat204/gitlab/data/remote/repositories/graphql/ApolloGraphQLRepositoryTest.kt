@@ -7,6 +7,7 @@ import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.json.mockedBranches
 import com.ahtat204.gitlab.reponses.json.mockedCommits
 import com.ahtat204.gitlab.reponses.json.mockedPipeline
+import com.ahtat204.gitlab.reponses.json.mockedPipelineJob
 import com.ahtat204.gitlab.reponses.json.mockedPipelines
 import com.ahtat204.gitlab.reponses.json.mockedProject
 import com.ahtat204.gitlab.reponses.json.mockedProjects
@@ -30,6 +31,7 @@ import org.junit.Test
  * These tests verify the integration between the repository, the Apollo GraphQL client, 
  * and the network layer by simulating real API responses.
  */
+@Suppress("DEPRECATION")
 class ApolloGraphQLRepositoryTest {
     private lateinit var mockWebserver: MockWebServer
     private lateinit var apolloClient: ApolloClient
@@ -233,5 +235,18 @@ class ApolloGraphQLRepositoryTest {
     }
 
     @Test
-    fun getPipelineJobTest() = runTest {}
+    fun getPipelineJobTest() = runTest {
+        val projectId = "gid://gitlab/Project/12345"
+        val jobId = "gid://gitlab/Ci::Build/987654"
+        mockWebserver.enqueue(
+            MockResponse().setResponseCode(200).setBody(mockedPipelineJob)
+        )
+        val result = repository.getPipelineJob(projectId, jobId).first()
+        val job = result.project?.job
+        assertNotNull(job)
+        assertNotNullAndEquals(job?.name, "build-android-debug")
+        assertNotNullAndEquals(job?.createdAt, "2023-10-27T10:00:00Z")
+        assertNotNullAndEquals(job?.duration, 345)
+        assertNotNullAndEquals(job?.id, "gid://gitlab/Ci::Build/987654")
+    }
 }
