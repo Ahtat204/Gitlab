@@ -131,7 +131,6 @@ fun PersonalProjects(
                     }
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = x,
                         verticalArrangement = Arrangement.spacedBy(0.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {

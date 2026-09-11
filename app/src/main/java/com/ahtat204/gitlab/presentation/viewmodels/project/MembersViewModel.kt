@@ -14,7 +14,7 @@ import javax.inject.Inject
 /**
  * Type alias for the ProjectMembers data structure from the GraphQL query.
  */
-typealias Members = GetProjectMembersQuery.ProjectMembers?
+typealias Members = GetProjectMembersQuery.Project?
 
 /**
  * ViewModel responsible for managing and exposing the list of members for a specific GitLab project.
@@ -53,18 +53,27 @@ class MembersViewModel @Inject constructor(private val repository: GraphQlReposi
         if (value == null) {
             scope.launch {
                 repository.getProjectMembers(project)
-                    .collect { _members.value = it.project?.projectMembers }
+                    .collect { _members.value = it.project }
             }
         } else {
-            val page = value.pageInfo
-            val hasNextPage = page.hasNextPage
-            val cursor = page.endCursor
-            if (hasNextPage && cursor != null) {
+            val page = value.projectMembers?.pageInfo
+            val hasNextPage = page?.hasNextPage
+            val cursor = page?.endCursor
+            if (hasNextPage == true && cursor != null) {
                 scope.launch {
                     repository.getProjectMembers(project, cursor)
-                        .collect { _members.value = it.project?.projectMembers }
+                        .collect { _members.value = it.project }
                 }
             }
+        }
+    }
+
+    fun refreshMembers(project: String) {
+        val scope = viewModelScope
+        scope.launch {
+            repository.refresh(GetProjectMembersQuery.Data(members.value))
+            _members.value = null
+            loadProjectMembers(project)
         }
 
     }

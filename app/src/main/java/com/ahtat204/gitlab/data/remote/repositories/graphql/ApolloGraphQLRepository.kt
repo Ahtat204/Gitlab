@@ -378,6 +378,11 @@ class ApolloGraphQLRepository @Inject constructor(
                 apolloClient.apolloStore.removeOperation(operation = query, data, publish = true)
             }
 
+            is GetProjectMembersQuery.Data -> {
+                val query = GetProjectMembersQuery(project = data.project?.id!!)
+                apolloClient.apolloStore.removeOperation(operation = query, data, publish = true)
+            }
+
             else -> Unit
         }
 
