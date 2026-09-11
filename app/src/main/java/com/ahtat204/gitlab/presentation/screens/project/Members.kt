@@ -65,9 +65,19 @@ fun Members(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .background(Color.Black)
+            .fillMaxSize()
+            .padding(x)
     ) {
+        //  Text(text = "Members", fontFamily = titleFont, fontSize = 20.sp, color = Orange)
         commits?.nodes?.let { nodes ->
+
             if (nodes.isNotEmpty()) {
+                Text(
+                    text = "Members",
+                    fontFamily = titleFont,
+                    fontSize = 20.sp,
+                    color = Color.White
+                )
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
@@ -103,14 +113,25 @@ fun Members(
                                         fontFamily = customFontFamily,
                                         modifier = Modifier.fillMaxWidth(0.7f),
                                         overflow = TextOverflow.Ellipsis,
-                                        maxLines = 2
+                                        maxLines = 2,
+                                        fontSize = 20.sp
                                     )
                                     Text(
-                                        text = "",
+                                        text = member?.user?.username ?: "",
                                         fontFamily = titleFont,
                                         fontSize = 12.sp,
                                         color = Orange,
                                         modifier = Modifier.fillMaxWidth(0.6f),
+                                        overflow = TextOverflow.Ellipsis,
+                                        maxLines = 2,
+
+                                        )
+                                    Text(
+                                        text = member?.user?.bio ?: "",
+                                        fontFamily = titleFont,
+                                        fontSize = 12.sp,
+                                        color = Orange,
+                                        modifier = Modifier.fillMaxWidth(0.9f),
                                         overflow = TextOverflow.Ellipsis,
                                         maxLines = 2
                                     )
