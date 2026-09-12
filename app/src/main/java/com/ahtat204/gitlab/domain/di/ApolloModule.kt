@@ -67,7 +67,7 @@ object ApolloModule {
         val networkTransport = HttpNetworkTransport.Builder().httpEngine(httpEngine)
             .httpRequestComposer(requestComposer).build()
         return ApolloClient.Builder().networkTransport(networkTransport)
-            .logCacheMisses({ Log.e("cacheMiss", it) })
+            .logCacheMisses { Log.i("com.ahtat204.gitlab.domain.di", it) }
             .cache(normalizedCacheFactory = cacheFactory, writeToCacheAsynchronously = true)
             .retryOnError { isConnected() }.failFastIfOffline(true).build()
     }

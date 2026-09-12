@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
+import com.ahtat204.gitlab.presentation.activities.ui.theme.topBarFont
 /**
  * Displays a vertical list of contact links, each with an optional icon and clickable text.
  *

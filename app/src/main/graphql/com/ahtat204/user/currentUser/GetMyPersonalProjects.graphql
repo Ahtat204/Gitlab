@@ -9,6 +9,7 @@ query GetMyPersonalProjects($cursor: String){
                    endCursor
                    hasNextPage
                    hasPreviousPage
+                   startCursor
                }
                 nodes {
                     id

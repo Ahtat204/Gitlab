@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -16,9 +17,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,13 +40,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.ImageLoader
 import com.ahtat204.gitlab.R
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
+import com.ahtat204.gitlab.presentation.activities.ui.theme.topBarFont
 import com.ahtat204.gitlab.presentation.components.CollaborationDetails
 import com.ahtat204.gitlab.presentation.components.GeneralDetails
 import com.ahtat204.gitlab.presentation.components.ProjectItem
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.ui.theme.topBarFont
-import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.PersonalProjectsViewModel
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.Instant
@@ -52,19 +56,19 @@ import java.time.ZoneId
  * Composable that displays the details of a given project.
  *
  * ## Overview
- * - Fetches and observes project data via [ProjectViewModel].
+ * - Fetches and observes project data via [PersonalProjectsViewModel].
  * - Shows a loading indicator until projects data is available.
  * - Delegates rendering the project details to a set of Components.
  *
  * ## Parameters
  * @param x The [PaddingValues] applied to the container for spacing.
  * @param path the path of the project to show.
- * @param projectViewModel The [ProjectViewModel] instance used to load and observe project data. Defaults to Hilt‑provided instance via [hiltViewModel].
+ * @param personalProjectsViewModel The [PersonalProjectsViewModel] instance used to load and observe project data. Defaults to Hilt‑provided instance via [hiltViewModel].
  *
  * ## UI Behavior
  * - Initializes a Coil [ImageLoader] with caching and crossfade enabled.
- * - Calls [ProjectViewModel.loadAllProjects] inside [LaunchedEffect] to trigger data fetch.
- * - Collects current user data from [ProjectViewModel.projects] as state.
+ * - Calls [PersonalProjectsViewModel.loadAllProjects] inside [LaunchedEffect] to trigger data fetch.
+ * - Collects current user data from [PersonalProjectsViewModel.projects] as state.
  * - If no projects or avatar are available:
  *   - Displays a [CircularProgressIndicator].
  * - Otherwise:
@@ -76,7 +80,7 @@ import java.time.ZoneId
  * ```kotlin
  * PersonalProjects(
  *     x = PaddingValues(16.dp),
- *     projectViewModel = hiltViewModel()
+ *     personalProjectsViewModel = hiltViewModel()
  * )
  * ```
  *
@@ -91,11 +95,11 @@ fun ProjectDetailScreen(
     navController: NavController,
     x: PaddingValues,
     path: String,
-    projectViewModel: ProjectViewModel = hiltViewModel()
+    personalProjectsViewModel: PersonalProjectsViewModel = hiltViewModel()
 ) {
-    val project by projectViewModel.currentProject.collectAsStateWithLifecycle()
+    val project by personalProjectsViewModel.currentProject.collectAsStateWithLifecycle()
     LaunchedEffect(true) {
-        projectViewModel.loadProject(path)
+        personalProjectsViewModel.loadProject(path)
     }
     Column(
         modifier = Modifier
@@ -108,13 +112,32 @@ fun ProjectDetailScreen(
     ) {
         project?.let { pro ->
             val encodedId = URLEncoder.encode(pro.fullPath, StandardCharsets.UTF_8.toString())
-            Text(
-                text = pro.namespace?.path ?: "",
-                fontFamily = titleFont,
-                textAlign = TextAlign.Center,
-                fontSize = 20.sp,
-                modifier = Modifier.fillMaxWidth()
-            )
+
+            Row(
+                modifier = Modifier
+                    .background(Color.Black)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = pro.namespace?.path ?: "",
+                    fontFamily = titleFont,
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1.0f)
+                        .offset(20.dp, 0.dp)
+                )
+                IconButton(
+                    onClick = { personalProjectsViewModel.refetchProject(path) },
+                    modifier = Modifier.weight(0.1f)
+                ) {
+                    Icon(Icons.Default.Refresh, contentDescription = null)
+                }
+            }
+
             GeneralDetails(
                 pro.forksCount, pro.starCount, pro.name, pro.description ?: ""
             )
@@ -122,7 +145,7 @@ fun ProjectDetailScreen(
                 pro.openIssuesCount ?: 0,
                 pro.openMergeRequestsCount ?: 0,
                 pro.pipelineCounts?.running,
-                navController,
+                navController, encodedId
             )
 
             Card(

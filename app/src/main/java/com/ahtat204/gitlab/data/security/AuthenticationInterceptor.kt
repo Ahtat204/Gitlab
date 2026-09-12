@@ -9,13 +9,14 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.internal.synchronized
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationService
 import okhttp3.Interceptor
 import okhttp3.Response
-import net.openid.appauth.AuthState
 import okio.IOException
 
 /**
@@ -31,7 +32,7 @@ import okio.IOException
  * - If the response is `401 Unauthorized`:
  *   - Synchronizes on a lock to prevent concurrent refresh attempts.
  *   - Uses [net.openid.appauth.AuthState.performActionWithFreshTokens] to refresh the token.
- *   - Updates [Tokens.accessToken] and persists the new state via [AuthStorage].
+ *   - Updates [com.ahtat204.gitlab.domain.authentication.constants.Tokens.accessToken] and persists the new state via [AuthStorage].
  *   - Retries the request with the refreshed token.
  *   - Logs an error if the retry still fails with `401`.
  *
@@ -68,6 +69,14 @@ class AuthenticationInterceptor : Interceptor {
             } else {
                 var request = chain.request()
                 val builder = request.newBuilder()
+
+                if (Tokens.accessToken == null) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val result = AuthStorage.getAuthState(context).data.first()
+                        Tokens.CurrentAuthState = result
+                        Tokens.accessToken = result.accessToken
+                    }
+                }
                 val token = Tokens.accessToken
                 if (token != null) {
                     builder.header("Authorization", "Bearer $token")
@@ -88,7 +97,8 @@ class AuthenticationInterceptor : Interceptor {
                                         Tokens.CurrentAuthState = state
                                         deferred.complete(token)
                                         CoroutineScope(Dispatchers.IO).launch {
-                                            AuthStorage.getAuthState(context).updateData { state }
+                                            AuthStorage.getAuthState(context)
+                                                .updateData { state }
                                         }
                                     }
                                     if (ex != null) {

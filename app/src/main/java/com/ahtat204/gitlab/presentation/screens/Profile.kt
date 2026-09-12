@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cases
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.rounded.Work
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,14 +28,17 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.R
-import com.ahtat204.gitlab.presentation.components.CoilCache.loader
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.components.Contact
 import com.ahtat204.gitlab.presentation.components.Header
 import com.ahtat204.gitlab.presentation.components.Info
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
+import com.ahtat204.gitlab.presentation.components.Item
+import com.ahtat204.gitlab.presentation.components.WorkItem
 import com.ahtat204.gitlab.presentation.viewmodels.ProfileViewModel
+import kotlinx.coroutines.Dispatchers
 
 /**
  * A profile screen composable responsible for orchestrating the user's account information display.
@@ -59,7 +62,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.ProfileViewModel
  * @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/profile.jpg" width="300" height="700"/>
  */
 @Composable
-fun Profile(
+internal fun Profile(
     navController: NavHostController,
     x: PaddingValues,
     profileViewModel: ProfileViewModel = hiltViewModel()
@@ -68,6 +71,9 @@ fun Profile(
         profileViewModel.loadProfile()
     }
     val user by profileViewModel.currentUser.collectAsState()
+    val loader: ImageLoader =
+        ImageLoader.Builder(Tokens.context).crossfade(true).dispatcher(Dispatchers.IO)
+            .respectCacheHeaders(false).build()
     user?.let { profile ->
         Column(
             verticalArrangement = Arrangement.Top,
@@ -101,14 +107,25 @@ fun Profile(
                 fontFamily = customFontFamily,
             )
             Info(
-                Pair(profile.jobTitle ?: "", Icons.Default.Cases),
+                Pair(profile.jobTitle ?: "", Icons.Rounded.Work),
                 Pair(profile.location, Icons.Default.LocationOn)
             )
             val linked: Pair<String?, Int?> =
                 if (profile.linkedin == null) Pair(null, null) else Pair(
                     profile.linkedin, R.drawable.linkedin
                 )
-            Contact(linked, github)
+            val email: Pair<String?, Int?> =
+                if (profile.publicEmail == null) Pair(null, null) else Pair(
+                    profile.publicEmail, R.drawable.mail
+                )
+            Contact(linked, github, email)
+            WorkItem(
+                Item(
+                    "Projects",
+                    route = "projects",
+                    R.drawable.project
+                )
+            ) { navController.navigate("projects") }
         }
     }
 
