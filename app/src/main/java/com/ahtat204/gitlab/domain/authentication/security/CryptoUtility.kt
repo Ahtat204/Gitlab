@@ -1,9 +1,9 @@
-package com.ahtat204.gitlab.domain.usecase.authentication.security
+package com.ahtat204.gitlab.domain.authentication.security
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import com.ahtat204.gitlab.domain.usecase.authentication.security.CryptoUtility.decrypt
-import com.ahtat204.gitlab.domain.usecase.authentication.security.CryptoUtility.encrypt
+import com.ahtat204.gitlab.domain.authentication.security.CryptoUtility.decrypt
+import com.ahtat204.gitlab.domain.authentication.security.CryptoUtility.encrypt
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator

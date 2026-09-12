@@ -2,6 +2,7 @@ package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
 import com.ahtat204.gitlab.data.fetchAndMergePipelines
+import com.ahtat204.gitlab.data.fetchAndMergeProjects
 import com.ahtat204.gitlab.data.mapAndHandleErrors
 import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
@@ -99,9 +100,10 @@ class ApolloGraphQLRepository @Inject constructor(
      * }
      * ```
      */
-    override suspend fun getAllPersonalProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
-        apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
-            .mapAndHandleErrors()
+    override suspend fun getAllPersonalProjects(cursor: String?): Flow<GetMyPersonalProjectsQuery.Data> =
+        apolloClient.query(GetMyPersonalProjectsQuery(Optional.presentIfNotNull(cursor)))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch()
+            .mapAndHandleErrors().fetchAndMergeProjects(client = apolloClient, cursor)
 
     /**
      * Retrieves a comprehensive overview for a given project, including statistics like star and fork counts.

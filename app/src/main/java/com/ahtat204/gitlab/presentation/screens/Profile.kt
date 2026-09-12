@@ -28,7 +28,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.ahtat204.gitlab.R
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens
 import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
@@ -72,7 +72,7 @@ internal fun Profile(
     }
     val user by profileViewModel.currentUser.collectAsState()
     val loader: ImageLoader =
-        ImageLoader.Builder(context).crossfade(true).dispatcher(Dispatchers.IO)
+        ImageLoader.Builder(Tokens.context).crossfade(true).dispatcher(Dispatchers.IO)
             .respectCacheHeaders(false).build()
     user?.let { profile ->
         Column(

@@ -25,7 +25,8 @@ val mockDataList: Data =
                         __typename = "PageInfo",
                         startCursor = "eyJjdXJzb3IiOiIxIn0=",
                         hasNextPage = true,
-                        hasPreviousPage = false
+                        hasPreviousPage = false,
+                        endCursor = "eNJjdXJzbTI2OiExIn0="
                     ),
                     nodes = listOf(
                         Node(
@@ -99,23 +100,3 @@ val mockDataList: Data =
         )
     )
 
-val nullProjects = Data(
-    currentUser = CurrentUser(
-        __typename = "User",
-        id = "user-102",
-        avatarUrl = null, // Testing nullable state
-        namespace = Namespace(
-            __typename = "Namespace",
-            projects = Projects(
-                __typename = "ProjectConnection",
-                pageInfo = PageInfo(
-                    __typename = "PageInfo",
-                    startCursor = null,
-                    hasNextPage = false,
-                    hasPreviousPage = false
-                ),
-                nodes = emptyList() // Testing empty repository list state
-            )
-        )
-    )
-)

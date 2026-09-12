@@ -38,7 +38,7 @@ interface GraphQlRepository {
      *
      * @return A reactive stream emitting the user's personal project collection metadata.
      */
-    suspend fun getAllPersonalProjects(): Flow<GetMyPersonalProjectsQuery.Data>
+    suspend fun getAllPersonalProjects(cursor: String? = null): Flow<GetMyPersonalProjectsQuery.Data>
 
     /**
      * Retrieves and monitors a comprehensive overview of a single project.

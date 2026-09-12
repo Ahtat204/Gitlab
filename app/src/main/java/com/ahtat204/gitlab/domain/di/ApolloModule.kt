@@ -2,9 +2,9 @@ package com.ahtat204.gitlab.domain.di
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.cache.Cache.cache
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig.GRAPHQL_URL
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.isConnected
+import com.ahtat204.gitlab.domain.authentication.constants.AuthConfig.GRAPHQL_URL
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens.isConnected
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.http.DefaultHttpRequestComposer

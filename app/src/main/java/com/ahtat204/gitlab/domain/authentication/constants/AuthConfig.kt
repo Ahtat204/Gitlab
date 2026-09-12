@@ -1,4 +1,4 @@
-package com.ahtat204.gitlab.domain.usecase.authentication.constants
+package com.ahtat204.gitlab.domain.authentication.constants
 
 import com.ahtat204.gitlab.BuildConfig
 import net.openid.appauth.ResponseTypeValues
