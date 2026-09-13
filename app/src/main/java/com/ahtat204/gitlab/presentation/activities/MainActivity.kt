@@ -17,8 +17,8 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
-import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.authentication.AuthStorage
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens
 import com.ahtat204.gitlab.presentation.activities.ui.theme.GitlabTheme
 import com.ahtat204.gitlab.presentation.components.CoilCache
 import com.ahtat204.gitlab.presentation.navigation.BottomBar

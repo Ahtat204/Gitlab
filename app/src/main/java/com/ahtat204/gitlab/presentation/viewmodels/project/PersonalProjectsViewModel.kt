@@ -60,12 +60,30 @@ class PersonalProjectsViewModel @Inject constructor(private val graphQlRepositor
 
     /**
      * Loads all projects contributed by the authenticated user.
-     *
-     * - First attempts with [com.apollographql.apollo.cache.normalized.FetchPolicy.CacheFirst].
-     * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
-    fun loadAllProjects() = viewModelScope.launch {
-        graphQlRepository.getAllPersonalProjects().collect { _projects.value = it.currentUser }
+    fun loadAllProjects() {
+        val value = _projects.value
+        if (value == null) viewModelScope.launch {
+            graphQlRepository.getAllPersonalProjects().collect { _projects.value = it.currentUser }
+        }
+        else {
+            val nodes = value.namespace?.projects?.nodes
+            if (nodes?.isEmpty() == true) viewModelScope.launch {
+                graphQlRepository.getAllPersonalProjects()
+                    .collect { _projects.value = it.currentUser }
+            }
+            val page = value.namespace?.projects?.pageInfo
+            val hasNextPage = page?.hasNextPage
+            val cursor = page?.endCursor
+            if (hasNextPage == true && cursor != null) {
+                viewModelScope.launch {
+                    graphQlRepository.getAllPersonalProjects(cursor)
+                        .collect { _projects.value = it.currentUser }
+                }
+
+            }
+        }
+
     }
 
     /**
@@ -73,15 +91,17 @@ class PersonalProjectsViewModel @Inject constructor(private val graphQlRepositor
      *
      * @param id The unique project identifier.
      */
-    fun loadProject(id: String) = viewModelScope.launch {
-        graphQlRepository.getProjectById(id).collect { currentProject.value = it?.project }
+    fun loadProject(id: String) {
+        viewModelScope.launch {
+            graphQlRepository.getProjectById(id).collect { currentProject.value = it?.project }
+        }
     }
 
     /**
      * Performs a manual refresh of the contributed projects list.
      *
      * This logic:
-     * 1. Invalides the current projects in the [projectRepository]'s local cache.
+     * 1. Invalids the current projects in the [graphQlRepository]'s local cache.
      * 2. Clears the local [_projects] state to ensure UI reflects a "loading" or "empty" state.
      * 3. Re-triggers [loadAllProjects] to fetch a fresh set of data from the network.
      */

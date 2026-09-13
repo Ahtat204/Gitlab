@@ -2,6 +2,7 @@ package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
 import com.ahtat204.gitlab.data.fetchAndMergePipelines
+import com.ahtat204.gitlab.data.fetchAndMergeProjects
 import com.ahtat204.gitlab.data.mapAndHandleErrors
 import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
@@ -61,14 +62,19 @@ class ApolloGraphQLRepository @Inject constructor(
      * Query Example:
      * ```
      *     currentUser {
+     *         id
      *         avatarUrl
-     *         projectMemberships(first: 10) {
-     *             __typename
-     *             nodes {
-     *                 __typename
-     *                 id
-     *                 project {
+     *         namespace {
+     *             projects(first: 20,after: $cursor,sort: ACTIVITY_DESC){
      *
+     *                pageInfo {
+     *                    endCursor
+     *                    hasNextPage
+     *                    hasPreviousPage
+     *                    startCursor
+     *                }
+     *                 nodes {
+     *                     id
      *                     topics
      *                     lastActivityAt
      *                     __typename
@@ -89,19 +95,14 @@ class ApolloGraphQLRepository @Inject constructor(
      *                     }
      *                 }
      *             }
-     *             pageInfo {
-     *                 __typename
-     *                 hasNextPage
-     *                 endCursor
-     *             }
      *         }
      *     }
-     * }
      * ```
      */
-    override suspend fun getAllPersonalProjects(): Flow<GetMyPersonalProjectsQuery.Data> =
-        apolloClient.query(GetMyPersonalProjectsQuery()).fetchPolicy(FetchPolicy.CacheFirst).watch()
-            .mapAndHandleErrors()
+    override suspend fun getAllPersonalProjects(cursor: String?): Flow<GetMyPersonalProjectsQuery.Data> =
+        apolloClient.query(GetMyPersonalProjectsQuery(Optional.presentIfNotNull(cursor)))
+            .fetchPolicy(FetchPolicy.CacheFirst).watch()
+            .mapAndHandleErrors().fetchAndMergeProjects(client = apolloClient, cursor)
 
     /**
      * Retrieves a comprehensive overview for a given project, including statistics like star and fork counts.
