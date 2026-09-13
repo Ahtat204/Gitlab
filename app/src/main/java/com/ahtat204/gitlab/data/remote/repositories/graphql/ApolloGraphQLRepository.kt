@@ -62,14 +62,19 @@ class ApolloGraphQLRepository @Inject constructor(
      * Query Example:
      * ```
      *     currentUser {
+     *         id
      *         avatarUrl
-     *         projectMemberships(first: 10) {
-     *             __typename
-     *             nodes {
-     *                 __typename
-     *                 id
-     *                 project {
+     *         namespace {
+     *             projects(first: 20,after: $cursor,sort: ACTIVITY_DESC){
      *
+     *                pageInfo {
+     *                    endCursor
+     *                    hasNextPage
+     *                    hasPreviousPage
+     *                    startCursor
+     *                }
+     *                 nodes {
+     *                     id
      *                     topics
      *                     lastActivityAt
      *                     __typename
@@ -90,14 +95,8 @@ class ApolloGraphQLRepository @Inject constructor(
      *                     }
      *                 }
      *             }
-     *             pageInfo {
-     *                 __typename
-     *                 hasNextPage
-     *                 endCursor
-     *             }
      *         }
      *     }
-     * }
      * ```
      */
     override suspend fun getAllPersonalProjects(cursor: String?): Flow<GetMyPersonalProjectsQuery.Data> =
