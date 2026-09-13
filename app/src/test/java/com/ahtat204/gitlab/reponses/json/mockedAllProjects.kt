@@ -4,6 +4,8 @@ val mockedAllProjects = """
     {
     "data":{
       "currentUser": {
+       "id" = "",
+        "avatarUrl" = "",
         "__typename": "CurrentUser",
         "projectMemberships": {
           "__typename": "ProjectMembershipConnection",

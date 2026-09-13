@@ -38,7 +38,8 @@ class ProjectsViewModelTest : TestBase() {
         viewModel.loadAllProjects()
         val value = viewModel.projects.value
         assertNotNull(value)
-        val page = value!!.pageInfo
+        val projects = value?.projectMemberships
+        val page = projects!!.pageInfo
         assertNotNullAndEquals(
             page.hasNextPage,
             mockedAllProjects.currentUser!!.projectMemberships!!.pageInfo.hasNextPage
@@ -50,7 +51,7 @@ class ProjectsViewModelTest : TestBase() {
         assertNotNullAndEquals(
             page.endCursor, mockedAllProjects.currentUser.projectMemberships.pageInfo.endCursor!!
         )
-        val nodes = value.nodes
+        val nodes = projects.nodes
         assertNotNull(nodes)
         assertFalse(nodes!!.isEmpty())
         // val first=projects[0]

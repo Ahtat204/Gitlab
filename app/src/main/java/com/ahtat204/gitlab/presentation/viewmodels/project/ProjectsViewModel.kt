@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-typealias Projects = GetAllProjectsQuery.ProjectMemberships?
+typealias Projects = GetAllProjectsQuery.CurrentUser?
 
 /**
  * ViewModel responsible for managing the user's project list with pagination support.
@@ -52,16 +52,17 @@ class ProjectsViewModel @Inject constructor(private val projectRepository: Graph
         if (value == null) {
             scope.launch {
                 projectRepository.getAllProjects(null)
-                    .collect { _projects.value = it.currentUser?.projectMemberships }
+                    .collect { _projects.value = it.currentUser }
             }
         } else {
-            val page = value.pageInfo
-            val cursor = page.endCursor
-            val hasNextPage = page.hasNextPage
-            if (hasNextPage && cursor != null) {
+            val projects = value.projectMemberships
+            val page = projects?.pageInfo
+            val cursor = page?.endCursor
+            val hasNextPage = page?.hasNextPage
+            if (hasNextPage == true && cursor != null) {
                 scope.launch {
                     projectRepository.getAllProjects(cursor)
-                        .collect { _projects.value = it.currentUser?.projectMemberships }
+                        .collect { _projects.value = it.currentUser }
                 }
             }
         }
