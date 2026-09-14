@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CalendarMonth
@@ -52,7 +53,7 @@ fun Pipeline(project: String, pipeline: Pipeline, navController: NavController) 
     val user = pipeline.user?.name
     val branch = pipeline.ref ?: return
     val formatedDuration = formatRelative(duration.toLong(), true)
-    val length = branch.length + 90
+
     val trigger = pipeline.type
     val encodedProjectId = URLEncoder.encode(project, StandardCharsets.UTF_8.toString())
     val encodedPipelineId = URLEncoder.encode(pipeline.id, StandardCharsets.UTF_8.toString())
@@ -71,26 +72,28 @@ fun Pipeline(project: String, pipeline: Pipeline, navController: NavController) 
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.Start
         ) {
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
+                    .weight(1.0f)
                     .background(Background),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start
             ) {
-                PipeLineStatusIcon(status)
+
                 Text(
                     text = "${pipeline.commit?.name}",
                     maxLines = 1,
                     fontSize = 17.sp,
                     color = White,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.width(290.dp),
+                    modifier = Modifier.width(310.dp),
                     fontFamily = customFontFamily,
                 )
                 Text(
-                    text = "via merge request $trigger by $user",
+                    text = "via $trigger by $user",
                     maxLines = 1,
                     fontSize = 10.sp,
                     color = White,
@@ -101,7 +104,7 @@ fun Pipeline(project: String, pipeline: Pipeline, navController: NavController) 
                 )
                 Row(
                     verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.Start,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier
                         .fillMaxSize()
                         .offset(y = 15.dp)
@@ -133,32 +136,7 @@ fun Pipeline(project: String, pipeline: Pipeline, navController: NavController) 
                             fontFamily = customFontFamily,
                         )
                     }
-                    //branch tag
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.Top,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(Orange)
-                            .height(15.dp)
-                            .width(length.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.branch),
-                            contentDescription = null,
-                            Modifier
-                                .size(10.dp)
-                                .offset(x = 7.dp, y = 1.dp)
-                        )
-                        Text(
-                            text = branch,
-                            maxLines = 1,
-                            fontSize = 10.sp,
-                            color = White,
-                            modifier = Modifier.offset(10.dp, y = (-3).dp),
-                            fontFamily = customFontFamily,
-                        )
-                    }
+
                     //finishedAt tag
                     Row(
                         horizontalArrangement = Arrangement.Start,
@@ -185,9 +163,54 @@ fun Pipeline(project: String, pipeline: Pipeline, navController: NavController) 
                             fontFamily = customFontFamily,
                         )
                     }
+                    val isBranch = trigger == "branch"
+                    val number = if (isBranch) branch else Regex("[0-9]+").findAll(
+                        branch
+                    ).map { it.value.toInt() }.firstOrNull().toString()
+                    //val brackets = """/""".toRegex().findAll(branch).toList().size
+                    //branch tag
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.Top,
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            //  .fillMaxWidth(length.toFloat())
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(Orange)
+                            .height(15.dp)
+
+
+                    ) {
+                        Icon(
+                            painter = painterResource(if (isBranch) R.drawable.branch else R.drawable.mergerequest),
+                            contentDescription = null,
+                            Modifier
+                                .size(10.dp)
+                                .offset(x = 7.dp, y = 1.dp)
+                            //    .weight(0.05f)
+                        )
+
+                        Text(
+                            text = number,
+                            maxLines = 1,
+                            fontSize = 10.sp,
+                            color = White,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .offset(10.dp, y = (-3).dp),
+                            //.fillMaxWidth(0.5f)
+                            //    .weight(0.8f)
+                            fontFamily = customFontFamily,
+                        )
+
+                    }
 
                 }
             }
+            PipeLineStatusIcon(
+                status, Modifier
+                    .weight(0.1f)
+            )
         }
     }
 }

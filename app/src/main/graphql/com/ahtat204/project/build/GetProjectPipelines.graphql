@@ -12,6 +12,7 @@ query GetProjectPipelines($project:ID!,$cursor:String,$status:PipelineStatusEnum
                 ref
                 mergeRequest {
                     name
+
                 }
                 commit {
                     name

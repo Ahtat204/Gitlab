@@ -135,17 +135,11 @@ fun ProjectItem(
 
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(0.7f)
                     .fillMaxHeight()
+                    .weight(0.7f)
                     .background(Background)
             ) {
-                val pipelines = project.pipelines?.nodes
-                pipelines?.let { pips ->
-                    if (pips.isNotEmpty()) {
-                        pips[0]?.status?.let { PipeLineStatusIcon(it) }
-                    }
-
-                }
 
 
                 //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
@@ -224,6 +218,19 @@ fun ProjectItem(
                         }
                     }
                 }
+            }
+            val pipelines = project.pipelines?.nodes
+            pipelines?.let { pips ->
+                if (pips.isNotEmpty()) {
+                    pips[0]?.status?.let {
+                        PipeLineStatusIcon(
+                            it, Modifier
+                                //   .offset(x = 10.dp)
+                                .weight(0.1f)
+                        )
+                    }
+                }
+
             }
         }
     }

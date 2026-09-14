@@ -81,7 +81,7 @@ fun Pipelines(
         val nodes = pipelines?.nodes
         if (nodes?.isEmpty() == false) {
             Text(
-                text = "Your Projects",
+                text = "Your Pipelines",
                 fontFamily = titleFont,
                 fontSize = 20.sp,
                 modifier = Modifier

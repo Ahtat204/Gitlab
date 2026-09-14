@@ -1,11 +1,12 @@
 package com.ahtat204.gitlab.presentation.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -48,45 +49,49 @@ import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
  * @author Lahcen AHTAT
  */
 @Composable
-fun PipeLineStatusIcon(status: PipelineStatusEnum) {
-    when (status) {
-        PipelineStatusEnum.CREATED -> {}
-        PipelineStatusEnum.SUCCESS -> {
-            Icon(
-                painter = painterResource(R.drawable.status_success),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .offset(310.dp, 35.dp)
-                    .size(20.dp)
-                    .clip(RoundedCornerShape(10.dp)) // Clip first
-                    .background(Color(0xFF30671B))                      // Optional inner padding
-            )
-        }
+fun PipeLineStatusIcon(status: PipelineStatusEnum, modifier: Modifier) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        when (status) {
+            PipelineStatusEnum.CREATED -> {}
+            PipelineStatusEnum.SUCCESS -> {
+                Icon(
+                    painter = painterResource(R.drawable.status_success),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        //  .offset(310.dp, 35.dp)
+                        .size(20.dp)
+                        .clip(RoundedCornerShape(10.dp)) // Clip first
+                        .background(Color(0xFF30671B))                      // Optional inner padding
+                )
+            }
 
-        PipelineStatusEnum.PENDING -> {}
-        PipelineStatusEnum.CANCELED -> {}
-        PipelineStatusEnum.RUNNING -> {}
-        PipelineStatusEnum.FAILED -> {
-            Icon(
-                painter = painterResource(R.drawable.failed),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .offset(310.dp, 40.dp)
-                    .size(20.dp)
-                    .clip(RoundedCornerShape(10.dp)) // Clip first
-                    .background(Color(0xFFAF2A2A))                      // Optional inner padding
-            )
-        }
+            PipelineStatusEnum.PENDING -> {}
+            PipelineStatusEnum.CANCELED -> {}
+            PipelineStatusEnum.RUNNING -> {}
+            PipelineStatusEnum.FAILED -> {
+                Icon(
+                    painter = painterResource(R.drawable.failed),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        //     .offset(310.dp, 40.dp)
+                        .size(20.dp)
+                        .clip(RoundedCornerShape(10.dp)) // Clip first
+                        .background(Color(0xFFAF2A2A))                      // Optional inner padding
+                )
+            }
 
-        PipelineStatusEnum.UNKNOWN__ -> {
+            PipelineStatusEnum.UNKNOWN__ -> {
 
-        }
+            }
 
-        else -> {
+            else -> {
 
+            }
         }
     }
 
 }
+
+
