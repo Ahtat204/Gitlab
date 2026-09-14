@@ -95,7 +95,9 @@ fun Pipelines(
                 items(items = nodes, key = { item -> item?.id ?: Any() }) { item ->
                     item?.let { pipeline ->
                         Pipeline(
-                            pipeline
+                            project = project,
+                            pipeline,
+                            navController
                         )
                     }
                 }

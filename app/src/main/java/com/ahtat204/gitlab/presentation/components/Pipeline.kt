@@ -31,17 +31,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.presentation.ui.theme.Background
 import com.ahtat204.gitlab.presentation.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 typealias Pipeline = GetProjectPipelinesQuery.Node?
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Pipeline(pipeline: Pipeline) {
+fun Pipeline(project: String, pipeline: Pipeline, navController: NavController) {
     if (pipeline == null) return
     val status = pipeline.status
     val duration = pipeline.duration ?: return
@@ -51,8 +54,11 @@ fun Pipeline(pipeline: Pipeline) {
     val formatedDuration = formatRelative(duration.toLong(), true)
     val length = branch.length + 90
     val trigger = pipeline.type
+    val encodedProjectId = URLEncoder.encode(project, StandardCharsets.UTF_8.toString())
+    val encodedPipelineId = URLEncoder.encode(pipeline.id, StandardCharsets.UTF_8.toString())
     Card(
-        {}, modifier = Modifier
+        { navController.navigate("${encodedProjectId}/pipeline/${encodedPipelineId}") },
+        modifier = Modifier
             .height(120.dp)
             .fillMaxSize()
             .padding(10.dp, 10.dp)

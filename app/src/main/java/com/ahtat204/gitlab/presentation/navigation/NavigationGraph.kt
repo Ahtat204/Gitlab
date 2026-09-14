@@ -14,6 +14,7 @@ import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
 import com.ahtat204.gitlab.presentation.screens.project.ProjectDetailScreen
+import com.ahtat204.gitlab.presentation.screens.project.build.Pipeline
 import com.ahtat204.gitlab.presentation.screens.project.build.Pipelines
 import com.ahtat204.gitlab.presentation.screens.project.code.RepositoryScreen
 
@@ -105,6 +106,25 @@ fun BottomNavigationGraph(
                 val projectId = backStackEntry.arguments?.getString("projectId")
                 projectId?.let {
                     Pipelines(navController = navController, x = x, project = it)
+                }
+            }
+            composable(
+                route = "{projectId}/pipeline/{pipelineId}",
+                arguments = listOf(
+                    navArgument("projectId") { defaultValue = "" },
+                    navArgument("pipelineId") { defaultValue = "" })
+            ) { backStackEntry ->
+                val projectId = backStackEntry.arguments?.getString("projectId")
+                val pipelineId = backStackEntry.arguments?.getString("pipelineId")
+                projectId?.let { proId ->
+                    pipelineId?.let { pipeId ->
+                        Pipeline(
+                            navController = navController,
+                            x = x,
+                            project = proId,
+                            pipeline = pipeId
+                        )
+                    }
                 }
             }
 
