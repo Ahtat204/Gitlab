@@ -1,5 +1,7 @@
 query GetAllProjects($cursor:String){
     currentUser {
+        id
+        avatarUrl
         projectMemberships(first: 20,after: $cursor){
             pageInfo {
                 hasPreviousPage

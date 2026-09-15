@@ -38,7 +38,8 @@ class ProjectsViewModelTest : TestBase() {
         viewModel.loadAllProjects()
         val value = viewModel.projects.value
         assertNotNull(value)
-        val page = value!!.pageInfo
+        val projects = value?.projectMemberships
+        val page = projects!!.pageInfo
         assertNotNullAndEquals(
             page.hasNextPage,
             mockedAllProjects.currentUser!!.projectMemberships!!.pageInfo.hasNextPage
@@ -50,13 +51,13 @@ class ProjectsViewModelTest : TestBase() {
         assertNotNullAndEquals(
             page.endCursor, mockedAllProjects.currentUser.projectMemberships.pageInfo.endCursor!!
         )
-        val nodes = value.nodes
+        val nodes = projects.nodes
         assertNotNull(nodes)
         assertFalse(nodes!!.isEmpty())
         // val first=projects[0]
         for (j in 0 until nodes.size) {
             val node = nodes[j]!!.project
-            val mockedNode = mockedAllProjects.currentUser!!.projectMemberships!!.nodes!![j]!!
+            val mockedNode = mockedAllProjects.currentUser.projectMemberships.nodes!![j]!!
             assertNotNullAndEquals(
                 nodes[j]?.id, mockedNode.id
             )
@@ -73,7 +74,7 @@ class ProjectsViewModelTest : TestBase() {
                 node?.visibility, mockedNode.project.visibility!!
             )
             assertNotNullAndEquals(
-                node?.description, mockedNode.project.description!!
+                node?.description, mockedNode.project.description
             )
             val size = node?.topics?.size!!
             assertNotNullAndEquals(

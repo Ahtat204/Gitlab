@@ -32,17 +32,45 @@ import com.ahtat204.gitlab.presentation.components.Pipeline
 import com.ahtat204.gitlab.presentation.viewmodels.project.PipelinesViewModel
 
 /**
- * Composable representing the Pipelines screen for a specific project.
+ * Composable screen responsible for rendering the CI/CD pipeline history of a GitLab project.
  *
- * This screen displays a list of CI/CD pipelines filtered by status. It supports
- * infinite scrolling by automatically fetching more pipelines when the user
- * reaches the bottom of the list.
+ * ## Overview
+ * This screen provides a reactive, paginated list of pipelines, allowing users to monitor
+ * build statuses, runtimes, and individual job outcomes. It integrates with the
+ * [PipelinesViewModel] to fetch data from GitLab's GraphQL API and utilizes Apollo's
+ * normalized cache for smooth state transitions.
  *
- * @param project The unique identifier or full path of the GitLab project.
- * @param navController Controller used for navigating between screens.
- * @param x Padding values representing the inner padding provided by a Scaffold.
- * @param pipelinesViewModel The ViewModel responsible for managing pipeline data,
- *                           injected via Hilt.
+ * ## Key Features
+ * - **Infinite Scrolling**: Automatically detects when the user approaches the end of the
+ *   [LazyColumn] and triggers a fetch for the next page of pipelines.
+ * - **Status Filtering**: Currently defaults to successful pipelines, with underlying
+ *   support for filtering by status (SUCCESS, RUNNING, FAILED, etc.).
+ * - **Reactive Updates**: Utilizes [collectAsStateWithLifecycle] to ensure the UI
+ *   responds immediately to cache updates or network fetches.
+ * - **Optimized Rendering**: Uses stable keys in the [LazyColumn] to minimize
+ *   unnecessary recompositions during pagination.
+ *
+ * ## UI Components
+ * - **Pipeline List**: A vertical list of [Pipeline] components, each representing
+ *   a single CI execution.
+ * - **Loading Logic**: Implements a `shouldLoadMore` derived state to manage
+ *   pagination triggers without blocking the main thread.
+ *
+ * @param project The unique identifier (GID) or full path of the target GitLab project.
+ * @param navController The [NavController] used to handle navigation to job details or other screens.
+ * @param x The [PaddingValues] provided by the parent [androidx.compose.material3.Scaffold].
+ * @param pipelinesViewModel The ViewModel providing pipeline state and pagination logic.
+ *
+ * ## Usage
+ * ```kotlin
+ * Pipelines(
+ *     project = "ahtat204/gitlab-client",
+ *     navController = navController,
+ *     x = it
+ * )
+ * ```
+ * @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/workitems/pipelines.jpg"  width="300" height="700"/>
+ * @author Lahcen AHTAT
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

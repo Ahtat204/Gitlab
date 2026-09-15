@@ -1,0 +1,19 @@
+query GetProjectWorkItems($project:ID!,$cursor:String){
+    project(fullPath: $project){
+        id
+        workItems(first: 20,after: $cursor){
+            nodes {
+                id
+                name
+                state
+                title
+                closedAt
+                updatedAt
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+    }
+}
