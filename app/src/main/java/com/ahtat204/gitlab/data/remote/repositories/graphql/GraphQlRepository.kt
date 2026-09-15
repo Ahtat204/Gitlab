@@ -7,6 +7,7 @@ import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
+import com.ahtat204.gitlab.data.queries.GetProjectWorkItemsQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
@@ -146,4 +147,9 @@ interface GraphQlRepository {
      * @return A reactive stream emitting the user's workitems  metadata.
      */
     suspend fun getCurrentUserWorkItems(cursor: String? = null): Flow<GetCurrentUserWorkItemsQuery.Data>
+
+    suspend fun getProjectWorkItems(
+        project: String,
+        cursor: String? = null
+    ): Flow<GetProjectWorkItemsQuery.Data>
 }

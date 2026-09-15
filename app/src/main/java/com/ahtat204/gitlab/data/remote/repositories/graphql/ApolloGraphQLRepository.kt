@@ -11,6 +11,7 @@ import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
+import com.ahtat204.gitlab.data.queries.GetProjectWorkItemsQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
@@ -537,4 +538,17 @@ class ApolloGraphQLRepository @Inject constructor(
 
     }
 
+    override suspend fun getProjectWorkItems(
+        project: String,
+        cursor: String?
+    ): Flow<GetProjectWorkItemsQuery.Data> {
+        return apolloClient.query(
+            GetProjectWorkItemsQuery(
+                project = project,
+                cursor = Optional.presentIfNotNull(cursor)
+            )
+        ).fetchPolicy(
+            FetchPolicy.CacheFirst
+        ).watch().mapAndHandleErrors()
+    }
 }
