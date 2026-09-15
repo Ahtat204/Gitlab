@@ -4,7 +4,7 @@ query GetCurrentUserWorkItems($cursor:String){
            pageInfo {
                hasNextPage
                hasPreviousPage
-               startCursor
+               endCursor
            }
             nodes {
                 name

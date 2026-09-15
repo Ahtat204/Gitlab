@@ -10,22 +10,31 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-typealias WorkItems= GetCurrentUserWorkItemsQuery.WorkItems?
-@HiltViewModel
-class WorkItemsViewModel @Inject constructor(private val projectRepository: ProjectRepository):
-    ViewModel() {
-        private val _workItems= MutableStateFlow<WorkItems>(null)
-        val workItems: StateFlow<WorkItems> = _workItems.asStateFlow()
 
-    fun loadCurrentUserWorkItems(){
-        val page=_workItems.value?.pageInfo
-        if(page?.hasPreviousPage==false){
+typealias WorkItems = GetCurrentUserWorkItemsQuery.WorkItems?
+
+@HiltViewModel
+class WorkItemsViewModel @Inject constructor(private val projectRepository: ProjectRepository) :
+    ViewModel() {
+    private val _workItems = MutableStateFlow<WorkItems>(null)
+    val workItems: StateFlow<WorkItems> get() = _workItems.asStateFlow()
+
+    fun loadCurrentUserWorkItems() {
+        val value = _workItems.value
+        val page = value?.pageInfo
+        if (value == null) {
             viewModelScope.launch {
-                projectRepository.getCurrentUserWorkItems().collect { _workItems.value=it.currentUser?.workItems }
+                projectRepository.getCurrentUserWorkItems()
+                    .collect { _workItems.value = it.currentUser?.workItems }
             }
-        }
-        else viewModelScope.launch{
-            projectRepository.getCurrentUserWorkItems(page?.startCursor).collect { _workItems.value=it.currentUser?.workItems }
+        } else {
+
+            val endCursor = page?.endCursor //When paginating forwards, the cursor to continue.
+            if (page?.hasNextPage == true && endCursor != null)
+                viewModelScope.launch {
+                    projectRepository.getCurrentUserWorkItems(endCursor)
+                        .collect { _workItems.value = it.currentUser?.workItems }
+                }
         }
     }
-    }
+}
