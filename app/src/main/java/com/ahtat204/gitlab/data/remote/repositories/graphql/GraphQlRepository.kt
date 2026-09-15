@@ -56,7 +56,13 @@ interface GraphQlRepository {
      * @return A reactive stream emitting the repository tree layer layout, or null if invalid or inaccessible.
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
      */
-    suspend fun getProjectRepository(id: String, branch: String?, path: String? = null): Flow<Data?>
+    suspend fun getProjectRepository(
+        id: String,
+        branch: String?,
+        path: String? = null,
+        blobsCursor: String? = null,
+        treeCursor: String? = null
+    ): Flow<Data?>
 
     /**
      * Retrieves a paginated chunk of available reference branches within a repository.
@@ -91,6 +97,7 @@ interface GraphQlRepository {
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
     fun getMyProfile(): Flow<GetMyProfileQuery.Data>
+
     /**
      * Streams all projects belonging to a specific user identified by their username.
      *

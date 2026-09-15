@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
+
 /**
  * Displays a file browser UI for navigating a GitLab project repository.
  *
@@ -74,7 +76,11 @@ fun FileBrowser(
     projectPath: String,
     repository: Repository
 ) {
-    Row(modifier = Modifier.padding(21.dp,0.dp).horizontalScroll(rememberScrollState())) {
+    Row(
+        modifier = Modifier
+            .padding(21.dp, 0.dp)
+            .horizontalScroll(rememberScrollState())
+    ) {
         repositoryViewModel.folders.collectAsState().value.forEach { (path, name) ->
             Text(
                 text = "$name \b /", modifier = Modifier
@@ -140,6 +146,7 @@ fun FileBrowser(
                     TreeItemCard(file)
                 }
             }
+            Button(onClick = { repositoryViewModel }) { }
         }
     }
 

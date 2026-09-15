@@ -14,6 +14,7 @@ query GetProjectRepository($projectPath:ID!,$branch:String,$path:String,$blobsCu
                         name
                     }
                 }
+
                 trees(first: 20,after:$treeCursor){
                     __typename
 

@@ -111,7 +111,7 @@ class RepositoryViewModel @Inject constructor(
      *
      * Emits repository tree data retrieved via [loadProjectRepository].
      */
-    val repository: StateFlow<Repository> = _repository.asStateFlow()
+    val repository: StateFlow<Repository> get() = _repository.asStateFlow()
 
     /** Backing state for branches. */
     private val _branches = MutableStateFlow<Branches>(null)
@@ -121,7 +121,7 @@ class RepositoryViewModel @Inject constructor(
      *
      * Emits branch data retrieved via [loadRepositoryBranches].
      */
-    val branches: StateFlow<Branches> = _branches.asStateFlow()
+    val branches: StateFlow<Branches> get() = _branches.asStateFlow()
 
     /**
      * Loads the repository tree for the given project and branch.
@@ -143,30 +143,36 @@ class RepositoryViewModel @Inject constructor(
         folderName: String? = null,
         folderPath: String? = null
     ) {
+        val value = _repository.value
         val path = if (folderPath.equals(".")) null else folderPath
         val newBranch = if (branch?.equals(_repository.value?.rootRef) == true) null else branch
-        viewModelScope.launch {
-            graphQlRepository.getProjectRepository(projectPath, branch = newBranch, path = path)
-                .collect {
-                    _repository.value = it?.project?.repository
-                    if (folders.value.isEmpty()) {
-                        it?.project?.name?.let { projectName ->
-                            folders.value["."] = projectName
-                            if (folders.value.size > 1 || folderPath == null) {
-                                folders.value.removeAfterKey(".")
+        val blobPage = _repository.value?.tree?.blobs?.pageInfo
+        val treePage = _repository.value?.tree?.trees?.pageInfo
+        if (value == null) {
+            viewModelScope.launch {
+                graphQlRepository.getProjectRepository(projectPath, branch = newBranch, path = path)
+                    .collect {
+                        _repository.value = it?.project?.repository
+                        if (folders.value.isEmpty()) {
+                            it?.project?.name?.let { projectName ->
+                                folders.value["."] = projectName
+                                if (folders.value.size > 1 || folderPath == null) {
+                                    folders.value.removeAfterKey(".")
+                                }
+                            }
+                        }
+                        if (folderPath != null) {
+                            folderName?.let {
+                                folders.value[folderPath] = folderName
+                            }
+                            if (folders.value.size > 1) {
+                                folders.value.removeAfterKey(folderPath)
                             }
                         }
                     }
-                    if (folderPath != null) {
-                        folderName?.let {
-                            folders.value[folderPath] = folderName
-                        }
-                        if (folders.value.size > 1) {
-                            folders.value.removeAfterKey(folderPath)
-                        }
-                    }
-                }
+            }
         }
+
     }
 
     /**

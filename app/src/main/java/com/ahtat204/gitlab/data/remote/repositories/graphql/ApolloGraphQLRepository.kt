@@ -306,13 +306,15 @@ class ApolloGraphQLRepository @Inject constructor(
      * ```
      */
     override suspend fun getProjectRepository(
-        id: String, branch: String?, path: String?
+        id: String, branch: String?, path: String?, blobsCursor: String?, treeCursor: String?
     ): Flow<GetProjectRepositoryQuery.Data?> {
         return apolloClient.query(
             GetProjectRepositoryQuery(
-                id,
+                projectPath = id,
                 branch = Optional.presentIfNotNull(branch),
-                path = Optional.presentIfNotNull(path)
+                path = Optional.presentIfNotNull(path),
+                treeCursor = Optional.presentIfNotNull(treeCursor),
+                blobsCursor = Optional.presentIfNotNull(blobsCursor)
             )
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
