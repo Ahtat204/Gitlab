@@ -8,11 +8,11 @@ import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
-import com.ahtat204.gitlab.domain.usecase.logging.logger
+import com.ahtat204.gitlab.domain.authentication.AuthStorage
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens.isConnected
+import com.ahtat204.gitlab.domain.logging.logger
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -23,7 +23,7 @@ import net.openid.appauth.AuthorizationService
  *
  * ## Responsibilities
  * - Displays the splash screen while authentication state is being checked.
- * - Initializes [net.openid.appauth.AuthorizationService] and sets up token context in [com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens].
+ * - Initializes [net.openid.appauth.AuthorizationService] and sets up token context in [Tokens].
  * - Ensures cache directory (`gitlab/httpCache`) exists for Apollo/HTTP caching.
  * - Determines whether to navigate to [MainActivity] (authenticated) or
  *   [AuthenticationActivity] (login required).
@@ -62,31 +62,25 @@ class LauncherActivity : ComponentActivity() {
         authenticationService = AuthorizationService(this)
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
-        CoroutineScope(Dispatchers.IO).launch {
-            val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
-            if (storedState.isAuthorized) {
-                storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
-                    if (token != null && ex == null) {
-                        Tokens.accessToken = token
-                        Tokens.CurrentAuthState = storedState
-                        lifecycleScope.launch {
-                            AuthStorage.getAuthState(this@LauncherActivity)
-                                .updateData { storedState }
-                            isReady = true
-                            navigateTo(MainActivity::class.java)
-                        }
-                    }
-                    if (ex != null) {
-                        logger(ex.message)
-                        navigateTo(AuthenticationActivity::class.java)
-                        throw ex
-                    }
-                }
-            } else {
-                navigateTo(AuthenticationActivity::class.java)
+        lifecycleScope.launch(Dispatchers.IO) {
+        val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
 
+        if (!storedState.isAuthorized) {
+            isReady = true
+            navigateTo(AuthenticationActivity::class.java)
+        } else {
+            // Even if offline, we load the cached state so tokens are ready
+            if (isConnected()) {
+                refresh { isReady = true }
+            } else {
+                // If offline, just load from cache and proceed
+                Tokens.CurrentAuthState = storedState
+                Tokens.accessToken = storedState.accessToken
+                isReady = true
+                navigateTo(MainActivity::class.java)
             }
         }
+    }
     }
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
@@ -102,4 +96,31 @@ class LauncherActivity : ComponentActivity() {
         authenticationService.dispose()
         super.onDestroy()
     }
+
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    private suspend fun refresh(isReady: () -> Unit) {
+        val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
+        if (storedState.isAuthorized) {
+            storedState.performActionWithFreshTokens(authenticationService) { token, _, ex ->
+                if (token != null && ex == null) {
+                    Tokens.accessToken = token
+                    Tokens.CurrentAuthState = storedState
+                    lifecycleScope.launch {
+                        AuthStorage.getAuthState(this@LauncherActivity).updateData { storedState }
+                        isReady()
+                        navigateTo(MainActivity::class.java)
+                    }
+                }
+                if (ex != null) {
+                    logger(ex.message)
+                    navigateTo(AuthenticationActivity::class.java)
+                    throw ex
+                }
+            }
+        } else {
+            navigateTo(AuthenticationActivity::class.java)
+
+        }
+    }
+
 }

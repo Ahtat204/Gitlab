@@ -58,7 +58,6 @@ android {
         buildConfig = true
         compose = true
     }
-
 }
 
 apollo {
@@ -70,6 +69,8 @@ apollo {
             addTypename.set("always")
             generateDataBuilders.set(true)
         }
+        plugin("com.apollographql.cache:normalized-cache-apollo-compiler-plugin:1.0.4")
+        pluginArgument("com.apollographql.cache.packageName", packageName.get())
     }
 }
 dependencies {
@@ -83,6 +84,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material)
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.hilt.android.testing)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -112,6 +116,15 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
     testImplementation(libs.apollo.mockserver)
-    testImplementation("com.apollographql.apollo:apollo-testing-support:4.4.2")
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    testImplementation(libs.apollo.testing.support)
+    testImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.mockwebserver)
+    testImplementation(libs.kotlinx.coroutines.test)
+}
+configurations.all {
+    resolutionStrategy {
+        // Force resolution to OkHttp 4.x
+        force("com.squareup.okhttp3:okhttp:4.12.0") // or the version you are using...
+    }
+    exclude(group = "com.squareup.okhttp3", module = "okhttp-coroutines") // Exclude okhttp-coroutines dependency, introduced in 5.0.0-alpha.X
 }

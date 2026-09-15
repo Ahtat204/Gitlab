@@ -6,29 +6,39 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.ImageLoader
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.components.CoilCache.loader
 import com.ahtat204.gitlab.presentation.components.ProjectItem
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectViewModel
+import com.ahtat204.gitlab.presentation.viewmodels.project.PersonalProjectsViewModel
 import java.time.Instant
 import java.time.ZoneId
 
@@ -36,20 +46,20 @@ import java.time.ZoneId
  * Composable that displays the authenticated user's personal GitLab projects.
  *
  * ## Overview
- * - Fetches and observes project data via [ProjectViewModel].
+ * - Fetches and observes project data via [PersonalProjectsViewModel].
  * - Shows a loading indicator until projects and avatar are available.
  * - Displays a list of projects sorted by last activity date.
  * - Delegates rendering of each project to [ProjectItem].
  *
  * ## Parameters
  * @param x The [PaddingValues] applied to the container for spacing.
- * @param projectViewModel The [ProjectViewModel] instance used to load and observe
+ * @param personalProjectsViewModel The [PersonalProjectsViewModel] instance used to load and observe
  *                         project data. Defaults to Hilt‑provided instance via [hiltViewModel].
  *
  * ## UI Behavior
  * - Initializes a Coil [ImageLoader] with caching and crossfade enabled.
- * - Calls [ProjectViewModel.loadAllProjects] inside [LaunchedEffect] to trigger data fetch.
- * - Collects current user data from [ProjectViewModel.projects] as state.
+ * - Calls [PersonalProjectsViewModel.loadAllProjects] inside [LaunchedEffect] to trigger data fetch.
+ * - Collects current user data from [PersonalProjectsViewModel.projects] as state.
  * - If no projects or avatar are available:
  *   - Displays a [CircularProgressIndicator].
  * - Otherwise:
@@ -61,7 +71,7 @@ import java.time.ZoneId
  * ```kotlin
  * PersonalProjects(
  *     x = PaddingValues(16.dp),
- *     projectViewModel = hiltViewModel()
+ *     personalProjectsViewModel = hiltViewModel()
  * )
  * ```
  *
@@ -69,23 +79,34 @@ import java.time.ZoneId
  * - Uses [Instant] and [ZoneId] to sort projects by activity date.
  * - Relies on [ProjectItem] composable to render individual project details.
  * - Displays up to all available projects; topics and languages are shown if present.
- *   @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/repository/personalprojects.jpg"  width="300" height="700"/>
+ *   @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/personalprojects.jpg"  width="300" height="700"/>
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PersonalProjects(
     navController: NavHostController,
     x: PaddingValues,
-    projectViewModel: ProjectViewModel = hiltViewModel()
+    personalProjectsViewModel: PersonalProjectsViewModel = hiltViewModel()
 ) {
     LaunchedEffect(1) {
-        projectViewModel.loadAllProjects()
+        personalProjectsViewModel.loadAllProjects()
     }
-    val currUser by projectViewModel.projects.collectAsState()
-    currUser?.projectMemberships?.nodes?.sortedByDescending {
-        Instant.parse(it?.project?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
-            .toLocalDate()
-    }?.let { nodes ->
+    val currUser by personalProjectsViewModel.projects.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val totalItems = listState.layoutInfo.totalItemsCount
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            // Trigger load when user is 3 items away from the bottom
+            totalItems > 3 && lastVisibleItem >= totalItems - 2
+        }
+    }
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value) {
+            personalProjectsViewModel.loadAllProjects()
+        }
+    }
+    currUser?.namespace?.projects?.nodes?.let { nodes ->
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -93,27 +114,42 @@ fun PersonalProjects(
                 .padding(x)
                 .background(Color.Black)
         ) {
-            if (currUser?.projectMemberships?.nodes?.isEmpty() == true || currUser?.avatarUrl == null) {
-                CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
-
-            } else {
-                Text(
-                    text = "Your Projects",
-                    fontFamily = titleFont,
-                    fontSize = 20.sp,
+            if (currUser?.namespace?.projects?.nodes?.isEmpty() != true && currUser?.avatarUrl != null) {
+                Row(
                     modifier = Modifier
-                )
+                        .background(Color.Black)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Your Projects",
+                        fontFamily = titleFont,
+                        fontSize = 20.sp,
+                        modifier = Modifier
+                            .weight(1.0f)
+                            .offset(20.dp, 0.dp),
+                        textAlign = TextAlign.Center
+                    )
+                    IconButton(
+                        onClick = { personalProjectsViewModel.refreshProjects() },
+                        modifier = Modifier.weight(0.1f)
+                    ) {
+                        Icon(Icons.Default.Refresh, contentDescription = null)
+                    }
+                }
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = x,
                     verticalArrangement = Arrangement.spacedBy(0.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    state = listState
                 ) {
                     items(nodes, key = { item -> item?.id ?: Any() }) { item ->
-                        item?.project?.let { ProjectItem(currUser, it, loader, navController) }
+                        item?.let { ProjectItem(currUser, it, loader, navController) }
                     }
                 }
             }
         }
     }
+
 }

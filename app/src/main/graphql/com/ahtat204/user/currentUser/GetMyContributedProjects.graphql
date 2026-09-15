@@ -1,0 +1,33 @@
+query GetMyContributedProjects($cursor:String){
+    currentUser {
+            contributedProjects(first: 20,includePersonal: true,after: $cursor){
+                pageInfo {
+                    startCursor
+                    hasNextPage
+                    hasPreviousPage
+                }
+                nodes {
+                    id
+                    topics
+                    lastActivityAt
+                    __typename
+                    languages {
+                        color
+                        name
+                    }
+                    name
+                    fullPath
+                    description
+                    visibility
+                    pipelines(first: 1){
+                        nodes {
+                            __typename
+                            id
+                            status
+                        }
+                    }
+                }
+            }
+
+    }
+}
