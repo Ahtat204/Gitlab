@@ -5,11 +5,13 @@ import com.ahtat204.gitlab.data.fetchAndMergePipelines
 import com.ahtat204.gitlab.data.fetchAndMergeProjects
 import com.ahtat204.gitlab.data.mapAndHandleErrors
 import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetCurrentUserWorkItemsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
+import com.ahtat204.gitlab.data.queries.GetProjectWorkItemsQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
@@ -494,4 +496,59 @@ class ApolloGraphQLRepository @Inject constructor(
             ).watch().mapAndHandleErrors()
     }
 
+    /**
+     * Retrieves the repository tree for a given project.
+     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
+     * @return A [Flow] emitting [GetCurrentUserWorkItemsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetCurrentUserWorkItemsQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+
+     * query example
+     * ``` GraphQL
+     *    currentUser {
+     *         workItems(first: 20,after: $cursor,sort: CREATED_ASC){
+     *            pageInfo {
+     *                hasNextPage
+     *                hasPreviousPage
+     *                startCursor
+     *            }
+     *             nodes {
+     *                 name
+     *                 id
+     *                 createdAt
+     *                 closedAt
+     *                 description
+     *
+     *             }
+     *         }
+     *     }
+     */
+    override suspend fun getCurrentUserWorkItems(cursor: String?): Flow<GetCurrentUserWorkItemsQuery.Data> {
+        return apolloClient.query(GetCurrentUserWorkItemsQuery(Optional.presentIfNotNull(cursor)))
+            .fetchPolicy(
+                FetchPolicy.CacheFirst
+            ).watch().mapAndHandleErrors()
+
+
+    }
+
+    override suspend fun getProjectWorkItems(
+        project: String,
+        cursor: String?
+    ): Flow<GetProjectWorkItemsQuery.Data> {
+        return apolloClient.query(
+            GetProjectWorkItemsQuery(
+                project = project,
+                cursor = Optional.presentIfNotNull(cursor)
+            )
+        ).fetchPolicy(
+            FetchPolicy.CacheFirst
+        ).watch().mapAndHandleErrors()
+    }
 }

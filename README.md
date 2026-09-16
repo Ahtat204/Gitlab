@@ -10,9 +10,9 @@
 
 ## 📸 Screenshots
 
-|       Home Screen        |             Project List              |            Project Overview            |              Profile               |              Repository               |              Commits               |  
-|:------------------------:|:-------------------------------------:|:--------------------------------------:|:----------------------------------:|:-------------------------------------:|:----------------------------------:|  
-| ![Home Screen](home.jpg) | ![Project List](personalprojects.jpg) | ![Project Details](projectdetails.jpg) | ![Developper Profile](profile.jpg) | ![Project Repository](repository.jpg) | ![Repository Commits](history.jpg) |  
+|       Home Screen        |             Project List              |          Project Pipelines          |            Project Overview            |              Profile               |              Repository               |              Commits               |  
+|:------------------------:|:-------------------------------------:|:-----------------------------------:|:--------------------------------------:|:----------------------------------:|:-------------------------------------:|:----------------------------------:|  
+| ![Home Screen](home.jpg) | ![Project List](personalprojects.jpg) | ![Project Pipelines](pipelines.jpg) | ![Project Details](projectdetails.jpg) | ![Developper Profile](profile.jpg) | ![Project Repository](repository.jpg) | ![Repository Commits](history.jpg) |  
 
 ---
 
@@ -299,7 +299,7 @@ Gitlab/
 
 ```properties
 # secrets.properties
-CLIENT_ID: # this the Gitlab OAuth2 ClientID you get when creating an application on Gitlab , you define scope, redirect URL , you also get a Client Secret as well  
+CLIENT_ID:# this the Gitlab OAuth2 ClientID you get when creating an application on Gitlab , you define scope, redirect URL , you also get a Client Secret as well  
 ```
 
 ### Dependencies

@@ -16,6 +16,8 @@ import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 val mockedAllProjects = Data(
     currentUser = CurrentUser(
         __typename = "CurrentUser",
+        id = "",
+        avatarUrl = "",
         projectMemberships = ProjectMemberships(
             __typename = "ProjectMembershipConnection",
             pageInfo = PageInfo(

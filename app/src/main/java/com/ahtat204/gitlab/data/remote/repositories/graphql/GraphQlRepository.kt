@@ -1,11 +1,13 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetCurrentUserWorkItemsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
+import com.ahtat204.gitlab.data.queries.GetProjectWorkItemsQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
@@ -137,4 +139,17 @@ interface GraphQlRepository {
      * @return A reactive stream emitting the user's project memberships metadata.
      */
     suspend fun getAllProjects(cursor: String? = null): Flow<GetAllProjectsQuery.Data>
+
+    /**
+     * Streams all workitems  of the currently authenticated user , with pagination support.
+     *
+     * @param cursor The pagination pointer for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the user's workitems  metadata.
+     */
+    suspend fun getCurrentUserWorkItems(cursor: String? = null): Flow<GetCurrentUserWorkItemsQuery.Data>
+
+    suspend fun getProjectWorkItems(
+        project: String,
+        cursor: String? = null
+    ): Flow<GetProjectWorkItemsQuery.Data>
 }
