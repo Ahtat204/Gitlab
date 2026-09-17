@@ -60,9 +60,16 @@ import com.ahtat204.gitlab.presentation.ui.theme.titleFont
  * @author Lahcen AHTAT
  */
 @Composable
-fun CommitCard(project:String,sha: String?, message: String?, author: String, date: String,navController: NavController) {
+fun CommitCard(
+    project: String,
+    sha: String?,
+    message: String?,
+    author: String,
+    date: String,
+    navController: NavController
+) {
     Card(
-        {navController.navigate("commit/$project/$sha")}, modifier = Modifier
+        { navController.navigate("$project/commit/$sha") }, modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp, 10.dp)
             .background(Color.Black)

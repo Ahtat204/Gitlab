@@ -2,16 +2,23 @@ package com.ahtat204.gitlab.presentation.screens.project
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.CommitViewModel
 
 @Composable
-fun CommitDetails(project:String,
-                  commitSha:String,
+fun CommitDetails(
+    project: String,
+    commitSha: String,
     navController: NavController,
     x: PaddingValues,
-    commitViewModel: CommitViewModel = hiltViewModel()
+    viewModel: CommitViewModel = hiltViewModel()
 ) {
-
+    LaunchedEffect(project, commitSha) {
+        viewModel.loadCommitDetails(project, commitSha)
+    }
+    val commitDetails by viewModel.commit.collectAsStateWithLifecycle()
 }

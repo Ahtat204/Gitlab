@@ -1,5 +1,6 @@
 query GetCommitDetails($sha:String!,$project:ID!,$cursor:String){
     project(fullPath: $project){
+        id
         repository {
             commit(ref:$sha ){
                 id
