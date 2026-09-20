@@ -7,7 +7,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery.Project
 import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery.ProjectMembers
 import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery.User
 
-val projectMembersData = Data(
+val mockedMembers = Data(
     project = Project(
         __typename = "Project",
         id = "gid://gitlab/Project/101",
@@ -33,7 +33,7 @@ val projectMembersData = Data(
                         __typename = "User",
                         name = "GitLab Bot",
                         username = "project_101_bot",
-                        bio = null
+                        bio = "ML Engineer & C++ enthusiast."
                     )
                 )
             ),
