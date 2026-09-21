@@ -1,9 +1,9 @@
-package com.ahtat204.gitlab.domain.usecase.authentication.security
+package com.ahtat204.gitlab.domain.authentication.security
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import com.ahtat204.gitlab.domain.usecase.authentication.security.CryptoUtility.decrypt
-import com.ahtat204.gitlab.domain.usecase.authentication.security.CryptoUtility.encrypt
+import com.ahtat204.gitlab.domain.authentication.security.CryptoUtility.decrypt
+import com.ahtat204.gitlab.domain.authentication.security.CryptoUtility.encrypt
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -38,7 +38,6 @@ import javax.crypto.spec.IvParameterSpec
  * val decrypted = CryptoUtility.decrypt(encrypted)
  * val original = decrypted.decodeToString()
  * ```
- * @author Lahcen AHTAT
  */
 object CryptoUtility {
     /** The alias used to store the secret key in the Android Keystore. */

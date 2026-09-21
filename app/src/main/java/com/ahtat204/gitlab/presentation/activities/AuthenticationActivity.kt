@@ -29,11 +29,11 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.ahtat204.gitlab.R
-import com.ahtat204.gitlab.domain.usecase.authentication.authStateStore
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
-import com.ahtat204.gitlab.domain.usecase.logging.logger
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
+import com.ahtat204.gitlab.domain.authentication.authStateStore
+import com.ahtat204.gitlab.domain.authentication.constants.AuthConfig
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.logging.logger
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthState

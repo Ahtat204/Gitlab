@@ -8,10 +8,10 @@ import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.isConnected
-import com.ahtat204.gitlab.domain.usecase.logging.logger
+import com.ahtat204.gitlab.domain.authentication.AuthStorage
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens.isConnected
+import com.ahtat204.gitlab.domain.logging.logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -23,7 +23,7 @@ import net.openid.appauth.AuthorizationService
  *
  * ## Responsibilities
  * - Displays the splash screen while authentication state is being checked.
- * - Initializes [net.openid.appauth.AuthorizationService] and sets up token context in [com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens].
+ * - Initializes [net.openid.appauth.AuthorizationService] and sets up token context in [Tokens].
  * - Ensures cache directory (`gitlab/httpCache`) exists for Apollo/HTTP caching.
  * - Determines whether to navigate to [MainActivity] (authenticated) or
  *   [AuthenticationActivity] (login required).

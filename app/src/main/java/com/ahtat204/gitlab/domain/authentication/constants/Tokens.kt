@@ -1,11 +1,11 @@
-package com.ahtat204.gitlab.domain.usecase.authentication.constants
+package com.ahtat204.gitlab.domain.authentication.constants
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.CurrentAuthState
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.accessToken
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.initialize
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens.CurrentAuthState
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens.accessToken
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens.initialize
 import net.openid.appauth.AuthState
 
 /**

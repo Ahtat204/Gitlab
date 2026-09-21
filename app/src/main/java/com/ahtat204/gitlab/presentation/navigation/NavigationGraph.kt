@@ -15,6 +15,7 @@ import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
 import com.ahtat204.gitlab.presentation.screens.project.Members
 import com.ahtat204.gitlab.presentation.screens.project.Pipelines
+import com.ahtat204.gitlab.presentation.screens.Projects
 import com.ahtat204.gitlab.presentation.screens.project.ProjectDetailScreen
 import com.ahtat204.gitlab.presentation.screens.project.RepositoryScreen
 
@@ -60,6 +61,9 @@ fun BottomNavigationGraph(
         }
         composable(route = BottomBarScreen.Activity.route) {
             // Activity screen placeholder
+        }
+        composable(route="projects") {
+            Projects(navController,x)
         }
         composable(route = "commits/{projectId}/{branch}",
             arguments = listOf(

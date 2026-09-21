@@ -26,7 +26,7 @@ import dagger.hilt.android.components.ViewModelComponent
  * Inject [GraphQlRepository] into a ViewModel:
  * ```kotlin
  * @HiltViewModel
- * class ProjectViewModel @Inject constructor(
+ * class PersonalProjectsViewModel @Inject constructor(
  *     private val repository: GraphQlRepository
  * ) : ViewModel() {
  *     // Use repository methods here
