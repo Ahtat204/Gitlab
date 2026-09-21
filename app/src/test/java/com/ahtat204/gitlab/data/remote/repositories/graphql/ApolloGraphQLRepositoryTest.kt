@@ -6,6 +6,7 @@ import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.json.mockedAllProjects
 import com.ahtat204.gitlab.reponses.json.mockedBranches
 import com.ahtat204.gitlab.reponses.json.mockedCommits
+import com.ahtat204.gitlab.reponses.json.mockedMembers
 import com.ahtat204.gitlab.reponses.json.mockedPipelines
 import com.ahtat204.gitlab.reponses.json.mockedProject
 import com.ahtat204.gitlab.reponses.json.mockedProjects
@@ -17,9 +18,11 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
@@ -248,5 +251,43 @@ class ApolloGraphQLRepositoryTest {
         assertEquals("Java", secondLanguage.name)
         // val recordedRequest = mockWebserver.takeRequest()
         //assertEquals("/graphql", recordedRequest.path)
+    }
+
+    @Test
+    fun getProjectMembers() = runTest {
+        val projectId = "gid://gitlab/Project/101"
+        mockWebserver.enqueue(
+            MockResponse().setResponseCode(200).setBody(mockedMembers)
+        )
+        val data = repository.getProjectMembers(projectId).first()
+        val members = data.project?.projectMembers
+        assertNotNull(members)
+        val page = members?.pageInfo
+        assertNotNullAndEquals(page?.endCursor, "eyJpZCI6IjIifQ")
+        assertNotNullAndEquals(page?.startCursor, "eyJpZCI6IjEifQ")
+        assertNotNullAndEquals(page?.hasPreviousPage, false)
+        assertNotNullAndEquals(page?.hasNextPage, true)
+        val nodes = members?.nodes
+        assertNotNull(nodes)
+        Assert.assertFalse(nodes?.size == 0)
+        ////////////////////////////////////////////////////////////
+        val one = nodes!![0]
+        assertNotNullAndEquals(one?.id, "gid://gitlab/ProjectMember/1")
+        assertNotNullAndEquals(one?.createdAt, "2023-10-27T10:00:00Z")
+        val user1 = one?.user
+        assertNotNull(user1)
+        assertNotNullAndEquals(user1?.name, "Lahcen AHTAT")
+        assertNotNullAndEquals(user1?.username, "Ahtat204")
+        assertNotNullAndEquals(user1?.bio, "Android Engineer & Systems Architecture enthusiast.")
+        //////////////////////////////////////////////////////////////////////
+        val two = nodes[1]
+        assertNotNullAndEquals(two?.id, "gid://gitlab/ProjectMember/2")
+        assertNotNullAndEquals(two?.createdAt, "2023-11-01T08:15:22Z")
+        val user2 = two?.user
+        assertNotNull(user2)
+        assertNotNullAndEquals(user2?.name, "GitLab Bot")
+        assertNotNullAndEquals(user2?.username, "project_101_bot")
+        assertNull(user2?.bio)
+
     }
 }

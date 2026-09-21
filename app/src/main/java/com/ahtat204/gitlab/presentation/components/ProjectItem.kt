@@ -235,7 +235,8 @@ fun ProjectItem(
 fun ProjectItem(
     project: GetAllProjectsQuery.Project,
     imageLoader: ImageLoader,
-    navController: NavHostController
+    navController: NavHostController,
+    avatarUrl: String?
 ) {
     val encodedId = URLEncoder.encode(project.fullPath, StandardCharsets.UTF_8.toString())
     Card(
@@ -252,6 +253,30 @@ fun ProjectItem(
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.Start
         ) {
+            avatarUrl?.let { url ->
+                val avatar = "https://gitlab.com/$url"
+
+                AsyncImage(
+                    imageLoader = imageLoader,
+                    model = ImageRequest.Builder(LocalContext.current).data(avatar) // Image URL
+                        .crossfade(true).memoryCachePolicy(CachePolicy.ENABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED) // Smooth fade-in
+                        .build(),
+                    contentDescription = "Sample Image",
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .offset(y = 13.dp)
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(20.dp)),
+                    onState = { state ->
+                        when (state) {
+                            is AsyncImagePainter.State.Loading -> {}
+                            is AsyncImagePainter.State.Success -> {}
+                            else -> {}
+                        }
+                    })
+            }
+
             project.let {
                 it.avatarUrl?.let { url ->
                     val avatar = "https://gitlab.com/$url"

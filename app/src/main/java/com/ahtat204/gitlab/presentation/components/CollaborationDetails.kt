@@ -76,15 +76,15 @@ fun CollaborationDetails(
         pipelinesCount?.let {
             ProjectWorkItems(
                 Item(
-                    "WorkItems", "project/{id]/workitems", R.drawable.workitems, null
+                    "WorkItems", "proshaject/{id]/workitems", R.drawable.workitems, null
                 )
             ) {}
         }
-        ProjectWorkItems(
-            Item(
-                "Members", "project/{id}/members", R.drawable.members, null
-            )
-        ) {}
+            ProjectWorkItems(
+                Item(
+                    "Members", "project/{id}/members", R.drawable.members, null
+                )
+            ) {navController.navigate("members?projectId=$encodedId")}
     }
 
 }

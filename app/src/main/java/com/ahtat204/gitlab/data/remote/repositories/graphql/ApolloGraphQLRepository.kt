@@ -8,6 +8,7 @@ import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -339,7 +340,7 @@ class ApolloGraphQLRepository @Inject constructor(
     /**
      * Manually invalidates and refreshes data in the normalized cache for specific operations.
      *
-     * Supported operations: [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery], [GetProjectRepositoryQuery].
+     * Supported operations: [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery], [GetProjectRepositoryQuery],[GetProjectMembersQuery].
      *
      * ### Behavior
      * 1. Identifies the query type from the provided [data].
@@ -366,6 +367,11 @@ class ApolloGraphQLRepository @Inject constructor(
 
             is GetProjectRepositoryQuery.Data -> {
                 val query = GetProjectRepositoryQuery(projectPath = data.project?.id!!)
+                apolloClient.apolloStore.removeOperation(operation = query, data, publish = true)
+            }
+
+            is GetProjectMembersQuery.Data -> {
+                val query = GetProjectMembersQuery(project = data.project?.id!!)
                 apolloClient.apolloStore.removeOperation(operation = query, data, publish = true)
             }
 
@@ -440,6 +446,55 @@ class ApolloGraphQLRepository @Inject constructor(
 
     }
 
+
+    /**
+     * Streams a paginated list of members for a specific GitLab project.
+     *
+     * @param project The unique identifier or full path of the GitLab project.
+     * @param cursor The pagination pointer for sequential page fetches.
+     * @return A [Flow] emitting [GetProjectMembersQuery.Data] objects.
+     *
+     * ### Behavior
+     * - Executes [GetProjectMembersQuery] with the provided project and cursor.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow using [watch].
+     * - Handles errors via [mapAndHandleErrors].
+     * - Throws [kotlinx.coroutines.CancellationException] if the collection coroutine scope is cancelled.
+     * ### query example
+     * ``` GraphQL
+     *  project(fullPath: $projectPath) {
+     *         projectMembers(first: 20, after: $cursor) {
+     *             nodes {
+     *                 id
+     *                 accessLevel {
+     *                     stringLevel
+     *                 }
+     *                 user {
+     *                     id
+     *                     name
+     *                     username
+     *                     avatarUrl
+     *                 }
+     *             }
+     *             pageInfo {
+     *                 endCursor
+     *                 hasNextPage
+     *             }
+     *         }
+     *     }
+     * ```
+     */
+    override suspend fun getProjectMembers(
+        project: String, cursor: String?
+    ): Flow<GetProjectMembersQuery.Data> {
+        return apolloClient.query(
+            GetProjectMembersQuery(
+                project, cursor = Optional.presentIfNotNull(cursor)
+            )
+        ).fetchPolicy(
+            FetchPolicy.CacheFirst
+        ).watch().mapAndHandleErrors()
+    }
     /**
      * Streams all projects that the currently authenticated user has access to, with pagination.
      *

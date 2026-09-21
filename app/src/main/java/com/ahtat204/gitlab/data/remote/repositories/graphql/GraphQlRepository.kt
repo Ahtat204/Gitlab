@@ -4,6 +4,7 @@ import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -16,8 +17,11 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Unified Repository interface for all GitLab GraphQL operations.
  *
- * This repository serves as the **Single Source of Truth (SSOT)** for all data retrieved via GitLab's GraphQL API.
- * It provides a reactive API using Kotlin [Flow] and leverages Apollo's normalized cache for performance and consistency.
+ * This repository serves as the **Single Source of Truth (SSOT)** for all data retrieved via GraphQL.
+ * Unlike traditional domain-driven repositories, this unified approach is used to:
+ * 1. **Minimize Memory Overhead**: Prevents the creation of multiple repository instances for different domains.
+ * 2. **Centralize Data Logic**: Provides a single entry point for all queries, ensuring consistent caching policies.
+ * 3. **Optimize Apollo Usage**: Facilitates cross-domain data consistency through Apollo's normalized cache.
  *
  * ### Key Responsibilities:
  * - **User Dashboard**: Fetching personal projects [getAllPersonalProjects] and user profile [getMyProfile].
@@ -137,4 +141,16 @@ interface GraphQlRepository {
      * @return A reactive stream emitting the user's project memberships metadata.
      */
     suspend fun getAllProjects(cursor: String? = null): Flow<GetAllProjectsQuery.Data>
+
+    /**
+     * Streams a paginated list of members for a specific GitLab project.
+     *
+     * @param project The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the current window slice of project member records.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
+    suspend fun getProjectMembers(
+        project: String, cursor: String? = null
+    ): Flow<GetProjectMembersQuery.Data>
 }

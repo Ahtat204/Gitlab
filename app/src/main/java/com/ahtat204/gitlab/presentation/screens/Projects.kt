@@ -7,11 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,7 +49,8 @@ fun Projects(
         viewModel.loadAllProjects()
     }
     val currUser by viewModel.projects.collectAsState()
-    currUser?.nodes?.let { nodes ->
+    val projects = currUser?.projectMemberships
+    projects?.nodes?.let { nodes ->
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -59,10 +58,7 @@ fun Projects(
                 .padding(x)
                 .background(Color.Black)
         ) {
-            if (currUser?.nodes?.isEmpty() == true) {
-                CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
-
-            } else {
+            if (projects.nodes.isNotEmpty()) {
                 Text(
                     text = "Your Projects",
                     fontFamily = titleFont,
@@ -76,7 +72,14 @@ fun Projects(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(nodes, key = { item -> item?.id ?: Any() }) { item ->
-                        item?.project?.let { ProjectItem(it, loader, navController) }
+                        item?.project?.let {
+                            ProjectItem(
+                                it,
+                                loader,
+                                navController,
+                                currUser?.avatarUrl
+                            )
+                        }
                     }
                 }
             }

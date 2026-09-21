@@ -46,7 +46,7 @@ class PipelinesViewModelTest : TestBase() {
         assertNotNull(nodes)
         assertFalse(nodes!!.isEmpty())
         val mockedPage = mockProjectPipelinesData.project!!.pipelines!!.pageInfo
-        val mockedNodes = mockProjectPipelinesData.project!!.pipelines!!.nodes
+        val mockedNodes = mockProjectPipelinesData.project.pipelines.nodes
         for (i in 0 until nodes.size) {
             assertNotNullAndEquals(
                 nodes[i]!!.id,
@@ -67,11 +67,11 @@ class PipelinesViewModelTest : TestBase() {
             assertNotNullAndEquals(nodes[i]!!.finishedAt, mockedNodes[i]!!.finishedAt!!)
             assertNotNullAndEquals(nodes[i]!!.ref, mockedNodes[i]!!.ref!!)
         }
-        val page = pipelines!!.pageInfo
+        val page = pipelines.pageInfo
         assertNotNullAndEquals(page.startCursor, mockedPage.startCursor!!)
-        assertNotNullAndEquals(page.hasNextPage, mockedPage!!.hasNextPage)
+        assertNotNullAndEquals(page.hasNextPage, mockedPage.hasNextPage)
         assertNotNullAndEquals(page.endCursor, mockedPage.endCursor!!)
-        assertNotNullAndEquals(page.hasPreviousPage, mockedPage!!.hasPreviousPage)
+        assertNotNullAndEquals(page.hasPreviousPage, mockedPage.hasPreviousPage)
     }
 
 }

@@ -106,50 +106,50 @@ fun PersonalProjects(
             personalProjectsViewModel.loadAllProjects()
         }
     }
-    currUser?.namespace?.projects?.nodes?.let { nodes ->
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(x)
-                .background(Color.Black)
-        ) {
+        currUser?.namespace?.projects?.nodes?.let { nodes ->
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(x)
+                    .background(Color.Black)
+            ) {
             if (currUser?.namespace?.projects?.nodes?.isEmpty() != true && currUser?.avatarUrl != null) {
-                Row(
-                    modifier = Modifier
-                        .background(Color.Black)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Your Projects",
-                        fontFamily = titleFont,
-                        fontSize = 20.sp,
+                    Row(
                         modifier = Modifier
-                            .weight(1.0f)
-                            .offset(20.dp, 0.dp),
-                        textAlign = TextAlign.Center
-                    )
-                    IconButton(
-                        onClick = { personalProjectsViewModel.refreshProjects() },
-                        modifier = Modifier.weight(0.1f)
+                            .background(Color.Black)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        Icon(Icons.Default.Refresh, contentDescription = null)
+                        Text(
+                            text = "Your Projects",
+                            fontFamily = titleFont,
+                            fontSize = 20.sp,
+                            modifier = Modifier
+                                .weight(1.0f)
+                                .offset(20.dp, 0.dp),
+                            textAlign = TextAlign.Center
+                        )
+                        IconButton(
+                        onClick = { personalProjectsViewModel.refreshProjects() },
+                            modifier = Modifier.weight(0.1f)
+                        ) {
+                            Icon(Icons.Default.Refresh, contentDescription = null)
+                        }
                     }
-                }
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(0.dp),
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     state = listState
-                ) {
-                    items(nodes, key = { item -> item?.id ?: Any() }) { item ->
-                        item?.let { ProjectItem(currUser, it, loader, navController) }
+                    ) {
+                        items(nodes, key = { item -> item?.id ?: Any() }) { item ->
+                            item?.let { ProjectItem(currUser, it, loader, navController) }
+                        }
                     }
                 }
             }
         }
-    }
 
 }
