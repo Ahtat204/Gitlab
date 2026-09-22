@@ -8,24 +8,22 @@ import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.isConnected
-import com.ahtat204.gitlab.domain.usecase.logging.logger
+import com.ahtat204.gitlab.domain.authentication.AuthStorage
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens.isConnected
+import com.ahtat204.gitlab.domain.logging.logger
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
-import okio.IOException
 
 /**
  * LauncherActivity is the entry point of the application.
  *
  * ## Responsibilities
  * - Displays the splash screen while authentication state is being checked.
- * - Initializes [net.openid.appauth.AuthorizationService] and sets up token context in [com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens].
+ * - Initializes [net.openid.appauth.AuthorizationService] and sets up token context in [Tokens].
  * - Ensures cache directory (`gitlab/httpCache`) exists for Apollo/HTTP caching.
  * - Determines whether to navigate to [MainActivity] (authenticated) or
  *   [AuthenticationActivity] (login required).
@@ -64,13 +62,23 @@ class LauncherActivity : ComponentActivity() {
         authenticationService = AuthorizationService(this)
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
-        if(!isConnected()){
-            navigateTo(MainActivity::class.java)
-            logger("no Internet Connection")
-        }
-        if(isConnected()){
-            CoroutineScope(Dispatchers.IO).launch {
-                refresh { isReady = true }
+        lifecycleScope.launch(Dispatchers.IO) {
+            val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
+
+            if (!storedState.isAuthorized) {
+                isReady = true
+                navigateTo(AuthenticationActivity::class.java)
+            } else {
+                // Even if offline, we load the cached state so tokens are ready
+                if (isConnected()) {
+                    refresh { isReady = true }
+                } else {
+                    // If offline, just load from cache and proceed
+                    Tokens.CurrentAuthState = storedState
+                    Tokens.accessToken = storedState.accessToken
+                    isReady = true
+                    navigateTo(MainActivity::class.java)
+                }
             }
         }
     }

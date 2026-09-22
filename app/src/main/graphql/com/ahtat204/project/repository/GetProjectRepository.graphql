@@ -4,7 +4,9 @@ query GetProjectRepository($projectPath:ID!,$branch:String,$path:String){
         name
         repository {
             rootRef
-            tree(ref: $branch,path:$path ){
+
+            tree(ref: $branch,path:$path){
+                __typename
                 lastCommit(ref: $branch){
                     message
                     id

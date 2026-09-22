@@ -1,12 +1,16 @@
 package com.ahtat204.gitlab.domain.di
 
+import android.util.Log
 import com.ahtat204.gitlab.data.queries.cache.Cache.cache
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig.GRAPHQL_URL
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.authentication.constants.AuthConfig.GRAPHQL_URL
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens.isConnected
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
 import com.apollographql.apollo.network.http.DefaultHttpEngine
 import com.apollographql.apollo.network.http.HttpNetworkTransport
+import com.apollographql.cache.normalized.logCacheMisses
 import com.apollographql.cache.normalized.memory.MemoryCacheFactory
 import dagger.Module
 import dagger.Provides
@@ -54,6 +58,7 @@ object ApolloModule {
      * @return A fully configured Apollo client with authentication, logging,
      *         and normalized caching enabled.
      */
+    @OptIn(ApolloExperimental::class)
     @Singleton
     @Provides
     fun getApolloService(okHttpClient: OkHttpClient): ApolloClient {
@@ -61,8 +66,9 @@ object ApolloModule {
         val requestComposer = DefaultHttpRequestComposer(GRAPHQL_URL)
         val networkTransport = HttpNetworkTransport.Builder().httpEngine(httpEngine)
             .httpRequestComposer(requestComposer).build()
-        return ApolloClient.Builder().networkTransport(networkTransport).cache(
-            cacheFactory, writeToCacheAsynchronously = false
-        ).build()
+        return ApolloClient.Builder().networkTransport(networkTransport)
+            .logCacheMisses { Log.i("com.ahtat204.gitlab.domain.di", it) }
+            .cache(normalizedCacheFactory = cacheFactory, writeToCacheAsynchronously = true)
+            .retryOnError { isConnected() }.failFastIfOffline(true).build()
     }
 }

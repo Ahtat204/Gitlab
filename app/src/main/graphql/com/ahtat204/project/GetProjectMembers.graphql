@@ -1,0 +1,23 @@
+query GetProjectMembers($project:ID!,$cursor:String){
+    project(fullPath: $project){
+        id
+        projectMembers(first: 20,after: $cursor){
+            nodes {
+                id
+                user {
+                    name
+                    username
+                    bio
+
+                }
+                createdAt
+            }
+            pageInfo {
+                endCursor
+                hasPreviousPage
+                hasNextPage
+                startCursor
+            }
+        }
+    }
+}
