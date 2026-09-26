@@ -290,4 +290,10 @@ class ApolloGraphQLRepositoryTest {
         assertNull(user2?.bio)
 
     }
+
+    @Test
+    fun getProjectIssuesTest() = runTest {
+
+    }
+
 }

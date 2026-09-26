@@ -1,6 +1,8 @@
 package com.ahtat204.gitlab.data
 
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
@@ -220,6 +222,100 @@ suspend fun Flow<GetMyPersonalProjectsQuery.Data>.fetchAndMergeProjects(
             }
         return this
     } catch (e: Throwable) {
+        throw e
+    }
+}
+
+/**
+ * Merges a new page of project issues into the existing cached list and updates the Apollo store.
+ *
+ * Similar to [fetchAndMergeCommits], this function handles the manual merging logic for issues.
+ * It ensures that pagination doesn't overwrite previously loaded issues in the UI.
+ *
+ * @receiver A [Flow] emitting the latest [GetProjectIssuesQuery.Data] (the new page).
+ * @param client The [ApolloClient] instance providing access to the [apolloStore].
+ * @param id The project identifier or full path.
+ * @param cursor The pagination cursor. If null, the function returns the original flow (base case).
+ * @return A [Flow] emitting the merged [GetProjectIssuesQuery.Data].
+ * @throws Throwable Propagates any errors encountered during the process.
+ */
+suspend fun Flow<GetProjectIssuesQuery.Data>.fetchAndMergeIssues(
+    id: String,
+    client: ApolloClient, cursor: String? = null
+): Flow<GetProjectIssuesQuery.Data> {
+    if (cursor == null) return this
+    try {
+        val query = GetProjectIssuesQuery(id)
+        var cachedData = client.query(
+            query
+        ).fetchPolicy(FetchPolicy.CacheOnly).execute().dataAssertNoErrors
+        val project = cachedData.project ?: return this
+        var issues = project.issues ?: return this
+        val nodes = issues.nodes.orEmpty()
+        val newIssues = this.first().project?.issues
+        val newNodes = newIssues?.nodes
+        val newPage = newIssues!!.pageInfo
+        if (newNodes.isNullOrEmpty()) return this
+        val totalNodes = nodes + newNodes
+        issues = issues.copy(nodes = totalNodes, pageInfo = newPage)
+        cachedData = GetProjectIssuesQuery.Data(
+            project.copy(
+                issues = issues
+            )
+        )
+        client.apolloStore.writeOperation(operation = query, publish = true, data = cachedData)
+            .also { keys ->
+                client.apolloStore.publish(keys)
+            }
+        return this
+    } catch (e: Exception) {
+        throw e
+    }
+}
+
+/**
+ * Merges a new page of project members into the existing cached list and updates the Apollo store.
+ *
+ * Similar to [fetchAndMergeCommits], this function handles the manual merging logic for members.
+ * It ensures that pagination doesn't overwrite previously loaded members in the UI.
+ *
+ * @receiver A [Flow] emitting the latest [GetProjectMembersQuery.Data] (the new page).
+ * @param client The [ApolloClient] instance providing access to the [apolloStore].
+ * @param id The project identifier or full path.
+ * @param cursor The pagination cursor. If null, the function returns the original flow (base case).
+ * @return A [Flow] emitting the merged [GetProjectMembersQuery.Data].
+ * @throws Throwable Propagates any errors encountered during the process.
+ */
+suspend fun Flow<GetProjectMembersQuery.Data>.fetchAndMergeMembers(
+    id: String,
+    client: ApolloClient, cursor: String? = null
+): Flow<GetProjectMembersQuery.Data> {
+    if (cursor == null) return this
+    try {
+        val query = GetProjectMembersQuery(id)
+        var cachedData = client.query(
+            query
+        ).fetchPolicy(FetchPolicy.CacheOnly).execute().dataAssertNoErrors
+        val project = cachedData.project ?: return this
+        var members = project.projectMembers ?: return this
+        val nodes = members.nodes.orEmpty()
+        val newMembers = this.first().project?.projectMembers
+        val newNodes = newMembers?.nodes
+        val newPage = newMembers!!.pageInfo
+        if (newNodes.isNullOrEmpty()) return this
+        val totalNodes = nodes + newNodes
+        members = members.copy(nodes = totalNodes, pageInfo = newPage)
+        cachedData = GetProjectMembersQuery.Data(
+            project.copy(
+                projectMembers = members
+            )
+        )
+        client.apolloStore.writeOperation(operation = query, publish = true, data = cachedData)
+            .also { keys ->
+                client.apolloStore.publish(keys)
+            }
+        return this
+    } catch (e: Exception) {
         throw e
     }
 }
