@@ -1,6 +1,8 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.fetchAndMergeIssues
+import com.ahtat204.gitlab.data.fetchAndMergeMembers
 import com.ahtat204.gitlab.data.fetchAndMergePipelines
 import com.ahtat204.gitlab.data.fetchAndMergeProjects
 import com.ahtat204.gitlab.data.mapAndHandleErrors
@@ -494,7 +496,7 @@ class ApolloGraphQLRepository @Inject constructor(
             )
         ).fetchPolicy(
             FetchPolicy.CacheFirst
-        ).watch().mapAndHandleErrors()
+        ).watch().mapAndHandleErrors().fetchAndMergeMembers(project, apolloClient, cursor)
     }
 
     /**
@@ -603,7 +605,7 @@ class ApolloGraphQLRepository @Inject constructor(
             )
         ).fetchPolicy(
             FetchPolicy.CacheFirst
-        ).watch().mapAndHandleErrors()
+        ).watch().mapAndHandleErrors().fetchAndMergeIssues(id, apolloClient, cursor)
     }
 
 }
