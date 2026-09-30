@@ -11,6 +11,7 @@ import com.ahtat204.gitlab.data.queries.type.IssueState
 
 val mockedIssues = Data(
     project = Project(
+        id = "gid://gitlab/Project/101",
         __typename = "Project",
         issues = Issues(
             __typename = "IssuesConnection",

@@ -1,5 +1,6 @@
 query GetProjectIssues($projectPath:ID!,$cursor:String){
     project(fullPath: $projectPath){
+        id
         issues(sort: CREATED_DESC,first: 20,after: $cursor){
             nodes {
                 id

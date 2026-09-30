@@ -4,6 +4,7 @@ val mockedIssues = """
   {
    "data": {
       "project": {
+      "id":"gid://gitlab/Project/101",
         "__typename": "Project",
         "issues": {
           "__typename": "IssuesConnection",
@@ -13,7 +14,7 @@ val mockedIssues = """
               "id": "issue_001",
               "name": "bug-fix-auth",
               "title": "Fix authentication token expiration bypass",
-              "state": "OPEN",
+              "state": "opened",
               "createdAt": "2026-09-26T16:26:00Z",
               "assignees": {
                 "__typename": "AssigneeConnection",
@@ -34,14 +35,14 @@ val mockedIssues = """
               "id": "issue_002",
               "name": "feature-dark-mode",
               "title": "Implement dark mode theme across dashboard",
-              "state": "CLOSED",
+              "state": "closed",
               "createdAt": "2026-09-25T10:00:00Z",
               "assignees": {
                 "__typename": "AssigneeConnection",
                 "nodes": [
                   {
                     "__typename": "User",
-                    "name": "Taylor Swift"
+                    "name": "Taylor Rake"
                   }
                 ]
               }
