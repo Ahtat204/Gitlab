@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-typealias Issues = GetProjectIssuesQuery.Data?
+typealias Issues = GetProjectIssuesQuery.Project?
 
 @HiltViewModel
 class IssuesViewModel @Inject constructor(private val projectRepository: GraphQlRepository) :
@@ -22,15 +22,16 @@ class IssuesViewModel @Inject constructor(private val projectRepository: GraphQl
         val value = _issues.value
         if (value == null) {
             viewModelScope.launch {
-                projectRepository.getProjectIssues(id).collect { _issues.value = it }
+                projectRepository.getProjectIssues(id).collect { _issues.value = it.project }
             }
         } else {
-            val page = value.project?.issues?.pageInfo
+            val page = value.issues?.pageInfo
             val hasNextPage = page?.hasNextPage
             val endCursor = page?.endCursor
             if (hasNextPage == true && endCursor != null) {
                 viewModelScope.launch {
-                    projectRepository.getProjectIssues(id, endCursor).collect { _issues.value = it }
+                    projectRepository.getProjectIssues(id, endCursor)
+                        .collect { _issues.value = it.project }
                 }
             }
         }
