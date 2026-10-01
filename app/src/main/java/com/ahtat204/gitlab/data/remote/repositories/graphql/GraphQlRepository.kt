@@ -4,6 +4,7 @@ import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
@@ -25,10 +26,11 @@ import kotlinx.coroutines.flow.Flow
  *
  * ### Key Responsibilities:
  * - **User Dashboard**: Fetching personal projects [getAllPersonalProjects] and user profile [getMyProfile].
- * - **Project Intelligence**: Retrieving detailed project statistics [getProjectById] and user-specific projects [getUserProjectsByName].
+ * - **Project Intelligence**: Retrieving detailed project statistics [getProjectById] and user-specific projects [getUserProjectsByName],Project Issues [getProjectIssues].
  * - **Repository Browsing**: Accessing file hierarchies [getProjectRepository] and commit histories [getProjectCommits].
  * - **Git Metadata**: Listing repository branches [getRepositoryBranches].
  * - **CI/CD Visibility**: Monitoring project pipelines [getProjectPipelines].
+
  *
  * ### Cache Strategy:
  * Implementations should prioritize Apollo's normalized cache to ensure snappy UI transitions
@@ -153,4 +155,19 @@ interface GraphQlRepository {
     suspend fun getProjectMembers(
         project: String, cursor: String? = null
     ): Flow<GetProjectMembersQuery.Data>
+
+    /**
+     * Streams a continuous, sequentially chunked record of first 20 issues in a project.
+     *
+     * Implementations are expected to manage incremental page updates and item appending states.
+     *
+     * @param id The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the combined commit log historical records, or null if missing.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     */
+    suspend fun getProjectIssues(
+        id: String,
+        cursor: String? = null
+    ): Flow<GetProjectIssuesQuery.Data>
 }

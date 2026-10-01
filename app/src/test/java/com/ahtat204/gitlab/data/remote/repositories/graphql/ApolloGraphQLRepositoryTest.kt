@@ -1,11 +1,13 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.queries.cache.Cache.cache
+import com.ahtat204.gitlab.data.queries.type.IssueState
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.json.mockedAllProjects
 import com.ahtat204.gitlab.reponses.json.mockedBranches
 import com.ahtat204.gitlab.reponses.json.mockedCommits
+import com.ahtat204.gitlab.reponses.json.mockedIssues
 import com.ahtat204.gitlab.reponses.json.mockedMembers
 import com.ahtat204.gitlab.reponses.json.mockedPipelines
 import com.ahtat204.gitlab.reponses.json.mockedProject
@@ -290,4 +292,42 @@ class ApolloGraphQLRepositoryTest {
         assertNull(user2?.bio)
 
     }
+
+    @Test
+    fun getProjectIssuesTest() = runTest {
+        val projectId = "gid://gitlab/Project/101"
+        mockWebserver.enqueue(
+            MockResponse().setResponseCode(200).setBody(mockedIssues)
+        )
+        val result = repository.getProjectIssues(projectId).first()
+        val project = result.project
+        assertNotNull(project)
+        val issues = project?.issues
+        assertNotNull(issues)
+        val nodes = issues?.nodes
+        assertNotNull(nodes)
+        assertFalse(nodes!!.isEmpty())
+        val first = nodes[0]!!
+        assertNotNullAndEquals(first.id, "issue_001")
+        assertNotNullAndEquals(first.name, "bug-fix-auth")
+        assertNotNullAndEquals(first.state, IssueState.opened)
+        assertNotNullAndEquals(first.title, "Fix authentication token expiration bypass")
+        assertNotNull(first.assignees)
+        assertNotNull(first.assignees?.nodes)
+        assertNotNullAndEquals(first.assignees?.nodes?.first()?.name, "Alex Smith")
+        assertNotNullAndEquals(first.assignees?.nodes?.get(1)?.name, "Jordan Doe")
+        val second = nodes[1]
+        assertNotNullAndEquals(second?.id, "issue_002")
+        assertNotNullAndEquals(second?.name, "feature-dark-mode")
+        assertNotNullAndEquals(second?.state, IssueState.closed)
+        assertNotNullAndEquals(second?.title, "Implement dark mode theme across dashboard")
+        assertNotNull(second?.assignees)
+        assertNotNull(second?.assignees?.nodes)
+        assertNotNullAndEquals(second?.assignees?.nodes?.first()?.name, "Taylor Rake")
+        val page = issues.pageInfo
+        assertNotNullAndEquals(page.startCursor, "eyJjdXJzb3IiOiJpc3N1ZV8wMDEifQ==")
+        assertNotNullAndEquals(page.hasNextPage, true)
+        assertNotNullAndEquals(page.endCursor, "eyJjdXJzb3IiOiJpc3N1ZV8wMDIifQ==")
+    }
+
 }
