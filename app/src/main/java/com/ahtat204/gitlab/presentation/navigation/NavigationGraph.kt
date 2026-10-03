@@ -13,6 +13,7 @@ import androidx.navigation.navigation
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
+import com.ahtat204.gitlab.presentation.screens.project.MergeRequests
 import com.ahtat204.gitlab.presentation.screens.project.Members
 import com.ahtat204.gitlab.presentation.screens.project.Pipelines
 import com.ahtat204.gitlab.presentation.screens.Projects
@@ -99,6 +100,10 @@ fun BottomNavigationGraph(
                 val projectId = backStackEntry.arguments?.getString("projectId")
                 projectId?.let { ProjectDetailScreen(navController,x, it)
                 }
+            }
+            composable(route = "mergerequests?projectId={projectId}",arguments = listOf(navArgument("projectId") { defaultValue = "" })) {backStackEntry ->
+                   val projectId=backStackEntry.arguments?.getString("projectId")
+                projectId?.let{ MergeRequests(it,navController,x) }
             }
             composable(
                 route = "pipelines?projectId={projectId}",

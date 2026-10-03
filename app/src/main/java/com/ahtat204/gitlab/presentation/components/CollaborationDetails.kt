@@ -52,7 +52,7 @@ fun CollaborationDetails(
     mergeRequestCount: Int?,
     pipelinesCount: Int?,
     navController: NavController,
-    encodedId: String
+    encodedId:String
 ) {
     Column(
         modifier = Modifier
@@ -67,7 +67,7 @@ fun CollaborationDetails(
                 Item(
                     "Merge Requests", "merge_requests", R.drawable.mergerequest, it
                 )
-            ) {}
+            ) {navController.navigate("mergerequests?projectId=$encodedId")}
         }
         ProjectWorkItems(
             Item(
@@ -76,7 +76,7 @@ fun CollaborationDetails(
         pipelinesCount?.let {
             ProjectWorkItems(
                 Item(
-                    "WorkItems", "proshaject/{id]/workitems", R.drawable.workitems, null
+                    "WorkItems", "project/{id]/workitems", R.drawable.workitems, null
                 )
             ) {}
         }
