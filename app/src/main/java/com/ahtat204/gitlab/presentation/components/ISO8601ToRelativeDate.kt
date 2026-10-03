@@ -7,8 +7,8 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.logging.Logger
 import kotlin.math.abs
+
 /**
  * Converts an ISO 8601 date-time string with offset into a human-readable relative time string.
  *
@@ -56,10 +56,14 @@ fun iso8601ToRelative(iso8601: String): String {
             else -> formatRelative(abs(secondsDiff), future = false)
         }
     } catch (e: Exception) {
-       Log.d("invalid Date Format","\"Invalid date format. Expected ISO 8601 with offset (e.g., 2026-04-22T17:41:15+02:00)\"")
+        Log.e(
+            "invalid Date Format",
+            "\"Invalid date format. Expected ISO 8601 with offset (e.g., 2026-04-22T17:41:15+02:00)\""
+        )
         throw e
     }
 }
+
 /**
  * Formats a time difference in seconds into a relative string.
  *
@@ -80,7 +84,7 @@ fun iso8601ToRelative(iso8601: String): String {
  * println(result) // "1 hour ago"
  * ```
  */
-private fun formatRelative(seconds: Long, future: Boolean): String {
+fun formatRelative(seconds: Long, future: Boolean): String {
     val minutes = seconds / 60
     val hours = minutes / 60
     val days = hours / 24

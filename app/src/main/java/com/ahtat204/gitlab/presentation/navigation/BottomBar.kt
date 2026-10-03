@@ -1,7 +1,8 @@
 package com.ahtat204.gitlab.presentation.navigation
+
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Text
@@ -12,7 +13,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
 
 
 /**
@@ -26,7 +27,10 @@ import com.ahtat204.gitlab.presentation.ui.theme.Orange
 @Composable
 fun BottomBar(navController: NavHostController) {
     val items = listOf(
-        BottomBarScreen.Home, BottomBarScreen.Activity,BottomBarScreen.Explore,BottomBarScreen.Profile
+        BottomBarScreen.Home,
+        BottomBarScreen.Activity,
+        BottomBarScreen.Explore,
+        BottomBarScreen.Profile
     )
 
     // Observe the current back stack entry to highlight the selected item
@@ -71,13 +75,13 @@ fun RowScope.AddItem(
                 contentDescription = "${screen.title} icon"
             )
         }, colors = NavigationBarItemColors(
-            selectedIconColor =Color.White,
-            selectedTextColor =Orange,
-            selectedIndicatorColor =Orange,
-            unselectedIconColor =Color.White,
-            unselectedTextColor =Color.White,
-            disabledIconColor =Orange,
-            disabledTextColor =Orange
+            selectedIconColor = Color.White,
+            selectedTextColor = Orange,
+            selectedIndicatorColor = Orange,
+            unselectedIconColor = Color.White,
+            unselectedTextColor = Color.White,
+            disabledIconColor = Orange,
+            disabledTextColor = Orange
         ),
         alwaysShowLabel = true
     )

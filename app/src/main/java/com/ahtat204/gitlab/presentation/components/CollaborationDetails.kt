@@ -69,11 +69,10 @@ fun CollaborationDetails(
                 )
             ) {navController.navigate("mergerequests?projectId=$encodedId")}
         }
-            ProjectWorkItems(
-                Item(
-                    "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, null
-                )
-            ) {}
+        ProjectWorkItems(
+            Item(
+                "Pipelines", "project/{id}/pipelines", R.drawable.pipeline, null
+            ), openScreen = { navController.navigate("pipelines?projectId=$encodedId") })
         pipelinesCount?.let {
             ProjectWorkItems(
                 Item(
@@ -85,7 +84,7 @@ fun CollaborationDetails(
                 Item(
                     "Members", "project/{id}/members", R.drawable.members, null
                 )
-            ) {}
+            ) {navController.navigate("members?projectId=$encodedId")}
     }
 
 }

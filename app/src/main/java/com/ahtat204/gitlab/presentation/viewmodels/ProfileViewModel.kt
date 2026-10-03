@@ -15,25 +15,25 @@ import javax.inject.Inject
 /**
  * ViewModel responsible for managing the user's profile state and data retrieval.
  *
- * This ViewModel acts as an intermediary between the UI layer and the [ProfileRepository],
- * handling data fetching, caching strategies, and state exposure. It utilizes [StateFlow]
+ * This ViewModel acts as an intermediary between the UI layer and the [GraphQlRepository],
+ * handling data fetching, caching strategies, and state exposure. It utilizes [MutableStateFlow]
  * to provide a thread-safe, observable stream of the current user's profile information.
  *
- * @property graphqlRepository The repository instance responsible for data access,
+ * @property repository The repository instance responsible for data access,
  * injected via Hilt.
  *
  * @see GetMyProfileQuery
  */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val graphqlRepository: GraphQlRepository
+    private val repository: GraphQlRepository
 ) : ViewModel() {
     private val profile = MutableStateFlow<GetMyProfileQuery.CurrentUser?>(null)
 
     /**
      * Exposes the current user's profile as an immutable [kotlinx.coroutines.flow.StateFlow].
      */
-    val currentUser = profile.asStateFlow()
+    val currentUser get() = profile.asStateFlow()
 
     /**
      * Loads the profile information.
@@ -45,7 +45,7 @@ class ProfileViewModel @Inject constructor(
      */
     fun loadProfile() {
         viewModelScope.launch {
-            graphqlRepository.getMyProfile().collect { profile.value = it.currentUser }
+            repository.getMyProfile().collect { profile.value = it.currentUser }
         }
 
     }

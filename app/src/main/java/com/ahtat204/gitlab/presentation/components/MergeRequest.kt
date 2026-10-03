@@ -29,9 +29,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
-import com.ahtat204.gitlab.presentation.ui.theme.Background
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Background
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
 
 typealias MergeRequest = GetProjectMergeRequestsQuery.Node?
 

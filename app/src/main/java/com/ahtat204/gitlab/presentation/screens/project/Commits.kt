@@ -76,7 +76,7 @@ fun ProjectCommits(
     id: String,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
-    if (id == "") return
+    if (id.isEmpty()) return
     val commits by repositoryViewModel.commits.collectAsStateWithLifecycle()
     LaunchedEffect(id) {
         repositoryViewModel.loadProjectCommits(id,branch)
@@ -88,7 +88,7 @@ fun ProjectCommits(
             val totalItems = listState.layoutInfo.totalItemsCount
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
             // Trigger load when user is 3 items away from the bottom
-            totalItems > 9 && lastVisibleItem >= totalItems - 9
+            totalItems > 3 && lastVisibleItem >= totalItems - 2
         }
     }
     LaunchedEffect(shouldLoadMore.value) {
