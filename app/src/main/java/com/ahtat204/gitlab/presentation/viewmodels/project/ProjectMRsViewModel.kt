@@ -49,9 +49,23 @@ class ProjectMRsViewModel @Inject constructor(
      * @param id The unique identifier or full path of the GitLab project.
      */
     fun loadProjectMRs(id: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getProjectMergeRequests(id).collect {
-                _mrs.value = it.project?.mergeRequests
+        val page = mrs.value?.pageInfo
+        val cursor = page?.endCursor
+        val hasNextPage = page?.hasNextPage
+        val isFirstPage = page?.startCursor
+        if (isFirstPage == null) { //first page
+            viewModelScope.launch {
+                repository.getProjectMergeRequests(
+                    id = id, cursor = null
+                ).collect { _mrs.value = it.project?.mergeRequests }
+            }
+        } else {
+            if (hasNextPage == true && cursor != null) {
+                viewModelScope.launch {
+                    repository.getProjectMergeRequests(
+                        id = id, cursor = cursor
+                    ).collect { _mrs.value = it.project?.mergeRequests }
+                }
             }
         }
     }

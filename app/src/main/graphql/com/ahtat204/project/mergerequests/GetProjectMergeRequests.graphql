@@ -1,5 +1,6 @@
 query GetProjectMergeRequests($project:ID!,$cursor:String){
     project(fullPath: $project){
+        id
         mergeRequests(sort: CREATED_DESC,first: 20,after:$cursor ){
             nodes{
                 id
