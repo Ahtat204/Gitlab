@@ -1,12 +1,14 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.queries.cache.Cache.cache
+import com.ahtat204.gitlab.data.queries.type.MergeRequestState
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.json.mockedAllProjects
 import com.ahtat204.gitlab.reponses.json.mockedBranches
 import com.ahtat204.gitlab.reponses.json.mockedCommits
 import com.ahtat204.gitlab.reponses.json.mockedMembers
+import com.ahtat204.gitlab.reponses.json.mockedMrs
 import com.ahtat204.gitlab.reponses.json.mockedPipelines
 import com.ahtat204.gitlab.reponses.json.mockedProject
 import com.ahtat204.gitlab.reponses.json.mockedProjects
@@ -18,7 +20,6 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -269,7 +270,7 @@ class ApolloGraphQLRepositoryTest {
         assertNotNullAndEquals(page?.hasNextPage, true)
         val nodes = members?.nodes
         assertNotNull(nodes)
-        Assert.assertFalse(nodes?.size == 0)
+        assertFalse(nodes?.size == 0)
         ////////////////////////////////////////////////////////////
         val one = nodes!![0]
         assertNotNullAndEquals(one?.id, "gid://gitlab/ProjectMember/1")
@@ -288,6 +289,74 @@ class ApolloGraphQLRepositoryTest {
         assertNotNullAndEquals(user2?.name, "GitLab Bot")
         assertNotNullAndEquals(user2?.username, "project_101_bot")
         assertNull(user2?.bio)
+
+    }
+
+    @Test
+    fun getProjectMergeRequest() = runTest {
+        val projectId = "gid://gitlab/Project/101"
+        mockWebserver.enqueue(
+            MockResponse().setResponseCode(200).setBody(mockedMrs)
+        )
+        val data = repository.getProjectMergeRequests(projectId).first()
+        val mrs = data.project?.mergeRequests
+        assertNotNull(mrs)
+        val page = mrs?.pageInfo
+        assertNotNull(page)
+        assertNotNullAndEquals(page?.endCursor, "eyJpZCI6IjEyMzQ1In0")
+        assertNotNullAndEquals(page?.startCursor, "eyJpZCI6IjEyMzQ1In0")
+        assertNotNullAndEquals(page?.hasNextPage, false)
+        assertNotNullAndEquals(page?.hasPreviousPage, false)
+        val nodes = mrs?.nodes
+        assertNotNull(nodes)
+        nodes!!
+        assertFalse(nodes.isEmpty())
+        val one = nodes[0]
+        assertNotNull(one)
+        one!!
+        assertNotNullAndEquals(one.name, "Features/implement-auth-flow")
+        assertNotNullAndEquals(one.iid, "42")
+
+        assertNotNullAndEquals(one.createdAt, "2026-10-04T21:40:00Z")
+        assertNotNullAndEquals(one.conflicts, false)
+        assertNotNullAndEquals(one.id, "gid://gitlab/MergeRequest/12345")
+        assertNotNullAndEquals(one.updatedAt, "2026-10-04T21:45:00Z")
+        assertNotNullAndEquals(one.state, MergeRequestState.opened)
+        assertNotNullAndEquals(one.targetBranch, "main")
+        assertNotNullAndEquals(one.sourceBranch, "features/implement-auth-flow")
+        //labels
+        val labels = one.labels
+        assertNotNull(labels)
+        labels!!
+        val labelNodes = labels.nodes
+        assertNotNull(labelNodes)
+        labelNodes!!
+        assertFalse(labelNodes.isEmpty())
+        val firstLabel = labelNodes[0]
+        assertNotNull(firstLabel)
+        firstLabel!!
+        assertNotNullAndEquals(firstLabel.id, "gid://gitlab/Label/789")
+        assertNotNullAndEquals(firstLabel.title, "bugfix")
+        assertNotNullAndEquals(firstLabel.color, "#FF0000")
+        //pipelines
+        val pipelines = one.pipelines?.edges
+        assertNotNull(pipelines)
+        pipelines!!
+        val firstPipeline = pipelines[0]
+        assertNotNull(firstPipeline)
+        firstPipeline!!
+        val firstPipelineNode = firstPipeline.node
+        assertNotNull(firstPipelineNode)
+        firstPipelineNode!!
+        assertNotNullAndEquals(firstPipelineNode.id, "gid://gitlab/Ci::Pipeline/98765")
+        assertNotNullAndEquals(firstPipelineNode.status, PipelineStatusEnum.SUCCESS)
+        // author
+        val author = one.author
+        assertNotNull(author)
+        author!!
+        val authorName = author.name
+        assertNotNullAndEquals(authorName, "Jane Doe")
+
 
     }
 }
