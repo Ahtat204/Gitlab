@@ -15,7 +15,7 @@ import javax.inject.Inject
 /**
  * Type alias for the MergeRequests data structure from the GraphQL query.
  */
-typealias MergeRequests = GetProjectMergeRequestsQuery.MergeRequests?
+typealias MergeRequests = GetProjectMergeRequestsQuery.Project?
 
 /**
  * ViewModel responsible for managing and providing Merge Request data for a specific GitLab project.
@@ -49,7 +49,7 @@ class ProjectMRsViewModel @Inject constructor(
      * @param id The unique identifier or full path of the GitLab project.
      */
     fun loadProjectMRs(id: String) {
-        val page = mrs.value?.pageInfo
+        val page = mrs.value?.mergeRequests?.pageInfo
         val cursor = page?.endCursor
         val hasNextPage = page?.hasNextPage
         val isFirstPage = page?.startCursor
@@ -57,16 +57,25 @@ class ProjectMRsViewModel @Inject constructor(
             viewModelScope.launch {
                 repository.getProjectMergeRequests(
                     id = id, cursor = null
-                ).collect { _mrs.value = it.project?.mergeRequests }
+                ).collect { _mrs.value = it.project }
             }
         } else {
             if (hasNextPage == true && cursor != null) {
                 viewModelScope.launch {
                     repository.getProjectMergeRequests(
                         id = id, cursor = cursor
-                    ).collect { _mrs.value = it.project?.mergeRequests }
+                    ).collect { _mrs.value = it.project }
                 }
             }
+        }
+    }
+
+    fun refreshMrs(project: String) {
+        val scope = viewModelScope
+        scope.launch {
+            repository.refresh(GetProjectMergeRequestsQuery.Data(_mrs.value))
+            _mrs.value = null
+            loadProjectMRs(project)
         }
     }
 }

@@ -52,6 +52,7 @@ fun Pipelines(
     x: PaddingValues,
     pipelinesViewModel: PipelinesViewModel = hiltViewModel()
 ) {
+    if (project.isEmpty()) return
     val listState = rememberLazyListState()
     val status by remember { mutableStateOf<PipelineStatusEnum>(PipelineStatusEnum.SUCCESS) }
     LaunchedEffect(status) {

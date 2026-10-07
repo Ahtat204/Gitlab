@@ -41,7 +41,7 @@ class ProjectMRsViewModelTest : TestBase() {
             )
         )
         viewModel.loadProjectMRs(projectId)
-        val mrs = viewModel.mrs.value
+        val mrs = viewModel.mrs.value?.mergeRequests
         assertNotNull(mrs)
         val nodes = mrs?.nodes
         assertNotNull(nodes)

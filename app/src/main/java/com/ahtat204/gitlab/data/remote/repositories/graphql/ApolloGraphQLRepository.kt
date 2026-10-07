@@ -1,15 +1,17 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
-import com.ahtat204.gitlab.data.fetchAndMergeCommits
-import com.ahtat204.gitlab.data.fetchAndMergePipelines
-import com.ahtat204.gitlab.data.fetchAndMergeProjects
-import com.ahtat204.gitlab.data.mapAndHandleErrors
+import com.ahtat204.gitlab.data.helpers.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.helpers.fetchAndMergeMRs
+import com.ahtat204.gitlab.data.helpers.fetchAndMergeMembers
+import com.ahtat204.gitlab.data.helpers.fetchAndMergePipelines
+import com.ahtat204.gitlab.data.helpers.fetchAndMergeProjects
+import com.ahtat204.gitlab.data.helpers.mapAndHandleErrors
 import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
-import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -119,62 +121,6 @@ class ApolloGraphQLRepository @Inject constructor(
         apolloClient.query(GetMyPersonalProjectsQuery(Optional.presentIfNotNull(cursor)))
             .fetchPolicy(FetchPolicy.CacheFirst).watch()
             .mapAndHandleErrors().fetchAndMergeProjects(client = apolloClient, cursor)
-
-    /**
-     * Retrieves the first 20 merge request for a given project.
-     *
-     * @param id The unique identifier of the project.
-     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
-     * @return A [Flow] emitting [GetProjectMergeRequestsQuery.Data] objects, or null if unavailable.
-     *
-     * ### Behavior
-     * - Executes [GetProjectMergeRequestsQuery] with the provided project ID.
-     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
-     * - Emits results reactively via Flow.
-     * - Uses Apollo’s [watch] to continuously observe changes.
-     * - Logs errors without terminating the stream.
-     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
-     *
-     * ### Example
-     * ```kotlin
-     * viewModelScope.launch {
-     *     projectRepository.getProjectMergeRequests("12345")
-     *         .collect { repoTree -> renderRepoTree(repoTree) }
-     * }
-     * ```
-     * query example
-     * ``` GraphQL
-     *  project(fullPath: $project){
-     *         mergeRequests(sort: CREATED_DESC,first: 20,after:$cursor ){
-     *             nodes{
-     *                 id
-     *                 name
-     *                 author {
-     *                     name
-     *                 }
-     *                 createdAt
-     *                 state
-     *                 sourceBranch
-     *                 targetBranch
-     *             }
-     *             pageInfo {
-     *                 startCursor
-     *                 hasNextPage
-     *             }
-     *         }
-     *     }
-     * ```
-     */
-    override suspend fun getProjectMergeRequests(
-        id: String, cursor: String?
-    ): Flow<GetProjectMergeRequestsQuery.Data> {
-        return apolloClient.query(
-            GetProjectMergeRequestsQuery(
-                id, cursor = Optional.presentIfNotNull(cursor)
-            )
-        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
-
-    }
 
     /**
      * Retrieves a comprehensive overview for a given project, including statistics like star and fork counts.
@@ -517,7 +463,6 @@ class ApolloGraphQLRepository @Inject constructor(
 
     }
 
-
     /**
      * Streams a paginated list of members for a specific GitLab project.
      *
@@ -565,7 +510,10 @@ class ApolloGraphQLRepository @Inject constructor(
         ).fetchPolicy(
             FetchPolicy.CacheFirst
         ).watch().mapAndHandleErrors()
+            .fetchAndMergeMembers(apolloClient, project, cursor)
     }
+
+
     /**
      * Streams all projects that the currently authenticated user has access to, with pagination.
      *
@@ -620,4 +568,60 @@ class ApolloGraphQLRepository @Inject constructor(
             ).watch().mapAndHandleErrors()
     }
 
+    /**
+     * Retrieves the first 20 merge request for a given project.
+     *
+     * @param id The unique identifier of the project.
+     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
+     * @return A [Flow] emitting [GetProjectMergeRequestsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetProjectMergeRequestsQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getProjectMergeRequests("12345")
+     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL
+     *  project(fullPath: $project){
+     *         mergeRequests(sort: CREATED_DESC,first: 20,after:$cursor ){
+     *             nodes{
+     *                 id
+     *                 name
+     *                 author {
+     *                     name
+     *                 }
+     *                 createdAt
+     *                 state
+     *                 sourceBranch
+     *                 targetBranch
+     *             }
+     *             pageInfo {
+     *                 startCursor
+     *                 hasNextPage
+     *             }
+     *         }
+     *     }
+     * ```
+     */
+    override suspend fun getProjectMergeRequests(
+        id: String, cursor: String?
+    ): Flow<GetProjectMergeRequestsQuery.Data> {
+        return apolloClient.query(
+            GetProjectMergeRequestsQuery(
+                id, cursor = Optional.presentIfNotNull(cursor)
+            )
+        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+            .fetchAndMergeMRs(apolloClient, id, cursor)
+
+    }
 }
