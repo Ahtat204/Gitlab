@@ -97,6 +97,7 @@ fun ProjectDetailScreen(
     path: String,
     personalProjectsViewModel: PersonalProjectsViewModel = hiltViewModel()
 ) {
+    if (path.isEmpty()) return
     val project by personalProjectsViewModel.currentProject.collectAsStateWithLifecycle()
     LaunchedEffect(true) {
         personalProjectsViewModel.loadProject(path)

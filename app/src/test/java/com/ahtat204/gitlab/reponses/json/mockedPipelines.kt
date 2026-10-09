@@ -19,7 +19,8 @@ val mockedPipelines = """
                 "ref": "main",
                 "mergeRequest": {
                   "__typename": "MergeRequest",
-                  "name": "implementing Kafka Consumer"
+                  "name": "implementing Kafka Consumer",
+                  "iid":"22"
                 },
                 "commit": {
                   "__typename": "Commit",
@@ -40,7 +41,8 @@ val mockedPipelines = """
                 "ref": "feature/api-fix",
                 "mergeRequest": {
                   "__typename": "MergeRequest",
-                  "name": "Resolve API payload serialization bug"
+                  "name": "Resolve API payload serialization bug",
+                  "iid":"50"
                 },
                 "commit": {
                   "__typename": "Commit",

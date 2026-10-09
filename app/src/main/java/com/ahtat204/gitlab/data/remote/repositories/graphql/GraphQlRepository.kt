@@ -4,6 +4,7 @@ import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
@@ -25,7 +26,7 @@ import kotlinx.coroutines.flow.Flow
  *
  * ### Key Responsibilities:
  * - **User Dashboard**: Fetching personal projects [getAllPersonalProjects] and user profile [getMyProfile].
- * - **Project Intelligence**: Retrieving detailed project statistics [getProjectById] and user-specific projects [getUserProjectsByName].
+ * - **Project Intelligence**: Retrieving detailed project statistics [getProjectById] and user-specific projects [getUserProjectsByName], [getProjectMergeRequests]: Retrieves and streams first 20 merge request ina Gitlab Project in descending order by creation Date..
  * - **Repository Browsing**: Accessing file hierarchies [getProjectRepository] and commit histories [getProjectCommits].
  * - **Git Metadata**: Listing repository branches [getRepositoryBranches].
  * - **CI/CD Visibility**: Monitoring project pipelines [getProjectPipelines].
@@ -90,6 +91,17 @@ interface GraphQlRepository {
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
 
+    /**
+     * Retrieves a paginated chunk of available Merged requests  within a project.
+     *
+     * @param id The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the current window slice of matching branch records.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
+    suspend fun getProjectMergeRequests(
+        id: String, cursor: String? = null
+    ): Flow<GetProjectMergeRequestsQuery.Data>
     /**
      * Streams a continuous Flow containing the CurrentUser Profile data.
      *
