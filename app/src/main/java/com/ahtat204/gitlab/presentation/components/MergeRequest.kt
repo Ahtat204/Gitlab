@@ -1,5 +1,7 @@
 package com.ahtat204.gitlab.presentation.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -23,9 +27,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import androidx.navigation.NavHostController
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
@@ -35,17 +41,18 @@ import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
 
 typealias MergeRequest = GetProjectMergeRequestsQuery.Node?
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MergeRequest(mr: MergeRequest, navController: NavHostController) {
-
     mr?.let { node ->
-        val labels = node.labels
+        val label = node.labels?.nodes?.firstOrNull()
         val author = node.author?.name
-        val id = node.id
+        val sourceBranch = node.sourceBranch
+        val date = iso8601ToRelative(node.createdAt as String)
         Card(
-            {},
-            modifier = Modifier
-                .height(120.dp)
+            {}, modifier = Modifier
+                .height(100.dp)
+
                 .fillMaxSize()
                 .padding(10.dp, 10.dp)
                 .background(Color.Black)
@@ -62,7 +69,7 @@ fun MergeRequest(mr: MergeRequest, navController: NavHostController) {
                         .fillMaxWidth()
                         .fillMaxHeight()
                         .background(Background),
-                    verticalArrangement = Arrangement.Center,
+                    verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.Start
                 ) {
                     Row(
@@ -80,28 +87,113 @@ fun MergeRequest(mr: MergeRequest, navController: NavHostController) {
                         )
 
                         Text(
-                            text = node.name ?: "",
+                            text = "${node.name}\t#${node.iid} ",
+                            maxLines = 2,
+                            fontSize = 17.sp,
+                            color = White,
+                            overflow = TextOverflow.Clip,
+                            modifier = Modifier
+                                .width(270.dp)
+                                .padding(horizontal = 10.dp),
+                            fontFamily = customFontFamily,
+                        )
+                        Text(
+                            text = date,
                             maxLines = 1,
                             fontSize = 17.sp,
                             color = White,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
                                 .width(290.dp)
-                                .padding(horizontal = 10.dp),
+                                .padding(horizontal = 0.dp),
                             fontFamily = customFontFamily,
                         )
+
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.Top,
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .offset(y = 15.dp)
+                    ) {
+                        //author tag
+                        Row(
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.Top,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(Orange)
+                                .height(15.dp)
+                                .width(measureTextWidth(author ?: "") + 20.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Person,
+                                contentDescription = null,
+                                Modifier
+                                    .size(12.dp)
+                                    .offset(x = 7.dp, y = 1.dp)
+                            )
+                            Text(
+                                text = author ?: "",
+                                maxLines = 1,
+                                fontSize = 10.sp,
+                                color = White,
+                                modifier = Modifier.offset(10.dp, y = (-3).dp),
+                                fontFamily = customFontFamily,
+                            )
+                        }
+                        //Source branch tag
+                        Row(
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.Top,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(Orange)
+                                .height(15.dp)
+                                .width(measureTextWidth(sourceBranch) - 25.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.branch),
+                                contentDescription = null,
+                                Modifier
+                                    .size(10.dp)
+                                    .offset(x = 7.dp, y = 1.dp)
+                            )
+                            Text(
+                                text = sourceBranch,
+                                maxLines = 1,
+                                fontSize = 10.sp,
+                                color = White,
+                                modifier = Modifier.offset(10.dp, y = (-3).dp),
+                                fontFamily = customFontFamily,
+                                textAlign = TextAlign.Start
+                            )
+                        }
+                        label?.let {
+                            Row(
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.Top,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(Color(it.color.toColorInt()))
+                                    .height(15.dp)
+                                    .width(measureTextWidth(sourceBranch) - 55.dp)
+                            ) {
+                                Text(
+                                    text = it.title,
+                                    maxLines = 1,
+                                    fontSize = 10.sp,
+                                    color = White,
+                                    modifier = Modifier.offset(10.dp, y = (-3).dp),
+                                    fontFamily = customFontFamily,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
                     }
                 }
-                Text(
-                    text = "created by $author",
-                    maxLines = 1,
-                    fontSize = 10.sp,
-                    color = White,
-                    modifier = Modifier
-                        .offset(0.dp, (10).dp)
-                        .fillMaxWidth(0.8f),
-                    fontFamily = customFontFamily,
-                )
             }
         }
     }

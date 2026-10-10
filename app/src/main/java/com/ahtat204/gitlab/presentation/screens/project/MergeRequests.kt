@@ -1,5 +1,7 @@
 package com.ahtat204.gitlab.presentation.screens.project
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,6 +49,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectMRsViewModel
  * @param viewModel The ViewModel responsible for managing project merge requests,
  *                     injected via Hilt.
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MergeRequests(
     project: String,
@@ -75,7 +78,7 @@ fun MergeRequests(
         }
     }
     Column(
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .background(Color.Black)
@@ -109,7 +112,6 @@ fun MergeRequests(
             }
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = x,
                 verticalArrangement = Arrangement.spacedBy(0.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 state = listState
