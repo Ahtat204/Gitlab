@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -45,12 +46,12 @@ typealias Pipeline = GetProjectPipelinesQuery.Node?
 fun Pipeline(pipeline: Pipeline) {
     if (pipeline == null) return
     val status = pipeline.status
+    val name = pipeline.commit?.name ?: ""
     val duration = pipeline.duration ?: return
     val finishedAt = iso8601ToRelative(pipeline.finishedAt as String)
     val user = pipeline.user?.name
     val branch = pipeline.ref ?: return
     val formatedDuration = formatRelative(duration.toLong(), true)
-    val length = branch.length + 90
     val trigger = pipeline.type
     Card(
         {}, modifier = Modifier
@@ -66,17 +67,18 @@ fun Pipeline(pipeline: Pipeline) {
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.Start
         ) {
+            Box(modifier = Modifier.offset(x = 50.dp)) { PipeLineStatusIcon(status) }
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(0.9f)
                     .fillMaxHeight()
                     .background(Background),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start
             ) {
-                PipeLineStatusIcon(status)
+
                 Text(
-                    text = "${pipeline.commit?.name}",
+                    text = name,
                     maxLines = 1,
                     fontSize = 17.sp,
                     color = White,
@@ -109,7 +111,7 @@ fun Pipeline(pipeline: Pipeline) {
                             .clip(RoundedCornerShape(20.dp))
                             .background(Orange)
                             .height(15.dp)
-                            .width(74.dp)
+                            .width(measureTextWidth(formatedDuration))
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.Timer,
@@ -136,7 +138,7 @@ fun Pipeline(pipeline: Pipeline) {
                             .clip(RoundedCornerShape(20.dp))
                             .background(Orange)
                             .height(15.dp)
-                            .width(length.dp)
+                            .width(measureTextWidth(branch))
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.branch),
@@ -150,7 +152,9 @@ fun Pipeline(pipeline: Pipeline) {
                             maxLines = 1,
                             fontSize = 10.sp,
                             color = White,
-                            modifier = Modifier.offset(10.dp, y = (-3).dp),
+                            modifier = Modifier
+                                .offset(10.dp, y = (-3).dp)
+                                .fillMaxWidth(),
                             fontFamily = customFontFamily,
                         )
                     }
@@ -162,7 +166,7 @@ fun Pipeline(pipeline: Pipeline) {
                             .clip(RoundedCornerShape(20.dp))
                             .background(Orange)
                             .height(15.dp)
-                            .width(70.dp)
+                            .width(measureTextWidth(finishedAt))
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.CalendarMonth,
@@ -183,6 +187,8 @@ fun Pipeline(pipeline: Pipeline) {
 
                 }
             }
+
         }
+
     }
 }

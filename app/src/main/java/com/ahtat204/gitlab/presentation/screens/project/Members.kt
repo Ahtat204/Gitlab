@@ -39,6 +39,23 @@ import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.project.MembersViewModel
 
+/**
+ * A composable screen that displays and manages a paginated list of project members.
+ *
+ * This component fetches project member data based on the provided [project] identifier
+ * and displays them inside a scrollable list. It implements automatic **pagination (infinite scroll)**
+ * by triggering data loads when the user nears the bottom of the list, and provides a **refresh** action.
+ *
+ * ### Behavior and Side Effects:
+ * * **Early Exit:** Returns immediately if the [project] string is empty or if the fetched member nodes are empty.
+ * * **Initial Load:** Automatically triggers [MembersViewModel.loadProjectMembers] when the [project] changes.
+ * * **Infinite Scroll:** Tracks the scroll state and fetches the next page when the user scrolls within 9 items of the bottom.
+ *
+ * @param project The unique identifier or name of the project whose members are to be loaded.
+ * @param navController The navigation controller used for navigating between screens (currently unused in layout).
+ * @param x The [PaddingValues] injected by the parent scaffold to ensure proper spacing around edge boundaries.
+ * @param viewModel The state holder managing the member data and business logic, defaulting to a Hilt-injected instance.
+ */
 @Composable
 fun Members(
     project: String,

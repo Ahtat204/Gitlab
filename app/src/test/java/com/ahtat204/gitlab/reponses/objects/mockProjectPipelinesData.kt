@@ -27,7 +27,8 @@ val mockProjectPipelinesData = Data(
                     ref = "main",
                     mergeRequest = MergeRequest(
                         __typename = "MergeRequest",
-                        name = "implementing Kafka Consumer"
+                        name = "implementing Kafka Consumer",
+                        iid = "43"
                     ),
                     commit = Commit(
                         __typename = "Commit",
@@ -48,7 +49,8 @@ val mockProjectPipelinesData = Data(
                     ref = "feature/api-fix",
                     mergeRequest = MergeRequest(
                         __typename = "MergeRequest",
-                        name = "Resolve API payload serialization bug"
+                        name = "Resolve API payload serialization bug",
+                        iid = "50"
                     ),
                     commit = Commit(
                         __typename = "Commit",
