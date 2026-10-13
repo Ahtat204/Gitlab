@@ -1,6 +1,7 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.helpers.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.helpers.fetchAndMergeIssues
 import com.ahtat204.gitlab.data.helpers.fetchAndMergeMRs
 import com.ahtat204.gitlab.data.helpers.fetchAndMergeMembers
 import com.ahtat204.gitlab.data.helpers.fetchAndMergePipelines
@@ -10,6 +11,7 @@ import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
@@ -509,8 +511,7 @@ class ApolloGraphQLRepository @Inject constructor(
             )
         ).fetchPolicy(
             FetchPolicy.CacheFirst
-        ).watch().mapAndHandleErrors()
-            .fetchAndMergeMembers(apolloClient, project, cursor)
+        ).watch().mapAndHandleErrors().fetchAndMergeMembers(apolloClient, project, cursor)
     }
 
 
@@ -566,6 +567,61 @@ class ApolloGraphQLRepository @Inject constructor(
             .fetchPolicy(
                 FetchPolicy.CacheFirst
             ).watch().mapAndHandleErrors()
+    }
+
+    /**
+     * Retrieves the repository tree for a given project.
+     *
+     * @param id The unique identifier of the project.
+     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
+     * @return A [Flow] emitting [GetRepositoryCommitsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetProjectIssuesQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getProjectIssues("12345")
+     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL query GetProjectIssues($projectPath:ID!,$cursor:String){
+     *     project(fullPath: $projectPath){
+     *         issues(sort: CREATED_DESC,first: 20,after: $cursor){
+     *             nodes {
+     *                 id
+     *                 name
+     *                 title
+     *                 state
+     *                 createdAt
+     *                 assignees{
+     *                     nodes {
+     *                         name
+     *                     }
+     *                 }
+     *             }
+     *         }
+     *     }
+     * }
+     * ```
+     */
+    override suspend fun getProjectIssues(
+        id: String, cursor: String?
+    ): Flow<GetProjectIssuesQuery.Data> {
+        return apolloClient.query(
+            GetProjectIssuesQuery(
+                id, cursor = Optional.presentIfNotNull(cursor)
+            )
+        ).fetchPolicy(
+            FetchPolicy.CacheFirst
+        ).watch().mapAndHandleErrors().fetchAndMergeIssues(id, apolloClient, cursor)
     }
 
     /**
