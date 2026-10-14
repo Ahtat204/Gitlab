@@ -258,7 +258,7 @@ Gitlab/
 │           │       │   │   └── Type.kt
 │           │       │   └── viewmodels/
 │           │       │       ├── ProfileViewModel.kt
-│           │       │       ├── ProjectViewModel.kt
+│           │       │       ├── PersonalProjectsViewModel.kt
 │           │       │       ├── RepositoryViewModel.kt
 │           │       │       └── UserViewModel.kt
 │           └── res/

@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.presentation.viewmodels.project.build
 
+
 import com.ahtat204.gitlab.presentation.viewmodels.TestBase
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.objects.mockProjectPipelinesData
@@ -10,7 +11,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.whenever
@@ -40,12 +42,12 @@ class PipelinesViewModelTest : TestBase() {
         )
         viewModel.loadProjectPipelines(projectId)
         val pipelines = viewModel.pipelines.value
-        Assert.assertNotNull(pipelines)
+        assertNotNull(pipelines)
         val nodes = pipelines!!.nodes
-        Assert.assertNotNull(nodes)
-        Assert.assertFalse(nodes!!.isEmpty())
+        assertNotNull(nodes)
+        assertFalse(nodes!!.isEmpty())
         val mockedPage = mockProjectPipelinesData.project!!.pipelines!!.pageInfo
-        val mockedNodes = mockProjectPipelinesData.project!!.pipelines!!.nodes
+        val mockedNodes = mockProjectPipelinesData.project.pipelines.nodes
         for (i in 0 until nodes.size) {
             assertNotNullAndEquals(
                 nodes[i]!!.id,
@@ -53,24 +55,24 @@ class PipelinesViewModelTest : TestBase() {
             )
             assertNotNullAndEquals(nodes[i]!!.type, mockedNodes[i]!!.type)
             assertNotNullAndEquals(nodes[i]!!.status, mockedNodes[i]!!.status)
-            Assert.assertNotNull(nodes[i]!!.commit)
+            assertNotNull(nodes[i]!!.commit)
             assertNotNullAndEquals(nodes[i]!!.commit!!.name, mockedNodes[i]!!.commit!!.name!!)
-            Assert.assertNotNull(nodes[i]!!.mergeRequest)
+            assertNotNull(nodes[i]!!.mergeRequest)
             assertNotNullAndEquals(
                 nodes[i]!!.mergeRequest!!.name,
                 mockedNodes[i]!!.mergeRequest!!.name!!
             )
             assertNotNullAndEquals(nodes[i]!!.duration, mockedNodes[i]!!.duration!!)
-            Assert.assertNotNull(nodes[i]!!.user)
+            assertNotNull(nodes[i]!!.user)
             assertNotNullAndEquals(nodes[i]!!.user!!.name, mockedNodes[i]!!.user!!.name)
             assertNotNullAndEquals(nodes[i]!!.finishedAt, mockedNodes[i]!!.finishedAt!!)
             assertNotNullAndEquals(nodes[i]!!.ref, mockedNodes[i]!!.ref!!)
         }
-        val page = pipelines!!.pageInfo
+        val page = pipelines.pageInfo
         assertNotNullAndEquals(page.startCursor, mockedPage.startCursor!!)
-        assertNotNullAndEquals(page.hasNextPage, mockedPage!!.hasNextPage)
+        assertNotNullAndEquals(page.hasNextPage, mockedPage.hasNextPage)
         assertNotNullAndEquals(page.endCursor, mockedPage.endCursor!!)
-        assertNotNullAndEquals(page.hasPreviousPage, mockedPage!!.hasPreviousPage)
+        assertNotNullAndEquals(page.hasPreviousPage, mockedPage.hasPreviousPage)
     }
 
 }

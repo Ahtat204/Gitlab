@@ -13,6 +13,10 @@ import androidx.navigation.navigation
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
+import com.ahtat204.gitlab.presentation.screens.Projects
+import com.ahtat204.gitlab.presentation.screens.project.Issues
+import com.ahtat204.gitlab.presentation.screens.project.Members
+import com.ahtat204.gitlab.presentation.screens.project.MergeRequests
 import com.ahtat204.gitlab.presentation.screens.project.ProjectDetailScreen
 import com.ahtat204.gitlab.presentation.screens.project.build.Pipeline
 import com.ahtat204.gitlab.presentation.screens.project.build.Pipelines
@@ -61,6 +65,9 @@ fun BottomNavigationGraph(
         composable(route = BottomBarScreen.Activity.route) {
             // Activity screen placeholder
         }
+        composable(route = "projects") {
+            Projects(navController, x)
+        }
         composable(
             route = "commits/{projectId}/{branch}",
             arguments = listOf(
@@ -80,7 +87,6 @@ fun BottomNavigationGraph(
                 // ProjectCommits(navController, x, branch,projectId)
             }
         }
-
         navigation(startDestination = "Project", route = "project") {
             composable(
                 route = "repository?projectId={projectId}",
@@ -100,12 +106,38 @@ fun BottomNavigationGraph(
                 }
             }
             composable(
+                route = "mergerequests?projectId={projectId}",
+                arguments = listOf(navArgument("projectId") { defaultValue = "" })
+            ) { backStackEntry ->
+                val projectId = backStackEntry.arguments?.getString("projectId")
+                projectId?.let { MergeRequests(it, navController, x) }
+            }
+            composable(
                 route = "pipelines?projectId={projectId}",
                 arguments = listOf(navArgument("projectId") { defaultValue = "" })
             ) { backStackEntry ->
                 val projectId = backStackEntry.arguments?.getString("projectId")
                 projectId?.let {
                     Pipelines(navController = navController, x = x, project = it)
+                }
+            }
+
+            composable(
+                route = "members?projectId={projectId}",
+                arguments = listOf(navArgument("projectId") { defaultValue = "" })
+            ) { backStackEntry ->
+                val projectId = backStackEntry.arguments?.getString("projectId")
+                projectId?.let {
+                    Members(navController = navController, x = x, project = it)
+                }
+            }
+            composable(
+                route = "issues?projectId={projectId}",
+                arguments = listOf(navArgument("projectId") { defaultValue = "" })
+            ) { backStackEntry ->
+                val projectId = backStackEntry.arguments?.getString("projectId")
+                projectId?.let {
+                    Issues(navController, x = x, it)
                 }
             }
             composable(
@@ -127,7 +159,6 @@ fun BottomNavigationGraph(
                     }
                 }
             }
-
         }
     }
 }

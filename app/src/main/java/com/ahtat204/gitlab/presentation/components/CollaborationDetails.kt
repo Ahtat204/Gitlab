@@ -52,7 +52,7 @@ fun CollaborationDetails(
     mergeRequestCount: Int?,
     pipelinesCount: Int?,
     navController: NavController,
-    encodedId: String
+    encodedId:String
 ) {
     Column(
         modifier = Modifier
@@ -61,13 +61,15 @@ fun CollaborationDetails(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ProjectWorkItems(Item("issues", "issues", R.drawable.issues, issuesCount)) {}
+        ProjectWorkItems(Item("issues", "issues", R.drawable.issues, issuesCount)) {
+            navController.navigate("issues?projectId=$encodedId")
+        }
         mergeRequestCount?.let {
             ProjectWorkItems(
                 Item(
                     "Merge Requests", "merge_requests", R.drawable.mergerequest, it
                 )
-            ) {}
+            ) {navController.navigate("mergerequests?projectId=$encodedId")}
         }
         ProjectWorkItems(
             Item(
@@ -80,11 +82,11 @@ fun CollaborationDetails(
                 )
             ) {}
         }
-        ProjectWorkItems(
-            Item(
-                "Members", "project/{id}/members", R.drawable.members, null
-            )
-        ) {}
+            ProjectWorkItems(
+                Item(
+                    "Members", "project/{id}/members", R.drawable.members, null
+                )
+            ) {navController.navigate("members?projectId=$encodedId")}
     }
 
 }
