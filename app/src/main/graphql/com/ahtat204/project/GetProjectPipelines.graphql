@@ -13,6 +13,8 @@ query GetProjectPipelines($project:ID!,$cursor:String,$status:PipelineStatusEnum
                 mergeRequest {
                     name
                     iid ## this the MR count
+                    sourceBranch
+                    title
                 }
                 commit {
                     name

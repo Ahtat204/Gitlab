@@ -20,7 +20,9 @@ val mockedPipelines = """
                 "mergeRequest": {
                   "__typename": "MergeRequest",
                   "name": "implementing Kafka Consumer",
-                  "iid":"22"
+                  "iid":"22",
+                 "sourceBranch" :"feature/jwt",
+                "title":"asymmetric jwt keys"
                 },
                 "commit": {
                   "__typename": "Commit",
@@ -42,7 +44,9 @@ val mockedPipelines = """
                 "mergeRequest": {
                   "__typename": "MergeRequest",
                   "name": "Resolve API payload serialization bug",
-                  "iid":"50"
+                  "iid":"50",
+                  "sourceBranch" :"feature/observability",
+                   "title":"OTEL with Elasticsearch and Grafana Tempo"
                 },
                 "commit": {
                   "__typename": "Commit",

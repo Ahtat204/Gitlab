@@ -88,39 +88,37 @@ fun Members(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .background(Color.Black)
-            .fillMaxSize()
             .padding(x)
+            .background(Color.Black)
     ) {
+        Row(
+            modifier = Modifier
+                .background(Color.Black)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Members",
+                fontFamily = titleFont,
+                fontSize = 20.sp,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .weight(0.5f)
+                    .offset(20.dp, 0.dp)
+            )
+            IconButton(
+                onClick = { viewModel.refreshMembers(project) },
+                modifier = Modifier.weight(0.1f)
+            ) {
+                Icon(Icons.Default.Refresh, contentDescription = null)
+            }
+        }
         //  Text(text = "Members", fontFamily = titleFont, fontSize = 20.sp, color = Orange)
         nodes?.let { nodes ->
 
             if (nodes.isNotEmpty()) {
-                Row(
-                    modifier = Modifier
-                        .background(Color.Black)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Members",
-                        fontFamily = titleFont,
-                        fontSize = 20.sp,
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .weight(0.5f)
-                            .offset(20.dp, 0.dp)
-                    )
-                    IconButton(
-                        onClick = { viewModel.refreshMembers(project) },
-                        modifier = Modifier.weight(0.1f)
-                    ) {
-                        Icon(Icons.Default.Refresh, contentDescription = null)
-                    }
-                }
-
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),

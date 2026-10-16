@@ -4,6 +4,7 @@ query GetProjectIssues($projectPath:ID!,$cursor:String){
         issues(sort: CREATED_DESC,first: 20,after: $cursor){
             nodes {
                 id
+                iid
                 name
                 title
                 state

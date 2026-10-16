@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Person
@@ -149,10 +150,11 @@ fun MergeRequest(mr: MergeRequest, navController: NavHostController) {
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.Top,
                             modifier = Modifier
+                                .wrapContentWidth()
                                 .clip(RoundedCornerShape(20.dp))
                                 .background(Orange)
                                 .height(15.dp)
-                                .width(measureTextWidth(sourceBranch) - 25.dp)
+                                .width(measureTextWidth(sourceBranch + 5.dp))
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.branch),

@@ -29,7 +29,8 @@ val mockedIssues = Data(
                             Node1(__typename = "User", name = "Alex Smith"),
                             Node1(__typename = "User", name = "Jordan Doe")
                         )
-                    )
+                    ),
+                    iid = "3"
                 ),
                 Node(
                     __typename = "Issue",
@@ -43,7 +44,8 @@ val mockedIssues = Data(
                         nodes = listOf(
                             Node1(__typename = "User", name = "Taylor Swift")
                         )
-                    )
+                    ),
+                    iid = "4"
                 )
             ),
             pageInfo = PageInfo(

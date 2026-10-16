@@ -13,6 +13,7 @@ val mockedIssues = """
               "__typename": "Issue",
               "id": "issue_001",
               "name": "bug-fix-auth",
+              "iid":"3",
               "title": "Fix authentication token expiration bypass",
               "state": "opened",
               "createdAt": "2026-09-26T16:26:00Z",
@@ -36,6 +37,7 @@ val mockedIssues = """
               "name": "feature-dark-mode",
               "title": "Implement dark mode theme across dashboard",
               "state": "closed",
+              "iid":"5",
               "createdAt": "2026-09-25T10:00:00Z",
               "assignees": {
                 "__typename": "AssigneeConnection",

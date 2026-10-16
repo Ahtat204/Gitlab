@@ -85,31 +85,32 @@ fun MergeRequests(
             .fillMaxSize()
             .padding(x)
     ) {
-        if (nodes?.isNotEmpty() == true) {
-            Row(
+        Row(
+            modifier = Modifier
+                .background(Color.Black)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Merge Requests",
+                fontFamily = titleFont,
+                fontSize = 20.sp,
+                color = Color.White,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .background(Color.Black)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                    .weight(0.5f)
+                    .offset(20.dp, 0.dp)
+            )
+            IconButton(
+                onClick = { viewModel.refreshMrs(project) },
+                modifier = Modifier.weight(0.1f)
             ) {
-                Text(
-                    text = "Members",
-                    fontFamily = titleFont,
-                    fontSize = 20.sp,
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .weight(0.5f)
-                        .offset(20.dp, 0.dp)
-                )
-                IconButton(
-                    onClick = { viewModel.refreshMrs(project) },
-                    modifier = Modifier.weight(0.1f)
-                ) {
-                    Icon(Icons.Default.Refresh, contentDescription = null)
-                }
+                Icon(Icons.Default.Refresh, contentDescription = null)
             }
+        }
+        if (nodes?.isNotEmpty() == true) {
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(0.dp),
