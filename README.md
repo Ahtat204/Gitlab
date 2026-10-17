@@ -144,8 +144,6 @@ Gitlab/
 │       │   ├── graphql
 │       │   │   └── com
 │       │   │       └── ahtat204
-│       │   │           ├── $~
-│       │   │           │   └── AndroidStudioProjects
 │       │   │           ├── mutation
 │       │   │           ├── project
 │       │   │           │   ├── GetProjectDetails.graphql
@@ -326,7 +324,6 @@ Gitlab/
 │                                   ├── mockProjectPipelinesData.kt
 │                                   └── mockRepository.kt
 ├── ARCHITECTURE.md
-├── branches.txt
 ├── build.gradle.kts
 ├── gradle
 │   ├── libs.versions.toml
@@ -340,7 +337,6 @@ Gitlab/
 ├── home.jpg
 ├── homescreen.jpg
 ├── issues.jpg
-├── log.txt
 ├── members.jpg
 ├── mrs.jpg
 ├── personalprojects.jpg
