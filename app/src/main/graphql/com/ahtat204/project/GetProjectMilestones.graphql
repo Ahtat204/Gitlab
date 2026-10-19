@@ -1,0 +1,14 @@
+query GetProjectMilestones($project:ID!,$cursor:String){
+    project(fullPath: $project) {
+        id
+        milestones(after: $cursor,first: 20){
+            nodes {
+                id
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+    }
+}

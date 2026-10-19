@@ -4,6 +4,7 @@ import com.ahtat204.gitlab.data.helpers.fetchAndMergeCommits
 import com.ahtat204.gitlab.data.helpers.fetchAndMergeIssues
 import com.ahtat204.gitlab.data.helpers.fetchAndMergeMRs
 import com.ahtat204.gitlab.data.helpers.fetchAndMergeMembers
+import com.ahtat204.gitlab.data.helpers.fetchAndMergeMilestones
 import com.ahtat204.gitlab.data.helpers.fetchAndMergePipelines
 import com.ahtat204.gitlab.data.helpers.fetchAndMergeProjects
 import com.ahtat204.gitlab.data.helpers.mapAndHandleErrors
@@ -14,6 +15,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMilestonesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -514,7 +516,6 @@ class ApolloGraphQLRepository @Inject constructor(
         ).watch().mapAndHandleErrors().fetchAndMergeMembers(apolloClient, project, cursor)
     }
 
-
     /**
      * Streams all projects that the currently authenticated user has access to, with pagination.
      *
@@ -568,6 +569,7 @@ class ApolloGraphQLRepository @Inject constructor(
                 FetchPolicy.CacheFirst
             ).watch().mapAndHandleErrors()
     }
+
 
     /**
      * Retrieves the repository tree for a given project.
@@ -678,6 +680,19 @@ class ApolloGraphQLRepository @Inject constructor(
             )
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
             .fetchAndMergeMRs(apolloClient, id, cursor)
+
+    }
+
+    override suspend fun getProjectMilestones(
+        project: String,
+        cursor: String?
+    ): Flow<GetProjectMilestonesQuery.Data> {
+        return apolloClient.query(
+            GetProjectMilestonesQuery(
+                project, cursor = Optional.presentIfNotNull(cursor)
+            )
+        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+            .fetchAndMergeMilestones(apolloClient, project, cursor)
 
     }
 }
