@@ -55,6 +55,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.MembersViewModel
  * @param navController The navigation controller used for navigating between screens (currently unused in layout).
  * @param x The [PaddingValues] injected by the parent scaffold to ensure proper spacing around edge boundaries.
  * @param viewModel The state holder managing the member data and business logic, defaulting to a Hilt-injected instance.
+ *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/members.jpg"  width="300" height="700"/>
  */
 @Composable
 fun Members(

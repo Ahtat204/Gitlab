@@ -51,6 +51,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.PipelinesViewModel
  * @param x Padding values representing the inner padding provided by a Scaffold.
  * @param pipelinesViewModel The ViewModel responsible for managing pipeline data,
  *                           injected via Hilt.
+ *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/pipelines.jpg"  width="300" height="700"/>
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

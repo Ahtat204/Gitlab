@@ -48,6 +48,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.ProjectMRsViewModel
  * @param x Padding values representing the inner padding provided by a Scaffold.
  * @param viewModel The ViewModel responsible for managing project merge requests,
  *                     injected via Hilt.
+ *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/mrs.jpg"  width="300" height="700"/>
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
