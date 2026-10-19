@@ -7,6 +7,7 @@ query GetProjectWorkItems($project:ID!,$cursor:String){
                 name
                 state
                 title
+                createdAt
                 closedAt
                 updatedAt
             }
