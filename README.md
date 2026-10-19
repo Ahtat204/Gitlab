@@ -10,9 +10,9 @@
 
 ## 📸 Screenshots
 
-|       Home Screen        |             Project List              |        Issues         |       MRs       |         Members         |            Project Overview            |              Profile               |              Repository               |              Commits               |  
-|:------------------------:|:-------------------------------------:|:---------------------:|:---------------:|:-----------------------:|:--------------------------------------:|:----------------------------------:|:-------------------------------------:|:----------------------------------:|  
-| ![Home Screen](home.jpg) | ![Project List](personalprojects.jpg) | ![issues](issues.jpg) | ![mrs](mrs.jpg) | ![members](members.jpg) | ![Project Details](projectdetails.jpg) | ![Developper Profile](profile.jpg) | ![Project Repository](repository.jpg) | ![Repository Commits](history.jpg) |  
+|       Home Screen        |             Project List              |        Issues         |       MRs       |         Members         |            Project Overview            |              Profile               |              Repository               |              Commits               |          Pipelines          |  
+|:------------------------:|:-------------------------------------:|:---------------------:|:---------------:|:-----------------------:|:--------------------------------------:|:----------------------------------:|:-------------------------------------:|:----------------------------------:|:---------------------------:|  
+| ![Home Screen](home.jpg) | ![Project List](personalprojects.jpg) | ![issues](issues.jpg) | ![mrs](mrs.jpg) | ![members](members.jpg) | ![Project Details](projectdetails.jpg) | ![Developper Profile](profile.jpg) | ![Project Repository](repository.jpg) | ![Repository Commits](history.jpg) | ![Pipelines](pipelines.jpg) |  
 
 ---
 

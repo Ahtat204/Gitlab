@@ -49,6 +49,7 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.IssuesViewModel
  *
  * @see IssueCard
  * @see IssuesViewModel
+ *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/issues.jpg"  width="300" height="700"/>
  */
 
 @RequiresApi(Build.VERSION_CODES.O)
