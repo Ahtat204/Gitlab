@@ -1,5 +1,6 @@
 query GetRepositoryCommits($projectPath: ID!,$cursor:String,$branch:String!){ ## we can use one query with a nullable (apollo almost always uses nullable types like String?)$cursor variable and just pass null for the first page
     project(fullPath: $projectPath){
+        id
         __typename
         repository {
             __typename

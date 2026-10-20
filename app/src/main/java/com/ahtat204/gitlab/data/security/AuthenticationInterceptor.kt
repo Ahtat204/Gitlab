@@ -1,22 +1,22 @@
 package com.ahtat204.gitlab.data.security
 
-import android.util.Log
-import com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.context
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.isConnected
-import com.ahtat204.gitlab.domain.usecase.logging.logger
+import com.ahtat204.gitlab.domain.authentication.AuthStorage
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens.context
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens.isConnected
+import com.ahtat204.gitlab.domain.logging.logger
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.internal.synchronized
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationService
 import okhttp3.Interceptor
 import okhttp3.Response
-import net.openid.appauth.AuthState
 import okio.IOException
 
 /**
@@ -32,7 +32,7 @@ import okio.IOException
  * - If the response is `401 Unauthorized`:
  *   - Synchronizes on a lock to prevent concurrent refresh attempts.
  *   - Uses [net.openid.appauth.AuthState.performActionWithFreshTokens] to refresh the token.
- *   - Updates [com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.accessToken] and persists the new state via [com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage].
+ *   - Updates [com.ahtat204.gitlab.domain.authentication.constants.Tokens.accessToken] and persists the new state via [AuthStorage].
  *   - Retries the request with the refreshed token.
  *   - Logs an error if the retry still fails with `401`.
  *
@@ -42,7 +42,7 @@ import okio.IOException
  *
  * ## Persistence
  * - After a successful refresh, the updated [AuthState] is saved into
- *   [com.ahtat204.gitlab.domain.usecase.authentication.AuthStorage] using DataStore, ensuring the new token is available
+ *   [AuthStorage] using DataStore, ensuring the new token is available
  *   for future requests.
  *
  * ## Usage
@@ -69,6 +69,14 @@ class AuthenticationInterceptor : Interceptor {
             } else {
                 var request = chain.request()
                 val builder = request.newBuilder()
+
+                if (Tokens.accessToken == null) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val result = AuthStorage.getAuthState(context).data.first()
+                        Tokens.CurrentAuthState = result
+                        Tokens.accessToken = result.accessToken
+                    }
+                }
                 val token = Tokens.accessToken
                 if (token != null) {
                     builder.header("Authorization", "Bearer $token")
@@ -89,7 +97,7 @@ class AuthenticationInterceptor : Interceptor {
                                         Tokens.CurrentAuthState = state
                                         deferred.complete(token)
                                         CoroutineScope(Dispatchers.IO).launch {
-                                            AuthStorage.getAuthState(Tokens.context)
+                                            AuthStorage.getAuthState(context)
                                                 .updateData { state }
                                         }
                                     }

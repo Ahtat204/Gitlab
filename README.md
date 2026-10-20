@@ -10,9 +10,9 @@
 
 ## 📸 Screenshots
 
-|       Home Screen        |             Project List              |            Project Overview            |              Profile               |              Repository               |              Commits               |  
-|:------------------------:|:-------------------------------------:|:--------------------------------------:|:----------------------------------:|:-------------------------------------:|:----------------------------------:|  
-| ![Home Screen](home.jpg) | ![Project List](personalprojects.jpg) | ![Project Details](projectdetails.jpg) | ![Developper Profile](profile.jpg) | ![Project Repository](repository.jpg) | ![Repository Commits](history.jpg) |  
+|       Home Screen        |             Project List              |        Issues         |       MRs       |         Members         |            Project Overview            |              Profile               |              Repository               |              Commits               |          Pipelines          |  
+|:------------------------:|:-------------------------------------:|:---------------------:|:---------------:|:-----------------------:|:--------------------------------------:|:----------------------------------:|:-------------------------------------:|:----------------------------------:|:---------------------------:|  
+| ![Home Screen](home.jpg) | ![Project List](personalprojects.jpg) | ![issues](issues.jpg) | ![mrs](mrs.jpg) | ![members](members.jpg) | ![Project Details](projectdetails.jpg) | ![Developper Profile](profile.jpg) | ![Project Repository](repository.jpg) | ![Repository Commits](history.jpg) | ![Pipelines](pipelines.jpg) |  
 
 ---
 
@@ -129,166 +129,224 @@ cd Gitlab
 
 ```
 Gitlab/
-├── .gitignore
+├── app
+│   ├── build.gradle.kts
+│   ├── proguard-rules.pro
+│   └── src
+│       ├── androidTest
+│       │   └── java
+│       │       └── com
+│       │           └── ahtat204
+│       │               └── gitlab
+│       │                   └── ExampleInstrumentedTest.kt
+│       ├── main
+│       │   ├── AndroidManifest.xml
+│       │   ├── graphql
+│       │   │   └── com
+│       │   │       └── ahtat204
+│       │   │           ├── mutation
+│       │   │           ├── project
+│       │   │           │   ├── GetProjectDetails.graphql
+│       │   │           │   ├── GetProjectIssues.graphql
+│       │   │           │   ├── GetProjectMembers.graphql
+│       │   │           │   ├── GetProjectMRs.graphql
+│       │   │           │   ├── GetProjectPipelines.graphql
+│       │   │           │   ├── mergerequests
+│       │   │           │   │   └── GetProjectMergeRequests.graphql
+│       │   │           │   └── repository
+│       │   │           │       ├── GetProjectRepository.graphql
+│       │   │           │       ├── GetRepositoryBlob.graphql
+│       │   │           │       ├── GetRepositoryBranches.graphql
+│       │   │           │       ├── GetRepositoryCommits.graphql
+│       │   │           │       └── GetRepositoryTree.graphql
+│       │   │           ├── schema.graphqls
+│       │   │           └── user
+│       │   │               ├── currentUser
+│       │   │               │   ├── GetAllProjects.graphql
+│       │   │               │   ├── GetMyContributedProjects.graphql
+│       │   │               │   ├── GetMyPersonalProjects.graphql
+│       │   │               │   └── GetMyProfile.graphql
+│       │   │               └── GetUserProjectsByName.graphql
+│       │   └── java
+│       │       └── com
+│       │           └── ahtat204
+│       │               └── gitlab
+│       │                   ├── data
+│       │                   │   ├── helpers
+│       │                   │   │   ├── fetchAndMergeCommits.kt
+│       │                   │   │   ├── fetchAndMergeIssues.kt
+│       │                   │   │   ├── fetchAndMergeMembers.kt
+│       │                   │   │   ├── fetchAndMergeMRs.kt
+│       │                   │   │   ├── fetchAndMergePipelines.kt
+│       │                   │   │   ├── fetchAndMergeProjects.kt
+│       │                   │   │   └── mapAndHandleErrors.kt
+│       │                   │   ├── remote
+│       │                   │   │   └── repositories
+│       │                   │   │       └── graphql
+│       │                   │   │           ├── ApolloGraphQLRepository.kt
+│       │                   │   │           └── GraphQlRepository.kt
+│       │                   │   └── security
+│       │                   │       └── AuthenticationInterceptor.kt
+│       │                   ├── domain
+│       │                   │   ├── authentication
+│       │                   │   │   ├── AuthStateSerializer.kt
+│       │                   │   │   ├── constants
+│       │                   │   │   │   ├── AuthConfig.kt
+│       │                   │   │   │   └── Tokens.kt
+│       │                   │   │   ├── SafeStore.kt
+│       │                   │   │   └── security
+│       │                   │   │       └── CryptoUtility.kt
+│       │                   │   ├── di
+│       │                   │   │   ├── ApolloModule.kt
+│       │                   │   │   ├── OkHttpModule.kt
+│       │                   │   │   └── ProjectRepositoryModule.kt
+│       │                   │   └── logging
+│       │                   │       └── Logger.kt
+│       │                   ├── GitlabApp.kt
+│       │                   └── presentation
+│       │                       ├── activities
+│       │                       │   ├── AuthenticationActivity.kt
+│       │                       │   ├── LauncherActivity.kt
+│       │                       │   ├── MainActivity.kt
+│       │                       │   └── ui
+│       │                       │       └── theme
+│       │                       │           ├── Color.kt
+│       │                       │           ├── Theme.kt
+│       │                       │           └── Type.kt
+│       │                       ├── components
+│       │                       │   ├── About.kt
+│       │                       │   ├── AutoLinkText.kt
+│       │                       │   ├── BlobCard.kt
+│       │                       │   ├── BranchesList.kt
+│       │                       │   ├── CoilCache.kt
+│       │                       │   ├── CollaborationDetails.kt
+│       │                       │   ├── CommitCard.kt
+│       │                       │   ├── Contact.kt
+│       │                       │   ├── FileBrowser.kt
+│       │                       │   ├── GeneralDetails.kt
+│       │                       │   ├── Header.kt
+│       │                       │   ├── Info.kt
+│       │                       │   ├── ISO8601ToRelativeDate.kt
+│       │                       │   ├── IssueCard.kt
+│       │                       │   ├── LanguageCircle.kt
+│       │                       │   ├── LanguagesBar.kt
+│       │                       │   ├── measureTestWidth.kt
+│       │                       │   ├── MergeRequest.kt
+│       │                       │   ├── Panel.kt
+│       │                       │   ├── PanelSlider.kt
+│       │                       │   ├── Pipeline.kt
+│       │                       │   ├── PipelineStatusIcon.kt
+│       │                       │   ├── ProjectItem.kt
+│       │                       │   ├── ProjectWorkItems.kt
+│       │                       │   ├── RemoveElementsAfterKey.kt
+│       │                       │   ├── RepositoryHead.kt
+│       │                       │   ├── RepositoryTree.kt
+│       │                       │   ├── Tag.kt
+│       │                       │   ├── TopAppBar.kt
+│       │                       │   ├── TopBar.kt
+│       │                       │   ├── WorkItem.kt
+│       │                       │   └── WorkItems.kt
+│       │                       ├── navigation
+│       │                       │   ├── BottomBar.kt
+│       │                       │   ├── BottomBarScreen.kt
+│       │                       │   ├── NavigationGraph.kt
+│       │                       │   └── UIState.kt
+│       │                       ├── screens
+│       │                       │   ├── Home.kt
+│       │                       │   ├── PersonalProjects.kt
+│       │                       │   ├── Profile.kt
+│       │                       │   ├── project
+│       │                       │   │   ├── Commits.kt
+│       │                       │   │   ├── Issues.kt
+│       │                       │   │   ├── Members.kt
+│       │                       │   │   ├── MergeRequests.kt
+│       │                       │   │   ├── Overview.kt
+│       │                       │   │   ├── Pipelines.kt
+│       │                       │   │   └── Repository.kt
+│       │                       │   ├── Projects.kt
+│       │                       │   └── SplashScreen.kt
+│       │                       └── viewmodels
+│       │                           ├── ProfileViewModel.kt
+│       │                           └── project
+│       │                               ├── IssuesViewModel.kt
+│       │                               ├── MembersViewModel.kt
+│       │                               ├── PersonalProjectsViewModel.kt
+│       │                               ├── PipelinesViewModel.kt
+│       │                               ├── ProjectMRsViewModel.kt
+│       │                               ├── ProjectsViewModel.kt
+│       │                               └── repository
+│       │                                   └── RepositoryViewModel.kt
+│       └── test
+│           └── java
+│               └── com
+│                   └── ahtat204
+│                       └── gitlab
+│                           ├── data
+│                           │   └── remote
+│                           │       └── repositories
+│                           │           └── graphql
+│                           │               └── ApolloGraphQLRepositoryTest.kt
+│                           ├── presentation
+│                           │   └── viewmodels
+│                           │       ├── ProfileViewModelTest.kt
+│                           │       ├── project
+│                           │       │   ├── IssuesViewModelTest.kt
+│                           │       │   ├── MembersViewModelTest.kt
+│                           │       │   ├── PersonalProjectsViewModelTest.kt
+│                           │       │   ├── PipelinesViewModelTest.kt
+│                           │       │   ├── ProjectMRsViewModelTest.kt
+│                           │       │   ├── ProjectsViewModelTest.kt
+│                           │       │   └── repository
+│                           │       │       └── RepositoryViewModelTest.kt
+│                           │       └── testBase.kt
+│                           └── reponses
+│                               ├── json
+│                               │   ├── mockedAllProjects.kt
+│                               │   ├── mockedBranches.kt
+│                               │   ├── mockedCommits.kt
+│                               │   ├── mockedIssues.kt
+│                               │   ├── mockedMembers.kt
+│                               │   ├── mockedMrs.kt
+│                               │   ├── mockedPipelines.kt
+│                               │   ├── mockedProject.kt
+│                               │   ├── mockedProjects.kt
+│                               │   └── mockedRepository.kt
+│                               └── objects
+│                                   ├── mockedAllProjects.kt
+│                                   ├── mockedBranches.kt
+│                                   ├── mockedCommits.kt
+│                                   ├── mockedIssues.kt
+│                                   ├── mockedMembers.kt
+│                                   ├── mockedMRs.kt
+│                                   ├── mockedProfile.kt
+│                                   ├── mockedProject.kt
+│                                   ├── mockedProjects.kt
+│                                   ├── mockProjectPipelinesData.kt
+│                                   └── mockRepository.kt
 ├── ARCHITECTURE.md
-├── README.md
 ├── build.gradle.kts
+├── gradle
+│   ├── libs.versions.toml
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
 ├── gradle.properties
 ├── gradlew
 ├── gradlew.bat
-├── local.properties
-├── secrets.properties
-├── settings.gradle.kts
-├── projects.json
-├── assets/
-│   ├── homescreen.jpg
-│   ├── personalprojects.jpg
-│   ├── profile.jpg
-│   ├── projectdetails.jpg
-│   ├── projectlist.jpg
-│   ├── projectsScreen.jpg
-├── .github/
-│   └── workflows/
-│       ├── Bundle.yml
-│       └── CI.yml
-├── app/
-│   ├── build.gradle.kts
-│   ├── proguard-rules.pro
-│   └── src/
-│       └── main/
-│           ├── AndroidManifest.xml
-│           ├── graphql/
-│           │   └── com/ahtat204/
-│           │       ├── GetMyProfile.graphql
-│           │       ├── GetProjectCommits.graphql
-│           │       ├── GetProjectDetails.graphql
-│           │       ├── GetProjectIssues.graphql
-│           │       ├── GetProjectMRs.graphql
-│           │       ├── GetProjectPipelines.graphql
-│           │       ├── GetUserProjectsByName.graphql
-│           │       ├── LoadMoreProjects.graphql
-│           │       ├── ProjectsList.graphql
-│           │       └── schema.graphqls 
-│           ├── java/
-│           │   └── com/ahtat204/gitlab/
-│           │       ├── GitlabApp.kt
-│           │       ├── data/
-│           │       │   ├── remote/AuthenticationInterceptor.kt
-│           │       │   ├── repositories/
-│           │       │   │   ├── profile/
-│           │       │   │   │   ├── ProfileRepository.kt
-│           │       │   │   │   └── ProfileRepositoryImpl.kt
-│           │       │   │   ├── project/
-│           │       │   │   │   ├── GraphQlRepository.kt
-│           │       │   │   │   └── ApolloGraphQLRepository.kt
-│           │       │   │   └── user/
-│           │       │   │       ├── UserRepository.kt
-│           │       │   │       └── UserRepositoryImpl.kt
-│           │       │   └── security/CryptoUtility.kt
-│           │       ├── domain/
-│           │       │   ├── di/
-│           │       │   │   ├── ApolloModule.kt
-│           │       │   │   ├── OkHttpModule.kt
-│           │       │   │   ├── ProfileRepositoryModule.kt
-│           │       │   │   ├── ProjectRepositoryModule.kt
-│           │       │   │   └── UserRepositoryModule.kt
-│           │       │   ├── models/
-│           │       │   │   ├── MergeRequest.kt
-│           │       │   │   └── Project.kt
-│           │       │   └── usecase/
-│           │       │       ├── authentication/
-│           │       │       │   ├── AuthStateSerializer.kt
-│           │       │       │   ├── SafeStore.kt
-│           │       │       │   ├── constants/AuthConfig.kt
-│           │       │       │   ├── constants/Tokens.kt
-│           │       │       │   ├── security/
-│           │       │       │   │   ├── CryptoUtility.kt
-│           │       │       │   │   └── SafeStore.kt
-│           │       │       │   └── utility/Helper.kt
-│           │       ├── presentation/
-│           │       │   ├── activities/
-│           │       │   │   ├── AuthenticationActivity.kt
-│           │       │   │   ├── LauncherActivity.kt
-│           │       │   │   └── MainActivity.kt
-│           │       │   ├── components/
-│           │       │   │   ├── About.kt
-│           │       │   │   ├── AutoLinkText.kt
-│           │       │   │   ├── Category.kt
-│           │       │   │   ├── CoilCache.kt
-│           │       │   │   ├── CollaborationDetails.kt
-│           │       │   │   ├── CommitCard.kt
-│           │       │   │   ├── Contact.kt
-│           │       │   │   ├── Count.kt
-│           │       │   │   ├── GeneralDetails.kt
-│           │       │   │   ├── Header.kt
-│           │       │   │   ├── Info.kt
-│           │       │   │   ├── LanguageCircle.kt
-│           │       │   │   ├── LanguagesBar.kt
-│           │       │   │   ├── MergeRequestsSummary.kt
-│           │       │   │   ├── PipelineStatusIcon.kt
-│           │       │   │   ├── ProjectItem.kt
-│           │       │   │   ├── ProjectStatistics.kt
-│           │       │   │   ├── ProjectWorkItems.kt
-│           │       │   │   ├── ToDoItems.kt
-│           │       │   │   ├── TodoList.kt
-│           │       │   │   ├── TopAppBar.kt
-│           │       │   │   ├── TopBar.kt
-│           │       │   │   ├── withCacheFallBack.kt
-│           │       │   │   ├── WorkItem.kt
-│           │       │   │   └── WorkItems.kt
-│           │       │   ├── navigation/
-│           │       │   │   ├── BottomBar.kt
-│           │       │   │   ├── BottomBarScreen.kt
-│           │       │   │   ├── NavigationGraph.kt
-│           │       │   │   └── UIState.kt
-│           │       │   ├── screens/
-│           │       │   │   ├── Home.kt
-│           │       │   │   ├── Issues.kt
-│           │       │   │   ├── MergeRequests.kt
-│           │       │   │   ├── PersonalProjects.kt
-│           │       │   │   ├── Profile.kt
-│           │       │   │   ├── ProjectCommits.kt
-│           │       │   │   ├── ProjectDetailsScreen.kt
-│           │       │   │   ├── Projects.kt
-│           │       │   │   ├── SplashScreen.kt
-│           │       │   │   └── StarrtedProjects.kt
-│           │       │   ├── ui/theme/
-│           │       │   │   ├── Color.kt
-│           │       │   │   ├── Theme.kt
-│           │       │   │   └── Type.kt
-│           │       │   └── viewmodels/
-│           │       │       ├── ProfileViewModel.kt
-│           │       │       ├── ProjectViewModel.kt
-│           │       │       ├── RepositoryViewModel.kt
-│           │       │       └── UserViewModel.kt
-│           └── res/
-│               └── drawable/
-│                   ├── commit.png
-│                   ├── failed.png
-│                   ├── fork.png
-│                   ├── github.png
-│                   ├── gitlab.png
-│                   ├── group.png
-│                   ├── issues.png
-│                   ├── linkedin.png
-│                   ├── logo.png
-│                   ├── members.png
-│                   ├── mergerequest.png
-│                   ├── milestone.png
-│                   ├── pipeline.png
-│                   ├── project.png
-│                   ├── repository.png
-│                   ├── star.png
-│                   ├── status_failed.png
-│                   ├── status_success.png
-│                   ├── workitems.png
-│                   └── workspaces.png
-├── gradle/
-│   ├── libs.versions.toml
-│   └── wrapper/
-│       ├── gradle-wrapper.jar
-│       └── gradle-wrapper.properties
-
+├── history.jpg
+├── home.jpg
+├── homescreen.jpg
+├── issues.jpg
+├── members.jpg
+├── mrs.jpg
+├── personalprojects.jpg
+├── profile.jpg
+├── projectdetails.jpg
+├── projectlist.jpg
+├── projectsScreen.jpg
+├── README.md
+├── repository.jpg
+└── settings.gradle.kts
 ```
 
 ---
@@ -299,7 +357,7 @@ Gitlab/
 
 ```properties
 # secrets.properties
-CLIENT_ID: # this the Gitlab OAuth2 ClientID you get when creating an application on Gitlab , you define scope, redirect URL , you also get a Client Secret as well  
+CLIENT_ID:# this the Gitlab OAuth2 ClientID you get when creating an application on Gitlab , you define scope, redirect URL , you also get a Client Secret as well  
 ```
 
 ### Dependencies
