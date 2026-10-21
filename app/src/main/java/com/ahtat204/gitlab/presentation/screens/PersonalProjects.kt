@@ -6,27 +6,39 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.ImageLoader
+import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.components.CoilCache.loader
 import com.ahtat204.gitlab.presentation.components.ProjectItem
+import com.ahtat204.gitlab.presentation.viewmodels.project.PersonalProjectsViewModel
 import com.ahtat204.gitlab.presentation.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.viewmodels.project.PersonalProjectsViewModel
 import java.time.Instant
@@ -61,7 +73,7 @@ import java.time.ZoneId
  * ```kotlin
  * PersonalProjects(
  *     x = PaddingValues(16.dp),
- *     projectViewModel = hiltViewModel()
+ *     personalProjectsViewModel = hiltViewModel()
  * )
  * ```
  *
@@ -81,39 +93,65 @@ fun PersonalProjects(
     LaunchedEffect(1) {
         personalProjectsViewModel.loadAllProjects()
     }
-    val currUser by personalProjectsViewModel.projects.collectAsState()
-    currUser?.namespace?.projects?.nodes?.sortedByDescending {
-        Instant.parse(it?.lastActivityAt.toString()).atZone(ZoneId.systemDefault())
-            .toLocalDate()
-    }?.let { nodes ->
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(x)
-                .background(Color.Black)
-        ) {
-            if (currUser?.namespace?.projects?.nodes?.isEmpty() == true || currUser?.avatarUrl == null) {
-                CircularProgressIndicator(modifier = Modifier.offset(160.dp, y = (190).dp))
-
-            } else {
-                Text(
-                    text = "Your Projects",
-                    fontFamily = titleFont,
-                    fontSize = 20.sp,
-                    modifier = Modifier
-                )
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = x,
-                    verticalArrangement = Arrangement.spacedBy(0.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    items(nodes, key = { item -> item?.id ?: Any() }) { item ->
-                        item?.let { ProjectItem(currUser, it, loader, navController) }
+    val currUser by personalProjectsViewModel.projects.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val totalItems = listState.layoutInfo.totalItemsCount
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            // Trigger load when user is 3 items away from the bottom
+            totalItems > 3 && lastVisibleItem >= totalItems - 2
+        }
+    }
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value) {
+            personalProjectsViewModel.loadAllProjects()
+        }
+    }
+        currUser?.namespace?.projects?.nodes?.let { nodes ->
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(x)
+                    .background(Color.Black)
+            ) {
+            if (currUser?.namespace?.projects?.nodes?.isEmpty() != true && currUser?.avatarUrl != null) {
+                    Row(
+                        modifier = Modifier
+                            .background(Color.Black)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Your Projects",
+                            fontFamily = titleFont,
+                            fontSize = 20.sp,
+                            modifier = Modifier
+                                .weight(1.0f)
+                                .offset(20.dp, 0.dp),
+                            textAlign = TextAlign.Center
+                        )
+                        IconButton(
+                        onClick = { personalProjectsViewModel.refreshProjects() },
+                            modifier = Modifier.weight(0.1f)
+                        ) {
+                            Icon(Icons.Default.Refresh, contentDescription = null)
+                        }
+                    }
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(0.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    state = listState
+                    ) {
+                        items(nodes, key = { item -> item?.id ?: Any() }) { item ->
+                            item?.let { ProjectItem(currUser, it, loader, navController) }
+                        }
                     }
                 }
             }
         }
-    }
+
 }

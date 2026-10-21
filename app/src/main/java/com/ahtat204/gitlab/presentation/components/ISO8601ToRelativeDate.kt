@@ -7,8 +7,8 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.logging.Logger
 import kotlin.math.abs
+
 /**
  * Converts an ISO 8601 date-time string with offset into a human-readable relative time string.
  *
@@ -56,10 +56,14 @@ fun iso8601ToRelative(iso8601: String): String {
             else -> formatRelative(abs(secondsDiff), future = false)
         }
     } catch (e: Exception) {
-       Log.d("invalid Date Format","\"Invalid date format. Expected ISO 8601 with offset (e.g., 2026-04-22T17:41:15+02:00)\"")
+        Log.e(
+            "invalid Date Format",
+            "\"Invalid date format. Expected ISO 8601 with offset (e.g., 2026-04-22T17:41:15+02:00)\""
+        )
         throw e
     }
 }
+
 /**
  * Formats a time difference in seconds into a relative string.
  *
@@ -80,15 +84,36 @@ fun iso8601ToRelative(iso8601: String): String {
  * println(result) // "1 hour ago"
  * ```
  */
-private fun formatRelative(seconds: Long, future: Boolean): String {
+fun formatRelative(seconds: Long, future: Boolean): String {
     val minutes = seconds / 60
     val hours = minutes / 60
     val days = hours / 24
+    val months = days / 30
+    val years = months / 12
     val timeStr = when {
+        years > 0 -> "$years month${if (years > 1) "s" else ""}"
+        months > 0 -> "$months month${if (months > 1) "s" else ""}"
         days > 0 -> "$days day${if (days > 1) "s" else ""}"
         hours > 0 -> "$hours hour${if (hours > 1) "s" else ""}"
         minutes > 0 -> "$minutes minute${if (minutes > 1) "s" else ""}"
         else -> "$seconds second${if (seconds > 1) "s" else ""}"
     }
     return if (future) "in $timeStr" else "$timeStr ago"
+}
+
+fun duration(seconds: Long): String {
+    val minutes = seconds / 60
+    val hours = minutes / 60
+    val days = hours / 24
+    val months = days / 30
+    val years = months / 12
+    val timeStr = when {
+        years > 0 -> "$years month${if (years > 1) "s" else ""}"
+        months > 0 -> "$months month${if (months > 1) "s" else ""}"
+        days > 0 -> "$days day${if (days > 1) "s" else ""}"
+        hours > 0 -> "$hours hour${if (hours > 1) "s" else ""}"
+        minutes > 0 -> "$minutes minute${if (minutes > 1) "s" else ""}"
+        else -> "$seconds second${if (seconds > 1) "s" else ""}"
+    }
+    return "in $timeStr"
 }

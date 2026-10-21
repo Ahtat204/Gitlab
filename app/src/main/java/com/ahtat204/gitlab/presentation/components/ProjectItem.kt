@@ -37,11 +37,12 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
-import com.ahtat204.gitlab.presentation.ui.theme.Background
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Background
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -121,6 +122,7 @@ fun ProjectItem(
                         contentDescription = "Sample Image",
                         modifier = Modifier
                             .padding(10.dp)
+                            .offset(y = 13.dp)
                             .size(40.dp)
                             .clip(RoundedCornerShape(20.dp)),
                         onState = { state ->
@@ -139,16 +141,16 @@ fun ProjectItem(
                     .fillMaxHeight()
                     .background(Background)
             ) {
-                val pipelines=project.pipelines?.nodes
-                pipelines?.let {pips->
-                    if(pips.isNotEmpty()){
+                val pipelines = project.pipelines?.nodes
+                pipelines?.let { pips ->
+                    if (pips.isNotEmpty()) {
                         pips[0]?.status?.let { PipeLineStatusIcon(it) }
                     }
 
                 }
 
 
-            //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+                //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
 
                 project.let { project ->
                     Row(
@@ -230,53 +232,12 @@ fun ProjectItem(
 
 }
 
-/**
- * Composable that renders a single GitLab project item card.
- *
- * ## Overview
- * Displays project details including:
- * - User avatar (if available)
- * - Project name and visibility (public/private icon)
- * - Project description (truncated to one line)
- * - Project topics (up to 3 shown)
- * - Primary language with color indicator
- *
- * ## Parameters
- * @param data The [com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery.CurrentUser] object containing user metadata
- *             (used to load avatar image if available).
- * @param project The [com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery.Project] object representing the project
- *                whose details will be displayed.
- * @param imageLoader The [ImageLoader] instance used by Coil to load images asynchronously.
- *
- * ## UI Behavior
- * - Wraps content in a [Card] with fixed height.
- * - Displays avatar image using [AsyncImage] with caching and crossfade enabled.
- * - Shows project name alongside a visibility icon (`Public` or `Lock`).
- * - Shows project description if present, truncated with ellipsis.
- * - Displays up to three topics styled in orange.
- * - Displays the first language with a colored circle and name.
- *
- * ## Example
- * ```kotlin
- * ProjectItem(
- *     data = userData,
- *     project = project,
- *     imageLoader = imageLoader
- * )
- * ```
- *
- * ## Notes
- * - Uses Coil’s [AsyncImage] for image loading with memory and disk caching.
- * - Applies custom font family and colors for consistent styling.
- * - Topics and languages are optional and only shown if available.
- * @author Lahcen AHTAT
- */
 @Composable
 fun ProjectItem(
-    data: GetMyContributedProjectsQuery.CurrentUser?,
-    project: GetMyContributedProjectsQuery.Node,
+    project: GetAllProjectsQuery.Project,
     imageLoader: ImageLoader,
-    navController: NavHostController
+    navController: NavHostController,
+    avatarUrl: String?
 ) {
     val encodedId = URLEncoder.encode(project.fullPath, StandardCharsets.UTF_8.toString())
     Card(
@@ -293,7 +254,31 @@ fun ProjectItem(
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.Start
         ) {
-   /*         data?.let {
+            avatarUrl?.let { url ->
+                val avatar = "https://gitlab.com/$url"
+
+                AsyncImage(
+                    imageLoader = imageLoader,
+                    model = ImageRequest.Builder(LocalContext.current).data(avatar) // Image URL
+                        .crossfade(true).memoryCachePolicy(CachePolicy.ENABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED) // Smooth fade-in
+                        .build(),
+                    contentDescription = "Sample Image",
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .offset(y = 13.dp)
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(20.dp)),
+                    onState = { state ->
+                        when (state) {
+                            is AsyncImagePainter.State.Loading -> {}
+                            is AsyncImagePainter.State.Success -> {}
+                            else -> {}
+                        }
+                    })
+            }
+
+            project.let {
                 it.avatarUrl?.let { url ->
                     val avatar = "https://gitlab.com/$url"
 
@@ -316,7 +301,7 @@ fun ProjectItem(
                             }
                         })
                 }
-            }*/
+            }
 
             Column(
                 modifier = Modifier
@@ -324,16 +309,16 @@ fun ProjectItem(
                     .fillMaxHeight()
                     .background(Background)
             ) {
-                val pipelines=project.pipelines?.nodes
-                pipelines?.let {pips->
-                    if(pips.isNotEmpty()){
+                val pipelines = project?.pipelines?.nodes
+                pipelines?.let { pips ->
+                    if (pips.isNotEmpty()) {
                         pips[0]?.status?.let { PipeLineStatusIcon(it) }
                     }
 
                 }
 
 
-            //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
+                //    project.pipelines?.nodes?.get(0)?.status?.let { PipeLineStatusIcon(it) }
 
                 project.let { project ->
                     Row(
@@ -414,27 +399,3 @@ fun ProjectItem(
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-
-fun hexColorToLong(hex: String): Long {
-    val cleanHex = hex.removePrefix("#").trim()
-    require(cleanHex.matches(Regex("^[0-9A-Fa-f]{6}$"))) {
-        "Invalid hex color format. Expected #RRGGBB."
-    }
-
-    // Parse as unsigned long from hex
-    return cleanHex.toLong(16)
-}*/

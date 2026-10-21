@@ -19,3 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# Optimize Apollo generated models and adapters
+-keepclassmembers class * implements com.apollographql.apollo3.api.Adapter {
+    public *** toJson(...);
+    public *** fromJson(...);
+}
+-assumenosideeffects class com.apollographql.apollo3.api.ApolloClient {
+    public void close();
+}

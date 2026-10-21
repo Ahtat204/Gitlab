@@ -16,7 +16,7 @@ import javax.inject.Inject
  * ViewModel responsible for exposing GitLab project data to the UI layer.
  *
  * ## Overview
- * - Integrates with [com.ahtat204.gitlab.data.remote.repositories.project.ProjectRepository] to fetch project lists and repository trees.
+ * - Integrates with [com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository] to fetch project lists and repository trees.
  * - Uses Kotlin [kotlinx.coroutines.flow.StateFlow] to provide reactive, lifecycle‑aware state to the UI.
  * - Scoped with [dagger.hilt.android.lifecycle.HiltViewModel] for dependency injection and lifecycle management.
  *
@@ -28,6 +28,7 @@ import javax.inject.Inject
  * - **loadAllProjects()**: Fetches all projects using Apollo caching. Falls back
  *   to `NetworkFirst` policy if cache retrieval fails.
  * - **loadProject(id)**: Retrieves a specific project’s repository details by ID.
+ * - **refreshProjects()**: Manually invalidates the project cache and triggers a re-fetch.
  *
  * ## Error Handling
  * - Exceptions during data collection are caught. The ViewModel retries with
@@ -37,7 +38,7 @@ import javax.inject.Inject
  * Inject into a UI controller (e.g., Activity/Fragment) and collect flows:
  * ```kotlin
  * @Composable
- * fun screen(projectVM:ProjectViewModel=hiltViewModel) {
+ * fun screen(projectVM:PersonalProjectsViewModel=hiltViewModel) {
  *  LaunchedEffect(1) {
  *         projectViewModel.loadAllProjects()
  *     }
@@ -46,7 +47,7 @@ import javax.inject.Inject
  * @author Lahcen AHTAT
  */
 @HiltViewModel
-class PersonalProjectsViewModel @Inject constructor(private val graphqlRepository: GraphQlRepository) :
+class PersonalProjectsViewModel @Inject constructor(private val graphQlRepository: GraphQlRepository) :
     ViewModel() {
     /** Currently selected project’s overview/details */
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
@@ -59,12 +60,30 @@ class PersonalProjectsViewModel @Inject constructor(private val graphqlRepositor
 
     /**
      * Loads all projects contributed by the authenticated user.
-     *
-     * - First attempts with [com.apollographql.apollo.cache.normalized.FetchPolicy.CacheFirst].
-     * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
-    fun loadAllProjects() = viewModelScope.launch {
-        graphqlRepository.getAllProjects().collect { _projects.value = it.currentUser }
+    fun loadAllProjects() {
+        val value = _projects.value
+        if (value == null) viewModelScope.launch {
+            graphQlRepository.getAllPersonalProjects().collect { _projects.value = it.currentUser }
+        }
+        else {
+            val nodes = value.namespace?.projects?.nodes
+            if (nodes?.isEmpty() == true) viewModelScope.launch {
+                graphQlRepository.getAllPersonalProjects()
+                    .collect { _projects.value = it.currentUser }
+            }
+            val page = value.namespace?.projects?.pageInfo
+            val hasNextPage = page?.hasNextPage
+            val cursor = page?.endCursor
+            if (hasNextPage == true && cursor != null) {
+                viewModelScope.launch {
+                    graphQlRepository.getAllPersonalProjects(cursor)
+                        .collect { _projects.value = it.currentUser }
+                }
+
+            }
+        }
+
     }
 
     /**
@@ -72,8 +91,38 @@ class PersonalProjectsViewModel @Inject constructor(private val graphqlRepositor
      *
      * @param id The unique project identifier.
      */
-    fun loadProject(id: String) = viewModelScope.launch {
-        graphqlRepository.getProjectById(id).collect { currentProject.value = it?.project }
+    fun loadProject(id: String) {
+        viewModelScope.launch {
+            graphQlRepository.getProjectById(id).collect { currentProject.value = it?.project }
+        }
+    }
+
+    /**
+     * Performs a manual refresh of the contributed projects list.
+     *
+     * This logic:
+     * 1. Invalids the current projects in the [graphQlRepository]'s local cache.
+     * 2. Clears the local [_projects] state to ensure UI reflects a "loading" or "empty" state.
+     * 3. Re-triggers [loadAllProjects] to fetch a fresh set of data from the network.
+     */
+    fun refreshProjects() {
+        val scope = viewModelScope
+        scope.launch {
+            graphQlRepository.refresh(GetMyPersonalProjectsQuery.Data(_projects.value))
+            _projects.value = null
+            loadAllProjects()
+        }
+
+    }
+
+    fun refetchProject(id: String) {
+        val scope = viewModelScope
+        val value = currentProject.value
+        scope.launch {
+            graphQlRepository.refresh(GetProjectDetailsQuery.Data(value))
+            currentProject.value = null
+            loadProject(id)
+        }
     }
 
 }

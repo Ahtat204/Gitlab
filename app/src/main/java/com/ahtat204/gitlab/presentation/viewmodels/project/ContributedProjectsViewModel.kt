@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
-import com.ahtat204.gitlab.presentation.components.withCacheFallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +31,25 @@ class ContributedProjectsViewModel @Inject constructor(private val graphqlReposi
      * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
      */
     fun loadAllProjects() = viewModelScope.launch {
-        graphqlRepository.getAllMyContributedProjects().collect { _projects.value = it.currentUser }
+        val scope = viewModelScope
+        val value = _projects.value
+        if (value == null) {
+            scope.launch {
+                graphqlRepository.getAllMyContributedProjects()
+                    .collect { _projects.value = it.currentUser }
+            }
+        } else {
+            val projects = value.contributedProjects
+            val page = projects?.pageInfo
+            val cursor = page?.endCursor
+            val hasNextPage = page?.hasNextPage
+            if (hasNextPage == true && cursor != null) {
+                scope.launch {
+                    graphqlRepository.getAllMyContributedProjects()
+                        .collect { _projects.value = it.currentUser }
+                }
+            }
+        }
     }
 
     /**
@@ -41,10 +58,6 @@ class ContributedProjectsViewModel @Inject constructor(private val graphqlReposi
      * @param id The unique project identifier.
      */
     fun loadProject(id: String) = viewModelScope.launch {
-        graphqlRepository.getProjectById(id).withCacheFallback {
-            graphqlRepository.getProjectById(
-                id
-            )
-        }.collect { currentProject.value = it?.project }
+        graphqlRepository.getProjectById(id).collect { currentProject.value = it?.project }
     }
 }

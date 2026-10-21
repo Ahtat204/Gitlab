@@ -5,6 +5,7 @@ query GetMyContributedProjects($cursor:String){
                     startCursor
                     hasNextPage
                     hasPreviousPage
+                    endCursor
                 }
                 nodes {
                     avatarUrl

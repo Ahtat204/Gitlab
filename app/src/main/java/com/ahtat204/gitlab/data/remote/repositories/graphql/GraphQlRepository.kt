@@ -1,13 +1,20 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
+import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
+import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
+import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
+import com.apollographql.apollo.api.Operation
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -20,10 +27,17 @@ import kotlinx.coroutines.flow.Flow
  * 3. **Optimize Apollo Usage**: Facilitates cross-domain data consistency through Apollo's normalized cache.
  *
  * ### Key Responsibilities:
- * - **User Dashboard**: [getAllProjects] and [getMyProfile].
- * - **Project Intelligence**: [getProjectById] and [getUserProjectsByName].
- * - **Repository Browsing**: [getProjectRepository] and [getProjectCommits].
- * - **Git Metadata**: [getRepositoryBranches].
+ * - **User Dashboard**: Fetching personal projects [getAllPersonalProjects] and user profile [getMyProfile].
+ * - **Project Intelligence**: Retrieving detailed project statistics [getProjectById] and user-specific projects [getUserProjectsByName],Project Issues [getProjectIssues].
+ * - **Project Intelligence**: Retrieving detailed project statistics [getProjectById] and user-specific projects [getUserProjectsByName], [getProjectMergeRequests]: Retrieves and streams first 20 merge request ina Gitlab Project in descending order by creation Date..
+ * - **Repository Browsing**: Accessing file hierarchies [getProjectRepository] and commit histories [getProjectCommits].
+ * - **Git Metadata**: Listing repository branches [getRepositoryBranches].
+ * - **CI/CD Visibility**: Monitoring project pipelines [getProjectPipelines].
+
+ *
+ * ### Cache Strategy:
+ * Implementations should prioritize Apollo's normalized cache to ensure snappy UI transitions
+ * and minimize redundant network traffic. Manual invalidation is supported via [refresh].
  *
  * @author Lahcen AHTAT
  */
@@ -32,9 +46,8 @@ interface GraphQlRepository {
      * Streams all projects that the currently authenticated user has contributed to.
      *
      * @return A reactive stream emitting the user's personal project collection metadata.
-     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
      */
-    suspend fun getAllProjects(): Flow<GetMyPersonalProjectsQuery.Data>
+    suspend fun getAllPersonalProjects(cursor: String? = null): Flow<GetMyPersonalProjectsQuery.Data>
 
     /**
      * Retrieves and monitors a comprehensive overview of a single project.
@@ -44,7 +57,6 @@ interface GraphQlRepository {
      *
      * @param id The unique identifier or full path of the target GitLab project.
      * @return A reactive stream emitting the project overview dataset, or null if the project is unavailable.
-     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
      */
     suspend fun getProjectById(id: String): Flow<GetProjectDetailsQuery.Data?>
 
@@ -55,7 +67,6 @@ interface GraphQlRepository {
      * @param branch The target git reference branch. Pass null to default to the repository's root reference.
      * @param path The relative sub-directory path to query inside the repository. Pass null to open the root folder.
      * @return A reactive stream emitting the repository tree layer layout, or null if invalid or inaccessible.
-     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
      */
     suspend fun getProjectRepository(id: String, branch: String?, path: String? = null): Flow<Data?>
 
@@ -65,7 +76,6 @@ interface GraphQlRepository {
      * @param project The unique identifier or full path of the target GitLab project.
      * @param skip The element offset index utilized to advance paginated window frames.
      * @return A reactive stream emitting the current window slice of matching branch records.
-     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
      */
     suspend fun getRepositoryBranches(
         project: String, skip: Int
@@ -80,16 +90,26 @@ interface GraphQlRepository {
      * @param branch The targeted git branch line from which to trace commit milestones.
      * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
      * @return A reactive stream emitting the combined commit log historical records, or null if missing.
-     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
     suspend fun getProjectCommits(
         id: String, branch: String, cursor: String?
     ): Flow<GetRepositoryCommitsQuery.Data?>
 
     /**
-     * Streams a continuous FLow containing the CurrentUser Profile data.
-     * @return A reactive stream emitting the Authenticated User's profile details
-     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     * Retrieves a paginated chunk of available Merged requests  within a project.
+     *
+     * @param id The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the current window slice of matching branch records.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
+    suspend fun getProjectMergeRequests(
+        id: String, cursor: String? = null
+    ): Flow<GetProjectMergeRequestsQuery.Data>
+    /**
+     * Streams a continuous Flow containing the CurrentUser Profile data.
+     *
+     * @return A reactive stream emitting the Authenticated User's profile details.
      */
     fun getMyProfile(): Flow<GetMyProfileQuery.Data>
 
@@ -98,11 +118,72 @@ interface GraphQlRepository {
      *
      * @param userName The unique username of the GitLab user.
      * @return A reactive stream emitting the user's project collection metadata, or null if not found.
-     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
      */
     suspend fun getUserProjectsByName(
         userName: String
     ): Flow<GetUserProjectsByNameQuery.Data?>
+
+    /**
+     * Manually invalidates and refreshes specific data in the normalized cache.
+     *
+     * Removes the existing operation data from the cache and triggers a re-fetch
+     * to ensure active observers receive fresh data.
+     *
+     * @param D The data type of the GraphQL operation.
+     * @param data The specific data object used to identify what needs removal.
+     */
+    suspend fun <D : Operation.Data> refresh(data: D?)
+
+    /**
+     * Streams a continuous, sequentially chunked record of project CI/CD pipelines.
+     *
+     * Implementations are expected to manage incremental page updates and item appending states.
+     *
+     * @param project The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
+     * @param status The status [PipelineStatusEnum] filter for the pipelines. Defaults to [PipelineStatusEnum.SUCCESS].
+     * @return A reactive stream emitting the filtered pipeline collection metadata.
+     */
+    suspend fun getProjectPipelines(
+        project: String,
+        cursor: String? = null,
+        status: PipelineStatusEnum = PipelineStatusEnum.SUCCESS
+    ): Flow<GetProjectPipelinesQuery.Data>
+
+    /**
+     * Streams all projects that the currently authenticated user has access to, with pagination support.
+     *
+     * @param cursor The pagination pointer for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the user's project memberships metadata.
+     */
+    suspend fun getAllProjects(cursor: String? = null): Flow<GetAllProjectsQuery.Data>
+
+    /**
+     * Streams a paginated list of members for a specific GitLab project.
+     *
+     * @param project The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the current window slice of project member records.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
+    suspend fun getProjectMembers(
+        project: String, cursor: String? = null
+    ): Flow<GetProjectMembersQuery.Data>
+
+    /**
+     * Streams a continuous, sequentially chunked record of first 20 issues in a project.
+     *
+     * Implementations are expected to manage incremental page updates and item appending states.
+     *
+     * @param id The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the combined commit log historical records, or null if missing.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     */
+    suspend fun getProjectIssues(
+        id: String,
+        cursor: String? = null
+    ): Flow<GetProjectIssuesQuery.Data>
 
     /**
      * Streams a continuous, sequentially chunked record of the [com.ahtat204.gitlab.data.queries.type.CurrentUser]  contributed  Projects.
