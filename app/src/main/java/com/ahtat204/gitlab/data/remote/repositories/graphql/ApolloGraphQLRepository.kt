@@ -8,7 +8,6 @@ import com.ahtat204.gitlab.data.helpers.fetchAndMergePipelines
 import com.ahtat204.gitlab.data.helpers.fetchAndMergeProjects
 import com.ahtat204.gitlab.data.helpers.mapAndHandleErrors
 import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
-import com.ahtat204.gitlab.data.fetchAndMergeCommits
 import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery

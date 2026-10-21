@@ -1,5 +1,6 @@
 package com.ahtat204.gitlab.presentation.viewmodels
 
+import  com.ahtat204.gitlab.presentation.viewmodels.user.ProfileViewModel
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
 import com.ahtat204.gitlab.reponses.objects.mockedProfile
 import kotlinx.coroutines.Dispatchers

@@ -39,8 +39,6 @@ import com.ahtat204.gitlab.presentation.activities.ui.theme.titleFont
 import com.ahtat204.gitlab.presentation.components.CoilCache.loader
 import com.ahtat204.gitlab.presentation.components.ProjectItem
 import com.ahtat204.gitlab.presentation.viewmodels.project.PersonalProjectsViewModel
-import com.ahtat204.gitlab.presentation.ui.theme.titleFont
-import com.ahtat204.gitlab.presentation.viewmodels.project.PersonalProjectsViewModel
 import java.time.Instant
 import java.time.ZoneId
 
@@ -108,50 +106,50 @@ fun PersonalProjects(
             personalProjectsViewModel.loadAllProjects()
         }
     }
-        currUser?.namespace?.projects?.nodes?.let { nodes ->
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(x)
-                    .background(Color.Black)
-            ) {
+    currUser?.namespace?.projects?.nodes?.let { nodes ->
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(x)
+                .background(Color.Black)
+        ) {
             if (currUser?.namespace?.projects?.nodes?.isEmpty() != true && currUser?.avatarUrl != null) {
-                    Row(
+                Row(
+                    modifier = Modifier
+                        .background(Color.Black)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Your Projects",
+                        fontFamily = titleFont,
+                        fontSize = 20.sp,
                         modifier = Modifier
-                            .background(Color.Black)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Your Projects",
-                            fontFamily = titleFont,
-                            fontSize = 20.sp,
-                            modifier = Modifier
-                                .weight(1.0f)
-                                .offset(20.dp, 0.dp),
-                            textAlign = TextAlign.Center
-                        )
-                        IconButton(
+                            .weight(1.0f)
+                            .offset(20.dp, 0.dp),
+                        textAlign = TextAlign.Center
+                    )
+                    IconButton(
                         onClick = { personalProjectsViewModel.refreshProjects() },
-                            modifier = Modifier.weight(0.1f)
-                        ) {
-                            Icon(Icons.Default.Refresh, contentDescription = null)
-                        }
+                        modifier = Modifier.weight(0.1f)
+                    ) {
+                        Icon(Icons.Default.Refresh, contentDescription = null)
                     }
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(0.dp),
+                }
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     state = listState
-                    ) {
-                        items(nodes, key = { item -> item?.id ?: Any() }) { item ->
-                            item?.let { ProjectItem(currUser, it, loader, navController) }
-                        }
+                ) {
+                    items(nodes, key = { item -> item?.id ?: Any() }) { item ->
+                        item?.let { ProjectItem(currUser, it, loader, navController) }
                     }
                 }
             }
         }
+    }
 
 }
