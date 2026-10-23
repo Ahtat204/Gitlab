@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+typealias CurrentUser = GetMyContributedProjectsQuery.CurrentUser?
+
 @HiltViewModel
 class ContributedProjectsViewModel @Inject constructor(private val graphqlRepository: GraphQlRepository) :
     ViewModel() {
@@ -19,10 +21,10 @@ class ContributedProjectsViewModel @Inject constructor(private val graphqlReposi
     val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
 
     /** Backing state for contributed projects. */
-    private val _projects = MutableStateFlow<GetMyContributedProjectsQuery.CurrentUser?>(null)
+    private val _projects = MutableStateFlow<CurrentUser>(null)
 
     /** Public immutable flow of contributed projects. */
-    val projects: StateFlow<GetMyContributedProjectsQuery.CurrentUser?> = _projects.asStateFlow()
+    val projects: StateFlow<CurrentUser> = _projects.asStateFlow()
 
     /**
      * Loads all projects contributed by the authenticated user.
