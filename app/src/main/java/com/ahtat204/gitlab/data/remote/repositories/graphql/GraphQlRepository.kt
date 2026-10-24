@@ -6,8 +6,8 @@ import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
-import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -106,6 +106,7 @@ interface GraphQlRepository {
     suspend fun getProjectMergeRequests(
         id: String, cursor: String? = null
     ): Flow<GetProjectMergeRequestsQuery.Data>
+
     /**
      * Streams a continuous Flow containing the CurrentUser Profile data.
      *
@@ -192,5 +193,5 @@ interface GraphQlRepository {
      * @return A reactive stream emitting the first 20 Contributed Projects then more with cursor pagination.
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
-    suspend fun getAllMyContributedProjects(): Flow<GetMyContributedProjectsQuery.Data>
+    suspend fun getAllMyContributedProjects(cursor: String? = null): Flow<GetMyContributedProjectsQuery.Data>
 }

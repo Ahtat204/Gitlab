@@ -123,7 +123,7 @@ fun PersonalProjects(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Your Projects",
+                        text = "Your Personal Projects",
                         fontFamily = titleFont,
                         fontSize = 20.sp,
                         modifier = Modifier

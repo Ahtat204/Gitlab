@@ -728,8 +728,14 @@ class ApolloGraphQLRepository @Inject constructor(
      *     }
      * ```
      */
-    override suspend fun getAllMyContributedProjects(): Flow<GetMyContributedProjectsQuery.Data> {
-        return apolloClient.query(GetMyContributedProjectsQuery())
+    override suspend fun getAllMyContributedProjects(cursor: String?): Flow<GetMyContributedProjectsQuery.Data> {
+        return apolloClient.query(
+            GetMyContributedProjectsQuery(
+                cursor = Optional.presentIfNotNull(
+                    cursor
+                )
+            )
+        )
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
     }
 }

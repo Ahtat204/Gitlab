@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -63,10 +66,24 @@ fun ContributedProjects(
     x: PaddingValues,
     viewModel: ContributedProjectsViewModel = hiltViewModel()
 ) {
+    val listState = rememberLazyListState()
+
     LaunchedEffect(1) {
         viewModel.loadAllProjects()
     }
     val currUser by viewModel.projects.collectAsStateWithLifecycle()
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val totalItems = listState.layoutInfo.totalItemsCount
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            totalItems > 1 && lastVisibleItem >= totalItems - 1
+        }
+    }
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value) {
+            viewModel.loadAllProjects()
+        }
+    }
     currUser?.contributedProjects?.nodes?.let { nodes ->
         Column(
             verticalArrangement = Arrangement.Center,
@@ -77,11 +94,12 @@ fun ContributedProjects(
         ) {
             if (currUser?.contributedProjects?.nodes?.isEmpty() != true) {
                 Text(
-                    text = "Your Projects",
+                    text = "Your Contributed Projects",
                     fontFamily = titleFont,
                     fontSize = 20.sp,
                     modifier = Modifier
                 )
+                if (nodes.isEmpty()) return
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = x,
