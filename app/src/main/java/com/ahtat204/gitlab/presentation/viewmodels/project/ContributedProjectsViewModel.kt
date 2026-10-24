@@ -1,0 +1,65 @@
+package com.ahtat204.gitlab.presentation.viewmodels.project
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.remote.repositories.graphql.GraphQlRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+typealias CurrentUser = GetMyContributedProjectsQuery.CurrentUser?
+
+@HiltViewModel
+class ContributedProjectsViewModel @Inject constructor(private val graphqlRepository: GraphQlRepository) :
+    ViewModel() {
+    /** Currently selected project’s overview/details */
+    val currentProject = MutableStateFlow<GetProjectDetailsQuery.Project?>(null)
+
+    /** Backing state for contributed projects. */
+    private val _projects = MutableStateFlow<CurrentUser>(null)
+
+    /** Public immutable flow of contributed projects. */
+    val projects: StateFlow<CurrentUser> = _projects.asStateFlow()
+
+    /**
+     * Loads all projects contributed by the authenticated user.
+     *
+     * - First attempts with [com.apollographql.apollo.cache.normalized.FetchPolicy.CacheFirst].
+     * - On exception, retries with [com.apollographql.apollo.cache.normalized.FetchPolicy.NetworkFirst].
+     */
+    fun loadAllProjects() = viewModelScope.launch {
+        val scope = viewModelScope
+        val value = _projects.value
+        if (value == null) {
+            scope.launch {
+                graphqlRepository.getAllMyContributedProjects()
+                    .collect { _projects.value = it.currentUser }
+            }
+        } else {
+            val projects = value.contributedProjects
+            val page = projects?.pageInfo
+            val cursor = page?.endCursor
+            val hasNextPage = page?.hasNextPage
+            if (hasNextPage == true && cursor != null) {
+                scope.launch {
+                    graphqlRepository.getAllMyContributedProjects()
+                        .collect { _projects.value = it.currentUser }
+                }
+            }
+        }
+    }
+
+    /**
+     * Loads a specific project’s details and statistics,such as commit counts and last commit , open MRs and issues count...
+     *
+     * @param id The unique project identifier.
+     */
+    fun loadProject(id: String) = viewModelScope.launch {
+        graphqlRepository.getProjectById(id).collect { currentProject.value = it?.project }
+    }
+}

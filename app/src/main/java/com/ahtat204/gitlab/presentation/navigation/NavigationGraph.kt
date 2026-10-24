@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.ahtat204.gitlab.presentation.screens.ContributedProjects
 import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
@@ -62,6 +63,9 @@ fun BottomNavigationGraph(
         composable(route = "personal") {
             PersonalProjects(navController, x)
         }
+        composable(route = "contributed") {
+            ContributedProjects(navController, x)
+        }
         composable(route = BottomBarScreen.Activity.route) {
             // Activity screen placeholder
         }
@@ -91,7 +95,7 @@ fun BottomNavigationGraph(
                 arguments = listOf(navArgument("projectId") { defaultValue = "" }))
             {backStackEntry ->
                 val projectId = backStackEntry.arguments?.getString("projectId")
-                projectId?.let {RepositoryScreen(it,x,navController)  }
+                projectId?.let { RepositoryScreen(it,x,navController) }
             }
             composable(
                 route = "project?projectId={projectId}",
