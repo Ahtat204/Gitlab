@@ -1,0 +1,25 @@
+query GetProjectIssues($projectPath:ID!,$cursor:String){
+    project(fullPath: $projectPath){
+        id
+        issues(sort: CREATED_DESC,first: 20,after: $cursor){
+            nodes {
+                id
+                iid
+                name
+                title
+                state
+                createdAt
+                assignees{
+                    nodes {
+                        name
+                    }
+                }
+            }
+            pageInfo {
+                hasNextPage
+                endCursor
+                startCursor
+            }
+        }
+    }
+}

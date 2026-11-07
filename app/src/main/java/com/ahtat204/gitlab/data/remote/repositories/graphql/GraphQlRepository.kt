@@ -1,10 +1,14 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetCurrentUserWorkItemsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetProjectWorkItemsQuery
@@ -18,15 +22,20 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Unified Repository interface for all GitLab GraphQL operations.
  *
- * This repository serves as the **Single Source of Truth (SSOT)** for all data retrieved via GitLab's GraphQL API.
- * It provides a reactive API using Kotlin [Flow] and leverages Apollo's normalized cache for performance and consistency.
+ * This repository serves as the **Single Source of Truth (SSOT)** for all data retrieved via GraphQL.
+ * Unlike traditional domain-driven repositories, this unified approach is used to:
+ * 1. **Minimize Memory Overhead**: Prevents the creation of multiple repository instances for different domains.
+ * 2. **Centralize Data Logic**: Provides a single entry point for all queries, ensuring consistent caching policies.
+ * 3. **Optimize Apollo Usage**: Facilitates cross-domain data consistency through Apollo's normalized cache.
  *
  * ### Key Responsibilities:
  * - **User Dashboard**: Fetching personal projects [getAllPersonalProjects] and user profile [getMyProfile].
- * - **Project Intelligence**: Retrieving detailed project statistics [getProjectById] and user-specific projects [getUserProjectsByName].
+ * - **Project Intelligence**: Retrieving detailed project statistics [getProjectById] and user-specific projects [getUserProjectsByName],Project Issues [getProjectIssues].
+ * - **Project Intelligence**: Retrieving detailed project statistics [getProjectById] and user-specific projects [getUserProjectsByName], [getProjectMergeRequests]: Retrieves and streams first 20 merge request ina Gitlab Project in descending order by creation Date..
  * - **Repository Browsing**: Accessing file hierarchies [getProjectRepository] and commit histories [getProjectCommits].
  * - **Git Metadata**: Listing repository branches [getRepositoryBranches].
  * - **CI/CD Visibility**: Monitoring project pipelines [getProjectPipelines].
+
  *
  * ### Cache Strategy:
  * Implementations should prioritize Apollo's normalized cache to ensure snappy UI transitions
@@ -89,6 +98,18 @@ interface GraphQlRepository {
     ): Flow<GetRepositoryCommitsQuery.Data?>
 
     /**
+     * Retrieves a paginated chunk of available Merged requests  within a project.
+     *
+     * @param id The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the current window slice of matching branch records.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
+    suspend fun getProjectMergeRequests(
+        id: String, cursor: String? = null
+    ): Flow<GetProjectMergeRequestsQuery.Data>
+
+    /**
      * Streams a continuous Flow containing the CurrentUser Profile data.
      *
      * @return A reactive stream emitting the Authenticated User's profile details.
@@ -139,6 +160,42 @@ interface GraphQlRepository {
      * @return A reactive stream emitting the user's project memberships metadata.
      */
     suspend fun getAllProjects(cursor: String? = null): Flow<GetAllProjectsQuery.Data>
+
+    /**
+     * Streams a paginated list of members for a specific GitLab project.
+     *
+     * @param project The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the current window slice of project member records.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is cancelled.
+     */
+    suspend fun getProjectMembers(
+        project: String, cursor: String? = null
+    ): Flow<GetProjectMembersQuery.Data>
+
+    /**
+     * Streams a continuous, sequentially chunked record of first 20 issues in a project.
+     *
+     * Implementations are expected to manage incremental page updates and item appending states.
+     *
+     * @param id The unique identifier or full path of the target GitLab project.
+     * @param cursor The pagination pointer marking the anchor location for sequential page fetches. Pass null for the initial page.
+     * @return A reactive stream emitting the combined commit log historical records, or null if missing.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     */
+    suspend fun getProjectIssues(
+        id: String,
+        cursor: String? = null
+    ): Flow<GetProjectIssuesQuery.Data>
+
+    /**
+     * Streams a continuous, sequentially chunked record of the [com.ahtat204.gitlab.data.queries.type.CurrentUser]  contributed  Projects.
+     *
+     * Implementations are expected to manage incremental page updates and item appending states.
+     * @return A reactive stream emitting the first 20 Contributed Projects then more with cursor pagination.
+     * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
+     */
+    suspend fun getAllMyContributedProjects(cursor: String? = null): Flow<GetMyContributedProjectsQuery.Data>
 
     /**
      * Streams all workitems  of the currently authenticated user , with pagination support.

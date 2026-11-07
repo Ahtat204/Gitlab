@@ -27,7 +27,10 @@ val mockProjectPipelinesData = Data(
                     ref = "main",
                     mergeRequest = MergeRequest(
                         __typename = "MergeRequest",
-                        name = "implementing Kafka Consumer"
+                        name = "implementing Kafka Consumer",
+                        iid = "43",
+                        sourceBranch = "feature/jwt",
+                        title = "asymmetric jwt keys "
                     ),
                     commit = Commit(
                         __typename = "Commit",
@@ -48,7 +51,10 @@ val mockProjectPipelinesData = Data(
                     ref = "feature/api-fix",
                     mergeRequest = MergeRequest(
                         __typename = "MergeRequest",
-                        name = "Resolve API payload serialization bug"
+                        name = "Resolve API payload serialization bug",
+                        iid = "50",
+                        sourceBranch = "feature/observability",
+                        title = "OTEL with Elasticsearch and Grafana Tempo"
                     ),
                     commit = Commit(
                         __typename = "Commit",

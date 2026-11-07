@@ -63,24 +63,24 @@ class LauncherActivity : ComponentActivity() {
         var isReady = false
         splashScreen.setKeepOnScreenCondition { isReady }
         lifecycleScope.launch(Dispatchers.IO) {
-        val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
+            val storedState = AuthStorage.getAuthState(this@LauncherActivity).data.first()
 
-        if (!storedState.isAuthorized) {
-            isReady = true
-            navigateTo(AuthenticationActivity::class.java)
-        } else {
-            // Even if offline, we load the cached state so tokens are ready
-            if (isConnected()) {
-                refresh { isReady = true }
-            } else {
-                // If offline, just load from cache and proceed
-                Tokens.CurrentAuthState = storedState
-                Tokens.accessToken = storedState.accessToken
+            if (!storedState.isAuthorized) {
                 isReady = true
-                navigateTo(MainActivity::class.java)
+                navigateTo(AuthenticationActivity::class.java)
+            } else {
+                // Even if offline, we load the cached state so tokens are ready
+                if (isConnected()) {
+                    refresh { isReady = true }
+                } else {
+                    // If offline, just load from cache and proceed
+                    Tokens.CurrentAuthState = storedState
+                    Tokens.accessToken = storedState.accessToken
+                    isReady = true
+                    navigateTo(MainActivity::class.java)
+                }
             }
         }
-    }
     }
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)

@@ -1,14 +1,21 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
-import com.ahtat204.gitlab.data.fetchAndMergeCommits
-import com.ahtat204.gitlab.data.fetchAndMergePipelines
-import com.ahtat204.gitlab.data.fetchAndMergeProjects
-import com.ahtat204.gitlab.data.mapAndHandleErrors
+import com.ahtat204.gitlab.data.helpers.fetchAndMergeCommits
+import com.ahtat204.gitlab.data.helpers.fetchAndMergeIssues
+import com.ahtat204.gitlab.data.helpers.fetchAndMergeMRs
+import com.ahtat204.gitlab.data.helpers.fetchAndMergeMembers
+import com.ahtat204.gitlab.data.helpers.fetchAndMergePipelines
+import com.ahtat204.gitlab.data.helpers.fetchAndMergeProjects
+import com.ahtat204.gitlab.data.helpers.mapAndHandleErrors
 import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetCurrentUserWorkItemsQuery
+import com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
+import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.data.queries.GetProjectWorkItemsQuery
@@ -39,11 +46,25 @@ import javax.inject.Singleton
  * - **Streamline DI**: Simplifies dependency injection configuration.
  *
  * ## Data Strategy
+ * - **Reactive Streams**: Returns Kotlin [Flow] to provide real-time updates when the cache changes.
+ * - **Normalized Caching**: Leverages Apollo's cache to minimize network requests and ensure data integrity.
+ * - **Performance**: Annotated with [Singleton] to persist across the app's lifecycle without redundant object creation.
+ * ## Responsibilities
+ * - Fetch all projects contributed by the authenticated user.
+ * - Access detailed project metadata including star counts, fork counts, and descriptions.
+ * - Retrieve and monitor repository tree structures (files and directories).
+ * - Fetch paginated commit histories and branch lists for a project repository.
+ * - Stream project merge requests with support for pagination.
+ * - Handle errors gracefully with unified logging and structured concurrency.
  * - **Reactive Streams**: Returns Kotlin [Flow] to provide real-time updates when the cache changes using Apollo's [watch] mechanism.
  * - **Normalized Caching**: Leverages Apollo's cache to minimize network requests, support offline viewing, and ensure data integrity.
  * - **Performance**: Annotated with [Singleton] to persist across the app's lifecycle.
  *
  * @param apolloClient The primary GraphQL engine used for network transport and cache management.
+ * ## Dependencies
+ * - [ApolloClient]: Executes GraphQL queries and manages caching.
+ * - [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery], [GetProjectMergeRequestsQuery], [GetProjectRepositoryQuery], [GetRepositoryCommitsQuery], [GetRepositoryBranchesQuery]: Auto‑generated query classes.
+ * - Kotlin Coroutines Flow: Enables reactive, cancellable streams.
  * @author Lahcen AHTAT
  */
 @Singleton
@@ -341,7 +362,7 @@ class ApolloGraphQLRepository @Inject constructor(
     /**
      * Manually invalidates and refreshes data in the normalized cache for specific operations.
      *
-     * Supported operations: [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery], [GetProjectRepositoryQuery].
+     * Supported operations: [GetMyPersonalProjectsQuery], [GetProjectDetailsQuery], [GetProjectRepositoryQuery],[GetProjectMembersQuery].
      *
      * ### Behavior
      * 1. Identifies the query type from the provided [data].
@@ -368,6 +389,11 @@ class ApolloGraphQLRepository @Inject constructor(
 
             is GetProjectRepositoryQuery.Data -> {
                 val query = GetProjectRepositoryQuery(projectPath = data.project?.id!!)
+                apolloClient.apolloStore.removeOperation(operation = query, data, publish = true)
+            }
+
+            is GetProjectMembersQuery.Data -> {
+                val query = GetProjectMembersQuery(project = data.project?.id!!)
                 apolloClient.apolloStore.removeOperation(operation = query, data, publish = true)
             }
 
@@ -443,6 +469,56 @@ class ApolloGraphQLRepository @Inject constructor(
     }
 
     /**
+     * Streams a paginated list of members for a specific GitLab project.
+     *
+     * @param project The unique identifier or full path of the GitLab project.
+     * @param cursor The pagination pointer for sequential page fetches.
+     * @return A [Flow] emitting [GetProjectMembersQuery.Data] objects.
+     *
+     * ### Behavior
+     * - Executes [GetProjectMembersQuery] with the provided project and cursor.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow using [watch].
+     * - Handles errors via [mapAndHandleErrors].
+     * - Throws [kotlinx.coroutines.CancellationException] if the collection coroutine scope is cancelled.
+     * ### query example
+     * ``` GraphQL
+     *  project(fullPath: $projectPath) {
+     *         projectMembers(first: 20, after: $cursor) {
+     *             nodes {
+     *                 id
+     *                 accessLevel {
+     *                     stringLevel
+     *                 }
+     *                 user {
+     *                     id
+     *                     name
+     *                     username
+     *                     avatarUrl
+     *                 }
+     *             }
+     *             pageInfo {
+     *                 endCursor
+     *                 hasNextPage
+     *             }
+     *         }
+     *     }
+     * ```
+     */
+    override suspend fun getProjectMembers(
+        project: String, cursor: String?
+    ): Flow<GetProjectMembersQuery.Data> {
+        return apolloClient.query(
+            GetProjectMembersQuery(
+                project, cursor = Optional.presentIfNotNull(cursor)
+            )
+        ).fetchPolicy(
+            FetchPolicy.CacheFirst
+        ).watch().mapAndHandleErrors().fetchAndMergeMembers(apolloClient, project, cursor)
+    }
+
+
+    /**
      * Streams all projects that the currently authenticated user has access to, with pagination.
      *
      * @param cursor The pagination pointer for sequential page fetches.
@@ -496,6 +572,174 @@ class ApolloGraphQLRepository @Inject constructor(
             ).watch().mapAndHandleErrors()
     }
 
+    /**
+     * Retrieves the repository tree for a given project.
+     *
+     * @param id The unique identifier of the project.
+     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
+     * @return A [Flow] emitting [GetRepositoryCommitsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetProjectIssuesQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [com.apollographql.apollo.cache.normalized.watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getProjectIssues("12345")
+     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL query GetProjectIssues($projectPath:ID!,$cursor:String){
+     *     project(fullPath: $projectPath){
+     *         issues(sort: CREATED_DESC,first: 20,after: $cursor){
+     *             nodes {
+     *                 id
+     *                 name
+     *                 title
+     *                 state
+     *                 createdAt
+     *                 assignees{
+     *                     nodes {
+     *                         name
+     *                     }
+     *                 }
+     *             }
+     *         }
+     *     }
+     * }
+     * ```
+     */
+    override suspend fun getProjectIssues(
+        id: String, cursor: String?
+    ): Flow<GetProjectIssuesQuery.Data> {
+        return apolloClient.query(
+            GetProjectIssuesQuery(
+                id, cursor = Optional.presentIfNotNull(cursor)
+            )
+        ).fetchPolicy(
+            FetchPolicy.CacheFirst
+        ).watch().mapAndHandleErrors().fetchAndMergeIssues(id, apolloClient, cursor)
+    }
+
+    /**
+     * Retrieves the first 20 merge request for a given project.
+     *
+     * @param id The unique identifier of the project.
+     * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor
+     * @return A [Flow] emitting [GetProjectMergeRequestsQuery.Data] objects, or null if unavailable.
+     *
+     * ### Behavior
+     * - Executes [GetProjectMergeRequestsQuery] with the provided project ID.
+     * - Uses Apollo’s normalized caching with [FetchPolicy.CacheFirst].
+     * - Emits results reactively via Flow.
+     * - Uses Apollo’s [watch] to continuously observe changes.
+     * - Logs errors without terminating the stream.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     *
+     * ### Example
+     * ```kotlin
+     * viewModelScope.launch {
+     *     projectRepository.getProjectMergeRequests("12345")
+     *         .collect { repoTree -> renderRepoTree(repoTree) }
+     * }
+     * ```
+     * query example
+     * ``` GraphQL
+     *  project(fullPath: $project){
+     *         mergeRequests(sort: CREATED_DESC,first: 20,after:$cursor ){
+     *             nodes{
+     *                 id
+     *                 name
+     *                 author {
+     *                     name
+     *                 }
+     *                 createdAt
+     *                 state
+     *                 sourceBranch
+     *                 targetBranch
+     *             }
+     *             pageInfo {
+     *                 startCursor
+     *                 hasNextPage
+     *             }
+     *         }
+     *     }
+     * ```
+     */
+    override suspend fun getProjectMergeRequests(
+        id: String, cursor: String?
+    ): Flow<GetProjectMergeRequestsQuery.Data> {
+        return apolloClient.query(
+            GetProjectMergeRequestsQuery(
+                id, cursor = Optional.presentIfNotNull(cursor)
+            )
+        ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+            .fetchAndMergeMRs(apolloClient, id, cursor)
+
+    }
+
+    /**
+     * Streams all Personal projects the authenticated user has contributed to.
+     * @return A [Flow] emitting [com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery.Data] objects.
+     *
+     * ### Behavior
+     * - Executes [com.ahtat204.gitlab.data.queries.GetMyContributedProjectsQuery] with the provided fetch policy.
+     * - Uses Apollo’s [watch] to continuously observe changes.
+     * - Filters out null results with `mapNotNull`.
+     * - Logs exceptions with [Log.e] while keeping the stream alive.
+     * - throws [kotlinx.coroutines.CancellationException] to avoid wasting resources
+     * ### Implementation Example
+     * Query Example:
+     * ```
+     *    currentUser {
+     *             contributedProjects(first: 20,includePersonal: true,after: $cursor){
+     *                 pageInfo {
+     *                     startCursor
+     *                     hasNextPage
+     *                     hasPreviousPage
+     *                 }
+     *                 nodes {
+     *                     id
+     *                     topics
+     *                     lastActivityAt
+     *                     __typename
+     *                     languages {
+     *                         color
+     *                         name
+     *                     }
+     *                     name
+     *                     fullPath
+     *                     description
+     *                     visibility
+     *                     pipelines(first: 1){
+     *                         nodes {
+     *                             __typename
+     *                             id
+     *                             status
+     *                         }
+     *                     }
+     *                 }
+     *             }
+     *
+     *     }
+     * ```
+     */
+    override suspend fun getAllMyContributedProjects(cursor: String?): Flow<GetMyContributedProjectsQuery.Data> {
+        return apolloClient.query(
+            GetMyContributedProjectsQuery(
+                cursor = Optional.presentIfNotNull(
+                    cursor
+                )
+            )
+        )
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
     /**
      * Retrieves the repository tree for a given project.
      * @param cursor:(optional)  pagination index ,match Gitlab Graphql's startCursor

@@ -1,11 +1,17 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.queries.cache.Cache.cache
+import com.ahtat204.gitlab.data.queries.type.IssueState
+import com.ahtat204.gitlab.data.queries.type.MergeRequestState
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
+import com.ahtat204.gitlab.reponses.json.mockContributedProjects
 import com.ahtat204.gitlab.reponses.json.mockedAllProjects
 import com.ahtat204.gitlab.reponses.json.mockedBranches
 import com.ahtat204.gitlab.reponses.json.mockedCommits
+import com.ahtat204.gitlab.reponses.json.mockedIssues
+import com.ahtat204.gitlab.reponses.json.mockedMembers
+import com.ahtat204.gitlab.reponses.json.mockedMrs
 import com.ahtat204.gitlab.reponses.json.mockedPipelines
 import com.ahtat204.gitlab.reponses.json.mockedProject
 import com.ahtat204.gitlab.reponses.json.mockedProjects
@@ -20,6 +26,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
@@ -249,4 +256,193 @@ class ApolloGraphQLRepositoryTest {
         // val recordedRequest = mockWebserver.takeRequest()
         //assertEquals("/graphql", recordedRequest.path)
     }
+
+    @Test
+    fun getProjectMembers() = runTest {
+        val projectId = "gid://gitlab/Project/101"
+        mockWebserver.enqueue(
+            MockResponse().setResponseCode(200).setBody(mockedMembers)
+        )
+        val data = repository.getProjectMembers(projectId).first()
+        val members = data.project?.projectMembers
+        assertNotNull(members)
+        val page = members?.pageInfo
+        assertNotNullAndEquals(page?.endCursor, "eyJpZCI6IjIifQ")
+        assertNotNullAndEquals(page?.startCursor, "eyJpZCI6IjEifQ")
+        assertNotNullAndEquals(page?.hasPreviousPage, false)
+        assertNotNullAndEquals(page?.hasNextPage, true)
+        val nodes = members?.nodes
+        assertNotNull(nodes)
+        assertFalse(nodes?.size == 0)
+        ////////////////////////////////////////////////////////////
+        val one = nodes!![0]
+        assertNotNullAndEquals(one?.id, "gid://gitlab/ProjectMember/1")
+        assertNotNullAndEquals(one?.createdAt, "2023-10-27T10:00:00Z")
+        val user1 = one?.user
+        assertNotNull(user1)
+        assertNotNullAndEquals(user1?.name, "Lahcen AHTAT")
+        assertNotNullAndEquals(user1?.username, "Ahtat204")
+        assertNotNullAndEquals(user1?.bio, "Android Engineer & Systems Architecture enthusiast.")
+        //////////////////////////////////////////////////////////////////////
+        val two = nodes[1]
+        assertNotNullAndEquals(two?.id, "gid://gitlab/ProjectMember/2")
+        assertNotNullAndEquals(two?.createdAt, "2023-11-01T08:15:22Z")
+        val user2 = two?.user
+        assertNotNull(user2)
+        assertNotNullAndEquals(user2?.name, "GitLab Bot")
+        assertNotNullAndEquals(user2?.username, "project_101_bot")
+        assertNull(user2?.bio)
+
+    }
+
+    @Test
+    fun getProjectMergeRequest() = runTest {
+        val projectId = "gid://gitlab/Project/101"
+        mockWebserver.enqueue(
+            MockResponse().setResponseCode(200).setBody(mockedMrs)
+        )
+        val data = repository.getProjectMergeRequests(projectId).first()
+        val mrs = data.project?.mergeRequests
+        assertNotNull(mrs)
+        val page = mrs?.pageInfo
+        assertNotNull(page)
+        assertNotNullAndEquals(page?.endCursor, "eyJpZCI6IjEyMzQ1In0")
+        assertNotNullAndEquals(page?.startCursor, "eyJpZCI6IjEyMzQ1In0")
+        assertNotNullAndEquals(page?.hasNextPage, false)
+        assertNotNullAndEquals(page?.hasPreviousPage, false)
+        val nodes = mrs?.nodes
+        assertNotNull(nodes)
+        nodes!!
+        assertFalse(nodes.isEmpty())
+        val one = nodes[0]
+        assertNotNull(one)
+        one!!
+        assertNotNullAndEquals(one.name, "Features/implement-auth-flow")
+        assertNotNullAndEquals(one.iid, "42")
+        assertNotNullAndEquals(one.createdAt, "2026-10-04T21:40:00Z")
+        assertNotNullAndEquals(one.conflicts, false)
+        assertNotNullAndEquals(one.id, "gid://gitlab/MergeRequest/12345")
+        assertNotNullAndEquals(one.updatedAt, "2026-10-04T21:45:00Z")
+        assertNotNullAndEquals(one.state, MergeRequestState.opened)
+        assertNotNullAndEquals(one.targetBranch, "main")
+        assertNotNullAndEquals(one.sourceBranch, "features/implement-auth-flow")
+        //labels
+        val labels = one.labels
+        assertNotNull(labels)
+        labels!!
+        val labelNodes = labels.nodes
+        assertNotNull(labelNodes)
+        labelNodes!!
+        assertFalse(labelNodes.isEmpty())
+        val firstLabel = labelNodes[0]
+        assertNotNull(firstLabel)
+        firstLabel!!
+        assertNotNullAndEquals(firstLabel.id, "gid://gitlab/Label/789")
+        assertNotNullAndEquals(firstLabel.title, "bugfix")
+        assertNotNullAndEquals(firstLabel.color, "#FF0000")
+        //pipelines
+        val pipelines = one.pipelines?.edges
+        assertNotNull(pipelines)
+        pipelines!!
+        val firstPipeline = pipelines[0]
+        assertNotNull(firstPipeline)
+        firstPipeline!!
+        val firstPipelineNode = firstPipeline.node
+        assertNotNull(firstPipelineNode)
+        firstPipelineNode!!
+        assertNotNullAndEquals(firstPipelineNode.id, "gid://gitlab/Ci::Pipeline/98765")
+        assertNotNullAndEquals(firstPipelineNode.status, PipelineStatusEnum.SUCCESS)
+        // author
+        val author = one.author
+        assertNotNull(author)
+        author!!
+        val authorName = author.name
+        assertNotNullAndEquals(authorName, "Jane Doe")
+
+
+    }
+
+    @Test
+    fun getProjectIssuesTest() = runTest {
+        val projectId = "gid://gitlab/Project/101"
+        mockWebserver.enqueue(
+            MockResponse().setResponseCode(200).setBody(mockedIssues)
+        )
+        val result = repository.getProjectIssues(projectId).first()
+        val project = result.project
+        assertNotNull(project)
+        val issues = project?.issues
+        assertNotNull(issues)
+        val nodes = issues?.nodes
+        assertNotNull(nodes)
+        assertFalse(nodes!!.isEmpty())
+        val first = nodes[0]!!
+        assertNotNullAndEquals(first.id, "issue_001")
+        assertNotNullAndEquals(first.name, "bug-fix-auth")
+        assertNotNullAndEquals(first.state, IssueState.opened)
+        assertNotNullAndEquals(first.title, "Fix authentication token expiration bypass")
+        assertNotNull(first.assignees)
+        assertNotNull(first.assignees?.nodes)
+        assertNotNullAndEquals(first.assignees?.nodes?.first()?.name, "Alex Smith")
+        assertNotNullAndEquals(first.assignees?.nodes?.get(1)?.name, "Jordan Doe")
+        val second = nodes[1]
+        assertNotNullAndEquals(second?.id, "issue_002")
+        assertNotNullAndEquals(second?.name, "feature-dark-mode")
+        assertNotNullAndEquals(second?.state, IssueState.closed)
+        assertNotNullAndEquals(second?.title, "Implement dark mode theme across dashboard")
+        assertNotNull(second?.assignees)
+        assertNotNull(second?.assignees?.nodes)
+        assertNotNullAndEquals(second?.assignees?.nodes?.first()?.name, "Taylor Rake")
+        val page = issues.pageInfo
+        assertNotNullAndEquals(page.startCursor, "eyJjdXJzb3IiOiJpc3N1ZV8wMDEifQ==")
+        assertNotNullAndEquals(page.hasNextPage, true)
+        assertNotNullAndEquals(page.endCursor, "eyJjdXJzb3IiOiJpc3N1ZV8wMDIifQ==")
+    }
+
+
+    @Test
+    fun getAllContributedProjectsTest() = runTest {
+        mockWebserver.enqueue(
+            MockResponse().setResponseCode(200).setBody(mockContributedProjects)
+        )
+        val result = repository.getAllMyContributedProjects().first()
+        //page
+        val page = result.currentUser!!.contributedProjects!!.pageInfo
+        assertNotNullAndEquals("eyJjdXJzb3IiOiIxMCJ9", page.endCursor!!)
+        assertNotNullAndEquals(true, page.hasNextPage)
+        assertNotNullAndEquals(false, page.hasPreviousPage)
+        ///node
+        assertNotNull(result.currentUser.contributedProjects.nodes)
+        assertFalse(result.currentUser.contributedProjects.nodes!!.isEmpty())
+        assertEquals(1, result.currentUser.contributedProjects.nodes.size)
+        val firstProject = result.currentUser.contributedProjects.nodes.first()
+        assertEquals("gid://gitlab/Project/1", firstProject?.id)
+        assertEquals("developer/mock-api-generator", firstProject?.fullPath)
+        assertEquals(
+            "A tool to generate mock data structures.",
+            firstProject?.description
+        )
+        assertEquals(
+            "https://example.com",
+            firstProject?.avatarUrl
+        )
+        assertEquals("mock-api-generator", firstProject?.name)
+        assertEquals("public", firstProject?.visibility)
+        val recentPipeline = firstProject!!.pipelines!!.nodes!![0]
+        assertEquals("gid://gitlab/Pipeline/42", recentPipeline!!.id)
+        assertEquals(PipelineStatusEnum.SUCCESS, recentPipeline.status)
+        val firstTopic = firstProject.topics!![0]
+        assertEquals("kotlin", firstTopic)
+        val secondTopic = firstProject.topics[1]
+        assertEquals("graphql", secondTopic)
+        val thirdTopic = firstProject.topics[2]
+        assertEquals("android", thirdTopic)
+        val firstLanguage = firstProject.languages!![0].name
+        assertEquals("Kotlin", firstLanguage)
+        val secondLanguage = firstProject.languages[1]
+        assertEquals("HTML", secondLanguage.name)
+        // val recordedRequest = mockWebserver.takeRequest()
+        //assertEquals("/graphql", recordedRequest.path)
+    }
+
 }

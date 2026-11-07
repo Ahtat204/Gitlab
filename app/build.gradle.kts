@@ -65,7 +65,7 @@ apollo {
         packageName.set("com.ahtat204.gitlab.data.queries")
         introspection {
             endpointUrl.set("https://gitlab.com/api/graphql")
-            schemaFile.set(file("app/src/main/graphql/com/ahtat204/schema.graphqls"))
+            schemaFile.set(file("src/main/graphql/com/ahtat204/schema.graphqls"))
             addTypename.set("always")
             generateDataBuilders.set(true)
         }
@@ -126,5 +126,8 @@ configurations.all {
         // Force resolution to OkHttp 4.x
         force("com.squareup.okhttp3:okhttp:4.12.0") // or the version you are using...
     }
-    exclude(group = "com.squareup.okhttp3", module = "okhttp-coroutines") // Exclude okhttp-coroutines dependency, introduced in 5.0.0-alpha.X
+    exclude(
+        group = "com.squareup.okhttp3",
+        module = "okhttp-coroutines"
+    ) // Exclude okhttp-coroutines dependency, introduced in 5.0.0-alpha.X
 }

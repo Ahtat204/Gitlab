@@ -88,11 +88,32 @@ fun formatRelative(seconds: Long, future: Boolean): String {
     val minutes = seconds / 60
     val hours = minutes / 60
     val days = hours / 24
+    val months = days / 30
+    val years = months / 12
     val timeStr = when {
+        years > 0 -> "$years month${if (years > 1) "s" else ""}"
+        months > 0 -> "$months month${if (months > 1) "s" else ""}"
         days > 0 -> "$days day${if (days > 1) "s" else ""}"
         hours > 0 -> "$hours hour${if (hours > 1) "s" else ""}"
         minutes > 0 -> "$minutes minute${if (minutes > 1) "s" else ""}"
         else -> "$seconds second${if (seconds > 1) "s" else ""}"
     }
     return if (future) "in $timeStr" else "$timeStr ago"
+}
+
+fun duration(seconds: Long): String {
+    val minutes = seconds / 60
+    val hours = minutes / 60
+    val days = hours / 24
+    val months = days / 30
+    val years = months / 12
+    val timeStr = when {
+        years > 0 -> "$years month${if (years > 1) "s" else ""}"
+        months > 0 -> "$months month${if (months > 1) "s" else ""}"
+        days > 0 -> "$days day${if (days > 1) "s" else ""}"
+        hours > 0 -> "$hours hour${if (hours > 1) "s" else ""}"
+        minutes > 0 -> "$minutes minute${if (minutes > 1) "s" else ""}"
+        else -> "$seconds second${if (seconds > 1) "s" else ""}"
+    }
+    return "in $timeStr"
 }

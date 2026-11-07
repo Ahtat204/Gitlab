@@ -97,6 +97,7 @@ fun ProjectDetailScreen(
     path: String,
     personalProjectsViewModel: PersonalProjectsViewModel = hiltViewModel()
 ) {
+    if (path.isEmpty()) return
     val project by personalProjectsViewModel.currentProject.collectAsStateWithLifecycle()
     LaunchedEffect(true) {
         personalProjectsViewModel.loadProject(path)
@@ -145,7 +146,8 @@ fun ProjectDetailScreen(
                 pro.openIssuesCount ?: 0,
                 pro.openMergeRequestsCount ?: 0,
                 pro.pipelineCounts?.running,
-                navController, encodedId
+                navController,
+                encodedId
             )
 
             Card(

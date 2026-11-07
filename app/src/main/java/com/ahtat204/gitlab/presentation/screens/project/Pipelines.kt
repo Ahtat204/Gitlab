@@ -6,11 +6,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -32,45 +40,18 @@ import com.ahtat204.gitlab.presentation.components.Pipeline
 import com.ahtat204.gitlab.presentation.viewmodels.project.PipelinesViewModel
 
 /**
- * Composable screen responsible for rendering the CI/CD pipeline history of a GitLab project.
+ * Composable representing the Pipelines screen for a specific project.
  *
- * ## Overview
- * This screen provides a reactive, paginated list of pipelines, allowing users to monitor
- * build statuses, runtimes, and individual job outcomes. It integrates with the
- * [PipelinesViewModel] to fetch data from GitLab's GraphQL API and utilizes Apollo's
- * normalized cache for smooth state transitions.
+ * This screen displays a list of CI/CD pipelines filtered by status. It supports
+ * infinite scrolling by automatically fetching more pipelines when the user
+ * reaches the bottom of the list.
  *
- * ## Key Features
- * - **Infinite Scrolling**: Automatically detects when the user approaches the end of the
- *   [LazyColumn] and triggers a fetch for the next page of pipelines.
- * - **Status Filtering**: Currently defaults to successful pipelines, with underlying
- *   support for filtering by status (SUCCESS, RUNNING, FAILED, etc.).
- * - **Reactive Updates**: Utilizes [collectAsStateWithLifecycle] to ensure the UI
- *   responds immediately to cache updates or network fetches.
- * - **Optimized Rendering**: Uses stable keys in the [LazyColumn] to minimize
- *   unnecessary recompositions during pagination.
- *
- * ## UI Components
- * - **Pipeline List**: A vertical list of [Pipeline] components, each representing
- *   a single CI execution.
- * - **Loading Logic**: Implements a `shouldLoadMore` derived state to manage
- *   pagination triggers without blocking the main thread.
- *
- * @param project The unique identifier (GID) or full path of the target GitLab project.
- * @param navController The [NavController] used to handle navigation to job details or other screens.
- * @param x The [PaddingValues] provided by the parent [androidx.compose.material3.Scaffold].
- * @param pipelinesViewModel The ViewModel providing pipeline state and pagination logic.
- *
- * ## Usage
- * ```kotlin
- * Pipelines(
- *     project = "ahtat204/gitlab-client",
- *     navController = navController,
- *     x = it
- * )
- * ```
- * @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/screen/project/workitems/pipelines.jpg"  width="300" height="700"/>
- * @author Lahcen AHTAT
+ * @param project The unique identifier or full path of the GitLab project.
+ * @param navController Controller used for navigating between screens.
+ * @param x Padding values representing the inner padding provided by a Scaffold.
+ * @param pipelinesViewModel The ViewModel responsible for managing pipeline data,
+ *                           injected via Hilt.
+ *  @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/pipelines.jpg"  width="300" height="700"/>
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -80,8 +61,9 @@ fun Pipelines(
     x: PaddingValues,
     pipelinesViewModel: PipelinesViewModel = hiltViewModel()
 ) {
+    if (project.isEmpty()) return
     val listState = rememberLazyListState()
-    val status by remember { mutableStateOf<PipelineStatusEnum>(PipelineStatusEnum.SUCCESS) }
+    val status by remember { mutableStateOf(PipelineStatusEnum.SUCCESS) }
     LaunchedEffect(status) {
         pipelinesViewModel.loadProjectPipelines(project, status)
     }
@@ -106,14 +88,33 @@ fun Pipelines(
             .padding(x)
             .background(Color.Black)
     ) {
-        val nodes = pipelines?.nodes
-        if (nodes?.isEmpty() == false) {
+        Row(
+            modifier = Modifier
+                .background(Color.Black)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
             Text(
-                text = "Your Projects",
+                text = "Pipelines",
                 fontFamily = titleFont,
                 fontSize = 20.sp,
+                color = Color.White,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
+                    .weight(0.5f)
+                    .offset(20.dp, 0.dp)
             )
+            IconButton(
+                onClick = { },
+                modifier = Modifier.weight(0.1f)
+            ) {
+                Icon(Icons.Default.Refresh, contentDescription = null)
+            }
+        }
+        val nodes = pipelines?.nodes
+        if (nodes?.isEmpty() == false) {
+
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
