@@ -5,7 +5,8 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,6 +25,7 @@ import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.components.CommitCard
 import com.ahtat204.gitlab.presentation.components.iso8601ToRelative
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
+
 /**
  * Displays a paginated list of commits for a given GitLab project.
  *
@@ -72,18 +74,18 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
 @Composable
 fun ProjectCommits(
     navController: NavController,
-    branch:String,
+    branch: String,
     id: String,
     repositoryViewModel: RepositoryViewModel = hiltViewModel()
 ) {
     if (id.isEmpty()) return
     val commits by repositoryViewModel.commits.collectAsStateWithLifecycle()
     LaunchedEffect(id) {
-        repositoryViewModel.loadProjectCommits(id,branch)
+        repositoryViewModel.loadProjectCommits(id, branch)
     }
     if (commits?.nodes?.isEmpty() == true) return
     val listState = rememberLazyListState()
-  val shouldLoadMore = remember {
+    val shouldLoadMore = remember {
         derivedStateOf {
             val totalItems = listState.layoutInfo.totalItemsCount
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
@@ -93,7 +95,7 @@ fun ProjectCommits(
     }
     LaunchedEffect(shouldLoadMore.value) {
         if (shouldLoadMore.value) {
-            repositoryViewModel.loadProjectCommits(id,branch)
+
         }
     }
     Column(
@@ -106,12 +108,21 @@ fun ProjectCommits(
             if (nodes.isNotEmpty()) {
                 LazyColumn(
                     state = listState,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.95f),
                     verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(items = nodes, key =  { item -> item?.id ?: item?.sha?: null.hashCode() }) { commit ->
-                        CommitCard(commit?.sha?.substring(0,8), commit?.name,commit?.authorName?:"", iso8601ToRelative(commit?.committedDate as String))
+                    items(
+                        items = nodes,
+                        key = { item -> item?.id ?: item?.sha ?: null.hashCode() }) { commit ->
+                        CommitCard(
+                            commit?.sha?.substring(0, 8),
+                            commit?.name,
+                            commit?.authorName ?: "",
+                            iso8601ToRelative(commit?.committedDate as String)
+                        )
                     }
                 }
             }

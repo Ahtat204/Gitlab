@@ -215,27 +215,28 @@ class RepositoryViewModel @Inject constructor(
      * - Supports infinite scrolling by appending new commits.
      */
     fun loadProjectCommits(id: String, branch: String) {
-        val pageInfo = commits.value?.pageInfo
+        val value = _commits.value
+        val pageInfo = value?.pageInfo
         val pager = pageInfo?.endCursor
-        val isFirstPage = pageInfo?.startCursor
         val hasNextPage = pageInfo?.hasNextPage
-        if (isFirstPage == null) {
+        if (value == null) {
             viewModelScope.launch {
                 projectRepository.getProjectCommits(id, cursor = null, branch = branch).collect {
                     _commits.value = it?.project?.repository?.commits
                 }
             }
-        }
-        if (hasNextPage == true && pager != null) {
-            viewModelScope.launch {
-                _commits.value?.nodes?.size?.let {
+        } else {
+            if (hasNextPage == true && pager != null) {
+                viewModelScope.launch {
                     projectRepository.getProjectCommits(id, cursor = pager, branch = branch)
                         .collect { newCommits ->
                             _commits.value = newCommits?.project?.repository?.commits
                         }
+
                 }
             }
         }
+
     }
 
     fun refreshRepository(project: String, branch: String? = null) {
