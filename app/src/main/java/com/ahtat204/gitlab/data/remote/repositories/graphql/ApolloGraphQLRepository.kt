@@ -8,6 +8,7 @@ import com.ahtat204.gitlab.data.helpers.fetchAndMergePipelines
 import com.ahtat204.gitlab.data.helpers.fetchAndMergeProjects
 import com.ahtat204.gitlab.data.helpers.mapAndHandleErrors
 import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMemberProfileQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
@@ -514,7 +515,6 @@ class ApolloGraphQLRepository @Inject constructor(
         ).watch().mapAndHandleErrors().fetchAndMergeMembers(apolloClient, project, cursor)
     }
 
-
     /**
      * Streams all projects that the currently authenticated user has access to, with pagination.
      *
@@ -568,6 +568,7 @@ class ApolloGraphQLRepository @Inject constructor(
                 FetchPolicy.CacheFirst
             ).watch().mapAndHandleErrors()
     }
+
 
     /**
      * Retrieves the repository tree for a given project.
@@ -679,5 +680,12 @@ class ApolloGraphQLRepository @Inject constructor(
         ).fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
             .fetchAndMergeMRs(apolloClient, id, cursor)
 
+    }
+
+    override suspend fun getMemberProfile(member: String): Flow<GetMemberProfileQuery.Data> {
+        return apolloClient.query(
+            GetMemberProfileQuery(member)
+        ).fetchPolicy(FetchPolicy.CacheFirst)
+            .watch().mapAndHandleErrors()
     }
 }

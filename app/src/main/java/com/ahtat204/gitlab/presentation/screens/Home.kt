@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import com.ahtat204.gitlab.presentation.components.MyWorkItems
+
 /**
  * Composable that represents the Home screen of the application.
  *
@@ -43,9 +44,10 @@ import com.ahtat204.gitlab.presentation.components.MyWorkItems
  *   @see <img src="https://raw.githubusercontent.com/Ahtat204/Gitlab/refs/heads/main/homescreen.jpg"  width="300" height="700"/>
  */
 @Composable
-fun Home(navController: NavHostController,x: PaddingValues) {
+internal fun Home(navController: NavHostController, x: PaddingValues) {
     Column(
-        modifier = Modifier.padding(x)
+        modifier = Modifier
+            .padding(x)
             .fillMaxHeight()
             .background(Color.Black),
         verticalArrangement = Arrangement.Top,

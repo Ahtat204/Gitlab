@@ -1,12 +1,13 @@
 package com.ahtat204.gitlab.data.remote.repositories.graphql
 
 import com.ahtat204.gitlab.data.queries.GetAllProjectsQuery
+import com.ahtat204.gitlab.data.queries.GetMemberProfileQuery
 import com.ahtat204.gitlab.data.queries.GetMyPersonalProjectsQuery
 import com.ahtat204.gitlab.data.queries.GetMyProfileQuery
 import com.ahtat204.gitlab.data.queries.GetProjectDetailsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectIssuesQuery
-import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
+import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
@@ -105,6 +106,7 @@ interface GraphQlRepository {
     suspend fun getProjectMergeRequests(
         id: String, cursor: String? = null
     ): Flow<GetProjectMergeRequestsQuery.Data>
+
     /**
      * Streams a continuous Flow containing the CurrentUser Profile data.
      *
@@ -183,4 +185,6 @@ interface GraphQlRepository {
         id: String,
         cursor: String? = null
     ): Flow<GetProjectIssuesQuery.Data>
+
+    suspend fun getMemberProfile(member: String): Flow<GetMemberProfileQuery.Data>
 }
