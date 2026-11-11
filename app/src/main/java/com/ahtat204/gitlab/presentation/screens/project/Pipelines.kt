@@ -63,7 +63,7 @@ fun Pipelines(
 ) {
     if (project.isEmpty()) return
     val listState = rememberLazyListState()
-    val status by remember { mutableStateOf<PipelineStatusEnum>(PipelineStatusEnum.SUCCESS) }
+    val status by remember { mutableStateOf(PipelineStatusEnum.SUCCESS) }
     LaunchedEffect(status) {
         pipelinesViewModel.loadProjectPipelines(project, status)
     }

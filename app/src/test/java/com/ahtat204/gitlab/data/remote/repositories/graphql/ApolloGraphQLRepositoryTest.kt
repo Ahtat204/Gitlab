@@ -5,6 +5,7 @@ import com.ahtat204.gitlab.data.queries.type.IssueState
 import com.ahtat204.gitlab.data.queries.type.MergeRequestState
 import com.ahtat204.gitlab.data.queries.type.PipelineStatusEnum
 import com.ahtat204.gitlab.reponses.json.assertNotNullAndEquals
+import com.ahtat204.gitlab.reponses.json.mockContributedProjects
 import com.ahtat204.gitlab.reponses.json.mockedAllProjects
 import com.ahtat204.gitlab.reponses.json.mockedBranches
 import com.ahtat204.gitlab.reponses.json.mockedCommits
@@ -318,7 +319,6 @@ class ApolloGraphQLRepositoryTest {
         one!!
         assertNotNullAndEquals(one.name, "Features/implement-auth-flow")
         assertNotNullAndEquals(one.iid, "42")
-
         assertNotNullAndEquals(one.createdAt, "2026-10-04T21:40:00Z")
         assertNotNullAndEquals(one.conflicts, false)
         assertNotNullAndEquals(one.id, "gid://gitlab/MergeRequest/12345")
@@ -397,6 +397,52 @@ class ApolloGraphQLRepositoryTest {
         assertNotNullAndEquals(page.startCursor, "eyJjdXJzb3IiOiJpc3N1ZV8wMDEifQ==")
         assertNotNullAndEquals(page.hasNextPage, true)
         assertNotNullAndEquals(page.endCursor, "eyJjdXJzb3IiOiJpc3N1ZV8wMDIifQ==")
+    }
+
+
+    @Test
+    fun getAllContributedProjectsTest() = runTest {
+        mockWebserver.enqueue(
+            MockResponse().setResponseCode(200).setBody(mockContributedProjects)
+        )
+        val result = repository.getAllMyContributedProjects().first()
+        //page
+        val page = result.currentUser!!.contributedProjects!!.pageInfo
+        assertNotNullAndEquals("eyJjdXJzb3IiOiIxMCJ9", page.endCursor!!)
+        assertNotNullAndEquals(true, page.hasNextPage)
+        assertNotNullAndEquals(false, page.hasPreviousPage)
+        ///node
+        assertNotNull(result.currentUser.contributedProjects.nodes)
+        assertFalse(result.currentUser.contributedProjects.nodes!!.isEmpty())
+        assertEquals(1, result.currentUser.contributedProjects.nodes.size)
+        val firstProject = result.currentUser.contributedProjects.nodes.first()
+        assertEquals("gid://gitlab/Project/1", firstProject?.id)
+        assertEquals("developer/mock-api-generator", firstProject?.fullPath)
+        assertEquals(
+            "A tool to generate mock data structures.",
+            firstProject?.description
+        )
+        assertEquals(
+            "https://example.com",
+            firstProject?.avatarUrl
+        )
+        assertEquals("mock-api-generator", firstProject?.name)
+        assertEquals("public", firstProject?.visibility)
+        val recentPipeline = firstProject!!.pipelines!!.nodes!![0]
+        assertEquals("gid://gitlab/Pipeline/42", recentPipeline!!.id)
+        assertEquals(PipelineStatusEnum.SUCCESS, recentPipeline.status)
+        val firstTopic = firstProject.topics!![0]
+        assertEquals("kotlin", firstTopic)
+        val secondTopic = firstProject.topics[1]
+        assertEquals("graphql", secondTopic)
+        val thirdTopic = firstProject.topics[2]
+        assertEquals("android", thirdTopic)
+        val firstLanguage = firstProject.languages!![0].name
+        assertEquals("Kotlin", firstLanguage)
+        val secondLanguage = firstProject.languages[1]
+        assertEquals("HTML", secondLanguage.name)
+        // val recordedRequest = mockWebserver.takeRequest()
+        //assertEquals("/graphql", recordedRequest.path)
     }
 
 }
