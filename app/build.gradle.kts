@@ -21,6 +21,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
+        manifestPlaceholders += mapOf()
         applicationId = "com.ahtat204.gitlab"
         minSdk = 24
         targetSdk = 35
@@ -32,6 +33,14 @@ android {
         val formattedDate = dateFormat.format(Date())
         val fileName = "${rootProject.name}_v${versionName}_${versionCode}_${formattedDate}"
         setProperty("archivesBaseName", rootProject.name)
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
+        externalNativeBuild {
+            cmake {
+                cppFlags += ""
+            }
+        }
     }
 
     buildTypes {
@@ -57,6 +66,12 @@ android {
     buildFeatures {
         buildConfig = true
         compose = true
+    }
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
 }
 
