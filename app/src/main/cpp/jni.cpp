@@ -2,8 +2,6 @@
 #include <string>
 #include <cstdlib>
 #include <android/log.h>
-#include "tree_sitter/parser.h"
-#include "tree_sitter/api.h"
 
 #define LOG_TAG "TreeSitterJNI"
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)

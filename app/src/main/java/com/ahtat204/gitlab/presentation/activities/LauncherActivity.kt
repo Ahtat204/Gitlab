@@ -123,4 +123,9 @@ class LauncherActivity : ComponentActivity() {
         }
     }
 
+    companion object {
+        init {
+            System.loadLibrary("gitlab")
+        }
+    }
 }
