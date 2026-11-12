@@ -27,14 +27,14 @@ project("gitlab")
 # used in the AndroidManifest.xml file.
 add_library(${CMAKE_PROJECT_NAME} SHARED
         # List C/C++ source files with relative paths to this CMakeLists.txt.
-        tree_sitter_jni.cpp
-        tree-sitter/lib/src/lib.c
-        tree-sitter-json/src/parser.c
-        gitlab.cpp)
+        jni.cpp
+        tree-sitter/src/lib.c
+        grammars/json/src/parser.c
+)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-        tree-sitter/lib/include
-        tree-sitter/lib/src
-        tree-sitter-json/src
+        tree-sitter/include
+        tree-sitter/src
+        grammars/json/src
 )
 find_library(log-lib log)
 
