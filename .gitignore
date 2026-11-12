@@ -17,9 +17,13 @@ keystore
 app/release
 keystore_base64.txt
 explanation.txt
-**.txt
+branches.txt
+log.txt
+output.txt
+output22.txt
 reflog.sh
 test.json
+RetrofitEvents.txt
 Runtree.py
 .kotlin/
 app/test.json
