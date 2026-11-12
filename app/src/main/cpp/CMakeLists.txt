@@ -1,47 +1,43 @@
-
-# For more information about using CMake with Android Studio, read the
-# documentation: https://d.android.com/studio/projects/add-native-code.html.
-# For more examples on how to use CMake, see https://github.com/android/ndk-samples.
-
-# Sets the minimum CMake version required for this project.
 cmake_minimum_required(VERSION 3.22.1)
-
-# Declares the project name. The project name can be accessed via ${ PROJECT_NAME},
-# Since this is the top level CMakeLists.txt, the project name is also accessible
-# with ${CMAKE_PROJECT_NAME} (both CMake variables are in-sync within the top level
-# build script scope).
 project("gitlab")
 
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds them for you.
-# Gradle automatically packages shared libraries with your APK.
-#
-# In this top level CMakeLists.txt, ${CMAKE_PROJECT_NAME} is used to define
-# the target library name; in the sub-module's CMakeLists.txt, ${PROJECT_NAME}
-# is preferred for the same purpose.
-#
-# In order to load a library into your app from Java/Kotlin, you must call
-# System.loadLibrary() and pass the name of the library defined here;
-# for GameActivity/NativeActivity derived applications, the same library name must be
-# used in the AndroidManifest.xml file.
-add_library(${CMAKE_PROJECT_NAME} SHARED
-        # List C/C++ source files with relative paths to this CMakeLists.txt.
-        jni.cpp
-        tree-sitter/src/lib.c
-        grammars/json/src/parser.c
-)
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-        tree-sitter/include
-        tree-sitter/src
-        grammars/json/src
-)
-find_library(log-lib log)
+include(FetchContent)
 
-# Specifies libraries CMake should link to your target library. You
-# can link libraries from various origins, such as libraries defined in this
-# build script, prebuilt third-party libraries, or Android system libraries.
-target_link_libraries(${CMAKE_PROJECT_NAME}
-        # List libraries link to the target library
-        android
-        log)
+# Check if a local directory was provided via local.properties
+if (DEFINED TREESITTER_DIR AND EXISTS "${TREESITTER_DIR}/tree-sitter/lib/src/lib.c")
+    message(STATUS "Using local Tree-sitter sources from: ${TREESITTER_DIR}")
+    set(TS_CORE_DIR "${TREESITTER_DIR}/tree-sitter")
+    set(TS_JSON_DIR "${TREESITTER_DIR}/tree-sitter-json")
+else ()
+    message(STATUS "Fetching Tree-sitter sources automatically via FetchContent...")
+
+    FetchContent_Declare(
+            treesitter
+            GIT_REPOSITORY https://github.com/tree-sitter/tree-sitter
+            GIT_TAG v0.25.1
+    )
+    FetchContent_Declare(
+            treesitter_json
+            GIT_REPOSITORY https://github.com/tree-sitter/tree-sitter-json
+            GIT_TAG v0.24.8
+    )
+    FetchContent_MakeAvailable(treesitter treesitter_json)
+
+    set(TS_CORE_DIR "${treesitter_SOURCE_DIR}")
+    set(TS_JSON_DIR "${treesitter_json_SOURCE_DIR}")
+endif ()
+
+add_library(gitlab SHARED
+        tree_sitter_jni.cpp
+        "${TS_CORE_DIR}/lib/src/lib.c"
+        "${TS_JSON_DIR}/src/parser.c"
+)
+
+target_include_directories(gitlab PRIVATE
+        "${TS_CORE_DIR}/lib/include"
+        "${TS_CORE_DIR}/lib/src"
+        "${TS_JSON_DIR}/src"
+)
+
+find_library(log-lib log)
+target_link_libraries(gitlab ${log-lib})
