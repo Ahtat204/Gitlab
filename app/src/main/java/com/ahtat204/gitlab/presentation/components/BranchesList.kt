@@ -24,8 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.ahtat204.gitlab.R
-import com.ahtat204.gitlab.presentation.ui.theme.Orange
-import com.ahtat204.gitlab.presentation.ui.theme.customFontFamily
+import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
+import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Branches
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
 /**

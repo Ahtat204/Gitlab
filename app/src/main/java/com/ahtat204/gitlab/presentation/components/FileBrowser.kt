@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
+
 /**
  * Displays a file browser UI for navigating a GitLab project repository.
  *
@@ -74,7 +75,11 @@ fun FileBrowser(
     projectPath: String,
     repository: Repository
 ) {
-    Row(modifier = Modifier.padding(21.dp,0.dp).horizontalScroll(rememberScrollState())) {
+    Row(
+        modifier = Modifier
+            .padding(21.dp, 0.dp)
+            .horizontalScroll(rememberScrollState())
+    ) {
         repositoryViewModel.folders.collectAsState().value.forEach { (path, name) ->
             Text(
                 text = "$name \b /", modifier = Modifier
@@ -103,7 +108,7 @@ fun FileBrowser(
             )
         }
     }
-    repository?.tree?.let {
+    repository?.repository?.tree?.let {
         Column(
             modifier = Modifier
                 .border(

@@ -65,7 +65,7 @@ apollo {
         packageName.set("com.ahtat204.gitlab.data.queries")
         introspection {
             endpointUrl.set("https://gitlab.com/api/graphql")
-            schemaFile.set(file("app/src/main/graphql/com/ahtat204/schema.graphqls"))
+            schemaFile.set(file("src/main/graphql/com/ahtat204/schema.graphqls"))
             addTypename.set("always")
             generateDataBuilders.set(true)
         }
@@ -84,6 +84,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material)
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.hilt.android.testing)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -111,10 +114,24 @@ dependencies {
     implementation(libs.multiplatform.markdown.renderer.m3)
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
+    implementation(libs.markdown.renderer.m3)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
     testImplementation(libs.apollo.mockserver)
     testImplementation(libs.apollo.testing.support)
     testImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.mockwebserver)
+    testImplementation(libs.kotlinx.coroutines.test)
+}
+configurations.all {
+    resolutionStrategy {
+        // Force resolution to OkHttp 4.x
+        force("com.squareup.okhttp3:okhttp:4.12.0") // or the version you are using...
+    }
+    exclude(
+        group = "com.squareup.okhttp3",
+        module = "okhttp-coroutines"
+    ) // Exclude okhttp-coroutines dependency, introduced in 5.0.0-alpha.X
+
 }

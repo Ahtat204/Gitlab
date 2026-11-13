@@ -2,12 +2,13 @@ query GetRepositoryBlob($project:ID!,$branch:String,$path:[String!]!){
     project(fullPath:$project ){
         repository {
             blobs(first: 20,ref: $branch,paths:$path  ){
-                edges {
-                    cursor
-                    node {
-                        rawBlob
-                        rawTextBlob
-                    }
+                nodes {
+                    id
+                    fileType
+                    rawBlob
+                    rawTextBlob
+                    name
+
                 }
             }
         }

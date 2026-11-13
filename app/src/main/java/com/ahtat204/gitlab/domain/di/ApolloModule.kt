@@ -2,9 +2,9 @@ package com.ahtat204.gitlab.domain.di
 
 import android.util.Log
 import com.ahtat204.gitlab.data.queries.cache.Cache.cache
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.AuthConfig.GRAPHQL_URL
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens
-import com.ahtat204.gitlab.domain.usecase.authentication.constants.Tokens.isConnected
+import com.ahtat204.gitlab.domain.authentication.constants.AuthConfig.GRAPHQL_URL
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens
+import com.ahtat204.gitlab.domain.authentication.constants.Tokens.isConnected
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.annotations.ApolloExperimental
 import com.apollographql.apollo.api.http.DefaultHttpRequestComposer
@@ -67,7 +67,7 @@ object ApolloModule {
         val networkTransport = HttpNetworkTransport.Builder().httpEngine(httpEngine)
             .httpRequestComposer(requestComposer).build()
         return ApolloClient.Builder().networkTransport(networkTransport)
-            .logCacheMisses({ Log.e("cacheMiss", it) })
+            .logCacheMisses { Log.i("com.ahtat204.gitlab.domain.di", it) }
             .cache(normalizedCacheFactory = cacheFactory, writeToCacheAsynchronously = true)
             .retryOnError { isConnected() }.failFastIfOffline(true).build()
     }
