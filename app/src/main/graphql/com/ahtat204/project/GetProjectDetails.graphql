@@ -1,3 +1,6 @@
+"""
+return bunch of information about a project , basically an overview, like name, description , owner star count ,open MRs or issues...
+"""
 query GetProjectDetails($projectPath: ID!) {
     project(fullPath: $projectPath) {
         __typename
