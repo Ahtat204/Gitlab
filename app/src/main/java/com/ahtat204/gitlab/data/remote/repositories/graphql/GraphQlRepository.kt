@@ -10,6 +10,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery.Data
+import com.ahtat204.gitlab.data.queries.GetRepositoryBlobsQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
@@ -194,4 +195,10 @@ interface GraphQlRepository {
      * @throws kotlinx.coroutines.CancellationException if the collection coroutine scope is canceled.
      */
     suspend fun getAllMyContributedProjects(cursor: String? = null): Flow<GetMyContributedProjectsQuery.Data>
+
+    suspend fun getRepositoryBlobsContent(
+        project: String,
+        paths: List<String>,
+        branch: String? = null
+    ): Flow<GetRepositoryBlobsQuery.Data>
 }
