@@ -15,7 +15,7 @@ import com.ahtat204.gitlab.presentation.screens.Home
 import com.ahtat204.gitlab.presentation.screens.PersonalProjects
 import com.ahtat204.gitlab.presentation.screens.Profile
 import com.ahtat204.gitlab.presentation.screens.Projects
-import com.ahtat204.gitlab.presentation.screens.project.FileContent
+import com.ahtat204.gitlab.presentation.screens.project.FileScreen
 import com.ahtat204.gitlab.presentation.screens.project.Issues
 import com.ahtat204.gitlab.presentation.screens.project.Members
 import com.ahtat204.gitlab.presentation.screens.project.MergeRequests
@@ -167,7 +167,7 @@ fun BottomNavigationGraph(
                 if (branch == null) throw IllegalArgumentException("branch is null ")
                 if (path == null) throw IllegalArgumentException("path is null ")
                 projectId?.let {
-                    FileContent(projectId, Path = path, branch = branch)
+                    FileScreen(projectId, Path = path, branch = branch, x = x)
                 }
 
             }
