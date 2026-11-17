@@ -110,6 +110,8 @@ dependencies {
     implementation(libs.androidx.material.icons.core)
     implementation(libs.apollo.normalized.cache)
     implementation(libs.apollo.http.cache)
+    //implementation(libs.multiplatform.markdown.renderer)
+    implementation(libs.markdown.renderer.m3)
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -130,4 +132,5 @@ configurations.all {
         group = "com.squareup.okhttp3",
         module = "okhttp-coroutines"
     ) // Exclude okhttp-coroutines dependency, introduced in 5.0.0-alpha.X
+
 }

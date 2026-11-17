@@ -1,4 +1,7 @@
-query GetRepositoryBranches($projectPath:ID!,$skip:Int!){
+"""
+Get List of git branches in a git repository
+"""
+query GetRepositoryBranches("Project the branches belong to." $projectPath:ID!,"offset pagination counter"$skip:Int!){
     project(fullPath: $projectPath){
         id
         repository{

@@ -1,3 +1,7 @@
+"""
+get the repository tree of a project
+note:$branch is nullable , it defaults to rootRef(which is the default branch, example:main)
+"""
 query GetProjectRepository($projectPath:ID!,$branch:String,$path:String){
     project(fullPath: $projectPath){
         id
