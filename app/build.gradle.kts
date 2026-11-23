@@ -73,6 +73,12 @@ apollo {
         pluginArgument("com.apollographql.cache.packageName", packageName.get())
     }
 }
+configurations.all {
+    resolutionStrategy {
+        force("androidx.core:core:1.16.0")
+        force("androidx.core:core-ktx:1.16.0")
+    }
+}
 dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.core.ktx)
@@ -93,6 +99,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
     implementation(libs.apollo.runtime)
     implementation(libs.retrofit)
     implementation(libs.hilt.android)
@@ -115,6 +122,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(platform("io.opentelemetry.android:opentelemetry-android-bom:0.16.0-alpha"))
+    implementation("io.opentelemetry.android:android-agent")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0")
+
     testImplementation(libs.apollo.mockserver)
     testImplementation(libs.apollo.testing.support)
     testImplementation(libs.mockwebserver)

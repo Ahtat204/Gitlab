@@ -10,8 +10,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.instrumentation.okhttp.v3_0.OkHttpTelemetry
 import kotlinx.coroutines.Dispatchers
 import okhttp3.Cache
+import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
@@ -72,6 +75,13 @@ object OkHttpModule {
                 level =
                     if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
             }).addInterceptor(AuthenticationInterceptor()).build()
+    }
+
+    @Singleton
+    @Provides
+    fun providesCallFactory(okHttpClient: OkHttpClient): Call.Factory {
+        return OkHttpTelemetry.builder(OpenTelemetry.noop()).build()
+            .newCallFactory(okHttpClient);
     }
 
     /**
