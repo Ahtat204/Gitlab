@@ -16,6 +16,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import javax.inject.Singleton
@@ -61,12 +62,13 @@ object ApolloModule {
     @OptIn(ApolloExperimental::class)
     @Singleton
     @Provides
-    fun getApolloService(okHttpClient: OkHttpClient): ApolloClient {
+    fun getApolloService(okHttpClient: OkHttpClient, factory: Call.Factory): ApolloClient {
         val httpEngine = DefaultHttpEngine { okHttpClient }
         val requestComposer = DefaultHttpRequestComposer(GRAPHQL_URL)
         val networkTransport = HttpNetworkTransport.Builder().httpEngine(httpEngine)
             .httpRequestComposer(requestComposer).build()
-        return ApolloClient.Builder().networkTransport(networkTransport)
+        return ApolloClient.Builder()
+            .networkTransport(networkTransport)
             .logCacheMisses { Log.i("com.ahtat204.gitlab.domain.di", it) }
             .cache(normalizedCacheFactory = cacheFactory, writeToCacheAsynchronously = true)
             .retryOnError { isConnected() }.failFastIfOffline(true).build()

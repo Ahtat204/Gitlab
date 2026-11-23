@@ -49,6 +49,7 @@ class GitlabApp : Application() {
             configuration = {
                 httpExport {
                     baseUrl = endpoint
+                    
                 }
                 session {
                     backgroundInactivityTimeout = 15.minutes

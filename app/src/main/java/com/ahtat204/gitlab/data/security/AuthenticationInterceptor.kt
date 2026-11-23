@@ -112,7 +112,10 @@ class AuthenticationInterceptor : Interceptor {
                             request = builder.build()
                             response = chain.proceed(request)
                             if (response.code == 401) {
-                                logger("RefreshError", "couldn't refresh")
+                                logger(
+                                    "RefreshError",
+                                    "couldn't refresh"
+                                )
                             }
                         }
                     }

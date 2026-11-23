@@ -40,7 +40,10 @@ import okio.IOException
  *                   excluding [CancellationException] which is re-thrown to honor coroutine lifecycle.
  * @author Lahcen AHTAT
  */
-fun <D : Query.Data> Flow<ApolloResponse<D>>.mapAndHandleErrors(): Flow<D> {
+fun <D : Query.Data> Flow<ApolloResponse<D>>.mapAndHandleErrors(
+    file: String? = null,
+    lineNumber: Int? = null
+): Flow<D> {
     return this.map { response ->
         response.exception?.cause?.let {
             throw it
@@ -48,7 +51,7 @@ fun <D : Query.Data> Flow<ApolloResponse<D>>.mapAndHandleErrors(): Flow<D> {
         response.data
     }.catch { ex ->
         when (ex) {
-            is IOException -> logger(message = ex.message)
+            is IOException -> logger(message = "${ex.localizedMessage},${file},${lineNumber}")
             is CancellationException -> throw ex
             else -> logger(message = null)
         }
