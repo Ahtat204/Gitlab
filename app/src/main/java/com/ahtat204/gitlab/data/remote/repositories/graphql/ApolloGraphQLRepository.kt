@@ -17,6 +17,7 @@ import com.ahtat204.gitlab.data.queries.GetProjectMembersQuery
 import com.ahtat204.gitlab.data.queries.GetProjectMergeRequestsQuery
 import com.ahtat204.gitlab.data.queries.GetProjectPipelinesQuery
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
+import com.ahtat204.gitlab.data.queries.GetRepositoryBlobsQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryBranchesQuery
 import com.ahtat204.gitlab.data.queries.GetRepositoryCommitsQuery
 import com.ahtat204.gitlab.data.queries.GetUserProjectsByNameQuery
@@ -734,6 +735,19 @@ class ApolloGraphQLRepository @Inject constructor(
                 cursor = Optional.presentIfNotNull(
                     cursor
                 )
+            )
+        )
+            .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()
+    }
+
+    override suspend fun getRepositoryBlobsContent(
+        project: String,
+        paths: List<String>,
+        branch: String?
+    ): Flow<GetRepositoryBlobsQuery.Data> {
+        return apolloClient.query(
+            GetRepositoryBlobsQuery(
+                project = project, branch = Optional.presentIfNotNull(branch), paths
             )
         )
             .fetchPolicy(FetchPolicy.CacheFirst).watch().mapAndHandleErrors()

@@ -1,10 +1,17 @@
-query GetRepositoryBlob{
-    project(fullPath: ""){
+"""
+Get the content of at least 1 git blob
+"""
+query GetRepositoryBlobs($project:ID!,$branch:String,$path:[String!]!){
+    project(fullPath:$project ){
         repository {
-            blobs(ref: "",paths: ".gitignore"){
+            blobs(first: 20,ref: $branch,paths:$path  ){
                 nodes {
-                    rawTextBlob
+                    id
+                    fileType
                     rawBlob
+                    rawTextBlob
+                    name
+
                 }
             }
         }
