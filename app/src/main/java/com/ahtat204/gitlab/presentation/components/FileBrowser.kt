@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
 
@@ -73,7 +74,8 @@ fun FileBrowser(
     repositoryViewModel: RepositoryViewModel,
     currentBranch: MutableState<String?>,
     projectPath: String,
-    repository: Repository
+    repository: Repository,
+    navController: NavController
 ) {
     Row(
         modifier = Modifier
@@ -142,7 +144,12 @@ fun FileBrowser(
             }
             it.blobs.nodes?.let { files ->
                 files.forEach { file ->
-                    TreeItemCard(file)
+                    TreeItemCard(
+                        item = file,
+                        project = projectPath,
+                        branch = currentBranch.value,
+                        navController = navController
+                    )
                 }
             }
         }

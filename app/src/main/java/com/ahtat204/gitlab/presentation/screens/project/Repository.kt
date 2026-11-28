@@ -148,7 +148,13 @@ fun RepositoryScreen(
                 Spacer(modifier = Modifier.height(30.dp))
 
                 if (!history.value) {
-                    FileBrowser(repositoryViewModel, currentBranch, projectPath, repository)
+                    FileBrowser(
+                        repositoryViewModel,
+                        currentBranch,
+                        projectPath,
+                        repository,
+                        navController
+                    )
                 }
                 if (history.value) {
                     currentBranch.value?.let {

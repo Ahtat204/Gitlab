@@ -20,6 +20,23 @@ jobs:
       - name: Create secrets file
         run: |
           echo "CLIENT_ID=20302211ABH62HY6" > $GITHUB_WORKSPACE/secrets.properties
+      - name: cache tree-sitter
+        uses: actions/cache@v4
+        id: cache-tree-sitter
+        with:
+          path: /home/runner/work/Gitlab/native-libs
+          key: ${{ runner.os }}-treeSitter-v1-${{ hashFiles('/home/runner/work/Gitlab/native-libs') }}
+          restore-keys: |
+            ${{ runner.os }}-treeSitter-
+      - name: create properties file
+        run: |
+          touch $GITHUB_WORKSPACE/local.properties
+          echo "treesitter.dir=/home/runner/work/Gitlab/native-libs" > local.properties
+      - name: clone tree-sitter
+        if: steps.cache-tree-sitter.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/tree-sitter/tree-sitter.git /home/runner/work/Gitlab/native-libs/tree-sitter
+          git clone https://github.com/tree-sitter/tree-sitter-json /home/runner/work/Gitlab/native-libs/tree-sitter-json
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Cache GraphQL Schema

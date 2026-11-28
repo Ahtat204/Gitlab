@@ -20,11 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.ahtat204.gitlab.R
 import com.ahtat204.gitlab.data.queries.GetProjectRepositoryQuery
 import com.ahtat204.gitlab.presentation.activities.ui.theme.Orange
 import com.ahtat204.gitlab.presentation.activities.ui.theme.customFontFamily
 import com.ahtat204.gitlab.presentation.viewmodels.project.repository.RepositoryViewModel
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 /**
  * Displays a repository tree item representing a file.
@@ -55,10 +58,18 @@ import com.ahtat204.gitlab.presentation.viewmodels.project.repository.Repository
  * ```
  */
 @Composable
-fun TreeItemCard(item: GetProjectRepositoryQuery.Node1?) {
+fun TreeItemCard(
+    project: String,
+    branch: String?,
+    item: GetProjectRepositoryQuery.Node1?,
+    navController: NavController
+) {
+    val encodedPath = URLEncoder.encode(item?.path, StandardCharsets.UTF_8.toString())
+
     item?.name?.let {
         Card(
-            {}, modifier = Modifier
+            { navController.navigate("file?projectId=$project/branch=$branch/path=$encodedPath") },
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp, 10.dp)
                 .background(Color.Black)
@@ -140,12 +151,12 @@ fun TreeItemCard(
     item: GetProjectRepositoryQuery.Node?,
     repositoryViewModel: RepositoryViewModel,
     path: String?,
-    name:String?,
+    name: String?,
     project: String,
     branch: String?,
-    addPath:()-> Unit,
+    addPath: () -> Unit,
 
-) {
+    ) {
     Card(
         onClick = {
             repositoryViewModel.loadProjectRepository(

@@ -4,6 +4,7 @@ import com.apollographql.apollo.annotations.ApolloExperimental
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -15,12 +16,16 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.secrets.gradle)
 }
-
+val localProps = Properties().apply {
+    load(File(rootProject.projectDir, "local.properties").inputStream())
+}
+val treesitterDir = localProps.getProperty("treesitter.dir")
 android {
     namespace = "com.ahtat204.gitlab"
     compileSdk = 35
 
     defaultConfig {
+        manifestPlaceholders += mapOf()
         applicationId = "com.ahtat204.gitlab"
         minSdk = 24
         targetSdk = 35
@@ -32,6 +37,15 @@ android {
         val formattedDate = dateFormat.format(Date())
         val fileName = "${rootProject.name}_v${versionName}_${versionCode}_${formattedDate}"
         setProperty("archivesBaseName", rootProject.name)
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
+        externalNativeBuild {
+            cmake {
+                cppFlags += ""
+                arguments += "-DTREESITTER_DIR=$treesitterDir"
+            }
+        }
     }
 
     buildTypes {
@@ -57,6 +71,12 @@ android {
     buildFeatures {
         buildConfig = true
         compose = true
+    }
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
 }
 

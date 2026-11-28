@@ -17,9 +17,13 @@ keystore
 app/release
 keystore_base64.txt
 explanation.txt
-**.txt
+branches.txt
+log.txt
+output.txt
+output22.txt
 reflog.sh
 test.json
+RetrofitEvents.txt
 Runtree.py
 .kotlin/
 app/test.json
@@ -43,3 +47,5 @@ docker.sh
 rev.sh
 rest.jsonbranches.txt explanation.txt keystore_base64.txt log.txt output22.txt output.txt RetrofitEvents.txt
 rest.json
+../gitignore
+app/build/

@@ -123,4 +123,16 @@ class LauncherActivity : ComponentActivity() {
         }
     }
 
+    companion object {
+        init {
+            try {
+                System.loadLibrary("ts_bridge")
+                android.util.Log.i("TS", "Library loaded OK")
+            } catch (e: UnsatisfiedLinkError) {
+                android.util.Log.e("TS", "Failed to load: ${e.message}")
+            }
+        }
+    }
+
+//// external fun parseJsonToSExp(sourceCode: String): String
 }
