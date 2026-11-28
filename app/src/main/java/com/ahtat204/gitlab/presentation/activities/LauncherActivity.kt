@@ -125,7 +125,7 @@ class LauncherActivity : ComponentActivity() {
 
     companion object {
         init {
-            System.loadLibrary("gitlab")
+            System.loadLibrary("ts_bridge")
         }
     }
 }

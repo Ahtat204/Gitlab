@@ -48,3 +48,4 @@ rev.sh
 rest.jsonbranches.txt explanation.txt keystore_base64.txt log.txt output22.txt output.txt RetrofitEvents.txt
 rest.json
 ../gitignore
+app/build/

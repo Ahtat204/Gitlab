@@ -30,7 +30,10 @@ add_library(ts_bridge SHARED
         "${TREESITTER_DIR}/tree-sitter/lib/src/lib.c"
         "${TREESITTER_DIR}/tree-sitter-json/src/parser.c"
 )
-
+target_link_options(ts_bridge PRIVATE
+        "-Wl,-z,max-page-size=16384"
+        "-Wl,-z,common-page-size=16384"
+)
 target_include_directories(ts_bridge PRIVATE
         "${TREESITTER_DIR}/tree-sitter/lib/include"
         "${TREESITTER_DIR}/tree-sitter/lib/src"
@@ -41,7 +44,7 @@ find_library(log-lib log)
 # Specifies libraries CMake should link to your target library. You
 # can link libraries from various origins, such as libraries defined in this
 # build script, prebuilt third-party libraries, or Android system libraries.
-target_link_libraries(${CMAKE_PROJECT_NAME}
+target_link_libraries(ts_bridge
         # List libraries link to the target library
         android
         log)

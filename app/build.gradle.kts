@@ -4,6 +4,7 @@ import com.apollographql.apollo.annotations.ApolloExperimental
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -15,7 +16,10 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.secrets.gradle)
 }
-
+val localProps = Properties().apply {
+    load(File(rootProject.projectDir, "local.properties").inputStream())
+}
+val treesitterDir = localProps.getProperty("treesitter.dir")
 android {
     namespace = "com.ahtat204.gitlab"
     compileSdk = 35
@@ -39,6 +43,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags += ""
+                arguments += "-DTREESITTER_DIR=$treesitterDir"
             }
         }
     }
