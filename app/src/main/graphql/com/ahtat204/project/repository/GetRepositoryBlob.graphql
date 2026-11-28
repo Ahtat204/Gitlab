@@ -12,6 +12,7 @@ query GetRepositoryBlobs($project:ID!,$branch:String,$path:[String!]!){
                     rawTextBlob
                     name
 
+
                 }
             }
         }
